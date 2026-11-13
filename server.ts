@@ -282,7 +282,7 @@ app.post('/api/monetization/check-access', (req, res) => {
     return res.json({ allowed: true, reason: 'Essential data access permitted.' });
   }
 
-  if (calc.canAccessFeatures) {
+  if (calc.canAccessFeatures || (feature === 'calculator' && calc.status === 'unregistered')) {
     return res.json({ allowed: true, status: calc.status });
   }
 

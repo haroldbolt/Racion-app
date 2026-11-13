@@ -523,9 +523,12 @@ export const TodayView: React.FC<TodayViewProps> = ({
               </span>
             </div>
             <p className="text-xs font-bold text-[#0B5D2E] tabular-nums">
-              Total diario: {formatRation(effectivePlan.gramsPerDay, units)} ({effectivePlan.mer} kcal)
+              {isEs ? 'Ración diaria' : 'Daily ration'}: {formatRation(effectivePlan.gramsPerDay, units)}
               {treatsGuidance.trainingGramsAllocatedToday > 0 &&
                 ` · ${treatsGuidance.trainingGramsAllocatedToday} g apartados para entrenamiento`}
+            </p>
+            <p className="text-xs text-[#44544A] tabular-nums">
+              {isEs ? 'Meta energética diaria (MER)' : 'Daily energy target (MER)'}: {effectivePlan.mer} kcal
             </p>
           </div>
         ) : isBarf ? (

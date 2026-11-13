@@ -518,6 +518,7 @@ export default function App() {
   };
 
   const isFeatureAccessBlocked = monetization ? (!monetization.canAccessFeatures && !userAccount.isLicensed) : false;
+  const isCalculatorBlocked = isFeatureAccessBlocked && monetization?.status !== 'unregistered';
   const isDark = userAccount.theme === 'dark';
 
   return (
@@ -636,7 +637,7 @@ export default function App() {
         )}
 
         {currentTab === 'calculate' && activePet && (
-          isFeatureAccessBlocked ? (
+          isCalculatorBlocked ? (
             <LockedFeatureNotice
               status={monetization?.status || 'canceled'}
               lang={userAccount.language}
