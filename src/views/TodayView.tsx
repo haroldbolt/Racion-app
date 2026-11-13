@@ -334,8 +334,8 @@ export const TodayView: React.FC<TodayViewProps> = ({
     } else {
       StorageService.addWeightRecord(record);
     }
-    const updatedPet: Pet = { ...pet, currentWeightKg: weightKg };
-    if (effectivePlan && !effectivePlan.isVetLocked) {
+    if (weightKg !== pet.currentWeightKg && effectivePlan && !effectivePlan.isVetLocked) {
+      const updatedPet: Pet = { ...pet, currentWeightKg: weightKg };
       const recalculated = recalculatePlanForPet(updatedPet, effectivePlan);
       persistPlanUpdate(recalculated);
     }

@@ -156,7 +156,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
     // AUTO-RECALCULATION LOGIC:
     // When a new weight is saved, calculate what the new ration would be.
     // If it differs, PROPOSE it to the user with confirm/dismiss modal! (Never change silently).
-    if (plan && plan.foodId) {
+    if (newRecord.weightKg !== pet.currentWeightKg && plan && plan.foodId) {
       const isOverweight = pet.bcs >= 7;
       const weightForCalc = isOverweight ? (pet.targetWeightKg || inputWeight * 0.9) : inputWeight;
       const newRer = calculateRER(weightForCalc);
