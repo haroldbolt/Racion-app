@@ -13,14 +13,12 @@ import { X, Check, Clock, Cookie, Scale, Utensils, AlertCircle } from 'lucide-re
 
 /* 1. CONFIGURAR HORARIOS */
 interface ScheduleConfigModalProps {
-  isOpen: boolean;
   onClose: () => void;
   plan: FeedingPlan;
   onSaveSchedule: (mealsPerDay: number, mealTimes: string[]) => void;
 }
 
 export const ScheduleConfigModal: React.FC<ScheduleConfigModalProps> = ({
-  isOpen,
   onClose,
   plan,
   onSaveSchedule,
@@ -30,15 +28,15 @@ export const ScheduleConfigModal: React.FC<ScheduleConfigModalProps> = ({
     plan.mealTimes && plan.mealTimes.length > 0 ? plan.mealTimes : ['08:00', '20:00']
   );
 
-  useEffect(() => {
-    if (!isOpen) return;
-    setMealsCount(plan.mealsPerDay || 2);
-    setTimes(plan.mealTimes && plan.mealTimes.length > 0 ? plan.mealTimes : ['08:00', '20:00']);
-  }, [isOpen, plan]);
-
-  if (!isOpen) return null;
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const mealTimes = new FormData(event.currentTarget).getAll('mealTime') as string[];
+    onSaveSchedule(mealsCount, mealTimes);
+    onClose();
+  };
 
   const handleCountChange = (count: number) => {
+    if (count === mealsCount) return;
     setMealsCount(count);
     if (count === 1) setTimes(['12:00']);
     if (count === 2) setTimes(['08:00', '20:00']);
@@ -48,7 +46,7 @@ export const ScheduleConfigModal: React.FC<ScheduleConfigModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4">
-      <div className="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-5 space-y-4 shadow-2xl border border-[#0B5D2E20]">
+      <form onSubmit={handleSubmit} className="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-5 space-y-4 shadow-2xl border border-[#0B5D2E20]">
         <div className="flex items-center justify-between border-b border-gray-100 pb-3">
           <div className="flex items-center gap-2">
             <Clock className="w-5 h-5 text-[#0B5D2E]" />
@@ -89,16 +87,14 @@ export const ScheduleConfigModal: React.FC<ScheduleConfigModalProps> = ({
 
         <div className="grid grid-cols-2 gap-2.5">
           {Array.from({ length: mealsCount }).map((_, idx) => (
-            <div key={idx} className="bg-[#F8FAF8] p-2.5 rounded-xl border border-gray-200 flex items-center gap-2">
+            <div key={`${mealsCount}-${idx}`} className="bg-[#F8FAF8] p-2.5 rounded-xl border border-gray-200 flex items-center gap-2">
               <span className="text-xs font-bold text-[#0B5D2E]">#{idx + 1}</span>
               <input
                 type="time"
-                value={times[idx] || '08:00'}
-                onChange={(e) => {
-                  const next = [...times];
-                  next[idx] = e.target.value;
-                  setTimes(next);
-                }}
+                name="mealTime"
+                aria-label={`Hora de la toma ${idx + 1}`}
+                defaultValue={times[idx] || '08:00'}
+                required
                 className="w-full bg-white px-2 py-1.5 rounded-lg border border-gray-200 text-xs font-bold text-[#1C2B21]"
               />
             </div>
@@ -106,17 +102,13 @@ export const ScheduleConfigModal: React.FC<ScheduleConfigModalProps> = ({
         </div>
 
         <button
-          type="button"
-          onClick={() => {
-            onSaveSchedule(mealsCount, times.slice(0, mealsCount));
-            onClose();
-          }}
+          type="submit"
           className="w-full min-h-[48px] bg-[#0B5D2E] text-white rounded-2xl font-heading font-extrabold text-sm flex items-center justify-center gap-2 hover:bg-[#094723] transition"
         >
           <Check className="w-4 h-4" />
           <span>Guardar horarios</span>
         </button>
-      </div>
+      </form>
     </div>
   );
 };

@@ -238,22 +238,19 @@ export const TodayView: React.FC<TodayViewProps> = ({
 
   const handleSaveSchedule = (mealsPerDay: number, mealTimes: string[]) => {
     if (!effectivePlan) return;
-    const basePlan: FeedingPlan = {
+    const mealCountChanged = mealsPerDay !== effectivePlan.mealsPerDay;
+    persistPlanUpdate({
       ...effectivePlan,
       mealsPerDay,
       mealTimes,
       scheduleConfigured: true,
-    };
-    const recalculated = effectivePlan.isVetLocked
-      ? {
-          ...basePlan,
-          gramsPerMeal:
-            basePlan.gramsPerDay > 0 ? Math.round(basePlan.gramsPerDay / mealsPerDay) : 0,
-          kcalPerMeal: Math.round((basePlan.mer || 0) / mealsPerDay),
-        }
-      : recalculatePlanForPet(pet, basePlan);
-
-    persistPlanUpdate(recalculated);
+      gramsPerMeal: mealCountChanged
+        ? Math.round(effectivePlan.gramsPerDay / mealsPerDay)
+        : effectivePlan.gramsPerMeal,
+      kcalPerMeal: mealCountChanged
+        ? Math.round(effectivePlan.kcalPerMeal * effectivePlan.mealsPerDay / mealsPerDay)
+        : effectivePlan.kcalPerMeal,
+    });
     showToast(`Horarios actualizados (${mealsPerDay} comidas al día).`);
   };
 
@@ -1314,12 +1311,14 @@ export const TodayView: React.FC<TodayViewProps> = ({
         lang={userAccount.language}
       />
 
-      <ScheduleConfigModal
-        isOpen={showScheduleModal}
-        onClose={() => setShowScheduleModal(false)}
-        plan={effectivePlan}
-        onSaveSchedule={handleSaveSchedule}
-      />
+      {showScheduleModal && (
+        <ScheduleConfigModal
+          key={effectivePlan.petId}
+          onClose={() => setShowScheduleModal(false)}
+          plan={effectivePlan}
+          onSaveSchedule={handleSaveSchedule}
+        />
+      )}
 
       <ProfileRefinementModal
         isOpen={showRefineModal}
