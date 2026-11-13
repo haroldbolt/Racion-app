@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es" class="notranslate" translate="no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="google" content="notranslate" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <script>
+      // Defensively guard DOM methods against Google Translate and browser extension mutations causing React reconciliation failures
+      (function() {
+        if (typeof Node === 'function' && Node.prototype) {
+          var origRemoveChild = Node.prototype.removeChild;
+          Node.prototype.removeChild = function(child) {
+            if (child.parentNode !== this) {
+              if (console && console.warn) {
+                console.warn('Suppressed removeChild on detached node:', child);
+              }
+              return child;
+            }
+            return origRemoveChild.apply(this, arguments);
+          };
+
+          var origInsertBefore = Node.prototype.insertBefore;
+          Node.prototype.insertBefore = function(newNode, referenceNode) {
+            if (referenceNode && referenceNode.parentNode !== this) {
+              if (console && console.warn) {
+                console.warn('Suppressed insertBefore with mismatched referenceNode:', referenceNode);
+              }
+              return this.appendChild(newNode);
+            }
+            return origInsertBefore.apply(this, arguments);
+          };
+        }
+      })();
+
+      // Per environment constraints: HMR is disabled; ignore WebSocket errors.
+      (function() {
+        var origConsoleError = console.error;
+        console.error = function() {
+          var text = '';
+          for (var i = 0; i < arguments.length; i++) {
+            var arg = arguments[i];
+            if (arg instanceof Error) {
+              text += ' ' + arg.message + ' ' + (arg.stack || '');
+            } else if (typeof arg === 'object' && arg !== null) {
+              try { text += ' ' + JSON.stringify(arg); } catch(e) { text += ' ' + String(arg); }
+            } else {
+              text += ' ' + String(arg);
+            }
+          }
+          if (
+            text.includes('[vite]') ||
+            text.includes('WebSocket') ||
+            text.includes('vite-hmr') ||
+            text.includes('closed without opened')
+          ) {
+            return;
+          }
+          return origConsoleError.apply(console, arguments);
+        };
+
+        var origConsoleWarn = console.warn;
+        console.warn = function() {
+          var text = '';
+          for (var i = 0; i < arguments.length; i++) {
+            var arg = arguments[i];
+            text += ' ' + (arg && arg.message ? arg.message : String(arg));
+          }
+          if (text.includes('[vite]') || text.includes('WebSocket') || text.includes('vite-hmr')) {
+            return;
+          }
+          return origConsoleWarn.apply(console, arguments);
+        };
+
+        var NativeWebSocket = window.WebSocket;
+        if (NativeWebSocket) {
+          window.WebSocket = function(url, protocols) {
+            var isVite = protocols === 'vite-hmr' || (typeof url === 'string' && (url.includes('vite') || url.includes(':3000')));
+            if (isVite) {
+              var listeners = {};
+              var mockWs = {
+                readyState: 1,
+                url: url,
+                protocol: 'vite-hmr',
+                send: function() {},
+                close: function() {
+                  mockWs.readyState = 3;
+                },
+                addEventListener: function(event, cb) {
+                  listeners[event] = listeners[event] || [];
+                  listeners[event].push(cb);
+                },
+                removeEventListener: function(event, cb) {
+                  if (!listeners[event]) return;
+                  listeners[event] = listeners[event].filter(function(fn) { return fn !== cb; });
+                },
+                dispatchEvent: function(evt) {
+                  var list = listeners[evt.type] || [];
+                  for (var j = 0; j < list.length; j++) {
+                    try { list[j].call(mockWs, evt); } catch(e) {}
+                  }
+                  return true;
+                }
+              };
+              setTimeout(function() {
+                mockWs.dispatchEvent({ type: 'open' });
+              }, 10);
+              return mockWs;
+            }
+            return new NativeWebSocket(url, protocols);
+          };
+          window.WebSocket.prototype = NativeWebSocket.prototype;
+          window.WebSocket.CONNECTING = NativeWebSocket.CONNECTING || 0;
+          window.WebSocket.OPEN = NativeWebSocket.OPEN || 1;
+          window.WebSocket.CLOSING = NativeWebSocket.CLOSING || 2;
+          window.WebSocket.CLOSED = NativeWebSocket.CLOSED || 3;
+        }
+
+        window.addEventListener('error', function(event) {
+          var msg = event.message || (event.error && event.error.message) || '';
+          if (msg.includes('WebSocket') || msg.includes('[vite]') || msg.includes('closed without opened')) {
+            event.stopImmediatePropagation();
+            event.preventDefault();
+          }
+        }, true);
+
+        window.addEventListener('unhandledrejection', function(event) {
+          var reason = event.reason;
+          var msg = reason ? (reason.message || String(reason)) : '';
+          if (msg.includes('WebSocket') || msg.includes('[vite]') || msg.includes('closed without opened')) {
+            event.stopImmediatePropagation();
+            event.preventDefault();
+          }
+        }, true);
+      })();
+    </script>
+    <title>Ración App</title>
+    <meta name="description" content="La ración exacta de cualquier alimento, para cualquier perro o gato, con seguimiento hasta su peso ideal." />
+    <meta property="og:title" content="Ración App" />
+    <meta property="og:description" content="La ración exacta de cualquier alimento, para cualquier perro o gato, con seguimiento hasta su peso ideal." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/assets/aistudio/Racio_n_App__Nutricio_n_con_carin_o_8fb59a2d.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0B5D2E" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Ración App" />
+    <link rel="apple-touch-icon" href="/assets/aistudio/Racio_n_App__Nutricio_n_con_carin_o_8fb59a2d.png" />
+    <link rel="icon" type="image/png" href="/assets/aistudio/Racio_n_App__Nutricio_n_con_carin_o_8fb59a2d.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  </head>
+  <body class="bg-[#EAF4EC] text-[#1C2B21] font-['Nunito',sans-serif] antialiased selection:bg-[#0B5D2E] selection:text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

@@ -1,0 +1,836 @@
+{
+  "txt_entries_total": 960,
+  "matched_dog_products": 960,
+  "resumen_lotes": {
+    "alimentos_activos_perro": 863,
+    "snacks_activos_perro": 91,
+    "productos_archivados_perro": 6,
+    "casas_comerciales_perro": 82,
+    "fichas_verificadas": 151,
+    "fichas_revision_requerida": 16,
+    "fichas_pendientes": 793,
+    "fecha_actualizacion": "2026-11-12"
+  },
+  "casas_comerciales": {
+    "Nutra-Nuggets": {
+      "total": 5,
+      "activos": 5,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 5,
+      "con_foto": 5
+    },
+    "Chunky": {
+      "total": 31,
+      "activos": 23,
+      "snacks": 8,
+      "archivados": 0,
+      "verificados": 6,
+      "revision_requerida": 4,
+      "pendientes": 21,
+      "con_foto": 31
+    },
+    "Agility Gold": {
+      "total": 13,
+      "activos": 13,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 8,
+      "revision_requerida": 0,
+      "pendientes": 5,
+      "con_foto": 13
+    },
+    "Monello": {
+      "total": 11,
+      "activos": 10,
+      "snacks": 0,
+      "archivados": 1,
+      "verificados": 3,
+      "revision_requerida": 1,
+      "pendientes": 7,
+      "con_foto": 10
+    },
+    "Diamond Naturals": {
+      "total": 22,
+      "activos": 22,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 2,
+      "revision_requerida": 0,
+      "pendientes": 20,
+      "con_foto": 22
+    },
+    "Max": {
+      "total": 6,
+      "activos": 6,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 1,
+      "revision_requerida": 1,
+      "pendientes": 4,
+      "con_foto": 6
+    },
+    "Taste Of The Wild": {
+      "total": 25,
+      "activos": 25,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 2,
+      "revision_requerida": 0,
+      "pendientes": 23,
+      "con_foto": 25
+    },
+    "BR for Dog": {
+      "total": 30,
+      "activos": 20,
+      "snacks": 10,
+      "archivados": 0,
+      "verificados": 10,
+      "revision_requerida": 0,
+      "pendientes": 20,
+      "con_foto": 30
+    },
+    "Pro Plan": {
+      "total": 34,
+      "activos": 34,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 2,
+      "pendientes": 32,
+      "con_foto": 34
+    },
+    "Alpo": {
+      "total": 2,
+      "activos": 2,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 2,
+      "con_foto": 2
+    },
+    "Vet Life": {
+      "total": 15,
+      "activos": 15,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 5,
+      "revision_requerida": 0,
+      "pendientes": 10,
+      "con_foto": 15
+    },
+    "Bonnat": {
+      "total": 8,
+      "activos": 8,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 8,
+      "con_foto": 8
+    },
+    "Ringo": {
+      "total": 8,
+      "activos": 7,
+      "snacks": 1,
+      "archivados": 0,
+      "verificados": 6,
+      "revision_requerida": 1,
+      "pendientes": 1,
+      "con_foto": 8
+    },
+    "Royal Canin": {
+      "total": 128,
+      "activos": 128,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 13,
+      "revision_requerida": 1,
+      "pendientes": 114,
+      "con_foto": 128
+    },
+    "Dog Chow": {
+      "total": 27,
+      "activos": 27,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 2,
+      "revision_requerida": 0,
+      "pendientes": 25,
+      "con_foto": 27
+    },
+    "Dogourmet": {
+      "total": 6,
+      "activos": 6,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 6,
+      "pendientes": 0,
+      "con_foto": 6
+    },
+    "Equilibrio": {
+      "total": 14,
+      "activos": 14,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 6,
+      "revision_requerida": 0,
+      "pendientes": 8,
+      "con_foto": 14
+    },
+    "Evolve": {
+      "total": 15,
+      "activos": 15,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 5,
+      "revision_requerida": 0,
+      "pendientes": 10,
+      "con_foto": 15
+    },
+    "Excellent": {
+      "total": 6,
+      "activos": 6,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 6,
+      "con_foto": 6
+    },
+    "Grandvita": {
+      "total": 3,
+      "activos": 3,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 3,
+      "con_foto": 3
+    },
+    "Hills": {
+      "total": 74,
+      "activos": 74,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 8,
+      "revision_requerida": 0,
+      "pendientes": 66,
+      "con_foto": 74
+    },
+    "N&D": {
+      "total": 27,
+      "activos": 27,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 2,
+      "revision_requerida": 0,
+      "pendientes": 25,
+      "con_foto": 27
+    },
+    "Nutriss": {
+      "total": 8,
+      "activos": 8,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 8,
+      "con_foto": 8
+    },
+    "Max Vita": {
+      "total": 5,
+      "activos": 0,
+      "snacks": 0,
+      "archivados": 5,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 5,
+      "con_foto": 5
+    },
+    "Acana": {
+      "total": 33,
+      "activos": 33,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 3,
+      "revision_requerida": 0,
+      "pendientes": 30,
+      "con_foto": 33
+    },
+    "Orijen": {
+      "total": 14,
+      "activos": 14,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 6,
+      "revision_requerida": 0,
+      "pendientes": 8,
+      "con_foto": 14
+    },
+    "Pixie": {
+      "total": 34,
+      "activos": 27,
+      "snacks": 7,
+      "archivados": 0,
+      "verificados": 1,
+      "revision_requerida": 0,
+      "pendientes": 33,
+      "con_foto": 34
+    },
+    "Whole Barf": {
+      "total": 10,
+      "activos": 10,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 10,
+      "revision_requerida": 0,
+      "pendientes": 0,
+      "con_foto": 10
+    },
+    "Grand Vita Equilibrio": {
+      "total": 9,
+      "activos": 9,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 9,
+      "con_foto": 9
+    },
+    "Fancy Feast": {
+      "total": 2,
+      "activos": 2,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 2,
+      "con_foto": 2
+    },
+    "Disugual": {
+      "total": 4,
+      "activos": 4,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 4,
+      "con_foto": 4
+    },
+    "Morando": {
+      "total": 7,
+      "activos": 7,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 7,
+      "con_foto": 7
+    },
+    "Naturo": {
+      "total": 13,
+      "activos": 13,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 13,
+      "con_foto": 13
+    },
+    "Tiki-Dog": {
+      "total": 4,
+      "activos": 4,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 4,
+      "con_foto": 4
+    },
+    "Dr. Clauders": {
+      "total": 13,
+      "activos": 9,
+      "snacks": 4,
+      "archivados": 0,
+      "verificados": 4,
+      "revision_requerida": 0,
+      "pendientes": 9,
+      "con_foto": 13
+    },
+    "Gemon": {
+      "total": 3,
+      "activos": 3,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 3,
+      "con_foto": 3
+    },
+    "Monge": {
+      "total": 9,
+      "activos": 9,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 9,
+      "con_foto": 9
+    },
+    "Purina One": {
+      "total": 4,
+      "activos": 4,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 4,
+      "con_foto": 4
+    },
+    "Pedigree": {
+      "total": 10,
+      "activos": 10,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 10,
+      "con_foto": 10
+    },
+    "Wow Can": {
+      "total": 28,
+      "activos": 28,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 2,
+      "revision_requerida": 0,
+      "pendientes": 26,
+      "con_foto": 28
+    },
+    "happyBARF": {
+      "total": 3,
+      "activos": 3,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 3,
+      "revision_requerida": 0,
+      "pendientes": 0,
+      "con_foto": 3
+    },
+    "Tommy": {
+      "total": 16,
+      "activos": 11,
+      "snacks": 5,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 16,
+      "con_foto": 16
+    },
+    "Little Big Paw": {
+      "total": 1,
+      "activos": 1,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 1,
+      "con_foto": 1
+    },
+    "Optimum": {
+      "total": 1,
+      "activos": 1,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 1,
+      "con_foto": 1
+    },
+    "Dingo": {
+      "total": 4,
+      "activos": 4,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 4,
+      "con_foto": 4
+    },
+    "Nutrecan": {
+      "total": 7,
+      "activos": 7,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 2,
+      "revision_requerida": 0,
+      "pendientes": 5,
+      "con_foto": 7
+    },
+    "Hpm": {
+      "total": 6,
+      "activos": 6,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 2,
+      "revision_requerida": 0,
+      "pendientes": 4,
+      "con_foto": 6
+    },
+    "Fórmula Natural": {
+      "total": 10,
+      "activos": 10,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 1,
+      "revision_requerida": 0,
+      "pendientes": 9,
+      "con_foto": 10
+    },
+    "Canito": {
+      "total": 2,
+      "activos": 2,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 2,
+      "con_foto": 2
+    },
+    "Filpo": {
+      "total": 2,
+      "activos": 2,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 2,
+      "con_foto": 2
+    },
+    "Ronik": {
+      "total": 7,
+      "activos": 7,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 7,
+      "con_foto": 7
+    },
+    "Sieger": {
+      "total": 15,
+      "activos": 15,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 7,
+      "revision_requerida": 0,
+      "pendientes": 8,
+      "con_foto": 15
+    },
+    "Vivance": {
+      "total": 2,
+      "activos": 2,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 2,
+      "con_foto": 2
+    },
+    "Mungos": {
+      "total": 7,
+      "activos": 0,
+      "snacks": 7,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 7,
+      "con_foto": 7
+    },
+    "Achiras": {
+      "total": 1,
+      "activos": 0,
+      "snacks": 1,
+      "archivados": 0,
+      "verificados": 1,
+      "revision_requerida": 0,
+      "pendientes": 0,
+      "con_foto": 1
+    },
+    "Quinoa": {
+      "total": 2,
+      "activos": 0,
+      "snacks": 2,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 2,
+      "con_foto": 2
+    },
+    "Vita Crunch": {
+      "total": 6,
+      "activos": 0,
+      "snacks": 6,
+      "archivados": 0,
+      "verificados": 6,
+      "revision_requerida": 0,
+      "pendientes": 0,
+      "con_foto": 6
+    },
+    "Nupec": {
+      "total": 17,
+      "activos": 17,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 9,
+      "revision_requerida": 0,
+      "pendientes": 8,
+      "con_foto": 17
+    },
+    "Bravery": {
+      "total": 22,
+      "activos": 22,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 3,
+      "revision_requerida": 0,
+      "pendientes": 19,
+      "con_foto": 22
+    },
+    "Performance": {
+      "total": 1,
+      "activos": 0,
+      "snacks": 1,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 1,
+      "con_foto": 1
+    },
+    "Animal Lovers": {
+      "total": 8,
+      "activos": 0,
+      "snacks": 8,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 8,
+      "con_foto": 8
+    },
+    "BR Bones": {
+      "total": 1,
+      "activos": 0,
+      "snacks": 1,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 1,
+      "con_foto": 1
+    },
+    "Pop’n Bites": {
+      "total": 4,
+      "activos": 0,
+      "snacks": 4,
+      "archivados": 0,
+      "verificados": 4,
+      "revision_requerida": 0,
+      "pendientes": 0,
+      "con_foto": 4
+    },
+    "Premio": {
+      "total": 14,
+      "activos": 0,
+      "snacks": 14,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 14,
+      "con_foto": 14
+    },
+    "Treatys": {
+      "total": 6,
+      "activos": 0,
+      "snacks": 6,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 6,
+      "con_foto": 6
+    },
+    "Artù": {
+      "total": 4,
+      "activos": 4,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 4,
+      "con_foto": 4
+    },
+    "HPM": {
+      "total": 11,
+      "activos": 11,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 11,
+      "con_foto": 11
+    },
+    "Fawna": {
+      "total": 6,
+      "activos": 6,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 1,
+      "revision_requerida": 0,
+      "pendientes": 5,
+      "con_foto": 6
+    },
+    "Nulo": {
+      "total": 12,
+      "activos": 6,
+      "snacks": 6,
+      "archivados": 0,
+      "verificados": 3,
+      "revision_requerida": 0,
+      "pendientes": 9,
+      "con_foto": 12
+    },
+    "Diamond": {
+      "total": 6,
+      "activos": 6,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 6,
+      "con_foto": 6
+    },
+    "Diamond Care": {
+      "total": 4,
+      "activos": 4,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 4,
+      "con_foto": 4
+    },
+    "Diamond Pro89": {
+      "total": 1,
+      "activos": 1,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 1,
+      "con_foto": 1
+    },
+    "Manjar": {
+      "total": 1,
+      "activos": 1,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 1,
+      "con_foto": 1
+    },
+    "Plaisir": {
+      "total": 2,
+      "activos": 2,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 2,
+      "con_foto": 2
+    },
+    "Guaumor": {
+      "total": 4,
+      "activos": 4,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 4,
+      "con_foto": 4
+    },
+    "Guabi Natural": {
+      "total": 5,
+      "activos": 5,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 2,
+      "revision_requerida": 0,
+      "pendientes": 3,
+      "con_foto": 5
+    },
+    "Dogo": {
+      "total": 3,
+      "activos": 3,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 3,
+      "con_foto": 3
+    },
+    "Holliday": {
+      "total": 5,
+      "activos": 5,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 5,
+      "con_foto": 5
+    },
+    "Prestige": {
+      "total": 3,
+      "activos": 3,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 3,
+      "con_foto": 3
+    },
+    "Birbo": {
+      "total": 4,
+      "activos": 4,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 2,
+      "revision_requerida": 0,
+      "pendientes": 2,
+      "con_foto": 4
+    },
+    "Country Value": {
+      "total": 2,
+      "activos": 2,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 2,
+      "con_foto": 2
+    },
+    "Donkan": {
+      "total": 2,
+      "activos": 2,
+      "snacks": 0,
+      "archivados": 0,
+      "verificados": 0,
+      "revision_requerida": 0,
+      "pendientes": 2,
+      "con_foto": 2
+    }
+  }
+}

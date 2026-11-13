@@ -1,0 +1,236 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --brand-green: #0B5D2E;
+    --brand-orange: #F57C1A;
+    --brand-mist: #EAF4EC;
+    --brand-ink: #1C2B21;
+    --brand-secondary: #44544A;
+    --status-good: #1E8A49;
+    --status-warning: #D97706;
+    --status-alert: #C0392B;
+    --bg-page: #EAF4EC;
+    --surface-card: #FFFFFF;
+    --surface-subtle: #F8FAF8;
+    --surface-inner: #EAF4EC;
+    --text-primary: #1C2B21;
+    --text-secondary: #44544A;
+    --border-color: rgba(11, 93, 46, 0.15);
+  }
+
+  html.dark, :root[data-theme="dark"] {
+    --brand-green: #1E8A49;
+    --brand-orange: #F57C1A;
+    --brand-mist: #15221B;
+    --brand-ink: #EAF4EC;
+    --brand-secondary: #9DB0A3;
+    --status-good: #27AE60;
+    --status-warning: #F59E0B;
+    --status-alert: #EF4444;
+    --bg-page: #0D1510;
+    --surface-card: #142018;
+    --surface-subtle: #19281F;
+    --surface-inner: #1C2E23;
+    --text-primary: #EAF4EC;
+    --text-secondary: #9DB0A3;
+    --border-color: rgba(30, 138, 73, 0.25);
+  }
+
+  body {
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    font-size: 16px;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+}
+
+.font-heading {
+  font-family: 'Baloo 2', 'Nunito', cursive, sans-serif;
+}
+
+/* Custom rounded animations & scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-page);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(30, 138, 73, 0.3);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(30, 138, 73, 0.6);
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2.5s infinite ease-in-out;
+}
+
+/* =========================================================
+   DARK MODE OVERRIDES (Keeps Brand Green #0B5D2E / #1E8A49 as Accent)
+   ========================================================= */
+
+.dark {
+  color-scheme: dark;
+}
+
+/* Dark mode surfaces & text */
+.dark body {
+  background-color: #0D1510 !important;
+  color: #EAF4EC !important;
+}
+
+.dark .bg-\[\#EAF4EC\] {
+  background-color: #0D1510 !important;
+}
+
+.dark .bg-white {
+  background-color: #142018 !important;
+  color: #EAF4EC;
+}
+
+.dark .bg-white\/95 {
+  background-color: rgba(20, 32, 24, 0.95) !important;
+}
+
+.dark .bg-white\/90 {
+  background-color: rgba(20, 32, 24, 0.90) !important;
+}
+
+.dark .bg-white\/80 {
+  background-color: rgba(20, 32, 24, 0.80) !important;
+}
+
+.dark .bg-\[\#F8FAF8\] {
+  background-color: #19281F !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: #19281F !important;
+  color: #EAF4EC !important;
+}
+
+.dark .bg-gray-100 {
+  background-color: #1F3227 !important;
+}
+
+/* Text adaptations in dark mode */
+.dark .text-\[\#1C2B21\] {
+  color: #EAF4EC !important;
+}
+
+.dark .text-\[\#44544A\] {
+  color: #9DB0A3 !important;
+}
+
+.dark .text-gray-900,
+.dark .text-gray-800,
+.dark .text-gray-700 {
+  color: #EAF4EC !important;
+}
+
+.dark .text-gray-600,
+.dark .text-gray-500 {
+  color: #9DB0A3 !important;
+}
+
+/* Borders in dark mode */
+.dark .border-gray-100,
+.dark .border-gray-200 {
+  border-color: rgba(30, 138, 73, 0.22) !important;
+}
+
+.dark .border-\[\#0B5D2E15\],
+.dark .border-\[\#0B5D2E18\],
+.dark .border-\[\#0B5D2E20\],
+.dark .border-\[\#0B5D2E30\] {
+  border-color: rgba(30, 138, 73, 0.3) !important;
+}
+
+/* Brand green surfaces in dark mode - keeps accent prominent */
+.dark .bg-\[\#EAF4EC\]:not(body):not(main):not(.min-h-screen) {
+  background-color: #1A2C21 !important;
+}
+
+/* Brand green text highlights in dark mode */
+.dark .text-\[\#0B5D2E\] {
+  color: #27AE60 !important;
+}
+
+.dark .hover\:text-\[\#0B5D2E\]:hover {
+  color: #27AE60 !important;
+}
+
+/* Inputs & Form controls in dark mode */
+.dark input[type="text"],
+.dark input[type="number"],
+.dark input[type="date"],
+.dark input[type="tel"],
+.dark select,
+.dark textarea {
+  background-color: #19281F !important;
+  color: #EAF4EC !important;
+  border-color: rgba(30, 138, 73, 0.35) !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #6C8474 !important;
+}
+
+/* Modals & Overlays */
+.dark .bg-black\/60 {
+  background-color: rgba(0, 0, 0, 0.75) !important;
+}
+
+/* Preserve Brand Buttons as Vibrant Accents */
+.dark .bg-\[\#0B5D2E\] {
+  background-color: #1E8A49 !important;
+}
+
+.dark .bg-\[\#0B5D2E\]:hover {
+  background-color: #16773B !important;
+}
+
+.dark .bg-\[\#F57C1A\] {
+  background-color: #F57C1A !important;
+}
+
+.dark .bg-\[\#F57C1A\]:hover {
+  background-color: #E06D12 !important;
+}
+
+/* Ring offsets and center button rings in dark mode */
+.dark .ring-\[\#EAF4EC\] {
+  --tw-ring-color: #0D1510 !important;
+}
+
+.dark .ring-offset-1 {
+  --tw-ring-offset-color: #142018 !important;
+}
+
+/* Warning and Alert banners in dark mode */
+.dark .bg-\[\#FFF7ED\] {
+  background-color: #2D1E10 !important;
+  color: #FED7AA !important;
+}
+
+.dark .bg-\[\#FEF2F2\] {
+  background-color: #2B1515 !important;
+  color: #FCA5A5 !important;
+}
+
+.dark .bg-\[\#FFFBEB\] {
+  background-color: #2C2210 !important;
+  color: #FDE68A !important;
+}

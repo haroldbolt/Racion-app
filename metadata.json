@@ -1,0 +1,6 @@
+{
+  "name": "Ración App",
+  "description": "La ración exacta de cualquier alimento, para cualquier perro o gato, con seguimiento hasta su peso ideal.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
