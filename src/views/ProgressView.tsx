@@ -39,6 +39,7 @@ import {
   Eye,
 } from 'lucide-react';
 import { BCSSelector, BCS_PHOTOS } from '../components/BCSSelector';
+import { WeightHistory } from '../components/WeightHistory';
 
 interface ProgressViewProps {
   pet: Pet;
@@ -1285,44 +1286,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
             </div>
           </div>
 
-          {/* Historical Weighing List */}
-          <div className="bg-white rounded-3xl p-5 border border-[#0B5D2E20] shadow-sm space-y-3">
-            <h3 className="font-heading font-extrabold text-base text-[#1C2B21]">
-              {isEs ? 'Historial de pesajes' : 'Weighing history'}
-            </h3>
-
-            <div className="space-y-2">
-              {sortedWeights.slice().reverse().map((rec) => (
-                <div
-                  key={rec.id}
-                  className="flex items-center justify-between p-3 rounded-xl bg-[#EAF4EC]/60 border border-[#0B5D2E15]"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-white text-[#0B5D2E] flex items-center justify-center font-bold text-xs border border-[#0B5D2E20]">
-                      <Scale className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="font-heading font-extrabold text-sm text-[#1C2B21]">
-                        {formatWeight(rec.weightKg, units)}
-                        {rec.waistCm && (
-                          <span className="text-xs text-[#44544A] ml-2 font-normal">
-                            (Cintura: {rec.waistCm} cm)
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-[11px] text-[#44544A]">{rec.date}</span>
-                    </div>
-                  </div>
-
-                  {rec.notes && (
-                    <span className="text-xs text-[#0B5D2E] font-semibold max-w-[140px] truncate text-right">
-                      {rec.notes}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
+          <WeightHistory pet={pet} records={weightRecords} account={userAccount} />
 
           {/* WSAVA Photographic Body Condition Reference Card */}
           <div className="bg-white rounded-3xl p-5 border border-[#0B5D2E20] shadow-sm space-y-4">

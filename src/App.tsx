@@ -15,6 +15,7 @@ import { PaymentView } from './views/PaymentView';
 import { AuthModal } from './components/AuthModal';
 import { TrialCountdownBanner } from './components/TrialCountdownBanner';
 import { LockedFeatureNotice } from './components/LockedFeatureNotice';
+import { WeightHistory } from './components/WeightHistory';
 import { CloudSqlService } from './services/cloudSqlService.ts';
 import { useAuth } from './contexts/AuthContext.tsx';
 import { OfflineSyncIndicator } from './components/OfflineSyncIndicator';
@@ -657,12 +658,17 @@ export default function App() {
 
         {currentTab === 'progress' && activePet && (
           isFeatureAccessBlocked ? (
-            <LockedFeatureNotice
-              status={monetization?.status || 'canceled'}
-              lang={userAccount.language}
-              onOpenPayment={() => setShowPaymentModal(true)}
-              onOpenSettings={() => setCurrentTab('more')}
-            />
+            <>
+              <div className="px-4 pt-4">
+                <WeightHistory pet={activePet} records={weightRecords} account={userAccount} />
+              </div>
+              <LockedFeatureNotice
+                status={monetization?.status || 'canceled'}
+                lang={userAccount.language}
+                onOpenPayment={() => setShowPaymentModal(true)}
+                onOpenSettings={() => setCurrentTab('more')}
+              />
+            </>
           ) : (
             <ProgressView
               pet={activePet}
