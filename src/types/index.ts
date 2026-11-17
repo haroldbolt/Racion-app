@@ -215,8 +215,13 @@ export interface FeedingPlan {
   mealTimes: string[];
   rer: number;
   factor: number;
+  goal?: Goal;
   mer: number; // total kcal/day
+  foodMerKcal?: number; // daily kcal from meals, excluding reserved treats
+  treatsKcal?: number; // daily kcal entered when calculating, before the budget cap
   gramsPerDay: number;
+  dryGramsPerDay?: number;
+  wetGramsPerDay?: number;
   gramsPerMeal: number;
   kcalPerMeal: number;
   cupsPerDay?: number;

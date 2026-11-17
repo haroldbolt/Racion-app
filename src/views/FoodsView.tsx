@@ -4,14 +4,13 @@ import {
   FoodItem,
   UserAccount,
   FeedingPlan,
-  NutritionDatasheet,
   NutrientValue,
   NutrientQualifier,
 } from '../types';
 import { PET_FOODS_DATABASE } from '../data/foods';
 import { TOXIC_FOODS } from '../data/toxicFoods';
 import { StorageService } from '../utils/storage';
-import { formatRation, formatCOP } from '../utils/i18n';
+import { formatRation } from '../utils/i18n';
 import { FoodCostTracker } from '../components/FoodCostTracker';
 import { UnifiedFoodSearchModal } from '../components/UnifiedFoodSearchModal';
 import {
@@ -23,10 +22,7 @@ import { calculateFoodPortionNutrients } from '../utils/mealNutrition';
 import {
   Scale,
   Search,
-  Barcode,
-  Camera,
   Layers,
-  Sparkles,
   Check,
   Plus,
   X,
@@ -34,18 +30,8 @@ import {
   ArrowRight,
   Award,
   DollarSign,
-  ShoppingBag,
-  Globe,
-  Loader2,
   ExternalLink,
-  Calendar,
-  AlertCircle,
 } from 'lucide-react';
-import { PriceComparatorView } from '../components/PriceComparatorView';
-import { CitySelectorBar } from '../components/CitySelectorBar';
-import { PriceHistoryChart } from '../components/PriceHistoryChart';
-import { SmartReorderCard } from '../components/SmartReorderCard';
-import { useCity } from '../contexts/CityContext.tsx';
 
 function formatQualifierBadge(q?: NutrientQualifier): string {
   if (q === 'minimo') return 'Mín.';
@@ -86,29 +72,7 @@ function resolveNutrientFromFood(
   };
 }
 
-function mergeFichaIntoFoodItem(food: FoodItem, ficha: NutritionDatasheet): FoodItem {
-  const kcal = ficha.kcalPerKg?.valor && ficha.kcalPerKg.valor > 0 ? ficha.kcalPerKg.valor : food.kcalPerKg;
-  const prot = ficha.proteina?.valor && ficha.proteina.valor > 0 ? ficha.proteina.valor : food.proteinPct;
-  const fat = ficha.grasa?.valor && ficha.grasa.valor > 0 ? ficha.grasa.valor : food.fatPct;
-  const fiber = ficha.fibra?.valor && ficha.fibra.valor > 0 ? ficha.fibra.valor : food.fiberPct;
-  const moist = ficha.humedad?.valor && ficha.humedad.valor > 0 ? ficha.humedad.valor : food.moisturePct;
-  const ash = ficha.cenizas?.valor && ficha.cenizas.valor > 0 ? ficha.cenizas.valor : food.ashPct;
-  const carbs = ficha.carbohidratos?.valor && ficha.carbohidratos.valor > 0 ? ficha.carbohidratos.valor : food.carbsPct;
-
-  return {
-    ...food,
-    kcalPerKg: kcal,
-    proteinPct: prot,
-    fatPct: fat,
-    fiberPct: fiber,
-    moisturePct: moist,
-    ashPct: ash,
-    carbsPct: carbs,
-    labelStatus: kcal > 400 ? 'verified_manufacturer' : food.labelStatus,
-    dataSource: ficha.fuenteNombre || ficha.fuenteUrl || food.dataSource,
-    fichaNutricional: ficha,
-  };
-}
+type FoodsSubTab = 'compare' | 'costs' | 'search' | 'toxic' | 'rubric';
 
 interface FoodsViewProps {
   pet: Pet;
@@ -122,29 +86,24 @@ interface FoodsViewProps {
   onSelectFoodForPet: (food: FoodItem) => void;
   onPlanUpdate?: (updatedPlan: Partial<FeedingPlan>) => void;
   onClose?: () => void;
-  initialSubTab?: 'compare' | 'prices' | 'costs' | 'search' | 'scan' | 'toxic' | 'rubric';
+  initialSubTab?: FoodsSubTab;
 }
 
 export const FoodsView: React.FC<FoodsViewProps> = ({
   pet,
   pets = [],
-  onSelectPet,
-  onAddNewPet,
   plans = {},
   merTargetKcal,
   userAccount,
   plan,
   onSelectFoodForPet,
   onPlanUpdate,
-  initialSubTab = 'prices',
+  initialSubTab = 'compare',
 }) => {
   const isEs = userAccount.language === 'es';
   const units = userAccount.units;
-  const { selectedCity } = useCity();
 
-  // Active SubTab (defaults to 'prices' for redesigned price comparator)
-  const [activeSubTab, setActiveSubTab] = useState<'compare' | 'prices' | 'costs' | 'search' | 'scan' | 'toxic' | 'rubric'>(initialSubTab);
-  const [selectedFoodForPrice, setSelectedFoodForPrice] = useState<FoodItem | null>(null);
+  const [activeSubTab, setActiveSubTab] = useState<FoodsSubTab>(initialSubTab);
 
   // Sync when initialSubTab changes from external navigation (e.g. from TodayView)
   React.useEffect(() => {
@@ -218,17 +177,8 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
 
   // Food comparer: up to 3 FoodItem objects (supports any Shopify/catalog item even before kcal verified)
   const [selectedCompareFoods, setSelectedCompareFoods] = useState<FoodItem[]>(initialCompareFoods);
-  const [lookupMetaMap, setLookupMetaMap] = useState<
-    Record<string, { lookupStatus: string; warningNotice?: string; isFromCache?: boolean }>
-  >({});
-  const [isComparingOnline, setIsComparingOnline] = useState(false);
-  const [compareError, setCompareError] = useState<string | null>(null);
-  const [lastCompareCheckedAt, setLastCompareCheckedAt] = useState<string | null>(null);
-
   useEffect(() => {
     setSelectedCompareFoods(initialCompareFoods);
-    setLookupMetaMap({});
-    setCompareError(null);
   }, [pet.id]);
 
   // Reuse UnifiedFoodSearchModal from Hoy -> Ajustar
@@ -236,23 +186,6 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
 
   // Toast / feedback state
   const [selectedToast, setSelectedToast] = useState<string | null>(null);
-
-  // Barcode / Scanner simulation & camera states
-  const [scannedBarcode, setScannedBarcode] = useState('');
-  const [scanResultNotice, setScanResultNotice] = useState<string | null>(null);
-
-  // Label AI OCR Extraction state
-  const [isAnalyzingLabel, setIsAnalyzingLabel] = useState(false);
-  const [extractedLabelData, setExtractedLabelData] = useState<{
-    brand: string;
-    name: string;
-    kcalPerKg: number;
-    proteinPct: number;
-    fatPct: number;
-    fiberPct: number;
-    moisturePct: number;
-    ingredientsSummary: string;
-  } | null>(null);
 
   // Toxic item search
   const [toxicQuery, setToxicQuery] = useState('');
@@ -297,136 +230,10 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
     setSelectedCompareFoods((prev) => prev.filter((f) => f.id !== id));
   };
 
-  const handleRunLiveNutritionCompare = async () => {
-    if (selectedCompareFoods.length === 0) return;
-    setIsComparingOnline(true);
-    setCompareError(null);
-    try {
-      const res = await fetch('/api/nutrition/compare-lookup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          foods: selectedCompareFoods.map((f) => ({
-            id: f.id,
-            brand: f.brand,
-            name: f.name,
-            species: f.species,
-            lifeStage: f.lifeStage,
-            weightKg: f.bagSizeKg,
-            catalogFicha: f.fichaNutricional,
-          })),
-          forceRefresh: true,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Error consultando fichas nutricionales');
-      }
-
-      const nextMeta: Record<string, { lookupStatus: string; warningNotice?: string; isFromCache?: boolean }> = {};
-      const updatedFoods = selectedCompareFoods.map((food, idx) => {
-        const match =
-          data.results?.find((r: any) => (r.id && r.id === food.id) || (r.brand === food.brand && r.name === food.name)) ||
-          data.results?.[idx];
-        if (!match) return food;
-
-        nextMeta[food.id] = {
-          lookupStatus: match.lookupStatus,
-          warningNotice: match.warningNotice,
-          isFromCache: match.isFromCache,
-        };
-        if (match.ficha) {
-          return mergeFichaIntoFoodItem(food, match.ficha);
-        }
-        return food;
-      });
-
-      setSelectedCompareFoods(updatedFoods);
-      setLookupMetaMap(nextMeta);
-      setLastCompareCheckedAt(data.serverCheckedAt || new Date().toISOString().split('T')[0]);
-    } catch (err: any) {
-      setCompareError(
-        err?.message || 'No pudimos consultar internet en este momento; se muestran las últimas fichas guardadas.'
-      );
-    } finally {
-      setIsComparingOnline(false);
-    }
-  };
-
   const handleSelectAndToast = (food: FoodItem) => {
     onSelectFoodForPet(food);
     setSelectedToast(isEs ? `¡${food.brand} ${food.name} seleccionado!` : `${food.brand} ${food.name} selected!`);
     setTimeout(() => setSelectedToast(null), 3000);
-  };
-
-  // Barcode Lookup Handler
-  const handleBarcodeSearch = (codeToLookup: string) => {
-    const code = codeToLookup.trim();
-    if (!code) return;
-
-    const found = allFoods.find((f) => f.barcode === code);
-    if (found) {
-      setScanResultNotice(
-        isEs
-          ? `¡Alimento encontrado: ${found.brand} - ${found.name}!`
-          : `Food found: ${found.brand} - ${found.name}!`
-      );
-      handleSelectAndToast(found);
-    } else {
-      setScanResultNotice(
-        isEs
-          ? `Código ${code} verificado en Open Pet Food Facts. Alimento balanceado estándar detectado (~3750 kcal/kg).`
-          : `Barcode ${code} verified on Open Pet Food Facts. Standard balanced pet food (~3750 kcal/kg).`
-      );
-    }
-  };
-
-  // Label AI simulation with OCR extraction
-  const handleSimulateLabelAI = () => {
-    setIsAnalyzingLabel(true);
-    setTimeout(() => {
-      setIsAnalyzingLabel(false);
-      setExtractedLabelData({
-        brand: pet.species === 'dog' ? 'Pro Plan Canine' : 'Royal Canin Feline',
-        name: isEs ? 'Fórmula Sensible Adulto Salmón' : 'Adult Sensitive Skin Salmon',
-        kcalPerKg: 3820,
-        proteinPct: 29.0,
-        fatPct: 18.0,
-        fiberPct: 3.0,
-        moisturePct: 9.5,
-        ingredientsSummary: 'Salmón fresco (20%), arroz cervecero, harina de ave, grasa de pollo con tocoferoles mixtos.',
-      });
-    }, 1200);
-  };
-
-  // Save confirmed AI extraction
-  const handleConfirmAISavedFood = () => {
-    if (!extractedLabelData) return;
-    const newFood: FoodItem = {
-      id: 'ai_label_' + Date.now(),
-      brand: extractedLabelData.brand,
-      name: extractedLabelData.name,
-      species: pet.species,
-      lifeStage: pet.ageYears !== undefined && pet.ageYears < 1 ? (pet.species === 'cat' ? 'kitten' : 'puppy') : 'adult',
-      type: 'dry',
-      kcalPerKg: extractedLabelData.kcalPerKg,
-      proteinPct: extractedLabelData.proteinPct,
-      fatPct: extractedLabelData.fatPct,
-      fiberPct: extractedLabelData.fiberPct,
-      moisturePct: extractedLabelData.moisturePct,
-      country: isEs ? 'Etiqueta confirmada por usuario' : 'User-confirmed label',
-      ingredientsSummary: extractedLabelData.ingredientsSummary,
-      score: 92,
-      labelStatus: 'user_confirmed_label',
-      isCompleteAndBalanced: true,
-      suitableForGrowth: pet.ageYears !== undefined && pet.ageYears < 1,
-      dataSource: 'Etiqueta confirmada',
-    };
-
-    StorageService.addCustomFood(newFood);
-    handleSelectAndToast(newFood);
-    setExtractedLabelData(null);
-    setActiveSubTab('compare');
   };
 
   // Compute standardized 100 g "tal como se vende" AND per-portion comparison metrics WITHOUT fabricating missing data
@@ -463,10 +270,9 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
         gramsDay,
         gramsPerMeal,
         portionNutrients,
-        meta: lookupMetaMap[food.id],
       };
     });
-  }, [selectedCompareFoods, merTargetKcal, mealsPerDay, lookupMetaMap]);
+  }, [selectedCompareFoods, merTargetKcal, mealsPerDay]);
 
   // Identify highest verified protein per 100 g when at least 2 foods have verified protein
   const maxProtein100g = useMemo(() => {
@@ -487,26 +293,21 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
         </div>
       )}
 
-      {/* Global City Selector Bar - only shown in nutritional comparer subtabs, not in the redesigned price comparator */}
-      {activeSubTab !== 'prices' && <CitySelectorBar lang={userAccount.language} />}
-
       {/* Subtab navigation */}
       <div className="flex bg-[#EAF4EC] p-1 rounded-2xl overflow-x-auto scrollbar-none gap-1 border border-[#0B5D2E15]">
-        {[
-          { id: 'prices', label: isEs ? 'Ver precios' : 'View prices', icon: ShoppingBag },
+        {([
           { id: 'compare', label: isEs ? 'Comparar otros alimentos' : 'Compare other foods', icon: Scale },
           { id: 'costs', label: isEs ? 'Gastos ($ COP)' : 'Food Costs ($ COP)', icon: DollarSign },
           { id: 'search', label: isEs ? 'Catálogo' : 'Catalog', icon: Search },
-          { id: 'scan', label: isEs ? 'Escáner / IA' : 'Scanner / AI', icon: Camera },
           { id: 'toxic', label: isEs ? 'Alimentos Tóxicos' : 'Toxic Foods', icon: ShieldAlert },
           { id: 'rubric', label: isEs ? 'Rúbrica' : 'Rubric', icon: Award },
-        ].map((tab) => {
+        ] satisfies { id: FoodsSubTab; label: string; icon: typeof Scale }[]).map((tab) => {
           const Icon = tab.icon;
           const isActive = activeSubTab === tab.id;
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveSubTab(tab.id as any)}
+              onClick={() => setActiveSubTab(tab.id)}
               className={`py-2 px-3 rounded-xl text-xs font-heading font-extrabold shrink-0 transition flex items-center gap-1.5 min-h-[44px] ${
                 isActive
                   ? 'bg-[#0B5D2E] text-white shadow-xs'
@@ -520,7 +321,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
         })}
       </div>
 
-      {/* ================= SUBTAB 1: COMPARAR OTROS ALIMENTOS (LIVE WEB NUTRITION) ================= */}
+      {/* ================= SUBTAB 1: COMPARAR OTROS ALIMENTOS (LOCAL) ================= */}
       {activeSubTab === 'compare' && (
         <div className="space-y-4 animate-in fade-in">
           {/* Header Card */}
@@ -536,7 +337,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                   </span>
                 </div>
                 <h3 className="font-heading font-black text-xl text-[#0B5D2E] mt-1">
-                  Comparar otros alimentos
+                  {isEs ? 'Comparar alimentos' : 'Compare foods'}
                 </h3>
                 <p className="text-xs text-[#44544A] mt-0.5 leading-relaxed">
                   Reutiliza el buscador del catálogo para elegir fórmulas y compara calorías, proteína, grasa y fibra cruda por 100 g tal como se vende y por porción de {pet.name} ({merTargetKcal} kcal/día).
@@ -555,7 +356,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
               )}
             </div>
 
-            {/* Selected chips bar + Live Web Verification CTA ("Comparar alimentos") */}
+            {/* Selected foods */}
             <div className="flex flex-wrap gap-1.5 pt-1">
               {selectedCompareFoods.map((f) => (
                 <span
@@ -577,49 +378,6 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
               ))}
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <button
-                type="button"
-                onClick={handleRunLiveNutritionCompare}
-                disabled={isComparingOnline || selectedCompareFoods.length === 0}
-                className="flex-1 min-h-[46px] px-4 py-2.5 bg-[#0B5D2E] hover:bg-[#094723] disabled:opacity-50 text-white rounded-2xl font-heading font-extrabold text-xs flex items-center justify-center gap-2 shadow-xs transition cursor-pointer"
-              >
-                {isComparingOnline ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Consultando fichas en internet...</span>
-                  </>
-                ) : (
-                  <>
-                    <Globe className="w-4 h-4" />
-                    <span>Comparar alimentos</span>
-                  </>
-                )}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowAddFoodModal(true)}
-                className="min-h-[46px] px-3.5 py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-[#1C2B21] rounded-2xl font-heading font-bold text-xs flex items-center gap-1.5"
-              >
-                <Search className="w-3.5 h-3.5 text-[#0B5D2E]" />
-                <span>Buscar en catálogo</span>
-              </button>
-            </div>
-
-            {lastCompareCheckedAt && !compareError && (
-              <p className="text-[11px] text-[#0B5D2E] font-semibold flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 shrink-0" />
-                <span>Consulta web verificada en servidor ({lastCompareCheckedAt.slice(0, 10)}).</span>
-              </p>
-            )}
-
-            {compareError && (
-              <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-900 flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-                <span>{compareError}</span>
-              </div>
-            )}
           </div>
 
           {/* Empty or single-selection guidance */}
@@ -630,7 +388,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                 Selecciona al menos 2 alimentos para comparar
               </h4>
               <p className="text-xs text-[#44544A] max-w-sm mx-auto">
-                Usa el buscador del catálogo para elegir fórmulas y luego pulsa «Comparar alimentos» para verificar sus fichas nutricionales en internet.
+                Elige dos o tres fórmulas del catálogo. La comparación se actualiza al agregar o quitar un alimento.
               </p>
               <button
                 type="button"
@@ -656,7 +414,6 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                   gramsDay,
                   gramsPerMeal,
                   portionNutrients,
-                  meta,
                 } = item;
                 const isHighestProtein =
                   maxProtein100g !== null && protField && protField.valor === maxProtein100g;
@@ -704,14 +461,6 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                         <X className="w-4 h-4" />
                       </button>
                     </div>
-
-                    {/* Meta warning notice (e.g. cache fallback / missing datasheet) */}
-                    {meta?.warningNotice && (
-                      <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 flex items-start gap-2 leading-snug">
-                        <AlertCircle className="w-3.5 h-3.5 text-amber-700 shrink-0 mt-0.5" />
-                        <span>{meta.warningNotice}</span>
-                      </div>
-                    )}
 
                     {/* Section 1: Base común 100 g de producto tal como se vende */}
                     <div className="bg-[#F8FAF8] p-3.5 rounded-2xl border border-gray-200 space-y-2">
@@ -827,7 +576,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                         </div>
                       ) : (
                         <p className="text-xs text-amber-900">
-                          <strong>Sin dato verificado de kcal/kg:</strong> completa o verifica las calorías de la etiqueta para calcular los gramos exactos de la porción de {pet.name}.
+                          <strong>Sin dato verificado de kcal/kg:</strong> completa o verifica las calorías de la etiqueta para estimar los gramos por porción para {pet.name}.
                         </p>
                       )}
                     </div>
@@ -858,29 +607,14 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                       )}
                     </div>
 
-                    {/* Action buttons */}
-                    <div className="grid grid-cols-2 gap-2 pt-1">
-                      <button
-                        type="button"
-                        onClick={() => handleSelectAndToast(food)}
-                        className="min-h-[42px] py-2 px-3 bg-[#0B5D2E] text-white rounded-2xl font-heading font-extrabold text-xs hover:bg-[#094723] transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
-                      >
-                        <Check className="w-3.5 h-3.5 stroke-[3]" />
-                        <span>Elegir para {pet.name}</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedFoodForPrice(food);
-                          setActiveSubTab('prices');
-                        }}
-                        className="min-h-[42px] py-2 px-3 bg-[#EAF4EC] text-[#0B5D2E] hover:bg-[#d8ebd9] rounded-2xl font-heading font-bold text-xs transition flex items-center justify-center gap-1.5 border border-[#0B5D2E20] cursor-pointer"
-                      >
-                        <ShoppingBag className="w-3.5 h-3.5 text-[#0B5D2E]" />
-                        <span>Ver precios</span>
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectAndToast(food)}
+                      className="w-full min-h-[42px] py-2 px-3 bg-[#0B5D2E] text-white rounded-2xl font-heading font-extrabold text-xs hover:bg-[#094723] transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+                    >
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                      <span>{isEs ? `Elegir para ${pet.name}` : `Select for ${pet.name}`}</span>
+                    </button>
                   </div>
                 );
               })}
@@ -889,43 +623,10 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
         </div>
       )}
 
-      {/* ================= SUBTAB: LIVE PRICE COMPARER, RECHARTS HISTORY & SMART REORDER ================= */}
-      {activeSubTab === 'prices' && (
-        <div className="space-y-4 animate-in fade-in">
-          {/* Real-time Shopping & Organic Search Comparator (Redesigned Habitual Food Selector) */}
-          <PriceComparatorView
-            pet={pet}
-            pets={pets}
-            onSelectPet={onSelectPet}
-            onAddNewPet={onAddNewPet}
-            plan={plan}
-            plans={plans}
-            initialFood={selectedFoodForPrice || plan?.dryFood || allFoods[0]}
-            userAccount={userAccount}
-          />
-
-          {/* Smart Reorder System Card ("Compra a tiempo" - Section 6) */}
-          <SmartReorderCard
-            pet={pet}
-            plan={plan}
-            city={selectedCity || userAccount.city || 'Bogotá'}
-            userAccount={userAccount}
-          />
-
-          {/* Recharts Price History (30-day real observations - Section 5) */}
-          <PriceHistoryChart
-            brand={selectedFoodForPrice?.brand || plan?.foodBrand || (pet.species === 'cat' ? 'Royal Canin' : "Hill's Science Diet")}
-            productName={selectedFoodForPrice?.name || plan?.foodName || (pet.species === 'cat' ? 'Fit 32' : 'Adult')}
-            presentationWeightKg={selectedFoodForPrice?.bagSizeKg || plan?.bagWeightKg || 15}
-            city={selectedCity || userAccount.city || 'Bogotá'}
-            lang={userAccount.language}
-          />
-        </div>
-      )}
-
       {/* ================= SUBTAB: FOOD COSTS TRACKER & RECEIPTS ($ COP) ================= */}
       {activeSubTab === 'costs' && (
         <FoodCostTracker
+          key={pet.id}
           pet={pet}
           plan={plan}
           userAccount={userAccount}
@@ -1076,193 +777,6 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
               );
             })}
           </div>
-        </div>
-      )}
-
-      {/* ================= SUBTAB 3: SCANNER & LABEL AI ================= */}
-      {activeSubTab === 'scan' && (
-        <div className="bg-white rounded-3xl p-5 border border-[#0B5D2E20] shadow-sm space-y-5 animate-in fade-in">
-          <div>
-            <h3 className="font-heading font-extrabold text-lg text-[#0B5D2E]">
-              {isEs ? 'Escáner de Código e IA de Etiquetas' : 'Barcode & Label AI Reader'}
-            </h3>
-            <p className="text-xs text-[#44544A] mt-0.5">
-              {isEs
-                ? 'Escanea el código de barras o toma una foto de la tabla nutricional de la bolsa'
-                : 'Scan the barcode or take a photo of the nutrition label'}
-            </p>
-          </div>
-
-          {/* Barcode scanner box */}
-          <div className="bg-[#EAF4EC] p-4 rounded-2xl border border-[#0B5D2E20] space-y-3">
-            <div className="flex items-center gap-2 text-xs font-bold text-[#0B5D2E]">
-              <Barcode className="w-5 h-5 text-[#0B5D2E]" />
-              <span>{isEs ? 'Escanear Código de Barras' : 'Barcode Scanner'}</span>
-            </div>
-
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={scannedBarcode}
-                onChange={(e) => setScannedBarcode(e.target.value)}
-                placeholder={isEs ? 'Escribe o escanea código (ej: 3182550774536)...' : 'Barcode number...'}
-                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-mono"
-              />
-              <button
-                type="button"
-                onClick={() => handleBarcodeSearch(scannedBarcode)}
-                className="min-h-[44px] px-4 bg-[#0B5D2E] text-white rounded-xl font-bold text-xs shrink-0"
-              >
-                {isEs ? 'Buscar' : 'Search'}
-              </button>
-            </div>
-
-            {/* Quick barcode simulation chips */}
-            <div className="space-y-1">
-              <span className="text-[11px] text-[#44544A] font-semibold">
-                {isEs ? 'Probar códigos de ejemplo:' : 'Test sample barcodes:'}
-              </span>
-              <div className="flex flex-wrap gap-1.5">
-                {[
-                  { label: 'Royal Canin Medium', code: '3182550774536' },
-                  { label: 'Pro Plan Optiderma', code: '7613035122108' },
-                  { label: 'Royal Canin Fit 32 Cat', code: '3182550702225' },
-                ].map((b) => (
-                  <button
-                    key={b.code}
-                    type="button"
-                    onClick={() => {
-                      setScannedBarcode(b.code);
-                      handleBarcodeSearch(b.code);
-                    }}
-                    className="text-[11px] px-2 py-1 rounded-md bg-white border border-[#0B5D2E30] text-[#0B5D2E] font-medium hover:bg-gray-50"
-                  >
-                    {b.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {scanResultNotice && (
-              <div className="bg-white p-3 rounded-xl border border-[#0B5D2E30] text-xs font-semibold text-[#0B5D2E]">
-                {scanResultNotice}
-              </div>
-            )}
-          </div>
-
-          {/* Label AI Camera & OCR Box */}
-          <div className="bg-[#FFF7ED] p-4 rounded-2xl border border-[#F57C1A]/30 space-y-3">
-            <div className="flex items-center gap-2 text-xs font-bold text-[#9A3412]">
-              <Camera className="w-5 h-5 text-[#F57C1A]" />
-              <span>{isEs ? 'IA de Etiquetas: Foto a la tabla de nutrición' : 'Label AI: Nutrition table OCR'}</span>
-            </div>
-            <p className="text-xs text-[#44544A]">
-              {isEs
-                ? 'Extrae energía (kcal/kg), proteína, grasa y fibra automáticamente con visión e inteligencia artificial.'
-                : 'Extracts kcal/kg, protein, fat, and fiber with AI vision.'}
-            </p>
-
-            <button
-              type="button"
-              onClick={handleSimulateLabelAI}
-              disabled={isAnalyzingLabel}
-              className="w-full min-h-[50px] bg-[#F57C1A] text-white rounded-xl font-heading font-extrabold text-sm flex items-center justify-center gap-2 hover:bg-[#e06d12] transition shadow-xs disabled:opacity-50"
-            >
-              {isAnalyzingLabel ? (
-                <>
-                  <Sparkles className="w-4 h-4 animate-spin" />
-                  <span>{isEs ? 'Analizando etiqueta con IA...' : 'Analyzing label with AI...'}</span>
-                </>
-              ) : (
-                <>
-                  <Camera className="w-4 h-4" />
-                  <span>{isEs ? 'Capturar foto de etiqueta o subir' : 'Capture label photo'}</span>
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* MANDATORY CONFIRMATION MODAL BEFORE SAVING AI READING */}
-          {extractedLabelData && (
-            <div className="bg-white rounded-2xl p-4 border-2 border-[#0B5D2E] space-y-3 shadow-md animate-in fade-in">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#0B5D2E]">
-                <Sparkles className="w-4 h-4" />
-                <span>
-                  {isEs ? 'Valores extraídos por IA (Confirma antes de guardar):' : 'AI Extracted values (Verify before saving):'}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div>
-                  <label className="text-[#44544A] font-semibold">{isEs ? 'Marca:' : 'Brand:'}</label>
-                  <input
-                    type="text"
-                    value={extractedLabelData.brand}
-                    onChange={(e) =>
-                      setExtractedLabelData({ ...extractedLabelData, brand: e.target.value })
-                    }
-                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg font-bold"
-                  />
-                </div>
-                <div>
-                  <label className="text-[#44544A] font-semibold">{isEs ? 'Producto:' : 'Product:'}</label>
-                  <input
-                    type="text"
-                    value={extractedLabelData.name}
-                    onChange={(e) =>
-                      setExtractedLabelData({ ...extractedLabelData, name: e.target.value })
-                    }
-                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg font-bold"
-                  />
-                </div>
-                <div>
-                  <label className="text-[#44544A] font-semibold">kcal / kg:</label>
-                  <input
-                    type="number"
-                    value={extractedLabelData.kcalPerKg}
-                    onChange={(e) =>
-                      setExtractedLabelData({
-                        ...extractedLabelData,
-                        kcalPerKg: Number(e.target.value),
-                      })
-                    }
-                    className="w-full px-2 py-1.5 border border-[#0B5D2E40] rounded-lg font-extrabold text-[#0B5D2E]"
-                  />
-                </div>
-                <div>
-                  <label className="text-[#44544A] font-semibold">{isEs ? 'Proteína %:' : 'Protein %:'}</label>
-                  <input
-                    type="number"
-                    value={extractedLabelData.proteinPct}
-                    onChange={(e) =>
-                      setExtractedLabelData({
-                        ...extractedLabelData,
-                        proteinPct: Number(e.target.value),
-                      })
-                    }
-                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg font-bold"
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setExtractedLabelData(null)}
-                  className="flex-1 py-2.5 bg-gray-100 rounded-xl text-xs font-bold text-[#44544A]"
-                >
-                  {isEs ? 'Descartar' : 'Discard'}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleConfirmAISavedFood}
-                  className="flex-1 py-2.5 bg-[#0B5D2E] text-white rounded-xl text-xs font-bold shadow-xs"
-                >
-                  {isEs ? 'Confirmar y Guardar' : 'Confirm & Save'}
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       )}
 

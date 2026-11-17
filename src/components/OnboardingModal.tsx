@@ -3,7 +3,6 @@ import { Pet, Species, FoodItem, Sex, BreedSize, DietType, SpecialState } from '
 import {
   ArrowRight,
   ArrowLeft,
-  LogIn,
   Search,
   Loader2,
   X,
@@ -13,7 +12,6 @@ import {
   ShieldCheck,
   Edit3,
 } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext.tsx';
 import {
   loadShopifyCatalog,
   searchShopifyCatalog,
@@ -67,7 +65,6 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   lang = 'es',
 }) => {
   const isEs = lang === 'es';
-  const { user, openAuthModal } = useAuth();
 
   // 2-step onboarding flow
   const [step, setStep] = useState<1 | 2>(1);
@@ -431,25 +428,15 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               <h1 className="font-heading font-extrabold text-lg text-[#1C2B21] truncate leading-tight">
                 {step === 1
                   ? isEs
-                    ? 'Datos de tu perro'
+                    ? 'Datos de tu mascota'
                     : 'Your pet basics'
                   : isEs
-                  ? `Alimento habitual de ${petName || 'tu perro'}`
+                  ? `Alimento habitual de ${petName || 'tu mascota'}`
                   : 'Current food'}
               </h1>
             </div>
           </div>
 
-          {!user && (
-            <button
-              type="button"
-              onClick={() => openAuthModal('login')}
-              className="text-xs font-bold text-[#0B5D2E] hover:bg-[#EAF4EC] px-2.5 py-2 rounded-xl border border-[#0B5D2E25] flex items-center gap-1 shrink-0 min-h-[40px]"
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              <span>{isEs ? 'Entrar' : 'Log in'}</span>
-            </button>
-          )}
         </div>
 
         {/* 2-Step Progress Bar */}

@@ -11,12 +11,11 @@ export default defineConfig(() => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'assets/aistudio/*.png'],
         manifest: {
           id: '/',
           name: 'Ración App',
           short_name: 'Ración App',
-          description: 'La ración exacta de cualquier alimento, para cualquier perro o gato, con seguimiento hasta su peso ideal.',
+          description: 'Estima la ración de tu perro o gato y lleva su diario de tomas y pesajes.',
           theme_color: '#0B5D2E',
           background_color: '#EAF4EC',
           display: 'standalone',
@@ -44,7 +43,13 @@ export default defineConfig(() => {
           ],
         },
         workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,woff,woff2}'],
+          globPatterns: [
+            '**/*.{js,css,html,ico,woff,woff2}',
+            'assets/food_*',
+            'assets/aistudio/Racio_n_App__Nutricio_n_con_carin_o_8fb59a2d.png',
+            'assets/aistudio/Catalogo_Alimentos_Racion_App_68a4174d.json',
+          ],
+          navigateFallbackDenylist: [/^\/api(?:\/|$)/],
           maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
           runtimeCaching: [
             {
@@ -68,7 +73,7 @@ export default defineConfig(() => {
     ],
     resolve: {
       alias: {
-        '@': path.resolve(import.meta.dirname || __dirname, '.'),
+        '@': path.resolve(import.meta.dirname, '.'),
       },
     },
     server: {

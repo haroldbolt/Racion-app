@@ -11,8 +11,7 @@ import {
   TreatLog,
   HydrationDailyState,
 } from '../types';
-import { PET_FOODS_DATABASE } from '../data/foods';
-import { SyncQueue } from '../services/syncQueueService';
+import { localDateKey } from './localDate';
 
 const STORAGE_KEYS = {
   PETS: 'racion_pets_v1',
@@ -30,251 +29,115 @@ const STORAGE_KEYS = {
   USER_ACCOUNT: 'racion_user_account_v1',
   USER_CITY: 'racion_user_city_v1',
   WATER_LOGS: 'racion_water_logs_v1',
-  INITIALIZED: 'racion_initialized_v1',
-};
-
-const DEFAULT_PETS: Pet[] = [
-  {
-    id: 'pet-milo',
-    name: 'Milo',
-    species: 'dog',
-    breed: 'Mestizo / Mixed',
-    breedSize: 'medium',
-    sex: 'male',
-    isNeutered: true,
-    birthDate: '2022-04-10',
-    ageYears: 2.5,
-    currentWeightKg: 14.2,
-    idealWeightKg: 13.5,
-    targetWeightKg: 13.5,
-    bcs: 6, // slightly above ideal
-    activityLevel: 'moderate',
-    photoUrl: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=400&q=80',
-    specialState: 'none',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'pet-luna',
-    name: 'Luna',
-    species: 'cat',
-    breed: 'Europeo Común',
-    sex: 'female',
-    isNeutered: true,
-    birthDate: '2023-01-15',
-    ageYears: 1.8,
-    currentWeightKg: 4.3,
-    idealWeightKg: 4.2,
-    targetWeightKg: 4.2,
-    bcs: 5, // ideal
-    activityLevel: 'moderate',
-    photoUrl: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=400&q=80',
-    specialState: 'none',
-    createdAt: new Date().toISOString(),
-  },
-];
-
-const DEFAULT_PLANS: Record<string, FeedingPlan> = {
-  'pet-milo': {
-    id: 'plan_milo_initial',
-    petId: 'pet-milo',
-    createdAt: new Date().toISOString(),
-    foodId: 'rc-medium-adult',
-    foodName: 'Medium Adult Dog Dry',
-    foodBrand: 'Royal Canin',
-    foodType: 'dry',
-    dryFood: PET_FOODS_DATABASE.find(f => f.id === 'rc-medium-adult'),
-    mixedDryPct: 100,
-    mixedWetPct: 0,
-    mealsPerDay: 2,
-    mealTimes: ['08:00', '20:00'],
-    rer: 489,
-    factor: 1.6,
-    mer: 782,
-    gramsPerDay: 190,
-    gramsPerMeal: 95,
-    kcalPerMeal: 365,
-    cupsPerDay: 2.0,
-    treatsBudgetKcal: 78,
-    treatsCountToday: 1,
-    manualAdjustmentPct: 0,
-    bagWeightKg: 15,
-    bagDaysRemaining: 42,
-    rationConfirmed: true,
-    scheduleConfigured: true,
-  },
-  'pet-luna': {
-    id: 'plan_luna_initial',
-    petId: 'pet-luna',
-    createdAt: new Date().toISOString(),
-    foodId: 'rc-sterilised-37-cat',
-    foodName: 'Sterilised 37 Neutered Cat Dry',
-    foodBrand: 'Royal Canin',
-    foodType: 'dry',
-    dryFood: PET_FOODS_DATABASE.find(f => f.id === 'rc-sterilised-37-cat'),
-    mixedDryPct: 100,
-    mixedWetPct: 0,
-    mealsPerDay: 2,
-    mealTimes: ['08:30', '19:30'],
-    rer: 205,
-    factor: 1.2,
-    mer: 246,
-    gramsPerDay: 62,
-    gramsPerMeal: 31,
-    kcalPerMeal: 115,
-    treatsBudgetKcal: 25,
-    treatsCountToday: 0,
-    manualAdjustmentPct: 0,
-    bagWeightKg: 4,
-    bagDaysRemaining: 55,
-    rationConfirmed: true,
-    scheduleConfigured: true,
-  },
+  LOCAL_DIARY_DATES: 'racion_local_diary_dates_v1',
 };
 
 const DEFAULT_USER: UserAccount = {
-  email: 'familia@ejemplo.com',
-  isLicensed: false, // Default is free calculation trial, user can unlock $20 lifetime
+  email: '',
+  isLicensed: false,
   language: 'es',
   units: 'metric',
   theme: 'light',
-  familyName: 'Familia Mascotera',
-  familyMembers: [
-    { id: 'fm-1', name: 'Mamá', role: 'feeder', avatarColor: '#0B5D2E' },
-    { id: 'fm-2', name: 'Papá', role: 'weighed_and_fed', avatarColor: '#F57C1A' },
-    { id: 'fm-3', name: 'Hijo', role: 'viewer', avatarColor: '#1E8A49' },
-  ],
+  familyName: '',
+  familyMembers: [],
   remindersEnabled: true,
   whatsappOptIn: false,
 };
 
+function migrateDatedLogs(key: string, timestampPattern: RegExp) {
+  try {
+    const data = localStorage.getItem(key);
+    if (!data) return;
+
+    const entries: { id: string; date: string }[] = JSON.parse(data);
+    let changed = false;
+    for (const entry of entries) {
+      const timestamp = timestampPattern.exec(entry.id)?.[1];
+      if (!timestamp) continue;
+
+      const createdAt = new Date(Number(timestamp));
+      if (createdAt.toISOString().slice(0, 10) !== entry.date) continue;
+
+      const localDay = localDateKey(createdAt);
+      if (localDay !== entry.date) {
+        entry.date = localDay;
+        changed = true;
+      }
+    }
+
+    if (changed) localStorage.setItem(key, JSON.stringify(entries));
+  } catch {
+    // Keep the original values if a legacy entry cannot be read.
+  }
+}
+
+function migrateHydrationDates() {
+  try {
+    const states: Record<string, HydrationDailyState> = JSON.parse(localStorage.getItem(STORAGE_KEYS.HYDRATION_STATE) || '{}');
+    const water: Record<string, number> = JSON.parse(localStorage.getItem(STORAGE_KEYS.WATER_LOGS) || '{}');
+    let statesChanged = false;
+    let waterChanged = false;
+
+    for (const [key, state] of Object.entries(states)) {
+      if (!state.updatedAt) continue;
+      const updated = new Date(state.updatedAt);
+      if (Number.isNaN(updated.getTime())) continue;
+
+      const utcDay = updated.toISOString().slice(0, 10);
+      const localDay = localDateKey(updated);
+      if (utcDay === localDay || !key.endsWith(`_${utcDay}`)) continue;
+
+      const localKey = key.slice(0, -utcDay.length) + localDay;
+      // Two saved snapshots can straddle the old UTC boundary. Keep both when they overlap.
+      if (Object.hasOwn(states, localKey)) continue;
+
+      states[localKey] = state;
+      delete states[key];
+      statesChanged = true;
+      if (Object.hasOwn(water, key) && water[key] === state.bowlsLogged && !Object.hasOwn(water, localKey)) {
+        water[localKey] = water[key];
+        delete water[key];
+        waterChanged = true;
+      }
+    }
+
+    if (statesChanged) localStorage.setItem(STORAGE_KEYS.HYDRATION_STATE, JSON.stringify(states));
+    if (waterChanged) localStorage.setItem(STORAGE_KEYS.WATER_LOGS, JSON.stringify(water));
+  } catch {
+    // Keep the original values if a legacy entry cannot be read.
+  }
+}
+
 export const StorageService = {
   initialize() {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || localStorage.getItem(STORAGE_KEYS.LOCAL_DIARY_DATES)) return;
 
-    if (!localStorage.getItem(STORAGE_KEYS.INITIALIZED)) {
-      localStorage.setItem(STORAGE_KEYS.PETS, JSON.stringify(DEFAULT_PETS));
-      localStorage.setItem(STORAGE_KEYS.ACTIVE_PET_ID, DEFAULT_PETS[0].id);
-      localStorage.setItem(STORAGE_KEYS.PLANS, JSON.stringify(DEFAULT_PLANS));
-      localStorage.setItem(STORAGE_KEYS.USER_ACCOUNT, JSON.stringify(DEFAULT_USER));
-
-      // Seed initial weight records
-      const initialWeights: WeightRecord[] = [
-        {
-          id: 'w1',
-          petId: 'pet-milo',
-          date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          weightKg: 14.6,
-          notes: 'Peso inicial de control',
-        },
-        {
-          id: 'w2',
-          petId: 'pet-milo',
-          date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          weightKg: 14.4,
-          notes: 'Disminución controlada',
-        },
-        {
-          id: 'w3',
-          petId: 'pet-milo',
-          date: new Date().toISOString().split('T')[0],
-          weightKg: 14.2,
-          notes: 'Vas bien, bajó 200 g hacia la meta',
-        },
-        {
-          id: 'wl1',
-          petId: 'pet-luna',
-          date: new Date().toISOString().split('T')[0],
-          weightKg: 4.3,
-          notes: 'Peso estable',
-        },
-      ];
-      localStorage.setItem(STORAGE_KEYS.WEIGHT_RECORDS, JSON.stringify(initialWeights));
-
-      // Seed health logs
-      const initialHealthLogs: HealthLog[] = [
-        {
-          id: 'hl1',
-          petId: 'pet-milo',
-          date: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          type: 'vaccine',
-          title: 'Vacuna Séxtuple canina',
-          notes: 'Sin efectos secundarios, próxima dosis en 1 año',
-          severity: 'normal',
-        },
-        {
-          id: 'hl2',
-          petId: 'pet-milo',
-          date: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          type: 'deworming',
-          title: 'Desparasitación interna trimestral',
-          notes: 'Comprimido palatale administrado con éxito',
-          severity: 'normal',
-        },
-      ];
-      localStorage.setItem(STORAGE_KEYS.HEALTH_LOGS, JSON.stringify(initialHealthLogs));
-
-      // Seed initial food purchase records in COP (Pesos Colombianos)
-      const initialPurchases: FoodCostEntry[] = [
-        {
-          id: 'fp-1',
-          petId: 'pet-milo',
-          date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          foodBrand: 'Royal Canin',
-          foodName: 'Medium Adult Dog Dry',
-          foodType: 'dry',
-          bagSizeKg: 15,
-          pricePaidCop: 295000,
-          costPerKgCop: Math.round(295000 / 15),
-          costPerDayCop: Math.round((295000 / 15) * (214 / 1000)),
-          costPerMonthCop: Math.round((295000 / 15) * (214 / 1000) * 30.5),
-          estimatedDaysDuration: Math.round((15 * 1000) / 214),
-          storeName: 'Agrocampo Bogotá',
-          notes: 'Bulto de 15 kg comprado con descuento de fin de mes',
-          createdAt: new Date().toISOString(),
-        },
-        {
-          id: 'fp-2',
-          petId: 'pet-luna',
-          date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          foodBrand: 'Royal Canin',
-          foodName: 'Sterilised 37 Neutered Cat Dry',
-          foodType: 'dry',
-          bagSizeKg: 4,
-          pricePaidCop: 148000,
-          costPerKgCop: Math.round(148000 / 4),
-          costPerDayCop: Math.round((148000 / 4) * (62 / 1000)),
-          costPerMonthCop: Math.round((148000 / 4) * (62 / 1000) * 30.5),
-          estimatedDaysDuration: Math.round((4 * 1000) / 62),
-          storeName: 'Laika Pets Colombia',
-          notes: 'Bulto de 4 kg para gato esterilizado',
-          createdAt: new Date().toISOString(),
-        },
-      ];
-      localStorage.setItem(STORAGE_KEYS.FOOD_PURCHASES, JSON.stringify(initialPurchases));
-
-      localStorage.setItem(STORAGE_KEYS.INITIALIZED, 'true');
-    }
+    // These IDs encode the recording instant. Entries dated manually keep their selected day.
+    migrateDatedLogs(STORAGE_KEYS.MEAL_LOGS, /^ml_(\d{13})_/);
+    migrateDatedLogs(STORAGE_KEYS.TREAT_LOGS, /^tr_(\d{13})$/);
+    migrateDatedLogs(STORAGE_KEYS.WEIGHT_RECORDS, /^w_(\d{13})$/);
+    migrateDatedLogs(STORAGE_KEYS.HEALTH_LOGS, /^hl_water_(\d{13})$/);
+    migrateHydrationDates();
+    localStorage.setItem(STORAGE_KEYS.LOCAL_DIARY_DATES, 'true');
   },
 
   getPets(): Pet[] {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.PETS);
-      return data ? JSON.parse(data) : DEFAULT_PETS;
+      const pets: unknown = data ? JSON.parse(data) : [];
+      return Array.isArray(pets) ? pets : [];
     } catch {
-      return DEFAULT_PETS;
+      return [];
     }
   },
 
   savePets(pets: Pet[]) {
     localStorage.setItem(STORAGE_KEYS.PETS, JSON.stringify(pets));
-    // Enqueue each pet to sync queue for offline persistence and auto-sync
-    pets.forEach(p => SyncQueue.enqueue('upsert_pet', p));
   },
 
   deletePet(petId: string) {
     const pets = this.getPets().filter(p => p.id !== petId);
     localStorage.setItem(STORAGE_KEYS.PETS, JSON.stringify(pets));
-    SyncQueue.enqueue('delete_pet', { id: petId });
     if (this.getActivePetId() === petId && pets.length > 0) {
       this.setActivePetId(pets[0].id);
     }
@@ -319,15 +182,20 @@ export const StorageService = {
     const plans = this.getPlans();
     plans[plan.petId] = plan;
     localStorage.setItem(STORAGE_KEYS.PLANS, JSON.stringify(plans));
-    SyncQueue.enqueue('save_plan', plan);
   },
 
   getTodayMealLogs(petId: string): MealLog[] {
-    const today = new Date().toISOString().split('T')[0];
+    const today = localDateKey();
     try {
       const data = localStorage.getItem(STORAGE_KEYS.MEAL_LOGS);
       const all: MealLog[] = data ? JSON.parse(data) : [];
-      return all.filter(l => l.petId === petId && l.date === today);
+      const latestByMeal = new Map<number, MealLog>();
+      for (const log of all) {
+        if (log.petId === petId && log.date === today) {
+          latestByMeal.set(log.mealIndex, log);
+        }
+      }
+      return Array.from(latestByMeal.values());
     } catch {
       return [];
     }
@@ -343,18 +211,19 @@ export const StorageService = {
     forceCompleteWithGrams?: boolean,
     mixedComponents?: import('../types').MealMixedComponent[]
   ): MealLog {
-    const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const today = localDateKey(now);
     const data = localStorage.getItem(STORAGE_KEYS.MEAL_LOGS);
     const all: MealLog[] = data ? JSON.parse(data) : [];
 
-    const existingIdx = all.findIndex(
-      l => l.petId === petId && l.date === today && l.mealIndex === mealIndex
+    const current = all.slice().reverse().find(
+      l => l.petId === petId && l.date === today && l.mealIndex === mealIndex,
     );
+    const completedAt = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    if (existingIdx >= 0) {
-      const current = all[existingIdx];
+    if (current) {
       current.completed = forceCompleteWithGrams ? true : !current.completed;
-      current.completedAt = current.completed ? new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : undefined;
+      current.completedAt = current.completed ? completedAt : undefined;
       current.fedBy = fedBy;
       if (forceCompleteWithGrams || grams > 0) {
         current.gramsFed = grams;
@@ -366,11 +235,10 @@ export const StorageService = {
         current.mixedComponents = mixedComponents;
       }
       localStorage.setItem(STORAGE_KEYS.MEAL_LOGS, JSON.stringify(all));
-      SyncQueue.enqueue('save_meal', current);
       return current;
     } else {
       const newLog: MealLog = {
-        id: 'ml_' + Date.now() + '_' + Math.random(),
+        id: 'ml_' + now.getTime() + '_' + Math.random(),
         petId,
         date: today,
         mealIndex,
@@ -380,11 +248,10 @@ export const StorageService = {
         mixedComponents,
         fedBy,
         completed: true,
-        completedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        completedAt,
       };
       all.push(newLog);
       localStorage.setItem(STORAGE_KEYS.MEAL_LOGS, JSON.stringify(all));
-      SyncQueue.enqueue('save_meal', newLog);
       return newLog;
     }
   },
@@ -399,20 +266,22 @@ export const StorageService = {
     }
   },
 
-  addWeightRecord(record: WeightRecord) {
+  addWeightRecord(record: WeightRecord): boolean {
     const data = localStorage.getItem(STORAGE_KEYS.WEIGHT_RECORDS);
     const all: WeightRecord[] = data ? JSON.parse(data) : [];
+    const hasNewerWeight = all.some(weight => weight.petId === record.petId && weight.date > record.date);
     all.push(record);
     localStorage.setItem(STORAGE_KEYS.WEIGHT_RECORDS, JSON.stringify(all));
-    SyncQueue.enqueue('save_weight', record);
 
-    // Update pet's current weight locally
+    if (hasNewerWeight) return false;
+
     const pets = this.getPets();
-    const petIdx = pets.findIndex(p => p.id === record.petId);
-    if (petIdx >= 0) {
-      pets[petIdx].currentWeightKg = record.weightKg;
-      this.savePets(pets);
-    }
+    const pet = pets.find(p => p.id === record.petId);
+    if (!pet || pet.currentWeightKg === record.weightKg) return false;
+
+    pet.currentWeightKg = record.weightKg;
+    this.savePets(pets);
+    return true;
   },
 
   getHealthLogs(petId: string): HealthLog[] {
@@ -432,8 +301,7 @@ export const StorageService = {
     localStorage.setItem(STORAGE_KEYS.HEALTH_LOGS, JSON.stringify(all));
   },
 
-  getWaterGlassesToday(petId: string): number {
-    const today = new Date().toISOString().split('T')[0];
+  getWaterGlassesToday(petId: string, today = localDateKey()): number {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.WATER_LOGS);
       const map = data ? JSON.parse(data) : {};
@@ -443,8 +311,7 @@ export const StorageService = {
     }
   },
 
-  setWaterGlassesToday(petId: string, count: number) {
-    const today = new Date().toISOString().split('T')[0];
+  setWaterGlassesToday(petId: string, count: number, today = localDateKey()) {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.WATER_LOGS);
       const map = data ? JSON.parse(data) : {};
@@ -456,8 +323,8 @@ export const StorageService = {
   },
 
   getHydrationStateToday(petId: string): HydrationDailyState {
-    const today = new Date().toISOString().split('T')[0];
-    const bowls = this.getWaterGlassesToday(petId);
+    const today = localDateKey();
+    const bowls = this.getWaterGlassesToday(petId, today);
     try {
       const data = localStorage.getItem(STORAGE_KEYS.HYDRATION_STATE);
       const map = data ? JSON.parse(data) : {};
@@ -477,14 +344,15 @@ export const StorageService = {
   },
 
   setHydrationStateToday(petId: string, state: HydrationDailyState) {
-    const today = new Date().toISOString().split('T')[0];
-    this.setWaterGlassesToday(petId, state.bowlsLogged);
+    const now = new Date();
+    const today = localDateKey(now);
+    this.setWaterGlassesToday(petId, state.bowlsLogged, today);
     try {
       const data = localStorage.getItem(STORAGE_KEYS.HYDRATION_STATE);
       const map = data ? JSON.parse(data) : {};
       map[`${petId}_${today}`] = {
         ...state,
-        updatedAt: new Date().toISOString(),
+        updatedAt: now.toISOString(),
       };
       localStorage.setItem(STORAGE_KEYS.HYDRATION_STATE, JSON.stringify(map));
     } catch {
@@ -493,7 +361,7 @@ export const StorageService = {
   },
 
   getTreatLogsToday(petId: string): TreatLog[] {
-    const today = new Date().toISOString().split('T')[0];
+    const today = localDateKey();
     try {
       const data = localStorage.getItem(STORAGE_KEYS.TREAT_LOGS);
       const all: TreatLog[] = data ? JSON.parse(data) : [];
@@ -526,7 +394,7 @@ export const StorageService = {
   },
 
   getTrainingRationGramsToday(petId: string): number {
-    const today = new Date().toISOString().split('T')[0];
+    const today = localDateKey();
     try {
       const data = localStorage.getItem(STORAGE_KEYS.TRAINING_RATION);
       const map = data ? JSON.parse(data) : {};
@@ -537,7 +405,7 @@ export const StorageService = {
   },
 
   setTrainingRationGramsToday(petId: string, grams: number) {
-    const today = new Date().toISOString().split('T')[0];
+    const today = localDateKey();
     try {
       const data = localStorage.getItem(STORAGE_KEYS.TRAINING_RATION);
       const map = data ? JSON.parse(data) : {};
@@ -591,14 +459,12 @@ export const StorageService = {
     const all = this.getFoodPurchases();
     all.unshift(entry);
     localStorage.setItem(STORAGE_KEYS.FOOD_PURCHASES, JSON.stringify(all));
-    SyncQueue.enqueue('save_purchase', entry);
   },
 
   deleteFoodPurchase(id: string) {
     const all = this.getFoodPurchases();
     const filtered = all.filter(p => p.id !== id);
     localStorage.setItem(STORAGE_KEYS.FOOD_PURCHASES, JSON.stringify(filtered));
-    SyncQueue.enqueue('delete_purchase', { id });
   },
 
   updateFoodPurchase(entry: FoodCostEntry) {
@@ -607,18 +473,30 @@ export const StorageService = {
     if (idx >= 0) {
       all[idx] = entry;
       localStorage.setItem(STORAGE_KEYS.FOOD_PURCHASES, JSON.stringify(all));
-      SyncQueue.enqueue('save_purchase', entry);
     }
   },
 
   exportAllDataJSON(): string {
+    const read = (key: string, fallback: unknown): unknown => {
+      try {
+        const stored = localStorage.getItem(key);
+        return stored === null ? fallback : JSON.parse(stored);
+      } catch {
+        return fallback;
+      }
+    };
     const payload = {
       exportedAt: new Date().toISOString(),
       account: this.getUserAccount(),
       pets: this.getPets(),
       plans: this.getPlans(),
-      weightRecords: localStorage.getItem(STORAGE_KEYS.WEIGHT_RECORDS) ? JSON.parse(localStorage.getItem(STORAGE_KEYS.WEIGHT_RECORDS)!) : [],
-      healthLogs: localStorage.getItem(STORAGE_KEYS.HEALTH_LOGS) ? JSON.parse(localStorage.getItem(STORAGE_KEYS.HEALTH_LOGS)!) : [],
+      mealLogs: read(STORAGE_KEYS.MEAL_LOGS, []),
+      treatLogs: read(STORAGE_KEYS.TREAT_LOGS, []),
+      trainingRation: read(STORAGE_KEYS.TRAINING_RATION, {}),
+      hydrationState: read(STORAGE_KEYS.HYDRATION_STATE, {}),
+      waterLogs: read(STORAGE_KEYS.WATER_LOGS, {}),
+      weightRecords: read(STORAGE_KEYS.WEIGHT_RECORDS, []),
+      healthLogs: read(STORAGE_KEYS.HEALTH_LOGS, []),
       customFoods: this.getCustomFoods(),
       foodPurchases: this.getFoodPurchases(),
     };
@@ -638,18 +516,7 @@ export const StorageService = {
       const data = localStorage.getItem(STORAGE_KEYS.RECENT_FOOD_SEARCHES);
       if (data) return JSON.parse(data);
     } catch {}
-    // Initial default matching user's mockup (Luna's food)
-    return [
-      {
-        id: 'search_recent_1',
-        brand: 'Royal Canin',
-        productName: 'Fit 32',
-        weightKg: 4,
-        city: 'Bogotá',
-        imageUrl: '/assets/food_rc_fit32.png',
-        timestamp: Date.now() - 1000 * 60 * 45,
-      },
-    ];
+    return [];
   },
 
   saveRecentFoodSearch(search: { brand: string; productName: string; weightKg: number; city: string; imageUrl?: string }) {
@@ -678,7 +545,10 @@ export const StorageService = {
   },
 
   clearAllData() {
-    localStorage.clear();
-    this.initialize();
+    for (const key of Object.keys(localStorage)) {
+      if (key.startsWith('racion_')) {
+        localStorage.removeItem(key);
+      }
+    }
   },
 };

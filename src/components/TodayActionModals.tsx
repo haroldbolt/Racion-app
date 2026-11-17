@@ -3,10 +3,14 @@ import {
   ActivityLevel,
   FeedingPlan,
   MealLog,
+  MealMixedComponent,
   Pet,
   TreatCatalogItem,
   TreatLog,
 } from '../types';
+import { localDateKey } from '../utils/localDate';
+import { defaultMealTimes } from '../utils/calculator';
+import { getPlannedMeals, getPlannedMealComponents } from '../utils/mealPortions';
 import { PET_TREATS_DATABASE } from '../data/foods';
 import { evaluateTreatsBudget, TreatsGuidance } from '../utils/feedingGuide';
 import { X, Check, Clock, Cookie, Scale, Utensils, AlertCircle } from 'lucide-react';
@@ -25,7 +29,7 @@ export const ScheduleConfigModal: React.FC<ScheduleConfigModalProps> = ({
 }) => {
   const [mealsCount, setMealsCount] = useState(plan.mealsPerDay || 2);
   const [times, setTimes] = useState<string[]>(
-    plan.mealTimes && plan.mealTimes.length > 0 ? plan.mealTimes : ['08:00', '20:00']
+    plan.mealTimes?.length ? plan.mealTimes : defaultMealTimes(plan.mealsPerDay)
   );
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -38,10 +42,7 @@ export const ScheduleConfigModal: React.FC<ScheduleConfigModalProps> = ({
   const handleCountChange = (count: number) => {
     if (count === mealsCount) return;
     setMealsCount(count);
-    if (count === 1) setTimes(['12:00']);
-    if (count === 2) setTimes(['08:00', '20:00']);
-    if (count === 3) setTimes(['08:00', '14:00', '20:00']);
-    if (count === 4) setTimes(['07:30', '12:00', '16:30', '20:30']);
+    setTimes(defaultMealTimes(count));
   };
 
   return (
@@ -68,7 +69,7 @@ export const ScheduleConfigModal: React.FC<ScheduleConfigModalProps> = ({
             ¿Cuántas comidas al día?
           </label>
           <div className="grid grid-cols-4 gap-2">
-            {[1, 2, 3, 4].map((c) => (
+            {(plan.isVetLocked ? [plan.mealsPerDay] : [1, 2, 3, 4]).map((c) => (
               <button
                 key={c}
                 type="button"
@@ -322,7 +323,7 @@ export const RegisterTreatModal: React.FC<RegisterTreatModalProps> = ({
       onAddTreat({
         id: 'tr_' + Date.now(),
         petId: pet.id,
-        date: new Date().toISOString().split('T')[0],
+        date: localDateKey(),
         name: selectedTreat.name,
         brand: selectedTreat.brand,
         kcal,
@@ -347,7 +348,7 @@ export const RegisterTreatModal: React.FC<RegisterTreatModalProps> = ({
     onAddTreat({
       id: 'tr_' + Date.now(),
       petId: pet.id,
-      date: new Date().toISOString().split('T')[0],
+      date: localDateKey(),
       name: selectedTreat ? selectedTreat.name : customName.trim() || 'Premio / Snack',
       brand: selectedTreat?.brand,
       kcal: Math.round(parsedKcal),
@@ -661,13 +662,15 @@ interface RegisterMealModalProps {
   plan: FeedingPlan;
   mealLogs: MealLog[];
   defaultFeeder: string;
+  preferredMealIndex?: number;
   familyMembers: Array<{ id: string; name: string }>;
   onConfirmMeal: (
     mealIndex: number,
     fedBy: string,
     grams: number,
     time: string,
-    plannedGrams?: number
+    plannedGrams?: number,
+    mixedComponents?: MealMixedComponent[]
   ) => void;
 }
 
@@ -678,33 +681,46 @@ export const RegisterMealModal: React.FC<RegisterMealModalProps> = ({
   plan,
   mealLogs,
   defaultFeeder,
+  preferredMealIndex,
   familyMembers,
   onConfirmMeal,
 }) => {
-  const totalMeals = Math.max(1, plan.mealsPerDay || 2);
-  const completedSet = new Set(mealLogs.filter((l) => l.completed).map((l) => l.mealIndex));
-  const firstPending = Array.from({ length: totalMeals }).findIndex((_, idx) => !completedSet.has(idx));
+  const portions = useMemo(() => getPlannedMeals(plan, plan.trainingRationGramsToday), [plan]);
+  const times = defaultMealTimes(portions.length);
+  const completedMeals = useMemo(() => mealLogs.filter((log) => log.completed), [mealLogs]);
+  const startingMealIndex = preferredMealIndex ?? portions.findIndex(
+    (_, index) => !completedMeals.some((log) => log.mealIndex === index)
+  );
+  const initialIndex = Math.max(0, startingMealIndex);
+  const initialPortion = completedMeals.find((log) => log.mealIndex === initialIndex)?.gramsFed ??
+    (plan.rationConfirmed ? portions[initialIndex]?.grams : undefined);
 
-  const [mealIndex, setMealIndex] = useState(firstPending >= 0 ? firstPending : 0);
+  const [mealIndex, setMealIndex] = useState(initialIndex);
   const [fedBy, setFedBy] = useState(defaultFeeder);
-  const trainingGrams = plan.rationConfirmed ? Math.min(plan.trainingRationGramsToday || 0, plan.gramsPerDay || 0) : 0;
-  const defaultBowlPerMeal = plan.rationConfirmed
-    ? Math.round(Math.max(0, (plan.gramsPerDay || 0) - trainingGrams) / totalMeals)
-    : 0;
-  const [grams, setGrams] = useState(defaultBowlPerMeal > 0 ? String(defaultBowlPerMeal) : '');
+  const [grams, setGrams] = useState('');
 
   useEffect(() => {
     if (!isOpen) return;
-    const done = new Set(mealLogs.filter((l) => l.completed).map((l) => l.mealIndex));
-    const nextIdx = Array.from({ length: totalMeals }).findIndex((_, idx) => !done.has(idx));
-    setMealIndex(nextIdx >= 0 ? nextIdx : 0);
-    setFedBy(defaultFeeder);
-    setGrams(defaultBowlPerMeal > 0 ? String(defaultBowlPerMeal) : '');
-  }, [isOpen, mealLogs, totalMeals, defaultFeeder, defaultBowlPerMeal]);
+    setMealIndex(initialIndex);
+    setFedBy(completedMeals.find((log) => log.mealIndex === initialIndex)?.fedBy || defaultFeeder);
+    setGrams(initialPortion === undefined ? '' : String(initialPortion));
+  }, [isOpen, initialIndex, initialPortion, completedMeals, defaultFeeder]);
 
   if (!isOpen) return null;
 
-  const scheduledTime = plan.mealTimes?.[mealIndex] || (mealIndex === 0 ? '08:00' : '20:00');
+  const scheduledTime = plan.mealTimes?.[mealIndex] || times[mealIndex];
+  const plannedPortion = portions[mealIndex];
+  const plannedGrams = plan.rationConfirmed ? plannedPortion?.grams : undefined;
+  const servedGrams = Number(grams);
+  const canSubmit = grams.trim() !== '' && Number.isFinite(servedGrams) && servedGrams >= 0;
+
+  const selectMeal = (index: number) => {
+    const existing = completedMeals.find((log) => log.mealIndex === index);
+    const amount = existing?.gramsFed ?? (plan.rationConfirmed ? portions[index]?.grams : undefined);
+    setMealIndex(index);
+    setFedBy(existing?.fedBy || defaultFeeder);
+    setGrams(amount === undefined ? '' : String(amount));
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4">
@@ -728,14 +744,14 @@ export const RegisterMealModal: React.FC<RegisterMealModalProps> = ({
         <div className="space-y-2">
           <label className="text-xs font-bold text-[#1C2B21] block">Toma del día</label>
           <div className="grid grid-cols-2 gap-2">
-            {Array.from({ length: totalMeals }).map((_, idx) => {
-              const t = plan.mealTimes?.[idx] || '08:00';
-              const isDone = completedSet.has(idx);
+            {portions.map((_, idx) => {
+              const t = plan.mealTimes?.[idx] || times[idx];
+              const isDone = completedMeals.some((log) => log.mealIndex === idx);
               return (
                 <button
                   key={idx}
                   type="button"
-                  onClick={() => setMealIndex(idx)}
+                  onClick={() => selectMeal(idx)}
                   className={`min-h-[44px] px-3 py-2 rounded-xl border text-xs font-bold text-left ${
                     mealIndex === idx
                       ? 'bg-[#0B5D2E] text-white border-[#0B5D2E]'
@@ -757,6 +773,7 @@ export const RegisterMealModal: React.FC<RegisterMealModalProps> = ({
               onChange={(e) => setFedBy(e.target.value)}
               className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-bold min-h-[44px]"
             >
+              {!familyMembers.length && <option value={defaultFeeder}>{defaultFeeder}</option>}
               {familyMembers.map((m) => (
                 <option key={m.id} value={m.name}>
                   {m.name}
@@ -767,17 +784,17 @@ export const RegisterMealModal: React.FC<RegisterMealModalProps> = ({
           <div className="space-y-1">
             <label className="text-xs font-bold text-[#1C2B21]">
               Gramos servidos
-              {defaultBowlPerMeal > 0 && (
+              {plannedGrams !== undefined && (
                 <span className="font-normal text-[#44544A] block text-[10px]">
-                  Planificado: {defaultBowlPerMeal} g
+                  Planificado: {plannedGrams} g
                 </span>
               )}
             </label>
             <input
               type="number"
               min="0"
-              step="1"
-              placeholder={defaultBowlPerMeal > 0 ? String(defaultBowlPerMeal) : 'Ej: 50'}
+              step="any"
+              placeholder={plannedGrams !== undefined ? String(plannedGrams) : 'Ej: 50'}
               value={grams}
               onChange={(e) => setGrams(e.target.value)}
               className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-extrabold text-[#0B5D2E] tabular-nums min-h-[44px]"
@@ -787,17 +804,13 @@ export const RegisterMealModal: React.FC<RegisterMealModalProps> = ({
 
         <button
           type="button"
+          disabled={!canSubmit}
           onClick={() => {
-            onConfirmMeal(
-              mealIndex,
-              fedBy,
-              Math.max(0, Math.round(parseFloat(grams) || 0)),
-              scheduledTime,
-              defaultBowlPerMeal
-            );
+            const components = getPlannedMealComponents(plan, plannedPortion, servedGrams);
+            onConfirmMeal(mealIndex, fedBy, servedGrams, scheduledTime, plannedGrams, components);
             onClose();
           }}
-          className="w-full min-h-[48px] bg-[#0B5D2E] text-white rounded-2xl font-heading font-extrabold text-sm flex items-center justify-center gap-2"
+          className="w-full min-h-[48px] bg-[#0B5D2E] text-white rounded-2xl font-heading font-extrabold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
         >
           <Check className="w-4 h-4" />
           <span>Confirmar toma</span>

@@ -1,27 +1,31 @@
 import React, { useState } from 'react';
 import { UserAccount, Pet } from '../types';
 import { StorageService } from '../utils/storage';
-import { jsPDF } from 'jspdf';
 import {
-  Settings,
-  Globe,
   Download,
   Trash2,
   Shield,
   FileSpreadsheet,
-  Check,
-  MessageSquare,
-  HelpCircle,
   Sun,
   Moon,
 } from 'lucide-react';
+
+function downloadData(data: string, type: string, filename: string) {
+  const url = URL.createObjectURL(new Blob([data], { type }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 
 interface SettingsViewProps {
   userAccount: UserAccount;
   pets: Pet[];
   onUpdateAccount: (updated: Partial<UserAccount>) => void;
   onResetAllData: () => void;
-  idToken?: string | null;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
@@ -29,37 +33,19 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   pets,
   onUpdateAccount,
   onResetAllData,
-  idToken,
 }) => {
   const isEs = userAccount.language === 'es';
 
-  const [whatsappPhone, setWhatsappPhone] = useState(userAccount.whatsappPhone || '');
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [showExportSuccess, setShowExportSuccess] = useState(false);
 
-  // Export data as JSON (local and cloud)
-  const handleExportJSON = async () => {
-    let dataStr = StorageService.exportAllDataJSON();
-    if (idToken) {
-      try {
-        const res = await fetch('/api/user/export', {
-          headers: { Authorization: `Bearer ${idToken}` },
-        });
-        if (res.ok) {
-          const cloudData = await res.json();
-          dataStr = JSON.stringify(cloudData, null, 2);
-        }
-      } catch (e) {
-        // Fall back to local dataStr
-      }
-    }
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `RacionApp_Backup_${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
+  const handleExportJSON = () => {
+    downloadData(
+      StorageService.exportAllDataJSON(),
+      'application/json',
+      `RacionApp_Backup_${new Date().toISOString().split('T')[0]}.json`
+    );
     setShowExportSuccess(true);
     setTimeout(() => setShowExportSuccess(false), 2500);
   };
@@ -70,12 +56,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     pets.forEach((p) => {
       csv += `"${p.name}","${p.species}","${p.breed}",${p.currentWeightKg},${p.idealWeightKg},${p.bcs}\n`;
     });
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `RacionApp_Mascotas_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
+    downloadData(csv, 'text/csv', `RacionApp_Mascotas_${new Date().toISOString().split('T')[0]}.csv`);
     setShowExportSuccess(true);
     setTimeout(() => setShowExportSuccess(false), 2500);
   };
@@ -87,7 +68,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           {isEs ? 'Ajustes y Privacidad' : 'Settings & Privacy'}
         </h3>
         <p className="text-xs text-[#44544A] mt-0.5">
-          {isEs ? 'Preferencias, recordatorios, exportación y control total de tus datos' : 'Preferences, reminders, data export and privacy'}
+          {isEs ? 'Preferencias, exportación y control de tus datos' : 'Preferences, data export and privacy'}
         </p>
       </div>
 
@@ -178,62 +159,18 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
       </div>
 
-      {/* WhatsApp Opt-in (Page 6) */}
-      <div className="bg-white rounded-3xl p-5 border border-[#0B5D2E20] shadow-sm space-y-3">
-        <div className="flex items-center gap-2">
-          <MessageSquare className="w-5 h-5 text-[#25D366]" />
-          <h4 className="font-heading font-extrabold text-base text-[#1C2B21]">
-            {isEs ? 'Canal de WhatsApp (Opcional)' : 'WhatsApp Channel (Optional)'}
-          </h4>
-        </div>
-
-        <div className="p-3 bg-[#EAF4EC] rounded-2xl border border-[#0B5D2E20] space-y-2">
-          <label className="flex items-center justify-between cursor-pointer">
-            <div className="flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-[#25D366]" />
-              <span className="font-bold text-[#0B5D2E] text-xs">
-                {isEs ? 'Recordatorios de salud y pesaje por WhatsApp (Opcional)' : 'Health & weight updates via WhatsApp (Optional)'}
-              </span>
-            </div>
-            <input
-              type="checkbox"
-              checked={userAccount.whatsappOptIn}
-              onChange={(e) => onUpdateAccount({ whatsappOptIn: e.target.checked })}
-              className="w-5 h-5 accent-[#0B5D2E] rounded cursor-pointer"
-            />
-          </label>
-            <p className="text-[11px] text-[#44544A]">
-              {isEs
-                ? 'Plantillas informativas exclusivas de aviso de comida o pesaje. Nunca enviaremos publicidad comercial.'
-                : 'Informational reminders only. No promotional spam.'}
-            </p>
-            {userAccount.whatsappOptIn && (
-              <input
-                type="tel"
-                value={whatsappPhone}
-                onChange={(e) => {
-                  setWhatsappPhone(e.target.value);
-                  onUpdateAccount({ whatsappPhone: e.target.value });
-                }}
-                placeholder="+54 9 11 1234-5678"
-                className="w-full px-3 py-2 bg-white border border-[#0B5D2E30] rounded-xl text-xs font-semibold"
-              />
-            )}
-          </div>
-        </div>
-
       {/* Data Export (CSV & JSON) */}
       <div className="bg-white rounded-3xl p-5 border border-[#0B5D2E20] shadow-sm space-y-3">
         <div className="flex items-center gap-2">
           <Download className="w-5 h-5 text-[#0B5D2E]" />
           <h4 className="font-heading font-extrabold text-base text-[#1C2B21]">
-            {isEs ? 'Exportar mis datos (Control total)' : 'Export My Data'}
+            {isEs ? 'Exportar mis datos' : 'Export My Data'}
           </h4>
         </div>
         <p className="text-xs text-[#44544A]">
           {isEs
-            ? 'Descarga una copia completa de tus mascotas, raciones y pesajes en formato abierto.'
-            : 'Download a complete copy of your pet records, rations, and logs.'}
+            ? 'Descarga tus perfiles en CSV o una copia de tus datos locales en JSON.'
+            : 'Download your pet profiles as CSV or a copy of your local data as JSON.'}
         </p>
 
         <div className="grid grid-cols-2 gap-2 pt-1">
@@ -262,13 +199,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         )}
       </div>
 
-      {/* Privacy Policy & GDPR/LGPD (Page 6) */}
+      {/* Your data and privacy/LGPD (Page 6) */}
       <div className="bg-white rounded-3xl p-5 border border-[#0B5D2E20] shadow-sm space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-[#0B5D2E]" />
             <h4 className="font-heading font-extrabold text-base text-[#1C2B21]">
-              {isEs ? 'Política de Privacidad y GDPR' : 'Privacy Policy & GDPR'}
+              {isEs ? 'Tus datos y privacidad' : 'Your data and privacy'}
             </h4>
           </div>
           <button
@@ -280,17 +217,17 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
         <p className="text-xs text-[#44544A]">
           {isEs
-            ? 'Regla estricta de Ración App: Tus datos de mascotas viven en tu dispositivo. Jamás vendemos información a terceros ni almacenamos fotos de etiquetas sin tu consentimiento explícito.'
-            : 'Strict policy: Your pet data is yours. We never sell data to advertisers.'}
+            ? 'Tus datos se guardan en este navegador. Si borras sus datos o usas otro navegador, tus registros no estarán allí.'
+            : 'Your data is saved in this browser. If you clear its data or switch browsers, your records will not be there.'}
         </p>
       </div>
 
-      {/* Delete Account & Wipe Local Data */}
+      {/* Wipe Local Data */}
       <div className="bg-[#FEF2F2] rounded-3xl p-5 border border-[#C0392B]/30 space-y-3">
         <div className="flex items-center gap-2 text-[#991B1B]">
           <Trash2 className="w-5 h-5 text-[#C0392B]" />
           <h4 className="font-heading font-extrabold text-base">
-            {isEs ? 'Borrar todos mis datos' : 'Delete Account & All Data'}
+            {isEs ? 'Borrar todos mis datos' : 'Delete all my data'}
           </h4>
         </div>
         <p className="text-xs text-[#7F1D1D]">
@@ -312,17 +249,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 {isEs ? 'Cancelar' : 'Cancel'}
               </button>
               <button
-                onClick={async () => {
-                  if (idToken) {
-                    try {
-                      await fetch('/api/user/delete-account', {
-                        method: 'POST',
-                        headers: { Authorization: `Bearer ${idToken}` },
-                      });
-                    } catch (e) {
-                      // Handled
-                    }
-                  }
+                onClick={() => {
                   onResetAllData();
                   setShowConfirmDelete(false);
                 }}
@@ -337,7 +264,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             onClick={() => setShowConfirmDelete(true)}
             className="w-full py-2.5 bg-white border border-[#C0392B]/40 text-[#C0392B] rounded-xl text-xs font-bold hover:bg-red-50 transition min-h-[44px]"
           >
-            {isEs ? 'Borrar cuenta y datos' : 'Delete account and data'}
+            {isEs ? 'Borrar datos locales' : 'Delete local data'}
           </button>
         )}
       </div>
@@ -351,16 +278,19 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </h3>
             <div className="text-xs text-[#1C2B21] space-y-2.5 leading-relaxed">
               <p>
-                <strong>1. Privacidad Primero:</strong> Ración App opera bajo el modelo de almacenamiento local y encriptado. No comercializamos bases de datos con marcas de comida ni anunciantes.
+                {isEs
+                  ? 'Esta beta no tiene cuentas. Los perfiles, planes, tomas y pesajes se guardan en este navegador.'
+                  : 'This beta has no accounts. Profiles, plans, meals and weigh-ins are saved in this browser.'}
               </p>
               <p>
-                <strong>2. Fotos de Etiquetas e IA:</strong> Las imágenes subidas para extracción OCR se procesan de forma transitoria y segura. Nunca se almacenan permanentemente sin confirmación.
+                {isEs
+                  ? 'Puedes descargar una copia en JSON antes de borrar los datos. El archivo contiene tus registros: guárdalo en un lugar seguro.'
+                  : 'You can download a JSON copy before deleting your data. It contains your records, so store it somewhere safe.'}
               </p>
               <p>
-                <strong>3. Cumplimiento GDPR / LGPD:</strong> Tienes derecho absoluto a la exportación de tus datos en formatos estándar (JSON, CSV, PDF) y al borrado definitivo con un solo toque.
-              </p>
-              <p>
-                <strong>4. Guía Educativa:</strong> Esta aplicación se fundamenta en guías nutricionales públicas (NRC 2006, WSAVA, AAHA). No constituye prescripción médica.
+                {isEs
+                  ? 'Las raciones son estimaciones y no sustituyen la indicación de un veterinario.'
+                  : 'Portions are estimates and do not replace veterinary guidance.'}
               </p>
             </div>
             <button

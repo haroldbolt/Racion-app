@@ -3,12 +3,15 @@ import {
   FeedingPlan,
   FoodItem,
   HydrationDailyState,
+  MealLog,
   Pet,
   TreatCatalogItem,
   TreatLog,
 } from '../types';
 import { findBreedProfile } from '../data/breeds';
 import { PET_FOODS_DATABASE } from '../data/foods';
+import { defaultMealTimes, hasValidVetGuideline, isClinicalOrVetPlan, requiresVetGuidance } from './calculator';
+import { getFoodKcalPerKg, getLoggedMealKcal, getPlanFoodKcalForGrams, getPlannedMeals, getPrimaryPlanFood } from './mealPortions';
 
 export interface RuleSourceItem {
   rule: string;
@@ -119,9 +122,7 @@ export function isPetSenior(pet: Pet): boolean {
 }
 
 export function getEffectiveFoodItem(plan?: FeedingPlan): FoodItem | undefined {
-  if (!plan) return undefined;
-  if (plan.foodType === 'wet') return plan.wetFood || plan.dryFood;
-  return plan.dryFood || plan.wetFood;
+  return getPrimaryPlanFood(plan);
 }
 
 export function hasConfirmedLabel(food?: FoodItem): boolean {
@@ -129,19 +130,11 @@ export function hasConfirmedLabel(food?: FoodItem): boolean {
   if (food.type === 'barf') return false;
   const statusOk =
     food.labelStatus === 'verified_manufacturer' || food.labelStatus === 'user_confirmed_label';
-  return statusOk && typeof food.kcalPerKg === 'number' && food.kcalPerKg > 400;
+  return statusOk && (getFoodKcalPerKg(food) ?? 0) > 400;
 }
 
 export function hasClinicalOrVetPlan(pet: Pet, plan?: FeedingPlan): boolean {
-  const hasRestrictions = Array.isArray(pet.restrictions) && pet.restrictions.length > 0;
-  return Boolean(
-    pet.hasVetGuideline ||
-      pet.vetGuideline?.locked ||
-      plan?.isVetLocked ||
-      pet.dietType === 'therapeutic' ||
-      pet.specialState !== 'none' ||
-      hasRestrictions
-  );
+  return isClinicalOrVetPlan(pet, plan);
 }
 
 function getEffectiveBreedSize(pet: Pet): { size: BreedSize; isAdultWeightKnown: boolean } {
@@ -481,7 +474,7 @@ export function evaluateCurrentFood(
     ? `Compatible con crecimiento: ${dataSourceLabel} confirma alimento completo y adecuado para cachorros (${food?.kcalPerKg} kcal/kg).`
     : senior
     ? `Compatible para etapa senior/adulto: ${dataSourceLabel} respalda nutrición completa (${food?.kcalPerKg} kcal/kg).`
-    : `Compatible para perro adulto: ${dataSourceLabel} confirma nutrición completa de mantenimiento (${food?.kcalPerKg} kcal/kg).`;
+    : `Compatible para ${pet.species === 'cat' ? 'gato adulto' : 'perro adulto'}: ${dataSourceLabel} confirma nutrición completa de mantenimiento (${food?.kcalPerKg} kcal/kg).`;
 
   return {
     status: 'compatible',
@@ -532,13 +525,14 @@ export function evaluateHydration(
     !hasWaterIntakeShift && !isBarf && !hasHydrationPathology && !isVetLocked && pet.currentWeightKg > 0;
 
   let foodMoistureEstimatedMl = 0;
-  if (plan?.rationConfirmed && plan.gramsPerDay > 0) {
+  if (plan?.rationConfirmed && plan.gramsPerDay > 0 && !isVetLocked && !isBarf) {
     if (plan.foodType === 'wet') {
       const moisture = (plan.wetFood?.moisturePct ?? 80) / 100;
       foodMoistureEstimatedMl = Math.round(plan.gramsPerDay * moisture);
     } else if (plan.foodType === 'mixed' && plan.dryFood && plan.wetFood) {
-      const dryGrams = Math.round(plan.gramsPerDay * ((plan.mixedDryPct || 50) / 100));
-      const wetGrams = Math.max(0, plan.gramsPerDay - dryGrams);
+      const portions = getPlannedMeals(plan);
+      const dryGrams = portions.reduce((total, portion) => total + (portion.dryGrams ?? 0), 0);
+      const wetGrams = portions.reduce((total, portion) => total + (portion.wetGrams ?? 0), 0);
       foodMoistureEstimatedMl = Math.round(
         dryGrams * ((plan.dryFood.moisturePct ?? 10) / 100) +
           wetGrams * ((plan.wetFood.moisturePct ?? 80) / 100)
@@ -637,10 +631,10 @@ export function evaluateTreatsBudget(
 
   const rationConfirmed = Boolean(plan?.rationConfirmed && plan.gramsPerDay > 0);
   const canAllocatePuppyTrainingFromRation =
-    puppy && rationConfirmed && !plan?.isVetLocked && pet.dietType !== 'barf';
+    puppy && rationConfirmed && !clinicalOrVet && pet.dietType !== 'barf' && plan?.foodType !== 'barf';
 
   const rawTraining = Math.max(0, Math.round(plan?.trainingRationGramsToday || 0));
-  const trainingGramsAllocatedToday = rationConfirmed
+  const trainingGramsAllocatedToday = canAllocatePuppyTrainingFromRation
     ? Math.min(rawTraining, plan?.gramsPerDay || 0)
     : 0;
   const bowlGramsTotalToday = rationConfirmed
@@ -701,7 +695,7 @@ export function getBarfAndSpecialDietGuidance(pet: Pet, plan?: FeedingPlan): Bar
     : 'Derivación veterinaria activa: las fórmulas terapéuticas, cantidades clínicas y transiciones deben ser indicadas y ajustadas por su veterinario tratante.';
 
   const registeredVetPlanSummary =
-    pet.hasVetGuideline && pet.vetGuideline
+    pet.vetGuideline && hasValidVetGuideline(pet)
       ? `${pet.vetGuideline.prescribedFoodName} · ${pet.vetGuideline.prescribedGramsPerMeal} g/comida × ${pet.vetGuideline.mealsPerDay} tomas (${pet.vetGuideline.prescribedKcal} kcal/día) — ${pet.vetGuideline.vetName}`
       : null;
 
@@ -711,7 +705,7 @@ export function getBarfAndSpecialDietGuidance(pet: Pet, plan?: FeedingPlan): Bar
     isTherapeuticOrRestricted,
     barfRisks,
     vetReferralBanner,
-    respectsVetPlan: Boolean(pet.hasVetGuideline || plan?.isVetLocked),
+    respectsVetPlan: hasValidVetGuideline(pet),
     registeredVetPlanSummary,
   };
 }
@@ -721,6 +715,7 @@ export function getNextBestStepForToday(
   plan?: FeedingPlan,
   review?: FoodCompatibilityReview
 ): NextStepRecommendation | null {
+  if (requiresVetGuidance(pet, plan)) return null;
   if (review?.needsLabelReview && !pet.dietType?.includes('barf')) {
     return {
       id: 'complete_label',
@@ -756,7 +751,7 @@ export function getNextBestStepForToday(
 
 export function getNextMealStatus(
   plan: FeedingPlan | undefined,
-  mealLogs: Array<{ mealIndex: number; completed: boolean; gramsFed: number }>,
+  mealLogs: Array<Pick<MealLog, 'mealIndex' | 'completed' | 'gramsFed' | 'plannedGrams' | 'mixedComponents'>>,
   treatLogsToday: TreatLog[] = [],
   now: Date = new Date()
 ): NextMealStatus {
@@ -775,26 +770,21 @@ export function getNextMealStatus(
     };
   }
 
-  const totalMealsCount = Math.max(1, plan.mealsPerDay || 2);
-  const mealTimes = plan.mealTimes && plan.mealTimes.length > 0 ? plan.mealTimes : ['08:00', '20:00'];
+  const trainingGramsToday = plan.rationConfirmed && !plan.isVetLocked
+    ? Math.min(Math.max(0, plan.trainingRationGramsToday || 0), plan.gramsPerDay || 0)
+    : 0;
+  const portions = getPlannedMeals(plan, trainingGramsToday);
+  const totalMealsCount = portions.length;
+  const mealTimes = defaultMealTimes(totalMealsCount).map((fallback, index) => plan.mealTimes?.[index] || fallback);
   const completedLogs = mealLogs.filter((l) => l.completed);
-  const completedSet = new Set(completedLogs.map((l) => l.mealIndex));
-
-  const trainingGramsToday = plan.rationConfirmed
-    ? Math.min(plan.trainingRationGramsToday || 0, plan.gramsPerDay || 0)
-    : 0;
-  const bowlGramsTotal = plan.rationConfirmed
-    ? Math.max(0, (plan.gramsPerDay || 0) - trainingGramsToday)
-    : 0;
-  const perMealBowlGrams = plan.rationConfirmed ? Math.round(bowlGramsTotal / totalMealsCount) : 0;
-
+  const completedSet = new Set(completedLogs.filter(l => l.mealIndex >= 0 && l.mealIndex < totalMealsCount).map(l => l.mealIndex));
   const nowMins = now.getHours() * 60 + now.getMinutes();
   let nextMealIndex: number | null = null;
   let bestDistance = Infinity;
 
   for (let idx = 0; idx < totalMealsCount; idx++) {
     if (completedSet.has(idx)) continue;
-    const tStr = mealTimes[idx] || (idx === 0 ? '08:00' : '20:00');
+    const tStr = mealTimes[idx];
     const [hh, mm] = tStr.split(':').map((n) => parseInt(n, 10) || 0);
     const mins = hh * 60 + mm;
     const dist = mins >= nowMins ? mins - nowMins : mins + 1440 - nowMins;
@@ -805,29 +795,20 @@ export function getNextMealStatus(
   }
 
   const consumedGramsMeals = completedLogs.reduce((sum, l) => sum + (l.gramsFed || 0), 0);
-  const kcalPerGram =
-    plan.rationConfirmed && plan.gramsPerDay > 0 ? plan.mer / plan.gramsPerDay : 0;
-
-  const consumedMealKcal = completedLogs.reduce((sum, l) => {
-    if (kcalPerGram > 0 && l.gramsFed > 0) return sum + Math.round(l.gramsFed * kcalPerGram);
-    if (plan.rationConfirmed && plan.kcalPerMeal > 0) return sum + plan.kcalPerMeal;
-    return sum;
-  }, 0);
-
+  const consumedMealKcal = completedLogs.reduce((sum, log) => sum + getLoggedMealKcal(log, plan), 0);
   const treatsKcalToday = treatLogsToday.reduce((sum, t) => sum + (t.kcal || 0), 0);
-  const trainingKcalToday =
-    kcalPerGram > 0 && trainingGramsToday > 0 ? Math.round(trainingGramsToday * kcalPerGram) : 0;
+  const trainingKcalToday = getPlanFoodKcalForGrams(plan, trainingGramsToday);
 
   return {
     nextMealIndex,
-    nextMealTime: nextMealIndex !== null ? mealTimes[nextMealIndex] || '08:00' : null,
-    nextMealGrams: nextMealIndex !== null && plan.rationConfirmed ? perMealBowlGrams : null,
-    allMealsCompleted: completedLogs.length >= totalMealsCount,
-    completedMealsCount: completedLogs.length,
+    nextMealTime: nextMealIndex !== null ? mealTimes[nextMealIndex] : null,
+    nextMealGrams: nextMealIndex !== null && plan.rationConfirmed ? portions[nextMealIndex].grams : null,
+    allMealsCompleted: completedSet.size >= totalMealsCount,
+    completedMealsCount: completedSet.size,
     totalMealsCount,
     consumedGramsMeals,
     trainingGramsToday,
-    consumedKcalTotal: consumedMealKcal + treatsKcalToday + trainingKcalToday,
+    consumedKcalTotal: Math.round(consumedMealKcal + treatsKcalToday + trainingKcalToday),
     targetKcalTotal: plan.mer || 0,
   };
 }

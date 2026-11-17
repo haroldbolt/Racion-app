@@ -2,8 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { Pet, FeedingPlan, FoodCostEntry, UserAccount } from '../types';
 import { StorageService } from '../utils/storage';
 import { formatCOP } from '../utils/i18n';
-import { CloudSqlService } from '../services/cloudSqlService';
-import { useAuth } from '../contexts/AuthContext';
 import {
   DollarSign,
   Plus,
@@ -40,7 +38,6 @@ export const FoodCostTracker: React.FC<FoodCostTrackerProps> = ({
   onPlanUpdate,
 }) => {
   const isEs = userAccount.language === 'es';
-  const { user } = useAuth();
 
   // Purchases list
   const [purchases, setPurchases] = useState<FoodCostEntry[]>(() =>
@@ -118,7 +115,7 @@ export const FoodCostTracker: React.FC<FoodCostTrackerProps> = ({
   };
 
   // Submit new purchase entry
-  const handleSubmitPurchase = async (e: React.FormEvent) => {
+  const handleSubmitPurchase = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!numericPrice || numericPrice <= 0) {
@@ -145,21 +142,11 @@ export const FoodCostTracker: React.FC<FoodCostTrackerProps> = ({
       createdAt: new Date().toISOString(),
     };
 
-    // 1. Save to local storage
+    // Save to local storage
     StorageService.addFoodPurchase(newEntry);
     setPurchases((prev) => [newEntry, ...prev]);
 
-    // 2. Optionally sync with Cloud SQL if authenticated
-    if (user) {
-      try {
-        const token = await user.getIdToken();
-        await CloudSqlService.savePurchase(newEntry, token);
-      } catch (err) {
-        console.warn('Could not sync purchase to Cloud SQL:', err);
-      }
-    }
-
-    // 3. Update FeedingPlan bag days & price if current food matches
+    // Update the plan with the current bag details.
     if (onPlanUpdate && plan) {
       onPlanUpdate({
         bagWeightKg: numericBagSize,
@@ -183,7 +170,7 @@ export const FoodCostTracker: React.FC<FoodCostTrackerProps> = ({
   };
 
   // Delete purchase
-  const handleDeletePurchase = async (id: string) => {
+  const handleDeletePurchase = (id: string) => {
     const confirmDelete = window.confirm(
       isEs ? '¿Deseas eliminar este registro de gasto?' : 'Delete this cost record?'
     );
@@ -191,15 +178,6 @@ export const FoodCostTracker: React.FC<FoodCostTrackerProps> = ({
 
     StorageService.deleteFoodPurchase(id);
     setPurchases((prev) => prev.filter((p) => p.id !== id));
-
-    if (user) {
-      try {
-        const token = await user.getIdToken();
-        await CloudSqlService.deletePurchase(id, token);
-      } catch (err) {
-        console.warn('Could not delete purchase from Cloud SQL:', err);
-      }
-    }
   };
 
   return (

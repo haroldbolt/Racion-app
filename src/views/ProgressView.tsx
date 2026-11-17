@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Pet, WeightRecord, HealthLog, FeedingPlan, UserAccount } from '../types';
 import { StorageService } from '../utils/storage';
 import { formatWeight, formatRation } from '../utils/i18n';
-import { calculateRER, determineFactor } from '../utils/calculator';
+import { recalculatePlanForPet, requiresVetGuidance } from '../utils/calculator';
+import { localDateKey } from '../utils/localDate';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -46,9 +47,9 @@ interface ProgressViewProps {
   plan?: FeedingPlan;
   weightRecords: WeightRecord[];
   healthLogs: HealthLog[];
-  onAddWeightRecord: (record: WeightRecord) => void;
+  onAddWeightRecord: (record: WeightRecord) => boolean;
   onAddHealthLog: (log: HealthLog) => void;
-  onUpdatePlanRation: (newGramsPerDay: number, newGramsPerMeal: number) => void;
+  onUpdatePlanRation: (plan: FeedingPlan) => void;
   userAccount: UserAccount;
 }
 
@@ -77,7 +78,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
 
   // Weighing inputs
   const [inputWeight, setInputWeight] = useState<number>(pet.currentWeightKg);
-  const [inputDate, setInputDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
+  const [inputDate, setInputDate] = useState<string>(() => localDateKey());
   const [inputWaist, setInputWaist] = useState<string>('');
   const [inputNotes, setInputNotes] = useState<string>('');
   const [inputPhoto, setInputPhoto] = useState<string>('');
@@ -85,8 +86,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
   // Auto-recalculation proposal modal (Section 5: Propose new ration, NEVER silently change it!)
   const [recalcProposal, setRecalcProposal] = useState<{
     oldGrams: number;
-    newGrams: number;
-    newGramsPerMeal: number;
+    newPlan: FeedingPlan;
   } | null>(null);
 
   // Health log form inputs
@@ -139,7 +139,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
   // Handle Save New Weight
   const handleSaveWeight = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputWeight || inputWeight <= 0) return;
+    if (!inputWeight || inputWeight <= 0 || !inputDate || inputDate > localDateKey()) return;
 
     const newRecord: WeightRecord = {
       id: 'weight_' + Date.now(),
@@ -151,38 +151,21 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
       notes: inputNotes,
     };
 
-    onAddWeightRecord(newRecord);
+    const changedWeight = onAddWeightRecord(newRecord);
     setShowWeighModal(false);
 
-    // AUTO-RECALCULATION LOGIC:
-    // When a new weight is saved, calculate what the new ration would be.
-    // If it differs, PROPOSE it to the user with confirm/dismiss modal! (Never change silently).
-    if (newRecord.weightKg !== pet.currentWeightKg && plan && plan.foodId) {
-      const isOverweight = pet.bcs >= 7;
-      const weightForCalc = isOverweight ? (pet.targetWeightKg || inputWeight * 0.9) : inputWeight;
-      const newRer = calculateRER(weightForCalc);
-      const { factor } = determineFactor(pet, pet.bcs >= 7 ? 'lose' : 'maintain', pet.bcs);
-      const newMer = Math.round(newRer * factor);
-
-      // Kcal per gram from dry food or default
-      const kcalPerKg = plan.dryFood?.kcalPerKg || (plan.mer / (plan.gramsPerDay || 200) * 1000);
-      const kcalPerG = kcalPerKg / 1000;
-      const newGramsDay = Math.round(newMer / kcalPerG);
-      const newGramsMeal = Math.round(newGramsDay / plan.mealsPerDay);
-
-      if (Math.abs(newGramsDay - plan.gramsPerDay) >= 3) {
-        setRecalcProposal({
-          oldGrams: plan.gramsPerDay,
-          newGrams: newGramsDay,
-          newGramsPerMeal: newGramsMeal,
-        });
+    const updatedPet = { ...pet, currentWeightKg: newRecord.weightKg };
+    if (changedWeight && plan?.rationConfirmed && !plan.isVetLocked && !requiresVetGuidance(updatedPet, plan)) {
+      const newPlan = recalculatePlanForPet(updatedPet, plan);
+      if (newPlan.rationConfirmed && newPlan.gramsPerDay !== plan.gramsPerDay) {
+        setRecalcProposal({ oldGrams: plan.gramsPerDay, newPlan });
       }
     }
   };
 
   const handleApplyRecalc = () => {
     if (recalcProposal) {
-      onUpdatePlanRation(recalcProposal.newGrams, recalcProposal.newGramsPerMeal);
+      onUpdatePlanRation(recalcProposal.newPlan);
       setRecalcProposal(null);
     }
   };
@@ -194,7 +177,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
     const newLog: HealthLog = {
       id: 'hl_' + Date.now(),
       petId: pet.id,
-      date: new Date().toISOString().split('T')[0],
+      date: localDateKey(),
       type: healthType,
       title: healthTitle.trim(),
       notes: healthNotes.trim(),
@@ -364,7 +347,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
 
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(68, 84, 74);
-      const rationStr = `${plan.gramsPerDay || 0} g/día (repartido en ${plan.mealsPerDay || 2} comidas de ${plan.gramsPerMeal || 0} g)`;
+      const rationStr = `${plan.gramsPerDay || 0} g/día · ${plan.mealsPerDay || 2} tomas`;
       doc.text(`${isEs ? 'Ración recomendada:' : 'Daily Ration:'} ${rationStr}`, margin + 3, y + 10);
       doc.text(
         `RER: ${plan.rer || 0} kcal/día  |  Factor: ${plan.factor || 1.6}  |  MER: ${plan.mer || 0} kcal/día  |  ${isEs ? 'Límite premios:' : 'Treats budget:'} ${plan.treatsBudgetKcal || 0} kcal/día`,
@@ -550,7 +533,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
     );
 
     const cleanName = pet.name.replace(/[^a-zA-Z0-9]/g, '_');
-    doc.save(`Informe_Veterinario_${cleanName}_${new Date().toISOString().split('T')[0]}.pdf`);
+    doc.save(`Informe_Veterinario_${cleanName}_${localDateKey()}.pdf`);
     setPdfDownloaded(true);
     setTimeout(() => setPdfDownloaded(false), 4000);
   };
@@ -583,7 +566,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
   const chartData = React.useMemo(() => {
     const records: WeightRecord[] = sortedWeights.length > 0
       ? sortedWeights
-      : [{ id: 'init', petId: pet.id, date: new Date().toISOString().split('T')[0], weightKg: pet.currentWeightKg }];
+      : [{ id: 'init', petId: pet.id, date: localDateKey(), weightKg: pet.currentWeightKg }];
 
     const mapped = records.map((w) => {
       const d = new Date(w.date + 'T12:00:00');
@@ -871,7 +854,14 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
               {/* Big [+ Pesar hoy] button (Rule 5: One big primary button) */}
               <button
                 type="button"
-                onClick={() => setShowWeighModal(true)}
+                onClick={() => {
+                  setInputDate(localDateKey());
+                  setInputWeight(pet.currentWeightKg);
+                  setInputWaist('');
+                  setInputNotes('');
+                  setInputPhoto('');
+                  setShowWeighModal(true);
+                }}
                 className="min-h-[52px] px-4 py-2.5 bg-[#0B5D2E] text-white rounded-2xl font-heading font-extrabold text-sm flex items-center gap-1.5 shadow-md hover:bg-[#094723] transition active:scale-95"
               >
                 <Plus className="w-5 h-5" />
@@ -1487,14 +1477,10 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
               </h3>
               <p className="text-sm text-[#1C2B21] font-semibold">
                 {isEs
-                  ? `Su ración cambia de ${recalcProposal.oldGrams} g a ${recalcProposal.newGrams} g al día. ¿Aplicar?`
-                  : `Their ration changes from ${recalcProposal.oldGrams} g to ${recalcProposal.newGrams} g per day. Apply?`}
+                  ? `Su ración cambia de ${recalcProposal.oldGrams} g a ${recalcProposal.newPlan.gramsPerDay} g al día. ¿Aplicar?`
+                  : `Their ration changes from ${recalcProposal.oldGrams} g to ${recalcProposal.newPlan.gramsPerDay} g per day. Apply?`}
               </p>
-              <p className="text-xs text-[#44544A] pt-1">
-                {isEs
-                  ? `Corresponde a ${recalcProposal.newGramsPerMeal} g en cada comida.`
-                  : `Equals ${recalcProposal.newGramsPerMeal} g per meal.`}
-              </p>
+
             </div>
 
             <div className="flex gap-2 pt-2">
@@ -1548,6 +1534,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
               </label>
               <input
                 type="date"
+                max={localDateKey()}
                 required
                 value={inputDate}
                 onChange={(e) => setInputDate(e.target.value)}

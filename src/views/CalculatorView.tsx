@@ -6,6 +6,8 @@ import { FoodsView } from './FoodsView';
 import {
   calculateFeedingPlan,
   buildFeedingPlan,
+  defaultMealTimes,
+  hasValidVetGuideline,
   CalculationInputs,
   CalculationResult,
 } from '../utils/calculator';
@@ -15,6 +17,7 @@ import {
   getIdealWeightForBreedAndSex,
   getBreedSizeLabel,
 } from '../data/breeds';
+import { getPlannedMeals } from '../utils/mealPortions';
 import { formatRation, formatWeight } from '../utils/i18n';
 import {
   ArrowLeft,
@@ -27,8 +30,6 @@ import {
   Sliders,
   ChevronDown,
   ChevronUp,
-  Camera,
-  Barcode,
   Scale,
   ShieldCheck,
 } from 'lucide-react';
@@ -39,7 +40,7 @@ interface CalculatorViewProps {
   onUpdatePet?: (pet: Pet) => void;
   userAccount: UserAccount;
   onNavigateHome: () => void;
-  onOpenScanner?: () => void;
+  savedPlan?: FeedingPlan;
 }
 
 const SIZE_OPTIONS: Array<{ id: BreedSize; es: string; en: string }> = [
@@ -56,7 +57,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
   onUpdatePet,
   userAccount,
   onNavigateHome,
-  onOpenScanner,
+  savedPlan,
 }) => {
   const isEs = userAccount.language === 'es';
   const units = userAccount.units;
@@ -72,6 +73,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
   const [breedQuery, setBreedQuery] = useState<string>('');
   const [bcs, setBcs] = useState<number>(pet.bcs || 5);
   const [goal, setGoal] = useState<Goal>(() => {
+    if (savedPlan?.goal) return savedPlan.goal;
     if (pet.bcs >= 7) return 'lose';
     if (pet.bcs <= 3) return 'gain';
     if (pet.ageYears && pet.ageYears < 1) return 'growth';
@@ -111,15 +113,11 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
 
   // Food selection states
   const [foodType, setFoodType] = useState<'dry' | 'wet' | 'mixed' | 'barf'>(
-    editablePet.dietType === 'barf' ? 'barf' : 'dry'
+    savedPlan?.foodType || (editablePet.dietType === 'barf' ? 'barf' : 'dry')
   );
-  const [dryFood, setDryFood] = useState<FoodItem | undefined>(() =>
-    PET_FOODS_DATABASE.find(f => f.species === pet.species && f.type === 'dry')
-  );
-  const [wetFood, setWetFood] = useState<FoodItem | undefined>(() =>
-    PET_FOODS_DATABASE.find(f => f.species === pet.species && f.type === 'wet')
-  );
-  const [mixedDryPct, setMixedDryPct] = useState<number>(50); // 50% kcal from dry, 50% from wet
+  const [dryFood, setDryFood] = useState(savedPlan?.dryFood);
+  const [wetFood, setWetFood] = useState(savedPlan?.wetFood);
+  const [mixedDryPct, setMixedDryPct] = useState(savedPlan?.mixedDryPct ?? 50);
 
   // Food search & filter
   const [foodSearchQuery, setFoodSearchQuery] = useState('');
@@ -127,22 +125,22 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
   const [showComparerModal, setShowComparerModal] = useState(false);
 
   // Treats mini-calculator
-  const [treatsPerDay, setTreatsPerDay] = useState<number>(2);
-  const [kcalPerTreat, setKcalPerTreat] = useState<number>(15);
+  const [treatsPerDay, setTreatsPerDay] = useState<number>(savedPlan?.treatsKcal ? 1 : 0);
+  const [kcalPerTreat, setKcalPerTreat] = useState<number>(savedPlan?.treatsKcal ?? 0);
 
   // Meals per day
-  const [mealsPerDay, setMealsPerDay] = useState<number>(2);
-  const [mealTimes, setMealTimes] = useState<string[]>(['08:00', '20:00']);
+  const [mealsPerDay, setMealsPerDay] = useState(savedPlan?.mealsPerDay ?? 2);
+  const [mealTimes, setMealTimes] = useState(savedPlan?.mealTimes ?? defaultMealTimes(2));
 
   // Manual +/- 10% adjustment
-  const [manualAdjustmentPct, setManualAdjustmentPct] = useState<number>(0);
-  const [manualAdjustmentReason, setManualAdjustmentReason] = useState<string>('');
+  const [manualAdjustmentPct, setManualAdjustmentPct] = useState<number>(savedPlan?.manualAdjustmentPct ?? 0);
+  const [manualAdjustmentReason] = useState(savedPlan?.manualAdjustmentReason ?? '');
   const [showFormulasDetails, setShowFormulasDetails] = useState<boolean>(false);
 
   // Custom food manual inputs
   const [customBrand, setCustomBrand] = useState('');
   const [customName, setCustomName] = useState('');
-  const [customKcalPerKg, setCustomKcalPerKg] = useState<number>(3700);
+  const [customKcalPerKg, setCustomKcalPerKg] = useState('');
 
   // Filter food database for current pet species
   const matchingFoods = PET_FOODS_DATABASE.filter(f => {
@@ -175,6 +173,8 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
   };
 
   const result: CalculationResult = calculateFeedingPlan(calculationInputs);
+  const resultPlan = buildFeedingPlan(calculationInputs, result);
+  const resultMeals = getPlannedMeals(resultPlan);
 
   const handleNext = () => {
     if (step < 5) {
@@ -200,15 +200,15 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
     if (onUpdatePet) {
       onUpdatePet({ ...editablePet, bcs });
     }
-    const plan = buildFeedingPlan(calculationInputs, result);
-    onSavePlan(plan);
+    onSavePlan(resultPlan);
     onNavigateHome();
   };
 
   const handleSaveCustomFood = (e: React.FormEvent) => {
     e.preventDefault();
     if (!customName.trim()) return;
-    const hasValidKcal = customKcalPerKg > 400;
+    const kcalPerKg = Number(customKcalPerKg);
+    if (!Number.isFinite(kcalPerKg) || kcalPerKg <= 0) return;
 
     const newFood: FoodItem = {
       id: 'custom_' + Date.now(),
@@ -217,16 +217,14 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
       species: editablePet.species,
       lifeStage: (editablePet.ageYears ?? 2) < 1 ? 'puppy' : 'all',
       type: foodType === 'wet' ? 'wet' : 'dry',
-      kcalPerKg: hasValidKcal ? customKcalPerKg : 0,
-      proteinPct: 24,
-      fatPct: 14,
-      fiberPct: 3,
-      moisturePct: foodType === 'wet' ? 78 : 10,
+      kcalPerKg,
+      proteinPct: 0,
+      fatPct: 0,
+      fiberPct: 0,
+      moisturePct: 0,
       country: isEs ? 'Etiqueta ingresada por el usuario' : 'User label entry',
-      labelStatus: hasValidKcal ? 'user_confirmed_label' : 'unconfirmed',
-      isCompleteAndBalanced: true,
-      suitableForGrowth: (editablePet.ageYears ?? 2) < 1,
-      dataSource: hasValidKcal ? 'Etiqueta confirmada por el usuario' : 'Etiqueta pendiente',
+      labelStatus: 'user_confirmed_label',
+      dataSource: isEs ? 'Energía de la etiqueta ingresada por el usuario' : 'Energy entered from the label',
     };
 
     if (foodType === 'wet') {
@@ -282,8 +280,8 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
             </h2>
             <p className="text-xs text-[#44544A] mt-0.5">
               {isEs
-                ? 'Confirma raza, sexo, peso y edad para un cálculo metabólico exacto'
-                : 'Confirm breed, sex, weight and age for exact metabolic math'}
+                ? 'Confirma raza, sexo, peso y edad para un estimar su ración'
+                : 'Confirm breed, sex, weight and age to estimate their portion'}
             </p>
           </div>
 
@@ -954,28 +952,31 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
 
       {/* ================= STEP 5: MEALS PER DAY ================= */}
       {step === 5 && (
-        <div className="bg-white rounded-3xl p-5 border border-[#0B5D2E20] shadow-sm space-y-5 animate-in fade-in">
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            setMealTimes(new FormData(event.currentTarget).getAll('mealTime') as string[]);
+            handleNext();
+          }}
+          className="bg-white rounded-3xl p-5 border border-[#0B5D2E20] shadow-sm space-y-5 animate-in fade-in">
           <div>
             <h2 className="font-heading font-extrabold text-xl text-[#0B5D2E]">
               {isEs ? '5. ¿Cuántas comidas al día?' : '5. Meals per day'}
             </h2>
             <p className="text-xs text-[#44544A] mt-0.5">
-              {isEs ? 'Dividiremos la ración exactamente en partes iguales' : 'We will divide the daily ration into equal portions'}
+              {isEs ? 'Dividiremos la ración en porciones que sumen el total diario.' : 'The portions will add up to the daily total.'}
             </p>
           </div>
 
           {/* Meals count selector: 1, 2, 3 or 4 */}
           <div className="grid grid-cols-4 gap-2">
-            {[1, 2, 3, 4].map((count) => (
+            {(hasValidVetGuideline(editablePet) ? [1, 2, 3, 4, 5, 6] : [1, 2, 3, 4]).map((count) => (
               <button
                 key={count}
                 type="button"
                 onClick={() => {
                   setMealsPerDay(count);
-                  if (count === 1) setMealTimes(['12:00']);
-                  if (count === 2) setMealTimes(['08:00', '20:00']);
-                  if (count === 3) setMealTimes(['08:00', '14:00', '20:00']);
-                  if (count === 4) setMealTimes(['07:30', '12:00', '16:30', '20:30']);
+                  if (count !== mealsPerDay) setMealTimes(defaultMealTimes(count));
                 }}
                 className={`p-3 rounded-2xl border text-center transition min-h-[64px] flex flex-col items-center justify-center ${
                   mealsPerDay === count
@@ -998,18 +999,16 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
             </label>
             <div className="grid grid-cols-2 gap-2">
               {Array.from({ length: mealsPerDay }).map((_, idx) => (
-                <div key={idx} className="flex items-center gap-2 bg-[#EAF4EC] p-2.5 rounded-xl">
+                <div key={`${mealsPerDay}-${idx}`} className="flex items-center gap-2 bg-[#EAF4EC] p-2.5 rounded-xl">
                   <span className="text-xs font-bold text-[#0B5D2E] shrink-0">
                     #{idx + 1}:
                   </span>
                   <input
                     type="time"
-                    value={mealTimes[idx] || (idx === 0 ? '08:00' : '20:00')}
-                    onChange={(e) => {
-                      const updated = [...mealTimes];
-                      updated[idx] = e.target.value;
-                      setMealTimes(updated);
-                    }}
+                    name="mealTime"
+                    aria-label={isEs ? `Hora de la toma ${idx + 1}` : `Meal ${idx + 1} time`}
+                    defaultValue={mealTimes[idx] || defaultMealTimes(mealsPerDay)[idx]}
+                    required
                     className="w-full bg-white px-2 py-1 border border-gray-200 rounded-lg text-xs font-bold text-[#1C2B21]"
                   />
                 </div>
@@ -1018,13 +1017,13 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
           </div>
 
           <button
-            onClick={handleNext}
+            type="submit"
             className="w-full min-h-[52px] bg-[#F57C1A] text-white rounded-2xl font-heading font-extrabold text-lg flex items-center justify-center gap-2 hover:bg-[#e06d12] transition active:scale-98 shadow-md"
           >
             <span>{isEs ? 'Ver su plan nutricional' : 'See their nutritional plan'}</span>
             <Sparkles className="w-5 h-5" />
           </button>
-        </div>
+        </form>
       )}
 
       {/* ================= STEP 6: FINAL RESULTS (THE PRODUCT HERO) ================= */}
@@ -1039,7 +1038,9 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                   {isEs ? `Plan nutricional de ${editablePet.name}` : `Feeding plan for ${editablePet.name}`}
                 </h2>
                 <p className="text-xs text-[#44544A]">
-                  {isEs ? 'Calculado con precisión gramo por gramo' : 'Calculated gram by gram'}
+                  {resultPlan.isVetLocked
+                    ? (isEs ? 'Pauta veterinaria' : 'Veterinary instructions')
+                    : (isEs ? 'Estimación de alimentación' : 'Feeding estimate')}
                 </p>
               </div>
             </div>
@@ -1048,84 +1049,58 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
             </span>
           </div>
 
-          {/* ================= HERO NUMBER: Grams per meal in largest type ================= */}
-          <div className="text-center py-3 bg-[#EAF4EC]/60 rounded-3xl p-5 border border-[#0B5D2E20]">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#0B5D2E] block mb-1">
-              {result.rationConfirmed
-                ? isEs
-                  ? 'Ración recomendada'
-                  : 'Recommended ration'
-                : isEs
-                ? 'Requerimiento energético diario (MER)'
-                : 'Daily energy requirement (MER)'}
-            </span>
+          <div className="rounded-3xl border border-[#0B5D2E20] bg-[#EAF4EC]/60 p-5">
             {result.rationConfirmed ? (
               <>
-                <div className="font-heading font-black text-5xl sm:text-6xl text-[#1C2B21] tracking-tight leading-none my-1 tabular-nums">
-                  {formatRation(result.gramsPerMeal, units)}
+                <div className="text-center">
+                  <p className="text-xs font-bold uppercase tracking-widest text-[#0B5D2E]">
+                    {isEs ? 'Ración diaria' : 'Daily portion'}
+                  </p>
+                  <p className="font-heading text-5xl font-black text-[#1C2B21]">
+                    {formatRation(result.gramsPerDay, units)}
+                  </p>
+                  <p className="mt-2 text-xs text-[#44544A]">
+                    {result.mer} kcal {isEs ? 'de meta diaria' : 'daily target'}
+                    {result.mer > result.foodMerKcal && (
+                      isEs ? ` · ${result.mer - result.foodMerKcal} kcal reservadas para premios` : ` · ${result.mer - result.foodMerKcal} kcal reserved for treats`
+                    )}
+                  </p>
                 </div>
-                <span className="text-lg font-bold text-[#44544A] block font-['Nunito',sans-serif]">
-                  {isEs ? 'por comida' : 'per meal'}
-                </span>
-                <p className="text-xs font-semibold text-[#0B5D2E] mt-2">
-                  {isEs
-                    ? `${result.kcalPerMeal} kcal en cada una de las ${mealsPerDay} tomas del día`
-                    : `${result.kcalPerMeal} kcal across ${mealsPerDay} daily meals`}
-                </p>
+                <ul className="mt-4 space-y-2">
+                  {resultMeals.map((portion, idx) => (
+                    <li key={idx} className="flex justify-between gap-2 rounded-xl bg-white px-3 py-2 text-xs">
+                      <span>{isEs ? 'Toma' : 'Meal'} {idx + 1} · {resultPlan.mealTimes[idx]}</span>
+                      <span className="text-right font-extrabold">
+                        {formatRation(portion.grams, units)}
+                        {portion.dryGrams !== undefined && portion.wetGrams !== undefined && (
+                          <small className="block">
+                            {formatRation(portion.dryGrams, units)} {isEs ? 'seco' : 'dry'} · {formatRation(portion.wetGrams, units)} {isEs ? 'húmedo' : 'wet'}
+                          </small>
+                        )}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </>
             ) : (
               <>
-                <div className="font-heading font-black text-4xl sm:text-5xl text-[#1C2B21] tracking-tight leading-none my-1 tabular-nums">
-                  {result.mer} kcal/día
-                </div>
-                <p className="text-xs font-semibold text-amber-800 mt-2">
-                  {foodType === 'barf'
-                    ? 'En dieta BARF, confirma fórmulas y gramos exactos con tu médico veterinario.'
-                    : 'Falta confirmar la etiqueta (kcal/kg) del alimento para expresar la ración en gramos.'}
+                <h3 className="font-extrabold text-amber-900">
+                  {result.requiresVetGuidance
+                    ? (isEs ? 'Hace falta una pauta veterinaria' : 'Veterinary guidance required')
+                    : (isEs ? 'Hace falta la energía de la etiqueta' : 'Food label energy required')}
+                </h3>
+                <p className="mt-2 text-xs text-[#44544A]">
+                  {result.requiresVetGuidance
+                    ? (isEs
+                      ? 'Consulta con tu veterinario. Puedes guardar los horarios y registrar las cantidades que ya sirves.'
+                      : 'Consult your vet. You can save the schedule and log the amounts you already serve.')
+                    : (isEs
+                      ? 'Ingresa las kcal/kg impresas en el envase para estimar los gramos, o guarda el horario para usar el diario.'
+                      : 'Enter the kcal/kg printed on the package to estimate grams, or save the schedule to use the diary.')}
                 </p>
               </>
             )}
           </div>
-
-          {/* Daily Breakdown: Grams/day, MER, cups/cans, treats */}
-          <div className="grid grid-cols-2 gap-3 text-xs">
-            <div className="bg-[#F8FAF8] p-3 rounded-2xl border border-gray-200">
-              <span className="text-[#44544A] block">{isEs ? 'Total al día:' : 'Daily total:'}</span>
-              <span className="font-heading font-black text-xl text-[#1C2B21] tabular-nums">
-                {result.rationConfirmed ? formatRation(result.gramsPerDay, units) : 'Etiqueta pendiente'}
-              </span>
-              <span className="text-[11px] text-[#0B5D2E] block font-semibold mt-0.5">
-                {result.foodMerKcal} kcal en comida
-              </span>
-            </div>
-
-            <div className="bg-[#F8FAF8] p-3 rounded-2xl border border-gray-200">
-              <span className="text-[#44544A] block">
-                {result.cupsPerDay ? (isEs ? 'Medida en tazas:' : 'Cups per day:') : (result.cansPerDay ? (isEs ? 'Medida en latas:' : 'Cans per day:') : (isEs ? 'Energía total:' : 'Total energy:'))}
-              </span>
-              <span className="font-heading font-black text-xl text-[#1C2B21] tabular-nums">
-                {result.cupsPerDay ? `${result.cupsPerDay} tazas` : (result.cansPerDay ? `${result.cansPerDay} latas` : `${result.mer} kcal`)}
-              </span>
-              <span className="text-[11px] text-[#44544A] block mt-0.5">
-                {result.treatsBudgetKcal > 0
-                  ? (isEs ? `Premios: máx ${result.treatsBudgetKcal} kcal` : `Treats: max ${result.treatsBudgetKcal} kcal`)
-                  : (isEs ? 'Premios bajo pauta veterinaria' : 'Treats per vet advice')}
-              </span>
-            </div>
-          </div>
-
-          {/* Mixed breakdown if mixed */}
-          {foodType === 'mixed' && (
-            <div className="bg-[#EAF4EC] p-3.5 rounded-2xl border border-[#0B5D2E20] text-xs space-y-1">
-              <span className="font-bold text-[#0B5D2E] block">
-                {isEs ? 'Detalle de porción mixta por comida:' : 'Mixed portion detail per meal:'}
-              </span>
-              <div className="flex justify-between text-[#1C2B21] font-semibold">
-                <span>🥣 {isEs ? 'Seco:' : 'Dry:'} {result.dryGramsPerMeal} g ({mixedDryPct}%)</span>
-                <span>🥫 {isEs ? 'Húmedo:' : 'Wet:'} {result.wetGramsPerMeal} g ({100 - mixedDryPct}%)</span>
-              </div>
-            </div>
-          )}
 
           {/* Cat hepatic lipidosis warning (Page 4) */}
           {result.catHepaticLipidosisWarning && (
@@ -1143,7 +1118,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
           )}
 
           {/* Safe loss pace */}
-          {goal === 'lose' && result.safeLossRateKgPerWeek && (
+          {!result.requiresVetGuidance && goal === 'lose' && result.safeLossRateKgPerWeek && (
             <div className="bg-[#F0FDF4] p-3 rounded-2xl border border-[#1E8A49]/30 text-xs text-[#166534] flex items-center gap-2">
               <Scale className="w-4 h-4 text-[#1E8A49] shrink-0" />
               <span>
@@ -1154,7 +1129,9 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
             </div>
           )}
 
-          {/* Manual +/- 10% adjustment slider (Page 4) */}
+          {result.rationConfirmed && !resultPlan.isVetLocked && (
+            <>
+              {/* Manual +/- 10% adjustment slider (Page 4) */}
           <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 space-y-2">
             <div className="flex justify-between items-center text-xs font-bold text-[#1C2B21]">
               <span>{isEs ? 'Ajuste manual individual (+/- 10%)' : 'Manual adjustment (+/- 10%)'}</span>
@@ -1227,6 +1204,8 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
               </div>
             )}
           </div>
+            </>
+          )}
 
           {/* Legal and Educational Disclaimer (Page 2, 4, 14) */}
           <p className="text-[11px] text-[#44544A] bg-[#EAF4EC] p-3 rounded-2xl border border-[#0B5D2E15] leading-relaxed">
@@ -1244,7 +1223,9 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
             className="w-full min-h-[52px] bg-[#0B5D2E] text-white rounded-2xl font-heading font-extrabold text-lg flex items-center justify-center gap-2 hover:bg-[#094723] transition active:scale-98 shadow-md"
           >
             <Check className="w-5 h-5 stroke-[3]" />
-            <span>{isEs ? 'Guardar este plan' : 'Save this plan'}</span>
+            <span>{result.rationConfirmed
+              ? (isEs ? 'Guardar este plan' : 'Save this plan')
+              : (isEs ? 'Guardar horario para el diario' : 'Save the diary schedule')}</span>
           </button>
         </div>
       )}
@@ -1298,10 +1279,11 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
               <input
                 type="number"
                 required
-                min="500"
-                max="6000"
+                min="1"
+                step="any"
+                placeholder="Ej. 3650"
                 value={customKcalPerKg}
-                onChange={(e) => setCustomKcalPerKg(parseInt(e.target.value) || 3600)}
+                onChange={(e) => setCustomKcalPerKg(e.target.value)}
                 className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold"
               />
             </div>

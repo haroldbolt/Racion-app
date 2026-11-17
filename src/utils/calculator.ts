@@ -1,5 +1,7 @@
 import { Pet, FoodItem, Goal, FeedingPlan, BreedSize } from '../types';
 import { findBreedProfile, getIdealWeightForBreedAndSex, BreedProfile } from '../data/breeds';
+import { distributeWholeGrams, getFoodKcalPerKg } from './mealPortions';
+import { localDateKey } from './localDate';
 
 export interface CalculationInputs {
   pet: Pet;
@@ -8,7 +10,7 @@ export interface CalculationInputs {
   foodType: 'dry' | 'wet' | 'mixed' | 'barf';
   dryFood?: FoodItem;
   wetFood?: FoodItem;
-  mixedDryPct?: number; // 0 - 100
+  mixedDryPct?: number; // 0 - 100, share of meal energy
   mealsPerDay: number;
   mealTimes?: string[];
   treatsKcal?: number;
@@ -36,6 +38,7 @@ export interface CalculationResult {
   gramsPerMeal: number;
   kcalPerMeal: number;
   rationConfirmed: boolean;
+  requiresVetGuidance: boolean;
   cupsPerDay?: number;
   cansPerDay?: number;
   dryGramsPerDay?: number;
@@ -54,7 +57,7 @@ export interface CalculationResult {
  * RER = 70 * (weight in kg) ^ 0.75
  */
 export function calculateRER(weightKg: number): number {
-  if (weightKg <= 0) return 0;
+  if (!Number.isFinite(weightKg) || weightKg <= 0) return 0;
   return Math.round(70 * Math.pow(weightKg, 0.75));
 }
 
@@ -289,9 +292,46 @@ export function determineFactor(
   };
 }
 
-/**
- * Executes complete feeding calculation adhering to NRC 2006, WSAVA and AAHA guidelines.
- */
+export function isClinicalOrVetPlan(pet: Pet, plan?: Pick<FeedingPlan, 'isVetLocked'>): boolean {
+  return Boolean(
+    pet.dietType === 'therapeutic' ||
+    (pet.specialState && pet.specialState !== 'none') ||
+    pet.restrictions?.length ||
+    pet.hasVetGuideline ||
+    pet.vetGuideline?.locked ||
+    plan?.isVetLocked
+  );
+}
+
+export function hasValidVetGuideline(pet: Pet): boolean {
+  const vet = pet.vetGuideline;
+  return Boolean(
+    vet?.locked &&
+    vet.prescribedFoodName?.trim() &&
+    vet.vetName?.trim() &&
+    vet.clinicName?.trim() &&
+    Number.isFinite(vet.prescribedKcal) && vet.prescribedKcal > 0 &&
+    Number.isFinite(vet.prescribedGramsPerMeal) && vet.prescribedGramsPerMeal > 0 &&
+    Number.isInteger(vet.mealsPerDay) && vet.mealsPerDay >= 1 && vet.mealsPerDay <= 6 &&
+    Number.isFinite(vet.prescribedGramsPerMeal * vet.mealsPerDay)
+  );
+}
+
+export function requiresVetGuidance(pet: Pet, plan?: Pick<FeedingPlan, 'foodType' | 'isVetLocked'>): boolean {
+  return !hasValidVetGuideline(pet) && (
+    isClinicalOrVetPlan(pet, plan) || pet.dietType === 'barf' || plan?.foodType === 'barf'
+  );
+}
+
+function normalizeMealsPerDay(meals: number): number {
+  return Number.isFinite(meals) ? Math.min(6, Math.max(1, Math.trunc(meals))) : 2;
+}
+
+function normalizeMixedDryPct(dryPct: number): number {
+  return Number.isFinite(dryPct) ? Math.min(100, Math.max(0, dryPct)) : 50;
+}
+
+/** Executes the feeding calculation for an automatic or veterinarian-prescribed plan. */
 export function calculateFeedingPlan(inputs: CalculationInputs): CalculationResult {
   const {
     pet,
@@ -319,20 +359,22 @@ export function calculateFeedingPlan(inputs: CalculationInputs): CalculationResu
   let mer = Math.round(rer * factorData.factor);
 
   // Apply manual +/- 10% adjustment if present
-  if (manualAdjustmentPct !== 0) {
+  if (Number.isFinite(manualAdjustmentPct) && manualAdjustmentPct !== 0) {
     const adj = Math.min(10, Math.max(-10, manualAdjustmentPct));
     mer = Math.round(mer * (1 + adj / 100));
   }
 
-  const validMeals = Math.max(1, mealsPerDay);
+  const validMeals = normalizeMealsPerDay(mealsPerDay);
 
   // Respect locked veterinary prescription if active
-  if (pet.hasVetGuideline && pet.vetGuideline?.locked) {
-    const vetMeals = Math.max(1, pet.vetGuideline.mealsPerDay || validMeals);
-    const vetGramsPerMeal = Math.max(0, pet.vetGuideline.prescribedGramsPerMeal || 0);
+  if (pet.vetGuideline && hasValidVetGuideline(pet)) {
+    const vetMeals = pet.vetGuideline.mealsPerDay;
+    const vetGramsPerMeal = pet.vetGuideline.prescribedGramsPerMeal;
     const vetGramsPerDay = vetGramsPerMeal * vetMeals;
-    const vetMer = Math.max(0, pet.vetGuideline.prescribedKcal || mer);
-    const bagToUseKg = bagWeightKg || (dryFood?.bagSizeKg ?? 0);
+    const vetMer = pet.vetGuideline.prescribedKcal;
+    const bagToUseKg = dryFood?.name === pet.vetGuideline.prescribedFoodName
+      ? bagWeightKg || dryFood.bagSizeKg || 0
+      : 0;
     let bagDaysRemaining: number | undefined;
     let reorderDate: string | undefined;
     if (vetGramsPerDay > 0 && bagToUseKg > 0) {
@@ -341,7 +383,7 @@ export function calculateFeedingPlan(inputs: CalculationInputs): CalculationResu
       const alertDays = Math.max(3, days - 5);
       const d = new Date();
       d.setDate(d.getDate() + alertDays);
-      reorderDate = d.toISOString().split('T')[0];
+      reorderDate = localDateKey(d);
     }
 
     return {
@@ -362,6 +404,7 @@ export function calculateFeedingPlan(inputs: CalculationInputs): CalculationResu
       gramsPerMeal: vetGramsPerMeal,
       kcalPerMeal: Math.round(vetMer / vetMeals),
       rationConfirmed: vetGramsPerDay > 0,
+      requiresVetGuidance: false,
       dailyWaterMl: 0, // Vet-managed hydration
       bagDaysRemaining,
       reorderDate,
@@ -373,17 +416,14 @@ export function calculateFeedingPlan(inputs: CalculationInputs): CalculationResu
     };
   }
 
-  // Treats budget: Maximum 10% of daily MER kcal for healthy pets.
-  // Therapeutic / clinical conditions respect veterinary orders.
-  const hasClinicalCondition =
-    pet.dietType === 'therapeutic' ||
-    (pet.specialState !== undefined && pet.specialState !== 'none');
-  const maxTreatsAllowed = hasClinicalCondition ? 0 : Math.round(mer * 0.10);
-  const effectiveTreatsKcal = Math.min(treatsKcal, maxTreatsAllowed);
-  const foodMerKcal = Math.max(100, mer - effectiveTreatsKcal);
-
-  const isFoodConfirmed = (f?: FoodItem) =>
-    Boolean(f && f.kcalPerKg > 400 && f.labelStatus !== 'unconfirmed');
+  const vetGuidanceRequired = requiresVetGuidance(pet, { foodType });
+  const maxTreatsAllowed = vetGuidanceRequired ? 0 : Math.round(mer * 0.10);
+  const effectiveTreatsKcal = Number.isFinite(treatsKcal)
+    ? Math.min(Math.max(0, treatsKcal), maxTreatsAllowed)
+    : 0;
+  const foodMerKcal = vetGuidanceRequired ? 0 : Math.max(0, mer - effectiveTreatsKcal);
+  const dryDensity = dryFood?.type === 'dry' ? (getFoodKcalPerKg(dryFood) ?? 0) : 0;
+  const wetDensity = wetFood?.type === 'wet' ? (getFoodKcalPerKg(wetFood) ?? 0) : 0;
 
   let totalGramsPerDay = 0;
   let dryGramsPerDay = 0;
@@ -394,40 +434,36 @@ export function calculateFeedingPlan(inputs: CalculationInputs): CalculationResu
   let cansPerDay: number | undefined;
   let rationConfirmed = false;
 
-  if (foodType === 'barf' || pet.dietType === 'barf') {
-    // BARF formulas/quantities must come from veterinary guidance — never guessed automatically
-    rationConfirmed = false;
-    totalGramsPerDay = 0;
-  } else if (foodType === 'dry' && isFoodConfirmed(dryFood) && dryFood) {
-    const kcalPerG = dryFood.kcalPerKg / 1000;
+  if (!vetGuidanceRequired && foodType === 'dry' && dryFood && dryDensity > 400) {
+    const kcalPerG = dryDensity / 1000;
     totalGramsPerDay = Math.round(foodMerKcal / kcalPerG);
     dryGramsPerDay = totalGramsPerDay;
     rationConfirmed = true;
     if (dryFood.kcalPerCup && dryFood.kcalPerCup > 0) {
       cupsPerDay = Number((foodMerKcal / dryFood.kcalPerCup).toFixed(2));
     }
-  } else if (foodType === 'wet' && isFoodConfirmed(wetFood) && wetFood) {
-    const kcalPerG = wetFood.kcalPerKg / 1000;
+  } else if (!vetGuidanceRequired && foodType === 'wet' && wetFood && wetDensity > 400) {
+    const kcalPerG = wetDensity / 1000;
     totalGramsPerDay = Math.round(foodMerKcal / kcalPerG);
     wetGramsPerDay = totalGramsPerDay;
     rationConfirmed = true;
     if (wetFood.kcalPerCan && wetFood.kcalPerCan > 0) {
       cansPerDay = Number((foodMerKcal / wetFood.kcalPerCan).toFixed(2));
     }
-  } else if (foodType === 'mixed' && isFoodConfirmed(dryFood) && isFoodConfirmed(wetFood) && dryFood && wetFood) {
-    // Mixed feeding strictly calculated BY KCAL, NEVER by volume!
-    const dryKcalTarget = foodMerKcal * (mixedDryPct / 100);
-    const wetKcalTarget = foodMerKcal * ((100 - mixedDryPct) / 100);
+  } else if (!vetGuidanceRequired && foodType === 'mixed' && dryDensity > 400 && wetDensity > 400) {
+    const dryShare = normalizeMixedDryPct(mixedDryPct) / 100;
+    const dryKcalTarget = foodMerKcal * dryShare;
+    const wetKcalTarget = foodMerKcal * (1 - dryShare);
 
-    const dryKcalPerG = dryFood.kcalPerKg / 1000;
-    const wetKcalPerG = wetFood.kcalPerKg / 1000;
+    const dryKcalPerG = dryDensity / 1000;
+    const wetKcalPerG = wetDensity / 1000;
 
     dryGramsPerDay = Math.round(dryKcalTarget / dryKcalPerG);
     wetGramsPerDay = Math.round(wetKcalTarget / wetKcalPerG);
     totalGramsPerDay = dryGramsPerDay + wetGramsPerDay;
 
-    dryGramsPerMeal = Math.round(dryGramsPerDay / validMeals);
-    wetGramsPerMeal = Math.round(wetGramsPerDay / validMeals);
+    dryGramsPerMeal = distributeWholeGrams(dryGramsPerDay, validMeals)[0];
+    wetGramsPerMeal = distributeWholeGrams(wetGramsPerDay, validMeals, dryGramsPerDay % validMeals)[0];
     rationConfirmed = true;
   } else {
     // Label or manufacturer datasheet is missing/unconfirmed: DO NOT fabricate exact grams
@@ -435,11 +471,12 @@ export function calculateFeedingPlan(inputs: CalculationInputs): CalculationResu
     totalGramsPerDay = 0;
   }
 
-  const gramsPerMeal = rationConfirmed ? Math.round(totalGramsPerDay / validMeals) : 0;
+  rationConfirmed = rationConfirmed && totalGramsPerDay > 0;
+  const gramsPerMeal = rationConfirmed ? distributeWholeGrams(totalGramsPerDay, validMeals)[0] : 0;
   const kcalPerMeal = Math.round(foodMerKcal / validMeals);
 
   // Daily water reference (approx. 50-60 ml/kg/day) — only used when validated rule applies
-  const dailyWaterMl = Math.round(pet.currentWeightKg * 55);
+  const dailyWaterMl = vetGuidanceRequired ? 0 : Math.round(pet.currentWeightKg * 55);
 
   const isCat = pet.species === 'cat';
   const safeLossRateKgPerWeek = {
@@ -454,28 +491,28 @@ export function calculateFeedingPlan(inputs: CalculationInputs): CalculationResu
   let reorderDate: string | undefined;
 
   const bagToUseKg = bagWeightKg || dryFood?.bagSizeKg;
-  if (rationConfirmed && totalGramsPerDay > 0 && bagToUseKg && bagToUseKg > 0) {
+  if (rationConfirmed && dryGramsPerDay > 0 && bagToUseKg && bagToUseKg > 0) {
     const totalBagGrams = bagToUseKg * 1000;
-    const days = Math.floor(totalBagGrams / totalGramsPerDay);
+    const days = Math.floor(totalBagGrams / dryGramsPerDay);
     bagDaysRemaining = days;
 
     const alertDays = Math.max(3, days - 5);
     const date = new Date();
     date.setDate(date.getDate() + alertDays);
-    reorderDate = date.toISOString().split('T')[0];
+    reorderDate = localDateKey(date);
   }
 
   return {
     rer,
     baseFactor: factorData.baseFactor,
     factor: factorData.factor,
-    factorExplanation: factorData.explanation,
+    factorExplanation: vetGuidanceRequired ? 'Requiere una pauta veterinaria registrada' : factorData.explanation,
     breedSize: factorData.breedSize,
     breedAdjustmentPct: factorData.breedAdjustmentPct,
     sexAdjustmentNote: factorData.sexAdjustmentNote,
     breedAdjustmentNote: factorData.breedAdjustmentNote,
     idealWeightRangeKg: factorData.idealWeightRangeKg,
-    mer,
+    mer: vetGuidanceRequired ? 0 : mer,
     weightUsedKg: Number(weightToUse.toFixed(2)),
     treatsBudgetKcal: maxTreatsAllowed,
     foodMerKcal,
@@ -483,6 +520,7 @@ export function calculateFeedingPlan(inputs: CalculationInputs): CalculationResu
     gramsPerMeal,
     kcalPerMeal,
     rationConfirmed,
+    requiresVetGuidance: vetGuidanceRequired,
     cupsPerDay,
     cansPerDay,
     dryGramsPerDay,
@@ -501,15 +539,11 @@ export function calculateFeedingPlan(inputs: CalculationInputs): CalculationResu
  * Creates a FeedingPlan record from inputs and result
  */
 export function buildFeedingPlan(inputs: CalculationInputs, result: CalculationResult): FeedingPlan {
-  const { pet, foodType, dryFood, wetFood, mixedDryPct = 50, mealsPerDay, mealTimes = [], scheduleConfigured } = inputs;
-
-  const defaultTimes = ['08:00', '20:00'];
-  if (mealsPerDay === 1) defaultTimes.splice(1, 1);
-  if (mealsPerDay === 3) defaultTimes.splice(1, 0, '14:00');
-  if (mealsPerDay === 4) defaultTimes.splice(1, 0, '12:00', '16:00');
-
-  const chosenTimes = mealTimes.length === mealsPerDay ? mealTimes : defaultTimes.slice(0, mealsPerDay);
-
+  const { pet, foodType, dryFood, wetFood, mealTimes = [], scheduleConfigured } = inputs;
+  const mixedDryPct = normalizeMixedDryPct(inputs.mixedDryPct ?? 50);
+  const vet = hasValidVetGuideline(pet) ? pet.vetGuideline : undefined;
+  const mealsPerDay = vet?.mealsPerDay ?? normalizeMealsPerDay(inputs.mealsPerDay);
+  const chosenTimes = mealTimes.length === mealsPerDay ? mealTimes : defaultMealTimes(mealsPerDay);
   const mainFood = foodType === 'dry' ? dryFood : (foodType === 'wet' ? wetFood : dryFood);
 
   return {
@@ -518,9 +552,12 @@ export function buildFeedingPlan(inputs: CalculationInputs, result: CalculationR
     createdAt: new Date().toISOString(),
     foodId: mainFood?.id || (foodType === 'barf' ? 'barf_custom' : 'custom'),
     foodName:
+      vet?.prescribedFoodName ||
       mainFood?.name ||
       (foodType === 'barf' ? 'Dieta BARF / Natural Cruda' : 'Alimento habitual por confirmar'),
-    foodBrand: mainFood?.brand || (foodType === 'barf' ? 'BARF' : 'Por confirmar'),
+    foodBrand: vet && vet.prescribedFoodName !== mainFood?.name
+      ? ''
+      : mainFood?.brand || (foodType === 'barf' ? 'BARF' : 'Por confirmar'),
     foodType,
     dryFood,
     wetFood,
@@ -530,8 +567,13 @@ export function buildFeedingPlan(inputs: CalculationInputs, result: CalculationR
     mealTimes: chosenTimes,
     rer: result.rer,
     factor: result.factor,
+    goal: inputs.goal,
     mer: result.mer,
+    foodMerKcal: result.foodMerKcal,
+    treatsKcal: inputs.treatsKcal ?? 0,
     gramsPerDay: result.gramsPerDay,
+    dryGramsPerDay: result.dryGramsPerDay,
+    wetGramsPerDay: result.wetGramsPerDay,
     gramsPerMeal: result.gramsPerMeal,
     kcalPerMeal: result.kcalPerMeal,
     cupsPerDay: result.cupsPerDay,
@@ -542,21 +584,36 @@ export function buildFeedingPlan(inputs: CalculationInputs, result: CalculationR
     manualAdjustmentReason: inputs.manualAdjustmentReason,
     bagWeightKg: inputs.bagWeightKg || dryFood?.bagSizeKg,
     bagDaysRemaining: result.bagDaysRemaining,
-    isVetLocked: Boolean(pet.hasVetGuideline && pet.vetGuideline?.locked),
+    isVetLocked: Boolean(vet),
     rationConfirmed: result.rationConfirmed,
     scheduleConfigured: scheduleConfigured ?? false,
   };
 }
 
+export function defaultMealTimes(meals: number): string[] {
+  const defaults = [
+    ['08:00'],
+    ['08:00', '20:00'],
+    ['08:00', '14:00', '20:00'],
+    ['08:00', '12:00', '16:00', '20:00'],
+    ['08:00', '11:00', '14:00', '17:00', '20:00'],
+    ['08:00', '10:30', '13:00', '15:30', '18:00', '20:00'],
+  ];
+  return defaults[normalizeMealsPerDay(meals) - 1];
+}
+
+function estimateLegacyTreatsKcal(plan: FeedingPlan): number {
+  if (plan.isVetLocked || plan.mer <= 0) return 0;
+  const configuredMeals = normalizeMealsPerDay(plan.mealsPerDay);
+  const foodKcal = plan.foodMerKcal ?? (plan.kcalPerMeal > 0 ? plan.kcalPerMeal * configuredMeals : plan.mer);
+  return Math.max(0, Math.min(plan.mer - foodKcal, Math.round(plan.mer * 0.1)));
+}
+
 /**
  * Recalculates an existing FeedingPlan whenever a pet's breed, sex, neuter status,
- * weight, or age changes (unless locked by a veterinarian).
+ * weight, or age changes, preserving the plan's inputs and any prescribed amounts.
  */
 export function recalculatePlanForPet(pet: Pet, existingPlan: FeedingPlan): FeedingPlan {
-  if (existingPlan.isVetLocked || (pet.hasVetGuideline && pet.vetGuideline?.locked)) {
-    return existingPlan;
-  }
-
   const ageMonths =
     pet.ageMonths !== undefined
       ? pet.ageMonths
@@ -564,7 +621,7 @@ export function recalculatePlanForPet(pet: Pet, existingPlan: FeedingPlan): Feed
   const breedProfile = findBreedProfile(pet.breed, pet.species, pet.breedSize);
   const isPuppyOrKitten = ageMonths < breedProfile.growthMonths;
 
-  const goal: Goal =
+  const profileGoal: Goal =
     pet.bcs >= 7
       ? 'lose'
       : pet.bcs <= 3
@@ -573,32 +630,42 @@ export function recalculatePlanForPet(pet: Pet, existingPlan: FeedingPlan): Feed
       ? 'growth'
       : 'maintain';
 
-  const result = calculateFeedingPlan({
-    pet,
+  // Old plans omitted the chosen goal; keep it if a single current factor matches the saved one.
+  const matchingGoals = existingPlan.goal || existingPlan.isVetLocked || existingPlan.mer <= 0
+    ? []
+    : (['maintain', 'lose', 'gain', 'growth'] as const).filter(
+        (candidate) => Math.abs(determineFactor(pet, candidate, pet.bcs || 5).factor - existingPlan.factor) < 0.001
+      );
+  const goal = existingPlan.goal ?? (matchingGoals.length === 1 ? matchingGoals[0] : profileGoal);
+  const orphanedVetLock = existingPlan.isVetLocked && !hasValidVetGuideline(pet);
+  const calculationInputs: CalculationInputs = {
+    pet: orphanedVetLock ? { ...pet, hasVetGuideline: true } : pet,
     goal,
     bcs: pet.bcs || 5,
     foodType: pet.dietType === 'barf' ? 'barf' : existingPlan.foodType || 'dry',
-    dryFood: existingPlan.foodType === 'wet' ? undefined : existingPlan.dryFood,
-    wetFood: existingPlan.foodType === 'wet' ? existingPlan.wetFood : existingPlan.wetFood,
+    dryFood: existingPlan.dryFood,
+    wetFood: existingPlan.wetFood,
     mixedDryPct: existingPlan.mixedDryPct ?? 50,
     mealsPerDay: existingPlan.mealsPerDay || 2,
     mealTimes: existingPlan.mealTimes,
+    treatsKcal: existingPlan.treatsKcal ?? estimateLegacyTreatsKcal(existingPlan),
     manualAdjustmentPct: existingPlan.manualAdjustmentPct || 0,
+    manualAdjustmentReason: existingPlan.manualAdjustmentReason,
     bagWeightKg: existingPlan.bagWeightKg,
-  });
+    scheduleConfigured: existingPlan.scheduleConfigured,
+  };
+  const result = calculateFeedingPlan(calculationInputs);
+  const computed = buildFeedingPlan(calculationInputs, result);
 
   return {
     ...existingPlan,
-    rer: result.rer,
-    factor: result.factor,
-    mer: result.mer,
-    gramsPerDay: result.gramsPerDay,
-    gramsPerMeal: result.gramsPerMeal,
-    kcalPerMeal: result.kcalPerMeal,
-    cupsPerDay: result.cupsPerDay,
-    cansPerDay: result.cansPerDay,
-    treatsBudgetKcal: result.treatsBudgetKcal,
-    bagDaysRemaining: result.bagDaysRemaining,
-    rationConfirmed: result.rationConfirmed,
+    ...computed,
+    id: existingPlan.id,
+    createdAt: existingPlan.createdAt,
+    foodId: existingPlan.foodId,
+    foodName: computed.isVetLocked ? computed.foodName : existingPlan.foodName,
+    foodBrand: computed.isVetLocked ? computed.foodBrand : existingPlan.foodBrand,
+    treatsCountToday: existingPlan.treatsCountToday,
+    isVetLocked: Boolean(computed.isVetLocked || orphanedVetLock),
   };
 }

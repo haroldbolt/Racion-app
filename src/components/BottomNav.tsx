@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Scale, Calculator, TrendingUp, MoreHorizontal, Users } from 'lucide-react';
+import { Calendar, Scale, Calculator, TrendingUp, MoreHorizontal } from 'lucide-react';
 
 export type TabId = 'today' | 'compare' | 'calculate' | 'progress' | 'more' | 'pets';
 
@@ -32,7 +32,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
           <span className="text-[11px] font-heading tracking-tight">{isEs ? 'Hoy' : 'Today'}</span>
         </button>
 
-        {/* Tab 2: Comparador */}
+        {/* Tab 2: Alimentos */}
         <button
           onClick={() => onTabChange('compare')}
           className={`flex flex-col items-center justify-center min-h-[50px] min-w-[56px] py-1 transition-all relative ${
@@ -42,7 +42,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
           }`}
         >
           <Scale className="w-5 h-5 mb-0.5" strokeWidth={currentTab === 'compare' ? 2.5 : 2} />
-          <span className="text-[11px] font-heading tracking-tight">{isEs ? 'Comparar' : 'Compare'}</span>
+          <span className="text-[11px] font-heading tracking-tight">{isEs ? 'Alimentos' : 'Foods'}</span>
         </button>
 
         {/* Tab 3: Central Button '+ Calcular' (Naranja y un poco más grande) */}
@@ -54,7 +54,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             <Calculator className="w-6 h-6" strokeWidth={2.5} />
           </div>
           <span className="text-[11px] font-heading font-extrabold text-[#F57C1A] mt-0.5 tracking-tight">
-            + Calcular
+            {isEs ? '+ Calcular' : '+ Calculate'}
           </span>
         </button>
 

@@ -4,9 +4,7 @@ import { PET_FOODS_DATABASE } from '../data/foods';
 import { StorageService } from '../utils/storage';
 import { getConfirmedPresentations } from '../data/foodPresentations';
 import { loadShopifyCatalog, ShopifyProduct, shopifyProductToFoodItem } from '../services/shopifyCatalogService';
-import { PriceComparatorService } from '../services/priceComparatorService';
-import { formatCOP } from '../utils/i18n';
-import { Search, X, Clock, ArrowRight, Package, Sparkles, Check, Globe, Loader2 } from 'lucide-react';
+import { Search, X, Clock, ArrowRight, Package, Sparkles, Check } from 'lucide-react';
 
 interface UnifiedFoodSearchModalProps {
   isOpen: boolean;
@@ -244,43 +242,6 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
     });
   }, [shopifyAsFoodItems]);
 
-  // 4. Live Internet Search State (Google Shopping Colombia via SerpApi)
-  const [isSearchingInternet, setIsSearchingInternet] = useState<boolean>(false);
-  const [internetResults, setInternetResults] = useState<Array<{
-    id: string;
-    brand: string;
-    productName: string;
-    fullName: string;
-    species: 'dog' | 'cat';
-    imageUrl?: string;
-    confirmedSizesKg: number[];
-    samplePriceCop?: number;
-    stores: string[];
-    source: 'internet_google_shopping';
-  }>>([]);
-  const [hasSearchedInternet, setHasSearchedInternet] = useState<boolean>(false);
-
-  const handleSearchInternet = async (customQuery?: string) => {
-    const q = (customQuery || query).trim();
-    if (!q) return;
-
-    setIsSearchingInternet(true);
-    setHasSearchedInternet(true);
-
-    try {
-      const results = await PriceComparatorService.discoverProducts({
-        query: q,
-        species: activePet?.species,
-      });
-      setInternetResults(results);
-    } catch (err) {
-      console.warn('Error during internet discovery:', err);
-      setInternetResults([]);
-    } finally {
-      setIsSearchingInternet(false);
-    }
-  };
-
   // Filter Tier 1 (Registered Pet Foods) instantly
   const filteredRegisteredFoods = useMemo(() => {
     if (searchTokens.length === 0) return registeredPetFoods;
@@ -413,14 +374,6 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
     onClose();
   };
 
-  // Handler to search custom text entered by user
-  const handleCustomSearch = () => {
-    const trimmed = query.trim();
-    if (!trimmed) return;
-    // Trigger real internet search on Google Shopping Colombia
-    handleSearchInternet(trimmed);
-  };
-
   // Highlight matching characters in text
   const renderHighlighted = (text: string) => {
     if (searchTokens.length === 0) return <span>{text}</span>;
@@ -455,16 +408,6 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
               <label className="text-[11px] font-black uppercase tracking-wider text-[#0B5D2E] block">
                 {isEs ? 'Busca su alimento' : 'Find their food'}
               </label>
-              <div
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[9px] font-extrabold shadow-2xs"
-                title={isEs ? 'Conectado a Google Shopping Colombia' : 'Online connected'}
-              >
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-                </span>
-                <span>{isEs ? 'En línea' : 'Online'}</span>
-              </div>
             </div>
             <h3 className="font-heading font-black text-lg text-[#1C2B21]">
               {titleOverride || (isEs ? 'Buscar alimento o marca' : 'Search food or brand')}
@@ -494,8 +437,6 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
                   const top = filteredCatalog[0];
                   const sizes = getConfirmedPresentations(top) || (top.bagSizeKg ? [top.bagSizeKg] : [15]);
                   handleSelectOption(top.brand, top.name, sizes[0], top.imageUrl, top);
-                } else if (query.trim()) {
-                  handleCustomSearch();
                 }
               }
             }}
@@ -795,174 +736,6 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
                   );
                 })}
 
-              {/* Live Internet Search Progress Animation */}
-              {isSearchingInternet && (
-                <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 text-center space-y-1.5 animate-pulse my-2">
-                  <div className="flex items-center justify-center gap-2 text-emerald-900 font-extrabold text-xs">
-                    <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
-                    <span>
-                      {isEs
-                        ? `Consultando Google Shopping en Colombia para "${query}"...`
-                        : `Searching Google Shopping Colombia for "${query}"...`}
-                    </span>
-                  </div>
-                  <p className="text-[10px] text-emerald-700">
-                    {isEs
-                      ? 'Explorando tiendas: Laika, Agrocampo, Kanú, Éxito, Puppis, Mercado Libre...'
-                      : 'Checking real Colombian stores in live mode...'}
-                  </p>
-                </div>
-              )}
-
-              {/* Live Internet Search Results */}
-              {internetResults.length > 0 && (
-                <div className="space-y-2 pt-2 border-t border-emerald-200/60 my-2">
-                  <div className="flex items-center justify-between px-1">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900 flex items-center gap-1.5">
-                      <Globe className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>
-                        {isEs
-                          ? `Encontrados en internet (${internetResults.length})`
-                          : `Found on internet (${internetResults.length})`}
-                      </span>
-                    </span>
-                    <span className="text-[9px] font-extrabold bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded-full border border-emerald-200">
-                      Google Shopping Colombia
-                    </span>
-                  </div>
-
-                  <div className="space-y-2">
-                    {internetResults.map((item) => (
-                      <div
-                        key={item.id}
-                        className="p-3 bg-white hover:bg-emerald-50/40 border border-emerald-300 rounded-2xl transition space-y-2 shadow-2xs hover:shadow-xs group"
-                      >
-                        <div
-                          onClick={() => {
-                            const targetSize =
-                              extractedWeight && item.confirmedSizesKg.includes(extractedWeight)
-                                ? extractedWeight
-                                : item.confirmedSizesKg[0];
-                            handleSelectOption(
-                              item.brand,
-                              item.productName,
-                              targetSize,
-                              item.imageUrl,
-                              undefined,
-                              item.confirmedSizesKg
-                            );
-                          }}
-                          className="flex items-center justify-between cursor-pointer"
-                        >
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <div className="w-12 h-14 bg-[#F8FAF8] rounded-xl p-0.5 border border-emerald-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
-                              {item.imageUrl ? (
-                                <img
-                                  src={item.imageUrl}
-                                  alt={item.fullName}
-                                  className="w-full h-full object-contain"
-                                  loading="lazy"
-                                />
-                              ) : (
-                                <Package className="w-6 h-6 text-emerald-600 opacity-80" />
-                              )}
-                            </div>
-                            <div className="min-w-0">
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className="text-xs font-extrabold text-[#1C2B21]">{item.brand}</span>
-                                <span className="text-[9px] font-extrabold bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-full">
-                                  {item.species === 'cat' ? 'Gato' : 'Perro'}
-                                </span>
-                                {item.samplePriceCop && (
-                                  <span className="text-[10px] font-extrabold text-[#0B5D2E]">
-                                    {formatCOP(item.samplePriceCop)}
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-[11px] font-medium text-[#44544A] leading-tight truncate mt-0.5">
-                                {item.productName}
-                              </p>
-                              {item.stores.length > 0 && (
-                                <p className="text-[9px] text-gray-500 truncate mt-0.5">
-                                  {isEs ? 'En: ' : 'At: '}
-                                  {item.stores.join(', ')}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                          <ArrowRight className="w-4 h-4 text-emerald-600 group-hover:translate-x-0.5 transition shrink-0 ml-2" />
-                        </div>
-
-                        {/* Presentation pills */}
-                        <div className="flex items-center gap-1.5 flex-wrap pt-1 border-t border-emerald-100">
-                          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider shrink-0">
-                            {isEs ? 'Tamaños confirmados:' : 'Confirmed sizes:'}
-                          </span>
-                          {item.confirmedSizesKg.map((size) => (
-                            <button
-                              key={size}
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleSelectOption(
-                                  item.brand,
-                                  item.productName,
-                                  size,
-                                  item.imageUrl,
-                                  undefined,
-                                  item.confirmedSizesKg
-                                );
-                              }}
-                              className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-[#EAF4EC] hover:bg-[#0B5D2E] text-[#0B5D2E] hover:text-white transition shadow-2xs cursor-pointer"
-                            >
-                              {size} kg
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Explicit action: "Buscar en comercios / Google Shopping" */}
-              {query.trim() && (
-                <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={() => handleSearchInternet(query.trim())}
-                    disabled={isSearchingInternet}
-                    className="w-full p-2.5 bg-[#F6FAF7] hover:bg-[#EAF4EC] border border-[#0B5D2E30] rounded-2xl flex items-center justify-between text-left transition group shadow-2xs cursor-pointer disabled:opacity-60"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-8 h-8 rounded-xl bg-white border border-[#0B5D2E25] flex items-center justify-center text-[#0B5D2E] shrink-0">
-                        {isSearchingInternet ? (
-                          <Loader2 className="w-4 h-4 animate-spin text-[#0B5D2E]" />
-                        ) : (
-                          <Globe className="w-4 h-4 text-[#0B5D2E]" />
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <span className="text-xs font-bold text-[#0B5D2E] block">
-                          {isSearchingInternet
-                            ? isEs
-                              ? 'Buscando en tiendas en internet...'
-                              : 'Searching online...'
-                            : isEs
-                            ? 'Buscar en internet (Google Shopping)'
-                            : 'Search online stores'}
-                        </span>
-                        <p className="text-[10px] text-gray-500 truncate">
-                          {isEs
-                            ? `Consultar tiendas en tiempo real para "${query}"`
-                            : `Check Google Shopping & live stores for "${query}"`}
-                        </p>
-                      </div>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-[#0B5D2E] opacity-75 group-hover:translate-x-0.5 transition shrink-0 ml-2" />
-                  </button>
-                </div>
-              )}
             </div>
           ) : (
               /* When 0 items in local catalog match */
@@ -978,107 +751,11 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
                   </p>
                   <p className="text-[11px] text-gray-500 mt-0.5">
                     {isEs
-                      ? 'Puedes buscar ofertas de esta referencia directamente en tiendas de internet.'
-                      : 'You can search for offers across online pet stores.'}
+                      ? 'Prueba con la marca o con una parte del nombre.'
+                      : 'Try the brand or part of the name.'}
                   </p>
                 </div>
 
-                {isSearchingInternet ? (
-                  <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 flex items-center justify-center gap-2 text-emerald-800 text-xs font-bold animate-pulse">
-                    <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
-                    <span>{isEs ? 'Buscando en Google Shopping Colombia...' : 'Searching Google Shopping...'}</span>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => handleSearchInternet(query.trim())}
-                    className="w-full py-2.5 bg-[#0B5D2E] text-white rounded-xl text-xs font-bold shadow-xs hover:bg-[#094723] transition flex items-center justify-center gap-1.5 cursor-pointer"
-                  >
-                    <Globe className="w-3.5 h-3.5" />
-                    <span>
-                      {isEs
-                        ? `Buscar "${query}" en internet (Google Shopping)`
-                        : `Search "${query}" online`}
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                )}
-
-                {/* Live Internet Search Results if triggered when local was empty */}
-                {internetResults.length > 0 && (
-                  <div className="space-y-2 pt-2 text-left">
-                    <div className="flex items-center justify-between px-1">
-                      <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900">
-                        {isEs ? `Resultados en internet (${internetResults.length})` : `Found online (${internetResults.length})`}
-                      </span>
-                    </div>
-                    {internetResults.map((item) => (
-                      <div
-                        key={item.id}
-                        className="p-3 bg-white border border-emerald-300 rounded-2xl space-y-2 shadow-2xs"
-                      >
-                        <div
-                          onClick={() => {
-                            const targetSize =
-                              extractedWeight && item.confirmedSizesKg.includes(extractedWeight)
-                                ? extractedWeight
-                                : item.confirmedSizesKg[0];
-                            handleSelectOption(
-                              item.brand,
-                              item.productName,
-                              targetSize,
-                              item.imageUrl,
-                              undefined,
-                              item.confirmedSizesKg
-                            );
-                          }}
-                          className="flex items-center justify-between cursor-pointer"
-                        >
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <div className="w-10 h-12 bg-white rounded-lg p-0.5 border border-gray-200 flex items-center justify-center shrink-0 overflow-hidden">
-                              {item.imageUrl ? (
-                                <img src={item.imageUrl} alt={item.fullName} className="w-full h-full object-contain" />
-                              ) : (
-                                <Package className="w-5 h-5 text-gray-400" />
-                              )}
-                            </div>
-                            <div className="min-w-0">
-                              <span className="text-xs font-bold text-[#1C2B21] block truncate">{item.brand} {item.productName}</span>
-                              {item.samplePriceCop && (
-                                <span className="text-[10px] font-bold text-[#0B5D2E]">
-                                  {formatCOP(item.samplePriceCop)}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          <ArrowRight className="w-4 h-4 text-emerald-600 shrink-0 ml-2" />
-                        </div>
-                        <div className="flex items-center gap-1.5 flex-wrap pt-1 border-t border-gray-100">
-                          {item.confirmedSizesKg.map((size) => (
-                            <button
-                              key={size}
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleSelectOption(
-                                  item.brand,
-                                  item.productName,
-                                  size,
-                                  item.imageUrl,
-                                  undefined,
-                                  item.confirmedSizesKg
-                                );
-                              }}
-                              className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-[#EAF4EC] hover:bg-[#0B5D2E] text-[#0B5D2E] hover:text-white transition"
-                            >
-                              {size} kg
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             )}
           </div>

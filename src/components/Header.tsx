@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Pet, UserAccount } from '../types';
 import { usePWAInstall } from '../hooks/usePWAInstall';
-import { Shield, Plus, WifiOff, Download, Globe, User as UserIcon, LogIn, LogOut, Bell } from 'lucide-react';
+import { Plus, Download, Globe, Bell } from 'lucide-react';
 import { OfflineSyncIndicator } from './OfflineSyncIndicator';
-import { useAuth } from '../contexts/AuthContext.tsx';
 
 interface HeaderProps {
   pets: Pet[];
@@ -12,10 +11,8 @@ interface HeaderProps {
   onAddNewPet: () => void;
   userAccount: UserAccount;
   onUpdateAccount: (updated: Partial<UserAccount>) => void;
-  onOpenPayment?: () => void;
   onOpenNotifications?: () => void;
   unreadNotificationsCount?: number;
-  idToken?: string | null;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -25,15 +22,11 @@ export const Header: React.FC<HeaderProps> = ({
   onAddNewPet,
   userAccount,
   onUpdateAccount,
-  onOpenPayment,
   onOpenNotifications,
   unreadNotificationsCount = 1,
-  idToken,
 }) => {
-  const { isInstallable, isInstalled, isOnline, install, isIOS } = usePWAInstall();
+  const { isInstallable, isInstalled, install, isIOS } = usePWAInstall();
   const [showIOSModal, setShowIOSModal] = useState(false);
-  const [showUserMenu, setShowUserMenu] = useState(false);
-  const { user, openAuthModal, signOut } = useAuth();
 
   const isEs = userAccount.language === 'es';
 
@@ -47,7 +40,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#0B5D2E18] shadow-xs px-4 py-2.5 transition-all">
-      {/* Top micro bar: brand symbol + language / unit toggle + auth + offline alert */}
+      {/* Top micro bar: brand symbol + language / unit toggle + offline alert */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           {/* Brand Icon Shield (In-app only shield icon according to Brand Manual Page 8) */}
@@ -61,18 +54,9 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="font-heading font-extrabold text-lg text-[#0B5D2E] tracking-tight">
             Ración App
           </span>
-          {userAccount.isLicensed ? (
-            <span className="bg-[#0B5D2E]/10 text-[#0B5D2E] text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#0B5D2E20]">
-              PRO
-            </span>
-          ) : (
-            <button
-              onClick={onOpenPayment}
-              className="bg-[#F57C1A] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-xs hover:bg-[#d9670f] transition active:scale-95"
-            >
-              {isEs ? 'Desbloquear PRO' : 'Unlock PRO'}
-            </button>
-          )}
+          <span className="bg-[#EAF4EC] text-[#0B5D2E] text-[10px] font-bold px-2 py-0.5 rounded-full">
+            Beta
+          </span>
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -81,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
             type="button"
             onClick={onOpenNotifications}
             className="relative p-1.5 rounded-lg border border-[#0B5D2E20] bg-[#EAF4EC] text-[#0B5D2E] hover:bg-[#d9ebdd] transition"
-            title={isEs ? 'Avisos y reposición' : 'Notifications'}
+            aria-label={isEs ? 'Avisos de reposición' : 'Reorder alerts'}
           >
             <Bell className="w-3.5 h-3.5" />
             {unreadNotificationsCount > 0 && (
@@ -89,72 +73,7 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </button>
 
-          {/* Offline & Sync Status Indicator */}
-          <OfflineSyncIndicator idToken={idToken} isCompact />
-
-          {/* User Auth Pill or Register Button */}
-          {user ? (
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center gap-1.5 p-0.5 pr-2 rounded-full border border-[#0B5D2E25] bg-[#EAF4EC] hover:bg-[#d9ebd9] transition min-h-[32px]"
-                title={user.displayName || user.email || 'Mi Cuenta'}
-              >
-                {user.photoURL ? (
-                  <img
-                    src={user.photoURL}
-                    alt={user.displayName || 'Usuario'}
-                    className="w-6 h-6 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-6 h-6 rounded-full bg-[#0B5D2E] text-white flex items-center justify-center text-[10px] font-black uppercase">
-                    {(user.displayName || user.email || 'U')[0]}
-                  </div>
-                )}
-                <span className="text-xs font-bold text-[#0B5D2E] max-w-[80px] truncate hidden sm:inline">
-                  {user.displayName?.split(' ')[0] || user.email?.split('@')[0] || 'Cuenta'}
-                </span>
-              </button>
-
-              {/* User Dropdown Menu */}
-              {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-xl border border-[#0B5D2E20] p-3.5 z-50 text-left animate-in fade-in">
-                  <div className="pb-2.5 border-b border-gray-100">
-                    <p className="text-xs font-bold text-[#1C2B21] truncate">
-                      {user.displayName || (isEs ? 'Usuario Registrado' : 'Registered User')}
-                    </p>
-                    <p className="text-[11px] text-[#64748B] truncate">{user.email}</p>
-                    <span className="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 bg-[#EAF4EC] text-[#0B5D2E] rounded-full">
-                      ✓ {isEs ? 'Sincronizado' : 'Synced'}
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      signOut();
-                      setShowUserMenu(false);
-                    }}
-                    className="w-full mt-2.5 py-2 px-2.5 text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl flex items-center gap-2 transition"
-                  >
-                    <LogOut className="w-3.5 h-3.5" />
-                    <span>{isEs ? 'Cerrar sesión' : 'Sign out'}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => openAuthModal('register')}
-              className="flex items-center gap-1 bg-[#0B5D2E] text-white text-xs font-bold px-2.5 py-1 rounded-lg shadow-xs hover:bg-[#094723] transition active:scale-95"
-              title="Crear cuenta o iniciar sesión"
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{isEs ? 'Registrarse' : 'Sign up'}</span>
-              <span className="sm:hidden">{isEs ? 'Entrar' : 'Login'}</span>
-            </button>
-          )}
+          <OfflineSyncIndicator lang={userAccount.language} />
 
           {/* Install PWA Button */}
           {isInstallable && !isInstalled && (

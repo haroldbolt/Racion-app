@@ -8,7 +8,7 @@ import {
   NutrientValue,
   NutritionDatasheet,
 } from '../types';
-import { getEffectiveFoodItem } from './feedingGuide';
+import { getComponentPlanFood, getFoodKcalPerKg, getPlannedMeals, getPrimaryPlanFood, splitMixedPortion } from './mealPortions';
 
 export interface NutrientPortionComputation {
   key: 'energia' | 'proteina' | 'grasa' | 'fibra' | 'humedad' | 'cenizas' | 'carbohidratos';
@@ -86,7 +86,7 @@ function getEffectiveNutrientField(
   food: FoodItem | undefined,
   field: 'kcalPerKg' | 'proteina' | 'grasa' | 'fibra' | 'humedad' | 'cenizas' | 'carbohidratos'
 ): NutrientValue | undefined {
-  if (!food) return undefined;
+  if (!food || food.labelStatus === 'unconfirmed') return undefined;
   const ficha: NutritionDatasheet | undefined = food.fichaNutricional;
   if (ficha && ficha[field] && ficha[field]!.valor > 0) {
     return ficha[field];
@@ -174,6 +174,7 @@ export function calculateFoodPortionNutrients(
   const safeGrams = Math.max(0, gramsServed || 0);
 
   const kcalField = getEffectiveNutrientField(food, 'kcalPerKg');
+  const kcalPerKg = getFoodKcalPerKg(food);
   const protField = getEffectiveNutrientField(food, 'proteina');
   const fatField = getEffectiveNutrientField(food, 'grasa');
   const fiberField = getEffectiveNutrientField(food, 'fibra');
@@ -182,15 +183,15 @@ export function calculateFoodPortionNutrients(
   const carbsField = getEffectiveNutrientField(food, 'carbohidratos');
 
   const energia: NutrientPortionComputation =
-    kcalField && kcalField.valor > 0 && safeGrams > 0
+    kcalPerKg && safeGrams > 0
       ? {
           key: 'energia',
           label: 'Energía',
           available: true,
-          kcal: Math.round(((kcalField.valor * safeGrams) / 1000) * 10) / 10,
-          qualifier: kcalField.calificador,
-          basis: kcalField.baseMedicion,
-          displayText: `${Math.round((kcalField.valor * safeGrams) / 1000)} kcal`,
+          kcal: (kcalPerKg * safeGrams) / 1000,
+          qualifier: kcalField?.calificador,
+          basis: kcalField?.baseMedicion,
+          displayText: `${Math.round((kcalPerKg * safeGrams) / 1000)} kcal`,
         }
       : {
           key: 'energia',
@@ -238,9 +239,25 @@ function resolveComponentFromMeal(
   comp: MealMixedComponent,
   plan?: FeedingPlan
 ): FoodItem | undefined {
-  if (comp.role === 'dry') return plan?.dryFood;
-  if (comp.role === 'wet') return plan?.wetFood;
-  return getEffectiveFoodItem(plan);
+  const hasSnapshot = comp.kcalPerKg !== undefined || comp.proteinPct !== undefined ||
+    comp.fatPct !== undefined || comp.fiberPct !== undefined || comp.fichaNutricional !== undefined;
+  const fallback = getComponentPlanFood(comp, plan);
+  if (!hasSnapshot) return fallback;
+  return {
+    id: comp.foodId || comp.foodName,
+    brand: fallback?.brand || '',
+    name: comp.foodName,
+    species: fallback?.species || 'dog',
+    lifeStage: fallback?.lifeStage || 'adult',
+    type: comp.role === 'wet' ? 'wet' : 'dry',
+    kcalPerKg: comp.kcalPerKg ?? 0,
+    proteinPct: comp.proteinPct ?? 0,
+    fatPct: comp.fatPct ?? 0,
+    fiberPct: comp.fiberPct ?? 0,
+    moisturePct: 0,
+    country: fallback?.country || '',
+    fichaNutricional: comp.fichaNutricional,
+  };
 }
 
 /**
@@ -256,10 +273,7 @@ export function calculateDailyMealNutritionSummary(params: {
   const { plan, mealLogs, dryFood, wetFood } = params;
   const completedLogs = mealLogs.filter((m) => m.completed);
 
-  const totalPlannedPerMeal =
-    plan && plan.rationConfirmed && plan.gramsPerDay > 0
-      ? Math.round(plan.gramsPerDay / Math.max(1, plan.mealsPerDay || 2))
-      : 0;
+  const plannedMeals = plan ? getPlannedMeals(plan, plan.trainingRationGramsToday) : [];
 
   let totalPlannedGrams = plan?.rationConfirmed ? plan.gramsPerDay : 0;
   let totalServedGrams = 0;
@@ -269,9 +283,18 @@ export function calculateDailyMealNutritionSummary(params: {
     string,
     { food?: FoodItem; brand: string; name: string; gramsServed: number }
   >();
+  const addComponent = (brand: string, name: string, gramsServed: number, food?: FoodItem) => {
+    if (gramsServed <= 0) return;
+    // A label change does not change the nutrition of a meal already served.
+    const key = JSON.stringify([
+      food?.id, brand, name, food?.kcalPerKg, food?.proteinPct, food?.fatPct, food?.fiberPct, food?.fichaNutricional,
+    ]);
+    const previous = componentMap.get(key);
+    componentMap.set(key, { food, brand, name, gramsServed: (previous?.gramsServed || 0) + gramsServed });
+  };
 
   for (const log of completedLogs) {
-    const served = Math.max(0, log.gramsFed || log.plannedGrams || totalPlannedPerMeal);
+    const served = Math.max(0, log.gramsFed ?? log.plannedGrams ?? plannedMeals[log.mealIndex]?.grams ?? 0);
     totalServedGrams += served;
 
     if (log.plannedGrams && log.plannedGrams > 0 && !plan?.rationConfirmed) {
@@ -280,74 +303,35 @@ export function calculateDailyMealNutritionSummary(params: {
 
     if (Array.isArray(log.mixedComponents) && log.mixedComponents.length > 0) {
       for (const comp of log.mixedComponents) {
-        const compFood: FoodItem | undefined =
-          resolveComponentFromMeal(comp, plan) ||
-          (comp.kcalPerKg || comp.proteinPct || comp.fatPct
-            ? {
-                id: comp.foodId || comp.foodName,
-                brand: '',
-                name: comp.foodName,
-                species: 'dog',
-                lifeStage: 'adult',
-                type: comp.role === 'wet' ? 'wet' : 'dry',
-                kcalPerKg: comp.kcalPerKg || 0,
-                proteinPct: comp.proteinPct || 0,
-                fatPct: comp.fatPct || 0,
-                fiberPct: 0,
-                moisturePct: 0,
-                country: 'Colombia',
-              }
-            : undefined);
-        const key = `${comp.role}__${comp.foodName}`;
-        const servedG = Math.max(0, comp.gramsFed || 0);
-        const prev = componentMap.get(key);
-        if (prev) {
-          prev.gramsServed += servedG;
-        } else {
-          componentMap.set(key, {
-            food: compFood,
-            brand: comp.role === 'wet' ? 'Húmedo' : comp.role === 'dry' ? 'Seco' : 'Alimento',
-            name: comp.foodName,
-            gramsServed: servedG,
-          });
-        }
+        const food = resolveComponentFromMeal(comp, plan);
+        const brand = food?.brand || (comp.role === 'wet' ? 'Húmedo' : comp.role === 'dry' ? 'Seco' : 'Alimento');
+        addComponent(brand, comp.foodName, comp.gramsFed, food);
       }
+    } else if (plan?.isVetLocked) {
+      const prescribedKcal = plan.foodMerKcal ?? plan.mer;
+      const food = resolveComponentFromMeal({
+        foodName: plan.foodName,
+        role: 'main',
+        gramsFed: served,
+        gramsPlanned: served,
+        kcalPerKg: plan.rationConfirmed && plan.gramsPerDay > 0
+          ? prescribedKcal * 1000 / plan.gramsPerDay
+          : undefined,
+      }, plan);
+      addComponent('Pauta veterinaria', plan.foodName, served, food);
     } else if (plan?.foodType === 'mixed' && plan.dryFood && plan.wetFood) {
-      const dryPct = (plan.mixedDryPct ?? 75) / 100;
-      const wetPct = 1 - dryPct;
-      const dryG = Math.round(served * dryPct);
-      const wetG = Math.max(0, served - dryG);
-
-      const dKey = `${plan.dryFood.brand}__${plan.dryFood.name}`;
-      const wKey = `${plan.wetFood.brand}__${plan.wetFood.name}`;
-
-      const prevD = componentMap.get(dKey);
-      componentMap.set(dKey, {
-        food: plan.dryFood,
-        brand: plan.dryFood.brand,
-        name: plan.dryFood.name,
-        gramsServed: (prevD?.gramsServed || 0) + dryG,
-      });
-
-      const prevW = componentMap.get(wKey);
-      componentMap.set(wKey, {
-        food: plan.wetFood,
-        brand: plan.wetFood.brand,
-        name: plan.wetFood.name,
-        gramsServed: (prevW?.gramsServed || 0) + wetG,
-      });
+      const portions = splitMixedPortion(plan, served);
+      if (portions) {
+        addComponent(plan.dryFood.brand, plan.dryFood.name, portions.dryGrams, plan.dryFood);
+        addComponent(plan.wetFood.brand, plan.wetFood.name, portions.wetGrams, plan.wetFood);
+      } else {
+        addComponent('Ración mixta', plan.foodName, served);
+      }
     } else {
-      const primaryFood = dryFood || wetFood || getEffectiveFoodItem(plan);
+      const primaryFood = getPrimaryPlanFood(plan) || dryFood || wetFood;
       const brand = primaryFood?.brand || plan?.foodBrand || 'Alimento habitual';
       const name = primaryFood?.name || plan?.foodName || '';
-      const key = `${brand}__${name}`;
-      const prev = componentMap.get(key);
-      componentMap.set(key, {
-        food: primaryFood,
-        brand,
-        name,
-        gramsServed: (prev?.gramsServed || 0) + served,
-      });
+      addComponent(brand, name, served, primaryFood);
     }
   }
 
@@ -361,8 +345,8 @@ export function calculateDailyMealNutritionSummary(params: {
   if (perFoodBreakdown.length === 0) {
     return {
       totalPlannedGrams,
-      totalServedGrams: 0,
-      completedMealsCount: 0,
+      totalServedGrams,
+      completedMealsCount: completedLogs.length,
       kcalServedTotal: 0,
       proteinaGramsTotal: 0,
       proteinaPhrase: 'Registra una toma para calcular proteína servida',

@@ -44,8 +44,8 @@ export const PetModal: React.FC<PetModalProps> = ({
   const [sex, setSex] = useState<Sex>(petToEdit?.sex || 'male');
   const [isNeutered, setIsNeutered] = useState<boolean>(petToEdit ? petToEdit.isNeutered : true);
   const [ageYears, setAgeYears] = useState<number>(petToEdit?.ageYears ?? 3);
-  const [currentWeightKg, setCurrentWeightKg] = useState<number>(petToEdit?.currentWeightKg ?? 12);
-  const [idealWeightKg, setIdealWeightKg] = useState<number>(petToEdit?.idealWeightKg ?? 11);
+  const [currentWeightKg, setCurrentWeightKg] = useState<string>(petToEdit ? String(petToEdit.currentWeightKg) : '');
+  const [idealWeightKg, setIdealWeightKg] = useState<string>(petToEdit ? String(petToEdit.idealWeightKg) : '');
   const [bcs, setBcs] = useState<number>(petToEdit?.bcs ?? 5);
   const [activityLevel, setActivityLevel] = useState<ActivityLevel>(petToEdit?.activityLevel || 'moderate');
   const [specialState, setSpecialState] = useState<SpecialState>(petToEdit?.specialState || 'none');
@@ -79,8 +79,8 @@ export const PetModal: React.FC<PetModalProps> = ({
     setSex(petToEdit?.sex || 'male');
     setIsNeutered(petToEdit ? petToEdit.isNeutered : true);
     setAgeYears(petToEdit?.ageYears ?? 3);
-    setCurrentWeightKg(petToEdit?.currentWeightKg ?? (sp === 'dog' ? 12 : 4));
-    setIdealWeightKg(petToEdit?.idealWeightKg ?? (sp === 'dog' ? 11 : 4));
+    setCurrentWeightKg(petToEdit ? String(petToEdit.currentWeightKg) : '');
+    setIdealWeightKg(petToEdit ? String(petToEdit.idealWeightKg) : '');
     setExpectedAdultWeightKg(
       petToEdit?.expectedAdultWeightKg ? String(petToEdit.expectedAdultWeightKg) : ''
     );
@@ -246,7 +246,8 @@ export const PetModal: React.FC<PetModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
+    const measuredWeight = Number(currentWeightKg);
+    if (!name.trim() || !Number.isFinite(measuredWeight) || measuredWeight <= 0) return;
 
     stopCamera();
 
@@ -269,9 +270,9 @@ export const PetModal: React.FC<PetModalProps> = ({
       isNeutered,
       ageYears: cleanYears,
       ageMonths: computedMonths,
-      currentWeightKg: Number(currentWeightKg) || 5,
-      idealWeightKg: Number(idealWeightKg) || Number(currentWeightKg) || 5,
-      targetWeightKg: Number(idealWeightKg) || Number(currentWeightKg) || 5,
+      currentWeightKg: measuredWeight,
+      idealWeightKg: Number(idealWeightKg) || measuredWeight,
+      targetWeightKg: Number(idealWeightKg) || measuredWeight,
       expectedAdultWeightKg:
         Number.isFinite(parsedExpectedAdult) && parsedExpectedAdult > 0
           ? parsedExpectedAdult
@@ -689,7 +690,7 @@ export const PetModal: React.FC<PetModalProps> = ({
           {/* Age & Weights */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
             <div className="flex flex-col justify-between gap-1">
-              <label className="text-xs font-bold text-[#1C2B21] leading-tight">
+              <label htmlFor="pet-current-weight" className="text-xs font-bold text-[#1C2B21] leading-tight">
                 {isEs ? 'Peso Actual (kg)' : 'Current Wt (kg)'}
               </label>
               <input
@@ -697,18 +698,17 @@ export const PetModal: React.FC<PetModalProps> = ({
                 step="0.1"
                 min="0.5"
                 max="100"
+                id="pet-current-weight"
+                required
                 value={currentWeightKg}
-                onChange={(e) => {
-                  const val = parseFloat(e.target.value) || 1;
-                  setCurrentWeightKg(val);
-                }}
+                onChange={(e) => setCurrentWeightKg(e.target.value)}
                 className="w-full px-3 py-2.5 bg-white border border-[#0B5D2E40] rounded-xl text-center font-extrabold text-base text-[#0B5D2E] focus:ring-2 focus:ring-[#0B5D2E] min-h-[46px]"
               />
             </div>
 
             <div className="flex flex-col justify-between gap-1">
               <label className="text-xs font-bold text-[#1C2B21] leading-tight">
-                {isEs ? 'Peso Ideal (kg)' : 'Ideal Wt (kg)'}
+                {isEs ? 'Peso ideal (opcional, kg)' : 'Ideal weight (optional, kg)'}
               </label>
               <input
                 type="number"
@@ -716,7 +716,7 @@ export const PetModal: React.FC<PetModalProps> = ({
                 min="0.5"
                 max="100"
                 value={idealWeightKg}
-                onChange={(e) => setIdealWeightKg(parseFloat(e.target.value) || 1)}
+                onChange={(e) => setIdealWeightKg(e.target.value)}
                 className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-center font-bold text-base text-[#1C2B21] focus:ring-2 focus:ring-[#0B5D2E] min-h-[46px]"
               />
             </div>
@@ -750,7 +750,7 @@ export const PetModal: React.FC<PetModalProps> = ({
             </span>
             <button
               type="button"
-              onClick={() => setIdealWeightKg(idealWeightRef.midpoint)}
+              onClick={() => setIdealWeightKg(String(idealWeightRef.midpoint))}
               className="px-2.5 py-1 bg-white text-[#0B5D2E] border border-[#0B5D2E30] rounded-lg font-bold hover:bg-[#0B5D2E] hover:text-white transition shrink-0 text-[11px]"
             >
               {isEs ? `Usar ${idealWeightRef.midpoint} kg` : `Use ${idealWeightRef.midpoint} kg`}

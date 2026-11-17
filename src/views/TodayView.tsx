@@ -3,6 +3,7 @@ import {
   Pet,
   FeedingPlan,
   MealLog,
+  MealMixedComponent,
   UserAccount,
   FoodItem,
   WeightRecord,
@@ -12,7 +13,8 @@ import {
 } from '../types';
 import { formatRation, formatCOP } from '../utils/i18n';
 import { StorageService } from '../utils/storage';
-import { useCity } from '../contexts/CityContext';
+import { localDateKey } from '../utils/localDate';
+import { getPlannedMeals, getPlannedMealComponents } from '../utils/mealPortions';
 import { UnifiedFoodSearchModal, resolveFoodThumbnail } from '../components/UnifiedFoodSearchModal';
 import { InventoryFoodSearchModal } from '../components/InventoryFoodSearchModal';
 import { DailyKcalRingChart } from '../components/DailyKcalRingChart';
@@ -35,14 +37,13 @@ import {
   getEffectiveFoodItem,
 } from '../utils/feedingGuide';
 import { calculateDailyMealNutritionSummary } from '../utils/mealNutrition';
-import { recalculatePlanForPet } from '../utils/calculator';
+import { defaultMealTimes, recalculatePlanForPet, requiresVetGuidance } from '../utils/calculator';
 import {
   Check,
   CheckCircle2,
   Clock,
   Droplets,
   Cookie,
-  ShoppingBag,
   ChevronRight,
   ChevronDown,
   ChevronUp,
@@ -73,21 +74,18 @@ interface TodayViewProps {
     grams: number,
     time: string,
     plannedGrams?: number,
-    forceComplete?: boolean
+    forceComplete?: boolean,
+    mixedComponents?: MealMixedComponent[]
   ) => void;
   userAccount: UserAccount;
-  onNavigateTab: (
-    tab: 'calculate' | 'progress' | 'more' | 'pets' | 'compare',
-    subTab?: 'prices' | 'compare'
-  ) => void;
-  onOpenStoreModal?: () => void;
+  onNavigateTab: (tab: 'calculate' | 'progress' | 'more' | 'pets') => void;
   allPets?: Pet[];
   plans?: Record<string, FeedingPlan>;
   onSelectFoodForPet?: (food: FoodItem) => void;
   onEditPet?: (pet: Pet) => void;
   onSavePlan?: (plan: FeedingPlan) => void;
   onUpdatePetProfile?: (pet: Pet) => void;
-  onAddWeightRecord?: (record: WeightRecord) => void;
+  onAddWeightRecord?: (record: WeightRecord) => boolean;
   onAddHealthLog?: (log: HealthLog) => void;
 }
 
@@ -109,7 +107,6 @@ export const TodayView: React.FC<TodayViewProps> = ({
 }) => {
   const isEs = userAccount.language === 'es';
   const units = userAccount.units;
-  const { selectedCity } = useCity();
 
   const [hydrationState, setHydrationState] = useState<HydrationDailyState>(() =>
     StorageService.getHydrationStateToday(pet.id)
@@ -142,6 +139,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
   const [showTreatModal, setShowTreatModal] = useState(false);
   const [showWeightModal, setShowWeightModal] = useState(false);
   const [showMealModal, setShowMealModal] = useState(false);
+  const [selectedMealIndex, setSelectedMealIndex] = useState<number>();
   const [showAlternatives, setShowAlternatives] = useState(false);
   const [purchaseRefreshKey, setPurchaseRefreshKey] = useState(0);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -154,12 +152,9 @@ export const TodayView: React.FC<TodayViewProps> = ({
   // Merge today's puppy training allocation into plan view
   const effectivePlan = useMemo(() => {
     if (!plan) return undefined;
-    return {
-      ...plan,
-      trainingRationGramsToday:
-        trainingGramsToday > 0 ? trainingGramsToday : plan.trainingRationGramsToday || 0,
-    };
-  }, [plan, trainingGramsToday]);
+    const safePlan = requiresVetGuidance(pet, plan) ? recalculatePlanForPet(pet, plan) : plan;
+    return { ...safePlan, trainingRationGramsToday: trainingGramsToday };
+  }, [pet, plan, trainingGramsToday]);
 
   const latestFoodPurchase = useMemo(
     () => StorageService.getFoodPurchases(pet.id)[0] || null,
@@ -238,6 +233,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
 
   const handleSaveSchedule = (mealsPerDay: number, mealTimes: string[]) => {
     if (!effectivePlan) return;
+    if (effectivePlan.isVetLocked && mealsPerDay !== effectivePlan.mealsPerDay) return;
     const mealCountChanged = mealsPerDay !== effectivePlan.mealsPerDay;
     persistPlanUpdate({
       ...effectivePlan,
@@ -284,7 +280,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
       onAddHealthLog?.({
         id: 'hl_water_' + Date.now(),
         petId: pet.id,
-        date: new Date().toISOString().split('T')[0],
+        date: localDateKey(),
         type: 'symptom',
         title:
           flag === 'much_more'
@@ -311,9 +307,6 @@ export const TodayView: React.FC<TodayViewProps> = ({
   const handleSaveTrainingGrams = (grams: number) => {
     setTrainingGramsToday(grams);
     StorageService.setTrainingRationGramsToday(pet.id, grams);
-    if (effectivePlan) {
-      persistPlanUpdate({ ...effectivePlan, trainingRationGramsToday: grams });
-    }
     showToast(
       grams > 0
         ? `${grams} g apartados para entrenamiento dentro de su ración diaria.`
@@ -325,16 +318,14 @@ export const TodayView: React.FC<TodayViewProps> = ({
     const record: WeightRecord = {
       id: 'w_' + Date.now(),
       petId: pet.id,
-      date: new Date().toISOString().split('T')[0],
+      date: localDateKey(),
       weightKg,
       notes,
     };
-    if (onAddWeightRecord) {
-      onAddWeightRecord(record);
-    } else {
-      StorageService.addWeightRecord(record);
-    }
-    if (weightKg !== pet.currentWeightKg && effectivePlan && !effectivePlan.isVetLocked) {
+    const changedWeight = onAddWeightRecord
+      ? onAddWeightRecord(record)
+      : StorageService.addWeightRecord(record);
+    if (changedWeight && effectivePlan && !effectivePlan.isVetLocked) {
       const updatedPet: Pet = { ...pet, currentWeightKg: weightKg };
       const recalculated = recalculatePlanForPet(updatedPet, effectivePlan);
       persistPlanUpdate(recalculated);
@@ -399,8 +390,8 @@ export const TodayView: React.FC<TodayViewProps> = ({
             </h2>
             <p className="text-sm text-[#44544A]">
               {isEs
-                ? 'Conoce los gramos exactos y evalúa su alimento habitual en menos de 60 segundos.'
-                : 'Calculate exact grams and review habitual food in under 60 seconds.'}
+                ? 'Estima su ración diaria a partir de su perfil y las calorías del alimento.'
+                : 'Estimate a daily portion from your pet’s profile and the food’s calories.'}
             </p>
           </div>
           <button
@@ -423,10 +414,10 @@ export const TodayView: React.FC<TodayViewProps> = ({
     resolveFoodThumbnail(effectivePlan.foodBrand, effectivePlan.foodName, pet.species);
 
   const isBarf = effectivePlan.foodType === 'barf' || pet.dietType === 'barf';
-  const totalMealsPlanned = Math.max(1, effectivePlan.mealsPerDay || 2);
-  const perMealBowlGrams = effectivePlan.rationConfirmed
-    ? Math.round(treatsGuidance.bowlGramsTotalToday / totalMealsPlanned)
-    : 0;
+  const needsVetGuidance = requiresVetGuidance(pet, effectivePlan);
+  const plannedMeals = getPlannedMeals(effectivePlan, treatsGuidance.trainingGramsAllocatedToday);
+  const totalMealsPlanned = plannedMeals.length;
+  const nextMealPortion = nextMeal.nextMealIndex === null ? undefined : plannedMeals[nextMeal.nextMealIndex];
 
   return (
     <div className="p-4 space-y-4 pb-28">
@@ -514,9 +505,9 @@ export const TodayView: React.FC<TodayViewProps> = ({
         {effectivePlan.rationConfirmed && effectivePlan.gramsPerDay > 0 ? (
           <div className="space-y-1.5">
             <div className="font-heading font-black text-4xl sm:text-5xl text-[#1C2B21] tracking-tight leading-none tabular-nums">
-              {formatRation(perMealBowlGrams, units)}
+              {formatRation(nextMealPortion?.grams ?? effectivePlan.gramsPerDay, units)}
               <span className="text-lg sm:text-xl font-bold text-[#44544A] ml-2 font-['Nunito',sans-serif]">
-                por toma ({totalMealsPlanned}/día)
+                {nextMealPortion ? (isEs ? 'próxima toma' : 'next meal') : (isEs ? 'por día' : 'per day')}
               </span>
             </div>
             <p className="text-xs font-bold text-[#0B5D2E] tabular-nums">
@@ -528,11 +519,15 @@ export const TodayView: React.FC<TodayViewProps> = ({
               {isEs ? 'Meta energética diaria (MER)' : 'Daily energy target (MER)'}: {effectivePlan.mer} kcal
             </p>
           </div>
-        ) : isBarf ? (
+        ) : needsVetGuidance ? (
           <div className="bg-[#FFFBEB] p-3.5 rounded-2xl border border-amber-200 text-xs text-amber-950 space-y-1">
-            <strong className="block font-extrabold">Dieta BARF / Natural Cruda registrada</strong>
+            <strong className="block font-extrabold">
+              {isEs ? 'Hace falta una pauta veterinaria' : 'Veterinary guidance required'}
+            </strong>
             <p className="leading-relaxed">
-              No calculamos gramos automáticos para dietas crudas. Sigue las porciones y fórmulas definidas por tu veterinario o nutricionista veterinario.
+              {isEs
+                ? 'Sigue las cantidades indicadas por tu veterinario y registra en el diario lo que sirves.'
+                : 'Follow your veterinarian’s instructions and record the portions you serve in your diary.'}
             </p>
           </div>
         ) : (
@@ -540,7 +535,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
             <div className="text-xs text-amber-950 space-y-0.5">
               <strong className="block font-extrabold">Etiqueta pendiente para calcular gramos</strong>
               <p className="leading-snug">
-                Confirma la fórmula y las kcal/kg del empaque para mostrar la porción exacta.
+                Confirma la fórmula y las kcal/kg del empaque para estimar la porción.
               </p>
             </div>
             <button
@@ -564,7 +559,9 @@ export const TodayView: React.FC<TodayViewProps> = ({
           <div className="bg-[#F8FAF8] p-2.5 rounded-2xl border border-gray-100">
             <span className="text-[10px] font-bold uppercase text-[#44544A] block">Energía hoy</span>
             <strong className="text-sm font-extrabold text-[#0B5D2E] tabular-nums">
-              {nextMeal.consumedKcalTotal} / {nextMeal.targetKcalTotal} kcal
+              {nextMeal.targetKcalTotal > 0
+                ? `${nextMeal.consumedKcalTotal} / ${nextMeal.targetKcalTotal} kcal`
+                : `${nextMeal.consumedKcalTotal} kcal`}
             </strong>
           </div>
           <div className="bg-[#F8FAF8] p-2.5 rounded-2xl border border-gray-100">
@@ -579,7 +576,10 @@ export const TodayView: React.FC<TodayViewProps> = ({
         <div className="grid grid-cols-3 gap-2">
           <button
             type="button"
-            onClick={() => setShowMealModal(true)}
+            onClick={() => {
+              setSelectedMealIndex(undefined);
+              setShowMealModal(true);
+            }}
             className="min-h-[46px] px-2 py-2 bg-[#0B5D2E] hover:bg-[#094723] text-white rounded-2xl text-xs font-heading font-extrabold flex flex-col items-center justify-center gap-1 transition active:scale-98"
           >
             <Utensils className="w-4 h-4" />
@@ -652,9 +652,9 @@ export const TodayView: React.FC<TodayViewProps> = ({
             </div>
           </div>
 
-          {Array.from({ length: totalMealsPlanned }).map((_, idx) => {
+          {plannedMeals.map((portion, idx) => {
             const scheduledTime =
-              effectivePlan.mealTimes?.[idx] || (idx === 0 ? '08:00' : '20:00');
+              effectivePlan.mealTimes?.[idx] || defaultMealTimes(totalMealsPlanned)[idx];
             const log = mealLogs.find((l) => l.mealIndex === idx);
             const isFed = log?.completed;
 
@@ -678,7 +678,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
                       </span>
                       {effectivePlan.rationConfirmed && (
                         <span className="font-extrabold text-[#0B5D2E] tabular-nums">
-                          {formatRation(perMealBowlGrams, units)}
+                          {formatRation(portion.grams, units)}
                         </span>
                       )}
                     </div>
@@ -700,9 +700,18 @@ export const TodayView: React.FC<TodayViewProps> = ({
 
                 <button
                   type="button"
-                  onClick={() =>
-                    onToggleMeal(idx, selectedFeeder, perMealBowlGrams, scheduledTime, perMealBowlGrams)
-                  }
+                  onClick={() => {
+                    if (!isFed && !effectivePlan.rationConfirmed) {
+                      setSelectedMealIndex(idx);
+                      setShowMealModal(true);
+                      return;
+                    }
+                    const components = getPlannedMealComponents(effectivePlan, portion);
+                    onToggleMeal(
+                      idx, selectedFeeder, portion.grams, scheduledTime,
+                      effectivePlan.rationConfirmed ? portion.grams : undefined, undefined, components
+                    );
+                  }}
                   className={`min-h-[44px] px-3.5 rounded-xl font-heading font-bold text-xs flex items-center gap-1 transition shrink-0 ${
                     isFed
                       ? 'bg-[#1E8A49] text-white'
@@ -710,7 +719,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
                   }`}
                 >
                   <Check className="w-3.5 h-3.5 stroke-[3]" />
-                  <span>{isFed ? 'Comió' : 'Ya comió'}</span>
+                  <span>{isFed ? 'Deshacer' : 'Ya comió'}</span>
                 </button>
               </div>
             );
@@ -1201,38 +1210,14 @@ export const TodayView: React.FC<TodayViewProps> = ({
         </div>
       )}
 
-      {/* Daily Ring Chart */}
-      <DailyKcalRingChart
-        pet={pet}
-        plan={effectivePlan}
-        mealLogs={mealLogs}
-        treatLogs={treatLogsToday}
-        trainingGramsToday={treatsGuidance.trainingGramsAllocatedToday}
-        lang={userAccount.language}
-      />
-
-      {/* Price Comparator Shortcut (for commercial diets) */}
-      {!isBarf && (
-        <div className="bg-white rounded-3xl p-4 sm:p-5 border border-[#0B5D2E20] shadow-xs space-y-3">
-          <div className="flex items-center justify-between gap-2">
-            <div>
-              <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#0B5D2E] block">
-                Comparador de precios · {selectedCity || 'Bogotá'}
-              </span>
-              <h3 className="font-heading font-extrabold text-base text-[#1C2B21]">
-                {effectivePlan.foodBrand} {effectivePlan.foodName}
-              </h3>
-            </div>
-            <button
-              type="button"
-              onClick={() => onNavigateTab('compare', 'prices')}
-              className="min-h-[44px] px-4 py-2 bg-[#0B5D2E] text-white rounded-xl font-heading font-extrabold text-xs hover:bg-[#094723] flex items-center gap-1.5 shrink-0"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              <span>Ver precios</span>
-            </button>
-          </div>
-        </div>
+      {nextMeal.targetKcalTotal > 0 && (
+        <DailyKcalRingChart
+          pet={pet}
+          plan={effectivePlan}
+          mealLogs={mealLogs}
+          treatLogs={treatLogsToday}
+          lang={userAccount.language}
+        />
       )}
 
       {/* ================= MODALS ================= */}
@@ -1351,9 +1336,10 @@ export const TodayView: React.FC<TodayViewProps> = ({
         plan={effectivePlan}
         mealLogs={mealLogs}
         defaultFeeder={selectedFeeder}
+        preferredMealIndex={selectedMealIndex}
         familyMembers={userAccount.familyMembers}
-        onConfirmMeal={(idx, feeder, grams, time, plannedGrams) => {
-          onToggleMeal(idx, feeder, grams, time, plannedGrams, true);
+        onConfirmMeal={(idx, feeder, grams, time, plannedGrams, components) => {
+          onToggleMeal(idx, feeder, grams, time, plannedGrams, true, components);
           showToast(`Comida ${idx + 1} registrada (${grams} g servidos).`);
         }}
       />

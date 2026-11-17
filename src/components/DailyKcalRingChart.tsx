@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import React from 'react';
+import { getNextMealStatus } from '../utils/feedingGuide';
 import { Pet, FeedingPlan, MealLog, TreatLog } from '../types';
 import { Flame, Utensils, CheckCircle2, AlertCircle } from 'lucide-react';
 
@@ -7,7 +8,6 @@ interface DailyKcalRingChartProps {
   plan: FeedingPlan;
   mealLogs: MealLog[];
   treatLogs?: TreatLog[];
-  trainingGramsToday?: number;
   lang?: string;
 }
 
@@ -16,55 +16,16 @@ export const DailyKcalRingChart: React.FC<DailyKcalRingChartProps> = ({
   plan,
   mealLogs,
   treatLogs = [],
-  trainingGramsToday = 0,
   lang = 'es',
 }) => {
   const isEs = lang === 'es';
 
+  const { targetKcalTotal: merTarget, consumedKcalTotal: kcalConsumed, completedMealsCount, totalMealsCount } =
+    getNextMealStatus(plan, mealLogs, treatLogs);
+  const mealsPlanned = Math.max(1, totalMealsCount);
+  const mealsCompletedCount = completedMealsCount;
+  const treatsKcalToday = treatLogs.reduce((sum, treat) => sum + (Number(treat.kcal) || 0), 0);
   const rationConfirmed = Boolean(plan.rationConfirmed && plan.gramsPerDay > 0);
-  const merTarget = plan.mer || 0;
-  const mealsPlanned = Math.max(1, plan.mealsPerDay || 2);
-  const kcalPerMeal = rationConfirmed
-    ? plan.kcalPerMeal || Math.round(merTarget / mealsPlanned)
-    : 0;
-
-  const completedMealLogs = useMemo(() => {
-    return mealLogs.filter((l) => l.completed);
-  }, [mealLogs]);
-
-  const mealsCompletedCount = completedMealLogs.length;
-
-  const treatsKcalToday = useMemo(
-    () => treatLogs.reduce((sum, t) => sum + (Number(t.kcal) || 0), 0),
-    [treatLogs]
-  );
-
-  const kcalConsumed = useMemo(() => {
-    if (!rationConfirmed || merTarget <= 0 || plan.gramsPerDay <= 0) {
-      return treatsKcalToday;
-    }
-
-    const kcalPerGram = merTarget / plan.gramsPerDay;
-    const mealsKcal = completedMealLogs.reduce((sum, log) => {
-      if (log.gramsFed && log.gramsFed > 0) {
-        return sum + Math.round(log.gramsFed * kcalPerGram);
-      }
-      return sum + kcalPerMeal;
-    }, 0);
-
-    const boundedTraining = Math.min(trainingGramsToday, plan.gramsPerDay);
-    const trainingKcal = boundedTraining > 0 ? Math.round(boundedTraining * kcalPerGram) : 0;
-
-    return mealsKcal + treatsKcalToday + trainingKcal;
-  }, [
-    rationConfirmed,
-    merTarget,
-    plan.gramsPerDay,
-    completedMealLogs,
-    kcalPerMeal,
-    treatsKcalToday,
-    trainingGramsToday,
-  ]);
 
   const percentKcal = merTarget > 0 ? Math.round((kcalConsumed / merTarget) * 100) : 0;
   const boundedKcalPercent = Math.min(100, Math.max(0, percentKcal));
@@ -272,9 +233,6 @@ export const DailyKcalRingChart: React.FC<DailyKcalRingChartProps> = ({
               </div>
             </div>
 
-            <span className="text-xs font-bold text-[#0284C7] tabular-nums shrink-0">
-              {rationConfirmed ? `~${kcalPerMeal} kcal/toma` : 'Etiqueta pendiente'}
-            </span>
           </div>
 
           <div className="p-3 bg-[#EAF4EC]/70 rounded-2xl border border-[#0B5D2E20] flex items-center justify-between text-xs gap-2">

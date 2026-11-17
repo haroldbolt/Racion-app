@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Pet, FeedingPlan, MealLog, WeightRecord, HealthLog, UserAccount, FoodItem, VetGuideline, MonetizationInfo } from './types';
+import React, { useState, useEffect } from 'react';
+import { Pet, FeedingPlan, MealLog, WeightRecord, HealthLog, UserAccount, FoodItem, VetGuideline, MealMixedComponent } from './types';
+import { localDateKey } from './utils/localDate';
 import { StorageService } from './utils/storage';
 import { Header } from './components/Header';
 import { BottomNav, TabId } from './components/BottomNav';
@@ -9,36 +10,20 @@ import { CalculatorView } from './views/CalculatorView';
 import { ProgressView } from './views/ProgressView';
 import { MoreView } from './views/MoreView';
 import { FoodsView } from './views/FoodsView';
-import { OnboardingModal, OnboardingPetData } from './components/OnboardingModal';
 import { PetModal } from './components/PetModal';
-import { PaymentView } from './views/PaymentView';
-import { AuthModal } from './components/AuthModal';
-import { TrialCountdownBanner } from './components/TrialCountdownBanner';
-import { LockedFeatureNotice } from './components/LockedFeatureNotice';
-import { WeightHistory } from './components/WeightHistory';
-import { CloudSqlService } from './services/cloudSqlService.ts';
-import { useAuth } from './contexts/AuthContext.tsx';
-import { OfflineSyncIndicator } from './components/OfflineSyncIndicator';
-import { SyncQueue } from './services/syncQueueService';
 import { NotificationsCenterModal } from './components/NotificationsCenterModal';
-import { ImportLocalDataModal } from './components/ImportLocalDataModal';
 import {
-  calculateFeedingPlan,
-  buildFeedingPlan,
   recalculatePlanForPet,
   determineFactor,
 } from './utils/calculator';
-import { findBreedProfile } from './data/breeds';
-import { isPetPuppy, hasConfirmedLabel } from './utils/feedingGuide';
+import { getEffectiveFoodItem, hasConfirmedLabel } from './utils/feedingGuide';
 
 export default function App() {
-  // Initialize Storage
-  useEffect(() => {
-    StorageService.initialize();
-  }, []);
-
   // Primary reactive state
-  const [pets, setPets] = useState<Pet[]>(() => StorageService.getPets());
+  const [pets, setPets] = useState<Pet[]>(() => {
+    StorageService.initialize();
+    return StorageService.getPets();
+  });
   const [activePetId, setActivePetId] = useState<string>(() => StorageService.getActivePetId());
   const [plans, setPlans] = useState<Record<string, FeedingPlan>>(() => StorageService.getPlans());
   const [userAccount, setUserAccount] = useState<UserAccount>(() => StorageService.getUserAccount());
@@ -51,91 +36,23 @@ export default function App() {
   const [weightRecords, setWeightRecords] = useState<WeightRecord[]>(() => StorageService.getWeightRecords(activePetId));
   const [healthLogs, setHealthLogs] = useState<HealthLog[]>(() => StorageService.getHealthLogs(activePetId));
 
-  // Modals
-  const [showOnboarding, setShowOnboarding] = useState<boolean>(() => {
-    // If no pets exist or explicit first visit, show onboarding
-    return StorageService.getPets().length === 0;
-  });
-  const [showPetModal, setShowPetModal] = useState<boolean>(false);
+  const [showPetModal, setShowPetModal] = useState(false);
   const [petToEdit, setPetToEdit] = useState<Pet | null>(null);
-  const [showPaymentModal, setShowPaymentModal] = useState<boolean>(false);
-  const [showNotificationsModal, setShowNotificationsModal] = useState<boolean>(false);
-  const [showImportModal, setShowImportModal] = useState<boolean>(false);
-  const [compareSubTab, setCompareSubTab] = useState<'prices' | 'compare'>('prices');
+  const [showNotificationsModal, setShowNotificationsModal] = useState(false);
+  const [diaryDay, setDiaryDay] = useState(localDateKey);
 
-  // Monetization state from backend (Rule 8)
-  const [monetization, setMonetization] = useState<MonetizationInfo | null>(null);
-
-  // Authentication & Cloud SQL sync
-  const { user: authUser, idToken, isAuthModalOpen, authModalMode, closeAuthModal } = useAuth();
-
-  // Auto-detect if user signed in and has local guest pets to offer import
   useEffect(() => {
-    if (authUser && idToken && pets.length > 0) {
-      const imported = localStorage.getItem('racion_app_local_data_imported');
-      if (!imported) {
-        setShowImportModal(true);
-      }
-    }
-  }, [authUser, idToken]);
-
-  // Initial connection verification with Cloud SQL
-  useEffect(() => {
-    CloudSqlService.checkConnection().then((status) => {
-      if (status?.configured) {
-        console.log('[Cloud SQL] Service connection initialized successfully:', status.database);
-      }
-    });
+    // Re-read the browser's calendar on resume and when an open diary passes midnight.
+    const refreshDay = () => setDiaryDay(localDateKey());
+    const interval = window.setInterval(refreshDay, 1000);
+    document.addEventListener('visibilitychange', refreshDay);
+    window.addEventListener('focus', refreshDay);
+    return () => {
+      window.clearInterval(interval);
+      document.removeEventListener('visibilitychange', refreshDay);
+      window.removeEventListener('focus', refreshDay);
+    };
   }, []);
-
-  // Sync dataset with Cloud SQL when user is authenticated
-  useEffect(() => {
-    if (!idToken || !authUser) return;
-    CloudSqlService.syncInitialData(idToken, {
-      pets,
-      plans,
-      weights: StorageService.getWeightRecords(activePetId),
-      mealLogs,
-    });
-  }, [idToken, authUser]);
-
-  // Keep SyncQueue updated with the current auth token
-  useEffect(() => {
-    SyncQueue.setIdToken(idToken || null);
-    if (idToken && navigator.onLine) {
-      SyncQueue.processQueue();
-    }
-  }, [idToken]);
-
-  const fetchMonetizationStatus = async () => {
-    try {
-      const res = await fetch('/api/monetization/status');
-      if (res.ok) {
-        const data: MonetizationInfo = await res.json();
-        setMonetization(data);
-        if (data.status === 'charged_lifetime' && !userAccount.isLicensed) {
-          handleUpdateAccount({ isLicensed: true, licenseKey: data.chargeTransactionId || 'RACION-PRO-LIFETIME' });
-        }
-      }
-    } catch (e) {
-      // Offline fallback
-    }
-  };
-
-  useEffect(() => {
-    fetchMonetizationStatus();
-    const interval = setInterval(fetchMonetizationStatus, 15000);
-    return () => clearInterval(interval);
-  }, [userAccount.isLicensed]);
-
-  const handleCancelTrial = async () => {
-    try {
-      await fetch('/api/monetization/cancel-trial', { method: 'POST' });
-      await fetchMonetizationStatus();
-    } catch (e) {
-      console.error('Failed to cancel trial', e);
-    }
-  };
 
   // Sync visual theme (claro / oscuro) globally to html and document attributes
   useEffect(() => {
@@ -153,11 +70,14 @@ export default function App() {
   useEffect(() => {
     if (activePetId) {
       StorageService.setActivePetId(activePetId);
-      setMealLogs(StorageService.getTodayMealLogs(activePetId));
       setWeightRecords(StorageService.getWeightRecords(activePetId));
       setHealthLogs(StorageService.getHealthLogs(activePetId));
     }
   }, [activePetId]);
+
+  useEffect(() => {
+    setMealLogs(StorageService.getTodayMealLogs(activePetId));
+  }, [activePetId, diaryDay]);
 
   const activePet = pets.find((p) => p.id === activePetId) || pets[0];
   const activePlan = activePet ? plans[activePet.id] : undefined;
@@ -169,7 +89,8 @@ export default function App() {
     grams: number,
     time: string,
     plannedGrams?: number,
-    forceComplete?: boolean
+    forceComplete?: boolean,
+    mixedComponents?: MealMixedComponent[]
   ) => {
     if (!activePet) return;
     StorageService.toggleMealCompleted(
@@ -179,27 +100,18 @@ export default function App() {
       grams,
       time,
       plannedGrams,
-      forceComplete
+      forceComplete,
+      mixedComponents
     );
-    const updatedMeals = StorageService.getTodayMealLogs(activePet.id);
-    setMealLogs(updatedMeals);
-    if (idToken) {
-      const toggled = updatedMeals.find((m) => m.mealIndex === mealIndex);
-      if (toggled) {
-        CloudSqlService.saveMealLog(activePet.id, toggled, idToken);
-      }
-    }
+    setDiaryDay(localDateKey());
+    setMealLogs(StorageService.getTodayMealLogs(activePet.id));
   };
 
-  // Add weight record handler
   const handleAddWeightRecord = (record: WeightRecord) => {
-    StorageService.addWeightRecord(record);
+    const changedWeight = StorageService.addWeightRecord(record);
     setWeightRecords(StorageService.getWeightRecords(record.petId));
-    // Refresh pets list since currentWeight was updated
     setPets(StorageService.getPets());
-    if (idToken) {
-      CloudSqlService.saveWeightRecord(record.petId, record, idToken);
-    }
+    return changedWeight;
   };
 
   // Add health event
@@ -212,25 +124,13 @@ export default function App() {
   const handleSavePlan = (plan: FeedingPlan) => {
     StorageService.savePlan(plan);
     setPlans(StorageService.getPlans());
-    if (idToken) {
-      CloudSqlService.saveFeedingPlan(plan.petId, plan, idToken);
-    }
     setCurrentTab('today');
   };
 
-  // Update plan ration from auto-recalculation
-  const handleUpdatePlanRation = (newGramsPerDay: number, newGramsPerMeal: number) => {
-    if (!activePet || !activePlan) return;
-    const updatedPlan: FeedingPlan = {
-      ...activePlan,
-      gramsPerDay: newGramsPerDay,
-      gramsPerMeal: newGramsPerMeal,
-    };
+  const handleUpdatePlanRation = (updatedPlan: FeedingPlan) => {
+    if (updatedPlan.petId !== activePet?.id || activePlan?.isVetLocked) return;
     StorageService.savePlan(updatedPlan);
     setPlans(StorageService.getPlans());
-    if (idToken) {
-      CloudSqlService.saveFeedingPlan(activePet.id, updatedPlan, idToken);
-    }
   };
 
   // Update plan details (e.g. food cost in COP, bag days remaining)
@@ -242,9 +142,6 @@ export default function App() {
     };
     StorageService.savePlan(updatedPlan);
     setPlans(StorageService.getPlans());
-    if (idToken) {
-      CloudSqlService.saveFeedingPlan(activePet.id, updatedPlan, idToken);
-    }
   };
 
   // Update pet profile silently (from Calculator Step 1 before saving new plan)
@@ -252,9 +149,6 @@ export default function App() {
     const updatedPets = pets.map((p) => (p.id === updatedPet.id ? updatedPet : p));
     setPets(updatedPets);
     StorageService.savePets(updatedPets);
-    if (idToken) {
-      CloudSqlService.savePet(updatedPet, idToken);
-    }
   };
 
   // Save pet (new or edit)
@@ -272,6 +166,7 @@ export default function App() {
     setActivePetId(savedPet.id);
     setShowPetModal(false);
     setPetToEdit(null);
+    if (existingIdx < 0) setCurrentTab('calculate');
 
     // Recalculate active feeding plan when breed, sex, neutered status, weight, or age changes
     const existingPlan = plans[savedPet.id];
@@ -279,132 +174,10 @@ export default function App() {
       const recalculated = recalculatePlanForPet(savedPet, existingPlan);
       StorageService.savePlan(recalculated);
       setPlans(StorageService.getPlans());
-      if (idToken) {
-        CloudSqlService.saveFeedingPlan(savedPet.id, recalculated, idToken);
-      }
     }
 
-    if (idToken) {
-      CloudSqlService.savePet(savedPet, idToken);
-    }
   };
 
-  // Finish onboarding (2-step setup -> opens pet guide automatically)
-  const handleFinishOnboarding = (petBasics?: OnboardingPetData) => {
-    setShowOnboarding(false);
-    if (!petBasics) return;
-
-    const sp = petBasics.species || 'dog';
-    const defaultBreed = sp === 'cat' ? 'Mestizo / Criollo / Mixed' : 'Mestizo / No sé';
-    const chosenBreed = petBasics.breed || defaultBreed;
-    const chosenSize = petBasics.breedSize || findBreedProfile(chosenBreed, sp).size;
-    const fallbackWeight = sp === 'cat' ? 4.2 : 12.5;
-    const weight = petBasics.currentWeightKg || fallbackWeight;
-    const ageYears = petBasics.ageYears ?? 1;
-    const ageMonths = petBasics.ageMonths ?? Math.max(1, Math.round(ageYears * 12));
-
-    const newPet: Pet = {
-      id: 'pet_' + Date.now(),
-      name: petBasics.name || (sp === 'cat' ? 'Luna' : 'Milo'),
-      species: sp,
-      breed: chosenBreed,
-      breedSize: chosenSize,
-      sex: petBasics.sex || 'male',
-      isNeutered: petBasics.isNeutered ?? false,
-      ageYears,
-      ageMonths,
-      currentWeightKg: weight,
-      idealWeightKg: petBasics.idealWeightKg || weight,
-      targetWeightKg: petBasics.targetWeightKg || weight,
-      expectedAdultWeightKg: petBasics.expectedAdultWeightKg,
-      bcs: 5,
-      activityLevel: 'moderate',
-      photoUrl: petBasics.photoUrl,
-      specialState: petBasics.specialState || 'none',
-      dietType: petBasics.dietType || 'commercial',
-      restrictions: petBasics.restrictions || [],
-      restrictionNotes: petBasics.restrictionNotes,
-      profileRefinementPending: petBasics.profileRefinementPending,
-      createdAt: new Date().toISOString(),
-    };
-
-    const updated = [newPet, ...pets];
-    setPets(updated);
-    StorageService.savePets(updated);
-    StorageService.setActivePetId(newPet.id);
-    setActivePetId(newPet.id);
-
-    const isBarf = petBasics.foodEntryMode === 'barf' || newPet.dietType === 'barf';
-    const rawFood = petBasics.selectedFood;
-    const puppy = isPetPuppy(newPet);
-    const confirmedKcal =
-      rawFood?.kcalPerKg && rawFood.kcalPerKg > 400 && rawFood.labelStatus !== 'unconfirmed'
-        ? rawFood.kcalPerKg
-        : 0;
-
-    const foodItem: FoodItem = {
-      id: rawFood?.id || (isBarf ? 'barf_' + Date.now() : 'food_' + Date.now()),
-      brand: rawFood?.brand || (isBarf ? 'BARF' : 'Por confirmar'),
-      name: rawFood?.name || (isBarf ? 'Dieta Natural Cruda (BARF)' : 'Alimento habitual'),
-      species: sp,
-      lifeStage: puppy ? (sp === 'cat' ? 'kitten' : 'puppy') : 'adult',
-      type: isBarf ? 'barf' : rawFood?.type === 'wet' ? 'wet' : 'dry',
-      kcalPerKg: confirmedKcal,
-      proteinPct: rawFood?.proteinPct ?? 0,
-      fatPct: rawFood?.fatPct ?? 0,
-      fiberPct: rawFood?.fiberPct ?? 0,
-      moisturePct: rawFood?.moisturePct ?? (rawFood?.type === 'wet' ? 78 : 0),
-      ashPct: rawFood?.ashPct,
-      carbsPct: rawFood?.carbsPct,
-      country: rawFood?.country || 'Colombia',
-      bagSizeKg: rawFood?.bagSizeKg,
-      availableSizesKg: rawFood?.availableSizesKg,
-      imageUrl: rawFood?.imageUrl,
-      labelStatus: isBarf
-        ? 'unconfirmed'
-        : rawFood?.labelStatus || (confirmedKcal > 400 ? 'user_confirmed_label' : 'unconfirmed'),
-      isCompleteAndBalanced: rawFood?.isCompleteAndBalanced,
-      suitableForGrowth: rawFood?.suitableForGrowth,
-      kibbleSizeSuitability: rawFood?.kibbleSizeSuitability,
-      dataSource: rawFood?.dataSource,
-      formulaNotes: rawFood?.formulaNotes,
-      fichaNutricional: rawFood?.fichaNutricional,
-    };
-
-    const foodType: 'dry' | 'wet' | 'barf' = isBarf
-      ? 'barf'
-      : foodItem.type === 'wet'
-      ? 'wet'
-      : 'dry';
-
-    const calcInputs = {
-      pet: newPet,
-      goal: (puppy ? 'growth' : 'maintain') as 'growth' | 'maintain',
-      bcs: 5,
-      foodType,
-      dryFood: foodType === 'dry' ? foodItem : undefined,
-      wetFood: foodType === 'wet' ? foodItem : undefined,
-      mealsPerDay: puppy && ageMonths < 6 ? 3 : 2,
-      mealTimes: puppy && ageMonths < 6 ? ['08:00', '14:00', '20:00'] : ['08:00', '20:00'],
-      bagWeightKg: foodItem.bagSizeKg,
-      scheduleConfigured: false,
-    };
-
-    const calcResult = calculateFeedingPlan(calcInputs);
-    const initialPlan = buildFeedingPlan(calcInputs, calcResult);
-    initialPlan.id = 'plan_' + newPet.id;
-
-    StorageService.savePlan(initialPlan);
-    setPlans(StorageService.getPlans());
-    if (idToken) {
-      CloudSqlService.savePet(newPet, idToken);
-      CloudSqlService.saveFeedingPlan(newPet.id, initialPlan, idToken);
-    }
-
-    setCurrentTab('today');
-  };
-
-  // Update user account
   const handleUpdateAccount = (updated: Partial<UserAccount>) => {
     const nextAccount = { ...userAccount, ...updated };
     setUserAccount(nextAccount);
@@ -427,32 +200,15 @@ export default function App() {
     setPets(updatedPets);
     StorageService.savePets(updatedPets);
 
-    // If guideline exists, update and lock active plan
-    if (guideline && activePlan) {
-      const totalGrams = guideline.prescribedGramsPerMeal * guideline.mealsPerDay;
-      const lockedPlan: FeedingPlan = {
-        ...activePlan,
-        isVetLocked: true,
-        gramsPerMeal: guideline.prescribedGramsPerMeal,
-        mealsPerDay: guideline.mealsPerDay,
-        mer: guideline.prescribedKcal,
-        gramsPerDay: totalGrams,
-        foodName: guideline.prescribedFoodName,
-        rationConfirmed: totalGrams > 0,
-        scheduleConfigured: true,
-        treatsBudgetKcal: 0,
-      };
-      StorageService.savePlan(lockedPlan);
-      setPlans(StorageService.getPlans());
-    } else if (!guideline && activePlan) {
-      const unlockedPlan: FeedingPlan = {
+    const updatedPet = updatedPets.find((pet) => pet.id === activePet.id);
+    if (activePlan && updatedPet) {
+      const previousFood = getEffectiveFoodItem(activePlan);
+      const recalculated = recalculatePlanForPet(updatedPet, {
         ...activePlan,
         isVetLocked: false,
-      };
-      const recalculated = recalculatePlanForPet(
-        { ...activePet, hasVetGuideline: false, vetGuideline: undefined },
-        unlockedPlan
-      );
+        foodName: previousFood?.name || activePlan.foodName,
+        foodBrand: previousFood?.brand || activePlan.foodBrand,
+      });
       StorageService.savePlan(recalculated);
       setPlans(StorageService.getPlans());
     }
@@ -501,9 +257,6 @@ export default function App() {
       const recalculated = recalculatePlanForPet(effectivePet, draftPlan);
       StorageService.savePlan(recalculated);
       setPlans(StorageService.getPlans());
-      if (idToken) {
-        CloudSqlService.saveFeedingPlan(effectivePet.id, recalculated, idToken);
-      }
     }
     setCurrentTab('today');
   };
@@ -514,12 +267,13 @@ export default function App() {
     setPets(StorageService.getPets());
     setActivePetId(StorageService.getActivePetId());
     setPlans(StorageService.getPlans());
+    setMealLogs([]);
+    setWeightRecords([]);
+    setHealthLogs([]);
     setUserAccount(StorageService.getUserAccount());
     setCurrentTab('today');
   };
 
-  const isFeatureAccessBlocked = monetization ? (!monetization.canAccessFeatures && !userAccount.isLicensed) : false;
-  const isCalculatorBlocked = isFeatureAccessBlocked && monetization?.status !== 'unregistered';
   const isDark = userAccount.theme === 'dark';
 
   return (
@@ -537,31 +291,37 @@ export default function App() {
         }}
         userAccount={userAccount}
         onUpdateAccount={handleUpdateAccount}
-        onOpenPayment={() => setShowPaymentModal(true)}
+
         onOpenNotifications={() => setShowNotificationsModal(true)}
-        idToken={idToken}
+
       />
 
-      {/* Offline & Synchronization State Banner */}
-      <div className="w-full max-w-md mx-auto px-4 pt-2">
-        <OfflineSyncIndicator idToken={idToken} />
-      </div>
-
-      {/* 72h Trial Countdown & 24h Expiration Notice Banner (Rule 1, 2, 7) */}
-      <TrialCountdownBanner
-        monetization={monetization}
-        onOpenPaymentModal={() => setShowPaymentModal(true)}
-        onCancelTrial={handleCancelTrial}
-        lang={userAccount.language}
-      />
-
-      {/* Main View Area */}
       <main className="flex-1 w-full max-w-md mx-auto">
+        {!activePet && currentTab !== 'more' && currentTab !== 'pets' && (
+          <section className="mx-4 mt-6 rounded-3xl border border-emerald-900/10 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#17251C]">
+            <h1 className="text-2xl font-extrabold">
+              {userAccount.language === 'es' ? 'La rutina de tu mascota' : 'Your pet’s feeding routine'}
+            </h1>
+            <p className="mt-2 text-sm">
+              {userAccount.language === 'es'
+                ? 'Calcula su ración estimada y guarda sus tomas y pesajes en este navegador.'
+                : 'Estimate a daily portion and save meals and weigh-ins in this browser.'}
+            </p>
+            <button
+              type="button"
+              className="mt-5 w-full rounded-xl bg-[#0B5D2E] px-4 py-3 font-extrabold text-white"
+              onClick={() => setShowPetModal(true)}
+            >
+              {userAccount.language === 'es' ? 'Agregar mascota' : 'Add pet'}
+            </button>
+          </section>
+        )}
         {currentTab === 'today' && activePet && (
           <TodayView
+            key={`${activePet.id}:${diaryDay}`}
             pet={activePet}
             plan={activePlan}
-            mealLogs={mealLogs}
+            mealLogs={mealLogs.filter((log) => log.petId === activePet.id && log.date === diaryDay)}
             onToggleMeal={handleToggleMeal}
             userAccount={userAccount}
             allPets={pets}
@@ -575,16 +335,7 @@ export default function App() {
               setPetToEdit(p);
               setShowPetModal(true);
             }}
-            onNavigateTab={(tab, subTab) => {
-              if (tab === 'compare') {
-                if (subTab) setCompareSubTab(subTab);
-                setCurrentTab('compare');
-              } else if (tab === 'calculate') setCurrentTab('calculate');
-              else if (tab === 'progress') setCurrentTab('progress');
-              else if (tab === 'pets') setCurrentTab('pets');
-              else if (tab === 'more') setCurrentTab('more');
-            }}
-            onOpenStoreModal={() => setCurrentTab('more')}
+            onNavigateTab={setCurrentTab}
           />
         )}
 
@@ -608,7 +359,6 @@ export default function App() {
             }
             userAccount={userAccount}
             plan={activePlan}
-            initialSubTab={compareSubTab}
             onSelectFoodForPet={handleSelectFoodForPet}
             onPlanUpdate={handleUpdatePlanDetails}
             onClose={() => setCurrentTab('today')}
@@ -638,70 +388,47 @@ export default function App() {
         )}
 
         {currentTab === 'calculate' && activePet && (
-          isCalculatorBlocked ? (
-            <LockedFeatureNotice
-              status={monetization?.status || 'canceled'}
-              lang={userAccount.language}
-              onOpenPayment={() => setShowPaymentModal(true)}
-              onOpenSettings={() => setCurrentTab('more')}
-            />
-          ) : (
-            <CalculatorView
-              pet={activePet}
-              onSavePlan={handleSavePlan}
-              onUpdatePet={handleUpdatePetProfile}
-              userAccount={userAccount}
-              onNavigateHome={() => setCurrentTab('today')}
-            />
-          )
+          <CalculatorView
+            key={activePet.id}
+            pet={activePet}
+            savedPlan={activePlan}
+            onSavePlan={handleSavePlan}
+            onUpdatePet={handleUpdatePetProfile}
+            userAccount={userAccount}
+            onNavigateHome={() => setCurrentTab('today')}
+          />
         )}
 
         {currentTab === 'progress' && activePet && (
-          isFeatureAccessBlocked ? (
-            <>
-              <div className="px-4 pt-4">
-                <WeightHistory pet={activePet} records={weightRecords} account={userAccount} />
-              </div>
-              <LockedFeatureNotice
-                status={monetization?.status || 'canceled'}
-                lang={userAccount.language}
-                onOpenPayment={() => setShowPaymentModal(true)}
-                onOpenSettings={() => setCurrentTab('more')}
-              />
-            </>
-          ) : (
-            <ProgressView
-              pet={activePet}
-              plan={activePlan}
-              weightRecords={weightRecords}
-              healthLogs={healthLogs}
-              onAddWeightRecord={handleAddWeightRecord}
-              onAddHealthLog={handleAddHealthLog}
-              onUpdatePlanRation={handleUpdatePlanRation}
-              userAccount={userAccount}
-            />
-          )
+          <ProgressView
+            key={activePet.id}
+            pet={activePet}
+            plan={activePlan}
+            weightRecords={weightRecords.filter((record) => record.petId === activePet?.id)}
+            healthLogs={healthLogs.filter((log) => log.petId === activePet?.id)}
+            onAddWeightRecord={handleAddWeightRecord}
+            onAddHealthLog={handleAddHealthLog}
+            onUpdatePlanRation={handleUpdatePlanRation}
+            userAccount={userAccount}
+          />
         )}
 
-        {currentTab === 'more' && activePet && (
+        {currentTab === 'more' && (
           <MoreView
             pet={activePet}
             pets={pets}
             plan={activePlan}
-            weightRecords={weightRecords}
-            healthLogs={healthLogs}
+            weightRecords={weightRecords.filter((record) => record.petId === activePet?.id)}
+            healthLogs={healthLogs.filter((log) => log.petId === activePet?.id)}
             userAccount={userAccount}
-            monetization={monetization}
-            onRefreshMonetization={fetchMonetizationStatus}
+
+
             onUpdateAccount={handleUpdateAccount}
             onUpdateVetGuideline={handleUpdateVetGuideline}
             onSelectFoodForPet={handleSelectFoodForPet}
-            onActivateLicense={(key) => {
-              handleUpdateAccount({ isLicensed: true, licenseKey: key });
-            }}
             onResetAllData={handleResetAllData}
-            onNavigateTab={(tab) => setCurrentTab(tab as TabId)}
-            idToken={idToken}
+            onNavigateTab={setCurrentTab}
+
           />
         )}
       </main>
@@ -710,13 +437,6 @@ export default function App() {
       <BottomNav
         currentTab={currentTab}
         onTabChange={(tab) => setCurrentTab(tab)}
-        lang={userAccount.language}
-      />
-
-      {/* Onboarding Welcome Modal */}
-      <OnboardingModal
-        isOpen={showOnboarding}
-        onFinish={handleFinishOnboarding}
         lang={userAccount.language}
       />
 
@@ -732,33 +452,6 @@ export default function App() {
         lang={userAccount.language}
       />
 
-      {/* Payment Checkout Modal */}
-      {showPaymentModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-lg w-full my-6 p-2 shadow-2xl relative">
-            <PaymentView
-              userAccount={userAccount}
-              monetization={monetization}
-              onRefreshMonetization={fetchMonetizationStatus}
-              onActivateLicense={(key) => {
-                handleUpdateAccount({ isLicensed: true, licenseKey: key });
-                setShowPaymentModal(false);
-              }}
-              onClose={() => setShowPaymentModal(false)}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* User Authentication & Registration Modal (Google / Email) */}
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={closeAuthModal}
-        initialMode={authModalMode}
-        activePet={activePet}
-        onFoodSelected={handleSelectFoodForPet}
-      />
-
       {/* Notifications & Reorder Center Modal */}
       <NotificationsCenterModal
         isOpen={showNotificationsModal}
@@ -769,18 +462,6 @@ export default function App() {
         lang={userAccount.language}
       />
 
-      {/* Safe Local Data Import Modal */}
-      {idToken && (
-        <ImportLocalDataModal
-          isOpen={showImportModal}
-          onClose={() => setShowImportModal(false)}
-          idToken={idToken}
-          lang={userAccount.language}
-          onImportComplete={(count) => {
-            console.log(`[Import] Successfully imported ${count} pets to cloud account`);
-          }}
-        />
-      )}
     </div>
   );
 }
