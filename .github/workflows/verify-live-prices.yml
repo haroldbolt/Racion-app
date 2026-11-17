@@ -1,0 +1,23 @@
+name: Verifica el comparador publicado
+
+on:
+  push:
+    branches: ['verify/comparador-publicado']
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --prefix "$RUNNER_TEMP/racion-browser" --no-save --package-lock=false --no-audit --no-fund playwright-core@1.62.1
+      - name: Comprueba ofertas reales y persistencia del diario en Chrome
+        run: |
+          export PLAYWRIGHT_PATH="$RUNNER_TEMP/racion-browser/node_modules/playwright-core"
+          node .github/scripts/verify-live-pages.cjs https://haroldbolt.github.io/Racion-app/
