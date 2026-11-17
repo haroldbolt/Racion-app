@@ -32,7 +32,7 @@ function displayTitle(value: string): string {
 async function storefrontJson(fetcher: typeof fetch, url: string | URL, init?: RequestInit): Promise<JsonRecord> {
   const response = await fetcher(url, {
     signal: AbortSignal.timeout(storefrontTimeout),
-    redirect: 'error',
+    redirect: 'manual',
     ...init,
     headers: { Accept: 'application/json', ...init?.headers },
   });

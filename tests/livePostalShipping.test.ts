@@ -50,6 +50,7 @@ function fixture() {
     }
     merchantCalls.push(url);
     assert.equal(url.origin, 'https://storefront-api.tiendanube.com');
+    assert.equal(init?.redirect, 'manual');
     assert.equal(url.searchParams.has('zip_code'), false);
     const path = '/2026-11/stores/5624899';
     if (url.pathname === path) return Response.json({ id: 5624899, country: 'CO', currency: stock.currency });
