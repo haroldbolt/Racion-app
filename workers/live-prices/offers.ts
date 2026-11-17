@@ -21,20 +21,24 @@ export function normalizePriceWords(value: string): string {
   return value.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 }
 
+export function withoutPackageWeight(value: string): string {
+  return value.replace(weightPattern, '');
+}
+
 function formulaTokens(value: string): string[] {
-  return normalizePriceWords(value.replace(weightPattern, '')).split(' ')
+  return normalizePriceWords(withoutPackageWeight(value)).split(' ')
     .filter((word) => word !== '' && !descriptors.has(word))
     .map((word) => Object.hasOwn(wordAliases, word) ? wordAliases[word] : word);
 }
 
 export function formulaSearchName(product: LivePriceProduct): string {
-  const name = product.name.replace(weightPattern, '').trim();
+  const name = withoutPackageWeight(product.name).trim();
   return normalizePriceWords(name).startsWith(`${normalizePriceWords(product.brand)} `)
     ? name
     : `${product.brand} ${name}`;
 }
 
-function packageGrams(title: string): number | null {
+export function packageGrams(title: string): number | null {
   if (invalidPackage.test(title) || packageAddOn.test(title) || /\b(?:reacondicionad[oa]|usad[oa]|segunda mano|granel|por kilo|desde|a partir de)\b/i.test(title)) {
     return null;
   }
@@ -56,7 +60,7 @@ function packageGrams(title: string): number | null {
   return matchesOnePackage ? selected.grams : null;
 }
 
-function matchesFormula(title: string, product: LivePriceProduct): boolean {
+export function matchesFormula(title: string, product: LivePriceProduct): boolean {
   const titleTokens = new Set(formulaTokens(title));
   const model = new Set(formulaTokens(formulaSearchName(product)));
   const optional = new Set(['gato', 'perro', 'seco', 'humedo']);

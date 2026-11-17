@@ -1,8 +1,9 @@
 import {
-  colombiaPriceDay, LIVE_PRICE_CITIES, LIVE_PRICE_MAX_GRAMS, LIVE_PRICE_MIN_GRAMS, type LivePriceCity, type LivePriceOffer, type LivePriceRequest,
+  colombiaPriceDay, isBogotaPostalCode, LIVE_PRICE_CITIES, LIVE_PRICE_MAX_GRAMS, LIVE_PRICE_MIN_GRAMS, type LivePriceCity, type LivePriceOffer, type LivePriceRequest,
   type LivePriceResponse, type PriceUnavailableReason,
 } from '../../src/types/livePrices';
 import { collectShoppingOffers, formulaSearchName, normalizePriceWords, rankShoppingOffers } from './offers';
+import { quotePostalOffers } from './postalShipping';
 
 const MAX_PERIOD_SEARCHES = 250;
 const MAX_HOURLY_SEARCHES = 50;
@@ -77,13 +78,18 @@ function validProductText(value: unknown, cap: number): string | null {
 
 export function parseLivePriceRequest(input: unknown): ValidRequest | null {
   if (!input || typeof input !== 'object' || Array.isArray(input)) return null;
-  const { product, city } = input as Partial<LivePriceRequest>;
+  const { product, city, postalCode } = input as Partial<LivePriceRequest>;
   if (!product || typeof product !== 'object' || !LIVE_PRICE_CITIES.includes(city as LivePriceCity)) return null;
   const brand = validProductText(product.brand, 65);
   const name = validProductText(product.name, 135);
   if (!brand || !name || !Number.isInteger(product.grams) || product.grams < LIVE_PRICE_MIN_GRAMS || product.grams > LIVE_PRICE_MAX_GRAMS) return null;
   if (product.barcode != null && (typeof product.barcode !== 'string' || !/^\d{8,14}$/.test(product.barcode))) return null;
-  return { city: city as LivePriceCity, product: { brand, name, grams: product.grams, barcode: product.barcode } };
+  if (postalCode !== undefined && (city !== 'Bogotá' || !isBogotaPostalCode(postalCode))) return null;
+  return {
+    city: city as LivePriceCity,
+    product: { brand, name, grams: product.grams, barcode: product.barcode },
+    ...(postalCode === undefined ? {} : { postalCode }),
+  };
 }
 
 export function unavailablePriceResult(
@@ -161,6 +167,14 @@ export class LivePriceService {
   ) {}
 
   async search(request: ValidRequest, caller: string): Promise<LivePriceResponse> {
+    const { product, city, postalCode } = request;
+    // The durable cache and concurrent lookup contain city offers only.
+    const baseline = await this.searchCity({ product, city }, caller);
+    if (city !== 'Bogotá' || !isBogotaPostalCode(postalCode)) return baseline;
+    return quotePostalOffers(baseline, product, postalCode, this.fetcher);
+  }
+
+  private async searchCity(request: ValidRequest, caller: string): Promise<LivePriceResponse> {
     const { product, city } = request;
     const lookup = await hashValue(JSON.stringify([
       normalizePriceWords(formulaSearchName(product)), product.grams, product.barcode ?? null, city,

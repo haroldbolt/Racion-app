@@ -7,6 +7,10 @@ export const LIVE_PRICE_CITIES = [
 
 export type LivePriceCity = (typeof LIVE_PRICE_CITIES)[number];
 
+export function isBogotaPostalCode(value: unknown): value is string {
+  return typeof value === 'string' && /^11\d{4}$/.test(value);
+}
+
 export interface LivePriceProduct {
   brand: string;
   name: string;
@@ -17,6 +21,7 @@ export interface LivePriceProduct {
 export interface LivePriceRequest {
   product: LivePriceProduct;
   city: string;
+  postalCode?: string;
 }
 
 export interface LivePriceOffer {
@@ -26,6 +31,7 @@ export interface LivePriceOffer {
   grams: number;
   productPriceCop: number;
   shippingCop: number | null;
+  shippingPostalCode?: string;
   totalCop: number | null;
   pricePerKgCop: number;
   productUrl: string;
