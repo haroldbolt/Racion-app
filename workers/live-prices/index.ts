@@ -86,7 +86,10 @@ export default {
     const query = parseLivePriceRequest(await readLimitedJson(request));
     if (!query) return Response.json({ error: 'invalid_request' }, { status: 400, headers });
     try {
-      const visitor = await hashValue(request.headers.get('CF-Connecting-IP') ?? 'anonymous');
+      // Budget reservations store a keyed digest rather than the client's IP address.
+      const visitor = env.SERPAPI_API_KEY
+        ? await hashValue(JSON.stringify([env.SERPAPI_API_KEY, request.headers.get('CF-Connecting-IP')]))
+        : 'anonymous';
       const internal = new Request('https://racion.internal/lookup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Racion-Visitor': visitor },

@@ -29,6 +29,7 @@ export interface LivePriceOffer {
   totalCop: number | null;
   pricePerKgCop: number;
   productUrl: string;
+  linkSource?: 'retailer' | 'google_shopping';
   stock: 'available' | 'unknown';
 }
 

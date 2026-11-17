@@ -9,6 +9,7 @@ const wordAliases: Record<string, string> = {
   chicken: 'pollo', salmon: 'salmon', turkey: 'pavo', lamb: 'cordero', rice: 'arroz',
   sterilised: 'esterilizado', sterilized: 'esterilizado', neutered: 'esterilizado', esterilizados: 'esterilizado',
   dry: 'seco', wet: 'humedo', junior: 'cachorro', mediano: 'medium', mediana: 'medium',
+  small: 'mini', grande: 'maxi', large: 'maxi',
 };
 const descriptors = new Set(['de', 'del', 'the', 'with', 'for', 'and', 'y', 'para', 'con', 'alimento', 'food']);
 const weightPattern = /(?<![\p{L}\p{N}])([0-9]+(?:[.,][0-9]+)?)\s*(kg|kilogramos?|kilos?|g|gr|gramos?|lbs?|libras?)\b/giu;
@@ -35,9 +36,12 @@ function packageGrams(title: string): number | null {
   if (invalidPackage.test(title) || /\b(?:reacondicionad[oa]|usad[oa]|segunda mano|granel|por kilo|desde|a partir de)\b/i.test(title)) {
     return null;
   }
+  if (/\s(?:kg|g|gr|lbs?|kilos?)\s*[x×]\s*(?:[2-9]\d*|1\d+)\b/i.test(title)) return null;
   const weights = [...title.matchAll(weightPattern)].map((match) => {
     const unit = match[2].toLowerCase();
-    const amount = Number(match[1].replace(',', '.'));
+    const raw = unit.startsWith('g') && /^\d{1,2}[.,]\d{3}$/.test(match[1])
+      ? match[1].replace(/[.,]/, '') : match[1].replace(',', '.');
+    const amount = Number(raw);
     if (unit.startsWith('l')) return { grams: Math.round(amount * 453.59237), imperial: true };
     return { grams: Math.round(amount * (unit.startsWith('k') ? 1000 : 1)), imperial: false };
   });
@@ -59,7 +63,7 @@ function matchesFormula(title: string, product: LivePriceProduct): boolean {
   // Species and texture often disappear from a localized title, but an explicit conflict excludes it.
   const pairs = [['gato', 'perro'], ['seco', 'humedo']];
   if (pairs.some(([a, b]) => (model.has(a) && titleTokens.has(b)) || (model.has(b) && titleTokens.has(a)))) return false;
-  const variants = ['cachorro', 'gatito', 'senior', 'pollo', 'salmon', 'pavo', 'cordero', 'esterilizado'];
+  const variants = ['cachorro', 'gatito', 'senior', 'pollo', 'salmon', 'pavo', 'cordero', 'esterilizado', 'mini', 'medium', 'maxi', 'light', 'indoor'];
   return !variants.some((word) => titleTokens.has(word) && !model.has(word));
 }
 
@@ -81,8 +85,11 @@ function retailerUrl(value: unknown): string | null {
 }
 
 function parseCop(value: string): number | null {
+  const explicitCop = /\bCOP\b|\bCOL\s*\$/i.test(value);
   if (/\b(?:USD|EUR|MXN|ARS|BRL|US)\b|[€£]|\bpor mes\b|\/\s*(?:kg|mes)\b/i.test(value)) return null;
   const digits = value.replace(/\bCOP\b|COL(?=\s*\$)|\$/gi, '').replace(/\s/g, '');
+  // An unqualified dollar amount with US-style cents is not grounded in COP.
+  if (!explicitCop && /\.\d{2}$/.test(digits)) return null;
   let normalized: string;
   if (/^\d+$/.test(digits)) normalized = digits;
   else if (/^\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?$/.test(digits)) normalized = digits.replace(/\./g, '').replace(',', '.');
@@ -99,11 +106,17 @@ export function quotedShippingCop(delivery: unknown, extensions: unknown): numbe
   const fields = typeof delivery === 'string' ? [delivery, ...extensionText] : extensionText;
   for (const field of fields) {
     const value = normalizePriceWords(field);
-    if (/\b(?:desde|minimo|compras|superiores|por encima|a partir|cupon|suscripcion|membresia|after|over|orders|starting|minimum)\b/.test(value)) continue;
-    if (/^(?:gratis|free|sin costo)\b|\b(?:envio|entrega|domicilio) (?:gratis|gratuit[oa]|incluid[oa]|sin costo)\b|\bfree (?:shipping|delivery)\b/.test(value)) return 0;
-    const money = field.match(/(?:COL\s*\$|\bCOP\b\s*\$?|\$)\s*([\d.,]+)|([\d.,]+)\s*\bCOP\b/i);
-    if (money && !/\b(?:USD|EUR|MXN|ARS|BRL|US)\b|[€£]/i.test(field)) {
-      const amount = parseCop(money[1] ?? money[2]);
+    if (/\b(?:desde|minimo|compras|superiores|por encima|a partir|cupon|suscripcion|membresia|solo|aplica|after|over|orders|starting|minimum|between|entre|hasta|if|members|pickup|recogida|retiro)\b/.test(value)) continue;
+    const amounts = [...field.matchAll(/(?:COL\s*\$|\bCOP\b\s*\$?|\$)\s*[\d.,]+|[\d.,]+\s*\bCOP\b/gi)];
+    if (amounts.length > 1 || /\b(?:USD|EUR|MXN|ARS|BRL|US)\b|[€£]|\b[\d.,]+\s+a\s+[\d.,]+/i.test(field)) continue;
+    const free = /^(?:gratis|free|sin costo)\b|\b(?:envio|entrega|domicilio) (?:gratis|gratuit[oa]|incluid[oa]|sin costo)\b|\bfree (?:shipping|delivery)\b/.test(value) ||
+      /\(\s*(?:gratis|free)\s*\)\s*$/i.test(field);
+    if (free) {
+      if (amounts.length === 0) return 0;
+      continue;
+    }
+    if (amounts.length === 1) {
+      const amount = parseCop(amounts[0][0]);
       if (amount !== null) return amount;
     }
   }
@@ -143,9 +156,10 @@ export function collectShoppingOffers(results: unknown[], product: LivePriceProd
     const stockText = normalizePriceWords([
       item.availability, item.tag, item.badge, title, ...(Array.isArray(item.extensions) ? item.extensions : []),
     ].join(' '));
-    if (/\b(?:agotad[oa]|sin stock|no disponible|out of stock|sold out)\b/.test(stockText)) continue;
+    if (/\b(?:agotad[oa]|sin stock|sin existencias|no hay stock|no disponible|out of stock|sold out)\b/.test(stockText)) continue;
     const productPriceCop = parseCop(priceText);
-    if (productPriceCop === null || productPriceCop <= 0) continue;
+    if (productPriceCop === null || productPriceCop <= 0 ||
+      (productPriceCop < 1000 && !/\bCOP\b|\bCOL\s*\$/i.test(priceText))) continue;
     const shippingCop = quotedShippingCop(item.delivery, item.extensions);
     const offer: LivePriceOffer = {
       id: `offer-${index + 1}`,
@@ -157,6 +171,7 @@ export function collectShoppingOffers(results: unknown[], product: LivePriceProd
       totalCop: shippingCop === null ? null : productPriceCop + shippingCop,
       pricePerKgCop: Math.round(productPriceCop * 1000 / grams),
       productUrl,
+      linkSource: /(?:^|\.)google\.(?:com(?:\.co)?|co)$/i.test(new URL(productUrl).hostname) ? 'google_shopping' : 'retailer',
       stock: /\b(?:disponible|en stock|in stock)\b/.test(stockText) ? 'available' : 'unknown',
     };
     const key = `${normalizePriceWords(retailer)}:${grams}:${productUrl}`;
