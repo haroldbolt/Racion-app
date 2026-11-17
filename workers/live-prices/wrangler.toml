@@ -1,0 +1,16 @@
+name = "racion-live-prices"
+main = "index.ts"
+compatibility_date = "2025-10-01"
+workers_dev = true
+preview_urls = false
+
+[vars]
+ALLOWED_ORIGINS = "https://haroldbolt.github.io"
+
+[[durable_objects.bindings]]
+name = "LIVE_PRICE_BUDGET"
+class_name = "PriceSearchBudget"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["PriceSearchBudget"]
