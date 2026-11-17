@@ -49,7 +49,7 @@ jobs:
       - run: bun run build
         env:
           PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
-          VITE_PRICE_API_URL: ${{ vars.PRICE_API_URL }}
+          VITE_PRICE_API_URL: ${{ vars.PRICE_API_URL || 'https://racion-live-prices.jumer4.workers.dev/api/live-prices' }}
       - uses: actions/upload-pages-artifact@v4
         if: github.ref == 'refs/heads/main'
         with:
