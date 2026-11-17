@@ -36,6 +36,8 @@ jobs:
           path: dist
 
   deploy:
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
     if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
@@ -48,3 +50,20 @@ jobs:
     steps:
       - uses: actions/deploy-pages@v4
         id: deployment
+
+  verify:
+    name: Verify published diary
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --prefix "$RUNNER_TEMP/racion-browser" --no-save --package-lock=false --no-audit --no-fund playwright-core@1.62.1
+      - run: |
+          export PLAYWRIGHT_PATH="$RUNNER_TEMP/racion-browser/node_modules/playwright-core"
+          node .github/scripts/verify-pages.cjs "$PAGES_URL"
+        env:
+          PAGES_URL: ${{ needs.deploy.outputs.page_url }}
