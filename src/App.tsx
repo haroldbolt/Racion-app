@@ -30,6 +30,7 @@ export default function App() {
 
   // Active Tab
   const [currentTab, setCurrentTab] = useState<TabId>('today');
+  const [calculatorSelection, setCalculatorSelection] = useState<{ petId: string; food: FoodItem }>();
 
   // Logs for active pet
   const [mealLogs, setMealLogs] = useState<MealLog[]>(() => StorageService.getTodayMealLogs(activePetId));
@@ -124,6 +125,7 @@ export default function App() {
   const handleSavePlan = (plan: FeedingPlan) => {
     StorageService.savePlan(plan);
     setPlans(StorageService.getPlans());
+    setCalculatorSelection(undefined);
     setCurrentTab('today');
   };
 
@@ -239,25 +241,29 @@ export default function App() {
         food.labelStatus || (hasConfirmedLabel(food) ? 'verified_manufacturer' : 'unconfirmed'),
     };
 
-    if (activePlan) {
-      const nextFoodType: 'dry' | 'wet' | 'barf' =
-        normalizedFood.type === 'barf' ? 'barf' : normalizedFood.type === 'wet' ? 'wet' : 'dry';
-
-      const draftPlan: FeedingPlan = {
-        ...activePlan,
-        foodId: normalizedFood.id,
-        foodBrand: normalizedFood.brand,
-        foodName: normalizedFood.name,
-        foodType: nextFoodType,
-        dryFood: nextFoodType === 'wet' ? activePlan.dryFood : normalizedFood,
-        wetFood: nextFoodType === 'wet' ? normalizedFood : activePlan.wetFood,
-        bagWeightKg: normalizedFood.bagSizeKg || activePlan.bagWeightKg,
-      };
-
-      const recalculated = recalculatePlanForPet(effectivePet, draftPlan);
-      StorageService.savePlan(recalculated);
-      setPlans(StorageService.getPlans());
+    if (!activePlan) {
+      setCalculatorSelection({ petId: activePet.id, food: normalizedFood });
+      setCurrentTab('calculate');
+      return;
     }
+
+    const nextFoodType: 'dry' | 'wet' | 'barf' =
+      normalizedFood.type === 'barf' ? 'barf' : normalizedFood.type === 'wet' ? 'wet' : 'dry';
+
+    const draftPlan: FeedingPlan = {
+      ...activePlan,
+      foodId: normalizedFood.id,
+      foodBrand: normalizedFood.brand,
+      foodName: normalizedFood.name,
+      foodType: nextFoodType,
+      dryFood: nextFoodType === 'wet' ? activePlan.dryFood : normalizedFood,
+      wetFood: nextFoodType === 'wet' ? normalizedFood : activePlan.wetFood,
+      bagWeightKg: normalizedFood.bagSizeKg || activePlan.bagWeightKg,
+    };
+
+    const recalculated = recalculatePlanForPet(effectivePet, draftPlan);
+    StorageService.savePlan(recalculated);
+    setPlans(StorageService.getPlans());
     setCurrentTab('today');
   };
 
@@ -267,6 +273,7 @@ export default function App() {
     setPets(StorageService.getPets());
     setActivePetId(StorageService.getActivePetId());
     setPlans(StorageService.getPlans());
+    setCalculatorSelection(undefined);
     setMealLogs([]);
     setWeightRecords([]);
     setHealthLogs([]);
@@ -392,10 +399,14 @@ export default function App() {
             key={activePet.id}
             pet={activePet}
             savedPlan={activePlan}
+            initialFood={calculatorSelection?.petId === activePet.id ? calculatorSelection.food : undefined}
             onSavePlan={handleSavePlan}
             onUpdatePet={handleUpdatePetProfile}
             userAccount={userAccount}
-            onNavigateHome={() => setCurrentTab('today')}
+            onNavigateHome={() => {
+              setCalculatorSelection(undefined);
+              setCurrentTab('today');
+            }}
           />
         )}
 

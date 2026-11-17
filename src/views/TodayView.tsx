@@ -15,11 +15,12 @@ import {
 import { formatRation, formatCOP } from '../utils/i18n';
 import { StorageService } from '../utils/storage';
 import { localDateKey } from '../utils/localDate';
-import { getPlannedMeals, getPlannedMealComponents } from '../utils/mealPortions';
+import { getFoodKcalPerKg, getPlannedMeals, getPlannedMealComponents } from '../utils/mealPortions';
 import { UnifiedFoodSearchModal, resolveFoodThumbnail } from '../components/UnifiedFoodSearchModal';
 import { InventoryFoodSearchModal } from '../components/InventoryFoodSearchModal';
 import { DailyKcalRingChart } from '../components/DailyKcalRingChart';
 import { LabelReviewModal } from '../components/LabelReviewModal';
+import { NutritionSummary } from '../components/NutritionSummary';
 import { WhyThisResultModal } from '../components/WhyThisResultModal';
 import {
   ScheduleConfigModal,
@@ -209,27 +210,32 @@ export const TodayView: React.FC<TodayViewProps> = ({
   const handleSaveLabel = (updatedFood: FoodItem) => {
     if (!effectivePlan) {
       onSelectFoodForPet?.(updatedFood);
-      showToast('Etiqueta confirmada y ración calculada.');
+      return;
+    }
+    if (effectivePlan.isVetLocked) {
+      showToast(isEs ? 'Ficha guardada en Mis alimentos.' : 'Label saved in My foods.');
       return;
     }
 
-    const basePlan: FeedingPlan = {
+    const isMixed = effectivePlan.foodType === 'mixed';
+    const isWet = updatedFood.type === 'wet';
+    const isMainFood = !isMixed || !effectivePlan.dryFood || !isWet;
+    const previousFood = isWet ? effectivePlan.wetFood : effectivePlan.dryFood;
+    const updatedPlan: FeedingPlan = {
       ...effectivePlan,
-      foodId: updatedFood.id,
-      foodBrand: updatedFood.brand,
-      foodName: updatedFood.name,
-      foodType: updatedFood.type === 'wet' ? 'wet' : 'dry',
-      dryFood: updatedFood.type === 'wet' ? effectivePlan.dryFood : updatedFood,
-      wetFood: updatedFood.type === 'wet' ? updatedFood : effectivePlan.wetFood,
-      bagWeightKg: updatedFood.bagSizeKg || effectivePlan.bagWeightKg,
+      foodId: isMainFood ? updatedFood.id : effectivePlan.foodId,
+      foodBrand: isMainFood ? updatedFood.brand : effectivePlan.foodBrand,
+      foodName: isMainFood ? updatedFood.name : effectivePlan.foodName,
+      foodType: isMixed ? 'mixed' : updatedFood.type,
+      dryFood: isWet ? effectivePlan.dryFood : updatedFood,
+      wetFood: isWet ? updatedFood : effectivePlan.wetFood,
+      bagWeightKg: (isMainFood && updatedFood.bagSizeKg) || effectivePlan.bagWeightKg,
     };
-
-    const recalculated = effectivePlan.isVetLocked
-      ? basePlan
-      : recalculatePlanForPet(pet, basePlan);
-
-    persistPlanUpdate(recalculated);
-    showToast(`Etiqueta de ${updatedFood.name} confirmada y ración calculada.`);
+    const portionInputsChanged = updatedPlan.foodType !== effectivePlan.foodType ||
+      updatedPlan.bagWeightKg !== effectivePlan.bagWeightKg ||
+      getFoodKcalPerKg(updatedFood) !== getFoodKcalPerKg(previousFood);
+    persistPlanUpdate(portionInputsChanged ? recalculatePlanForPet(pet, updatedPlan) : updatedPlan);
+    showToast(isEs ? `Ficha de ${updatedFood.name} guardada.` : `Saved ${updatedFood.name} label.`);
   };
 
   const handleSaveSchedule = (mealsPerDay: number, mealTimes: string[]) => {
@@ -727,53 +733,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
           })}
         </div>
 
-        {/* Daily served nutrient intake summary (tal como se vende) */}
-        <div className="bg-[#F8FAF8] rounded-2xl p-3.5 border border-gray-200 space-y-2">
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#0B5D2E]">
-              Aporte nutricional servido hoy (tal como se vende)
-            </span>
-            {dailyNutrition.isPartialTotal && (
-              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
-                Total parcial
-              </span>
-            )}
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="bg-white px-2.5 py-2 rounded-xl border border-gray-100">
-              <span className="text-[10px] text-[#44544A] block">Planificado vs. servido</span>
-              <strong className="text-[#1C2B21] tabular-nums">
-                {dailyNutrition.totalPlannedGrams > 0 ? `${dailyNutrition.totalPlannedGrams} g` : 'Sin plan'} /{' '}
-                <span className="text-[#0B5D2E]">{dailyNutrition.totalServedGrams} g</span>
-              </strong>
-            </div>
-            <div className="bg-white px-2.5 py-2 rounded-xl border border-gray-100">
-              <span className="text-[10px] text-[#44544A] block">Energía servida</span>
-              <strong className="text-[#1C2B21] tabular-nums">
-                {dailyNutrition.completedMealsCount === 0
-                  ? '0 kcal'
-                  : dailyNutrition.kcalServedTotal !== null
-                  ? `${dailyNutrition.kcalServedTotal} kcal`
-                  : 'Sin dato verificado'}
-              </strong>
-            </div>
-          </div>
-
-          {dailyNutrition.completedMealsCount > 0 && (
-            <div className="text-[11px] text-[#44544A] space-y-0.5 leading-snug">
-              <p>• {dailyNutrition.proteinaPhrase}</p>
-              <p>• {dailyNutrition.grasaPhrase}</p>
-              <p>• {dailyNutrition.fibraPhrase}</p>
-            </div>
-          )}
-
-          {dailyNutrition.partialWarning && (
-            <p className="text-[11px] text-amber-900 bg-amber-50 p-2 rounded-xl border border-amber-200 leading-snug">
-              {dailyNutrition.partialWarning}
-            </p>
-          )}
-        </div>
+        <NutritionSummary summary={dailyNutrition} language={userAccount.language} />
       </div>
 
       {/* 4. CARD: ¿ESTE ALIMENTO VA CON SU ETAPA? */}

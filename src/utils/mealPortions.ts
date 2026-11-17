@@ -133,6 +133,7 @@ export function getPlannedMealComponents(
     return {
       foodId: food.id,
       foodName: food.name,
+      foodLabelStatus: food.labelStatus ?? null,
       role,
       gramsPlanned: planned,
       gramsFed: fed,
@@ -140,7 +141,12 @@ export function getPlannedMealComponents(
       proteinPct: knownLabel ? food.proteinPct : undefined,
       fatPct: knownLabel ? food.fatPct : undefined,
       fiberPct: knownLabel ? food.fiberPct : undefined,
-      fichaNutricional: knownLabel ? food.fichaNutricional : undefined,
+      moisturePct: knownLabel ? food.moisturePct : undefined,
+      ashPct: knownLabel ? food.ashPct : undefined,
+      carbsPct: knownLabel ? food.carbsPct : undefined,
+      fichaNutricional: knownLabel || food.fichaNutricional?.coincidenciaEstado === 'verificado'
+        ? food.fichaNutricional
+        : undefined,
     };
   }
 

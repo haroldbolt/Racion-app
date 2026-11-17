@@ -4,7 +4,6 @@ import {
   FoodItem,
   UserAccount,
   FeedingPlan,
-  NutrientValue,
   NutrientQualifier,
 } from '../types';
 import { PET_FOODS_DATABASE } from '../data/foods';
@@ -12,13 +11,16 @@ import { TOXIC_FOODS } from '../data/toxicFoods';
 import { StorageService } from '../utils/storage';
 import { formatRation } from '../utils/i18n';
 import { FoodCostTracker } from '../components/FoodCostTracker';
+import { FoodLabelComposition } from '../components/FoodLabelComposition';
+import { LabelReviewModal } from '../components/LabelReviewModal';
 import { UnifiedFoodSearchModal } from '../components/UnifiedFoodSearchModal';
 import {
   loadShopifyCatalog,
   getCatalogStats,
   shopifyProductToFoodItem,
 } from '../services/shopifyCatalogService';
-import { calculateFoodPortionNutrients } from '../utils/mealNutrition';
+import { calculateFoodPortionNutrients, getEffectiveNutrientField } from '../utils/mealNutrition';
+import { getFoodKcalPerKg } from '../utils/mealPortions';
 import {
   Scale,
   Search,
@@ -40,39 +42,13 @@ function formatQualifierBadge(q?: NutrientQualifier): string {
   return '';
 }
 
-function resolveNutrientFromFood(
-  food: FoodItem,
-  key: 'kcalPerKg' | 'proteina' | 'grasa' | 'fibra' | 'humedad' | 'cenizas' | 'carbohidratos'
-): NutrientValue | undefined {
-  const fVal = food.fichaNutricional?.[key];
-  if (fVal && fVal.valor > 0) return fVal;
-
-  const fallbackQual: NutrientQualifier =
-    key === 'fibra' || key === 'humedad' || key === 'cenizas'
-      ? 'maximo'
-      : key === 'kcalPerKg' || key === 'carbohidratos'
-      ? 'tipico'
-      : 'minimo';
-
-  let raw = 0;
-  if (key === 'kcalPerKg') raw = food.kcalPerKg;
-  else if (key === 'proteina') raw = food.proteinPct;
-  else if (key === 'grasa') raw = food.fatPct;
-  else if (key === 'fibra') raw = food.fiberPct;
-  else if (key === 'humedad') raw = food.moisturePct;
-  else if (key === 'cenizas') raw = food.ashPct || 0;
-  else if (key === 'carbohidratos') raw = food.carbsPct || 0;
-
-  if (!raw || raw <= 0) return undefined;
-  return {
-    valor: raw,
-    unidadOriginal: key === 'kcalPerKg' ? 'kcal/kg' : '%',
-    baseMedicion: 'tal_como_se_vende',
-    calificador: fallbackQual,
-  };
+function asSoldAmount(nutrient: { grams?: number; qualifier?: NutrientQualifier } | undefined) {
+  return nutrient?.grams === undefined
+    ? undefined
+    : { valor: nutrient.grams, calificador: nutrient.qualifier };
 }
 
-type FoodsSubTab = 'compare' | 'costs' | 'search' | 'toxic' | 'rubric';
+type FoodsSubTab = 'compare' | 'costs' | 'search' | 'library' | 'toxic' | 'rubric';
 
 interface FoodsViewProps {
   pet: Pet;
@@ -104,6 +80,9 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
   const units = userAccount.units;
 
   const [activeSubTab, setActiveSubTab] = useState<FoodsSubTab>(initialSubTab);
+  const [customFoods, setCustomFoods] = useState(() => StorageService.getCustomFoods());
+  const [labelDraft, setLabelDraft] = useState<{ food?: FoodItem } | null>(null);
+  const showingLibrary = activeSubTab === 'library';
 
   // Sync when initialSubTab changes from external navigation (e.g. from TodayView)
   React.useEffect(() => {
@@ -115,7 +94,6 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
   // Search & filter for Catalog
   const [query, setQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'dry' | 'wet'>('all');
-  const [filterSpecies, setFilterSpecies] = useState<'current' | 'all'>('current');
 
   // Shopify Catalog load
   const [shopifyFoods, setShopifyFoods] = useState<FoodItem[]>([]);
@@ -136,18 +114,16 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
     };
   }, []);
 
-  // Combine custom foods + Shopify catalog + curated fallback DB (deduped, prioritizing active items)
-  const customFoods = StorageService.getCustomFoods();
-  const allFoods = useMemo(() => {
+  // The public catalog keeps its own entries; personal fichas can use the same product name.
+  const catalogFoods = useMemo(() => {
     const merged: FoodItem[] = [];
     const seenKeys = new Set<string>();
     const addUnique = (item: FoodItem) => {
-      const k = `${item.brand.toLowerCase().trim()}__${item.name.toLowerCase().trim()}`;
+      const k = `${item.species}__${item.type}__${item.brand.toLowerCase().trim()}__${item.name.toLowerCase().trim()}`;
       if (seenKeys.has(k)) return;
       seenKeys.add(k);
       merged.push(item);
     };
-    customFoods.forEach(addUnique);
     // Active curated foods with full datasheets first
     PET_FOODS_DATABASE.filter((f) => f.kcalPerKg > 400).forEach(addUnique);
     // Active Shopify foods
@@ -157,7 +133,8 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
     // Archived Shopify foods last
     shopifyFoods.filter((f) => f.estadoCatalogo === 'archivado').forEach(addUnique);
     return merged;
-  }, [customFoods, shopifyFoods]);
+  }, [shopifyFoods]);
+  const allFoods = useMemo(() => [...customFoods, ...catalogFoods], [customFoods, catalogFoods]);
 
   // Initial smart defaults for comparison based on species & pet current food
   const initialCompareFoods = useMemo(() => {
@@ -192,8 +169,9 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
 
   // Catalog filtered list (prioritizes active items, limits display to 80 for smooth rendering)
   const filteredFoods = useMemo(() => {
-    const matches = allFoods.filter((f) => {
-      if (filterSpecies === 'current' && f.species !== pet.species) return false;
+    const source = showingLibrary ? customFoods : catalogFoods;
+    const matches = source.filter((f) => {
+      if (f.species !== pet.species) return false;
       if (filterType !== 'all' && f.type !== filterType) return false;
       if (!query) return true;
       const q = query.toLowerCase();
@@ -204,12 +182,10 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
       );
     });
     return matches;
-  }, [allFoods, filterSpecies, filterType, query, pet.species]);
+  }, [catalogFoods, customFoods, showingLibrary, filterType, query, pet.species]);
 
   const addOrToggleCompareFood = (food: FoodItem) => {
-    const existsIdx = selectedCompareFoods.findIndex(
-      (f) => f.id === food.id || (f.brand.toLowerCase() === food.brand.toLowerCase() && f.name.toLowerCase() === food.name.toLowerCase())
-    );
+    const existsIdx = selectedCompareFoods.findIndex((f) => f.id === food.id);
     if (existsIdx >= 0) {
       setSelectedCompareFoods((prev) => prev.filter((_, i) => i !== existsIdx));
       return;
@@ -230,6 +206,14 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
     setSelectedCompareFoods((prev) => prev.filter((f) => f.id !== id));
   };
 
+  const saveLibraryFood = (food: FoodItem) => {
+    setCustomFoods(StorageService.getCustomFoods());
+    setSelectedCompareFoods((previous) => previous.map((item) => item.id === food.id ? food : item));
+    setQuery('');
+    setFilterType('all');
+    setActiveSubTab('library');
+  };
+
   const handleSelectAndToast = (food: FoodItem) => {
     onSelectFoodForPet(food);
     setSelectedToast(isEs ? `¡${food.brand} ${food.name} seleccionado!` : `${food.brand} ${food.name} selected!`);
@@ -240,17 +224,16 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
   const mealsPerDay = Math.max(1, plan?.mealsPerDay || 2);
   const comparedFoodsData = useMemo(() => {
     return selectedCompareFoods.map((food) => {
-      const kcalField = resolveNutrientFromFood(food, 'kcalPerKg');
-      const protField = resolveNutrientFromFood(food, 'proteina');
-      const fatField = resolveNutrientFromFood(food, 'grasa');
-      const fiberField = resolveNutrientFromFood(food, 'fibra');
-      const moistField = resolveNutrientFromFood(food, 'humedad');
-      const ashField = resolveNutrientFromFood(food, 'cenizas');
-      const carbsField = resolveNutrientFromFood(food, 'carbohidratos');
-
-      const hasValidKcal = Boolean(kcalField && kcalField.valor > 400);
-      const kcalPerKg = hasValidKcal ? kcalField!.valor : null;
-      const kcalPer100g = kcalPerKg ? Math.round(kcalPerKg / 10) : null;
+      const reference = calculateFoodPortionNutrients(food, 100);
+      const kcalField = getEffectiveNutrientField(food, 'kcalPerKg');
+      const kcalPerKg = getFoodKcalPerKg(food);
+      const kcalPer100g = kcalPerKg === undefined ? null : Math.round(kcalPerKg / 10);
+      const protField = asSoldAmount(reference.proteina);
+      const fatField = asSoldAmount(reference.grasa);
+      const fiberField = asSoldAmount(reference.fibra);
+      const moistField = asSoldAmount(reference.humedad);
+      const ashField = asSoldAmount(reference.cenizas);
+      const carbsField = asSoldAmount(reference.carbohidratos);
       const gramsDay = kcalPerKg && merTargetKcal > 0 ? Math.round(merTargetKcal / (kcalPerKg / 1000)) : null;
       const gramsPerMeal = gramsDay ? Math.round(gramsDay / mealsPerDay) : null;
       const portionNutrients = gramsPerMeal
@@ -274,15 +257,6 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
     });
   }, [selectedCompareFoods, merTargetKcal, mealsPerDay]);
 
-  // Identify highest verified protein per 100 g when at least 2 foods have verified protein
-  const maxProtein100g = useMemo(() => {
-    const vals = comparedFoodsData
-      .filter((c) => c.protField && c.protField.valor > 0)
-      .map((c) => c.protField!.valor);
-    if (vals.length < 2) return null;
-    return Math.max(...vals);
-  }, [comparedFoodsData]);
-
   return (
     <div className="p-4 space-y-4 pb-28 max-w-lg mx-auto">
       {/* Toast Notification */}
@@ -299,6 +273,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
           { id: 'compare', label: isEs ? 'Comparar otros alimentos' : 'Compare other foods', icon: Scale },
           { id: 'costs', label: isEs ? 'Gastos ($ COP)' : 'Food Costs ($ COP)', icon: DollarSign },
           { id: 'search', label: isEs ? 'Catálogo' : 'Catalog', icon: Search },
+          { id: 'library', label: isEs ? 'Mis alimentos' : 'My foods', icon: Layers },
           { id: 'toxic', label: isEs ? 'Alimentos Tóxicos' : 'Toxic Foods', icon: ShieldAlert },
           { id: 'rubric', label: isEs ? 'Rúbrica' : 'Rubric', icon: Award },
         ] satisfies { id: FoodsSubTab; label: string; icon: typeof Scale }[]).map((tab) => {
@@ -415,9 +390,6 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                   gramsPerMeal,
                   portionNutrients,
                 } = item;
-                const isHighestProtein =
-                  maxProtein100g !== null && protField && protField.valor === maxProtein100g;
-
                 return (
                   <div
                     key={food.id}
@@ -433,19 +405,17 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                           <span className="text-[10px] bg-[#EAF4EC] text-[#0B5D2E] font-bold px-2 py-0.5 rounded-full">
                             {food.type === 'wet' ? 'Húmedo' : food.type === 'barf' ? 'BARF' : food.kcalPerPiece ? 'Snack' : 'Seco'}
                           </span>
-                          <span className="text-[10px] bg-gray-100 text-[#44544A] font-semibold px-2 py-0.5 rounded-full">
-                            {food.empaqueTipo === 'fraccionado' ? 'Venta fraccionada' : 'Empaque de fábrica'}
-                          </span>
+                          {(food.empaqueTipo === 'fraccionado' || food.empaqueTipo === 'fabrica') && (
+                            <span className="text-[10px] bg-gray-100 text-[#44544A] font-semibold px-2 py-0.5 rounded-full">
+                              {food.empaqueTipo === 'fraccionado' ? 'Venta fraccionada' : 'Empaque de fábrica'}
+                            </span>
+                          )}
                           {food.estadoCatalogo === 'archivado' && (
                             <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">
                               Archivado
                             </span>
                           )}
-                          {isHighestProtein && (
-                            <span className="text-[10px] font-extrabold bg-[#EAF4EC] text-[#0B5D2E] border border-[#0B5D2E20] px-2 py-0.5 rounded-full">
-                              ★ Mayor proteína / 100 g
-                            </span>
-                          )}
+
                         </div>
                         <h4 className="font-heading font-extrabold text-base text-[#1C2B21] mt-1">
                           {food.name}
@@ -471,7 +441,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                         <div className="bg-white p-2.5 rounded-xl border border-gray-100">
                           <span className="text-[10px] text-[#44544A] block">Energía</span>
-                          {kcalPer100g ? (
+                          {kcalPer100g !== null ? (
                             <strong className="text-[#1C2B21] font-mono">
                               {kcalPer100g} kcal{' '}
                               <span className="text-[10px] font-normal text-[#44544A]">
@@ -572,6 +542,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                             <p>• {portionNutrients.proteina.displayText}</p>
                             <p>• {portionNutrients.grasa.displayText}</p>
                             <p>• {portionNutrients.fibra.displayText}</p>
+                            {portionNutrients.carbohidratos?.available && <p>• {portionNutrients.carbohidratos.displayText}</p>}
                           </div>
                         </div>
                       ) : (
@@ -635,11 +606,23 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
       )}
 
       {/* ================= SUBTAB 2: CATALOG & SEARCH ================= */}
-      {activeSubTab === 'search' && (
+      {(activeSubTab === 'search' || showingLibrary) && (
         <div className="space-y-4 animate-in fade-in">
-          {/* Search bar & quick filters */}
           <div className="bg-white rounded-3xl p-4 border border-[#0B5D2E20] shadow-sm space-y-3">
-            {catalogStats && (
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="font-heading text-base font-extrabold text-[#1C2B21]">
+                {showingLibrary ? (isEs ? 'Mis alimentos' : 'My foods') : (isEs ? 'Catálogo' : 'Catalog')}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setLabelDraft({})}
+                className="flex min-h-11 items-center gap-1 rounded-xl bg-[#EAF4EC] px-3 text-xs font-bold text-[#0B5D2E]"
+              >
+                <Plus className="size-4" />
+                {isEs ? 'Agregar alimento' : 'Add food'}
+              </button>
+            </div>
+            {!showingLibrary && catalogStats && (
               <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] bg-[#F8FAF8] px-3 py-2 rounded-xl border border-gray-100 text-[#44544A]">
                 <span>
                   Catálogo Perros:{' '}
@@ -656,7 +639,8 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder={isEs ? 'Buscar alimento (Agility Gold, Ringo, Royal Canin, Hills...)' : 'Search foods...'}
+                aria-label={isEs ? 'Buscar alimento' : 'Search foods'}
+                placeholder={isEs ? 'Buscar por marca, fórmula o EAN' : 'Search by brand, formula or EAN'}
                 className="w-full pl-10 pr-4 py-2.5 bg-[#EAF4EC]/40 border border-gray-200 rounded-xl text-xs text-[#1C2B21] focus:ring-2 focus:ring-[#0B5D2E] min-h-[44px]"
               />
             </div>
@@ -686,13 +670,17 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
 
           {/* Foods list (slice first 60 matches for snappy DOM) */}
           <div className="space-y-3">
+            {filteredFoods.length === 0 && (
+              <p className="rounded-2xl bg-white p-4 text-sm text-[#44544A]">
+                {showingLibrary && !query
+                  ? (isEs ? 'Guarda una etiqueta para reutilizar su ficha en las raciones.' : 'Save a food label to reuse it in feeding plans.')
+                  : (isEs ? 'No hay alimentos que coincidan con la búsqueda.' : 'No foods match your search.')}
+              </p>
+            )}
             {filteredFoods.slice(0, 60).map((f) => {
-              const hasValidKcal = f.kcalPerKg > 400;
-              const kcalPerG = hasValidKcal ? f.kcalPerKg / 1000 : 0;
-              const gramsPerDay = hasValidKcal && kcalPerG > 0 ? Math.round(merTargetKcal / kcalPerG) : 0;
-              const isSelectedForCompare = selectedCompareFoods.some(
-                (sf) => sf.id === f.id || (sf.brand === f.brand && sf.name === f.name)
-              );
+              const kcalPerKg = getFoodKcalPerKg(f);
+              const gramsPerDay = kcalPerKg && merTargetKcal > 0 ? Math.round(merTargetKcal * 1000 / kcalPerKg) : undefined;
+              const isSelectedForCompare = selectedCompareFoods.some((sf) => sf.id === f.id);
 
               return (
                 <div
@@ -720,38 +708,34 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                       <h4 className="font-heading font-extrabold text-base text-[#1C2B21] mt-0.5">
                         {f.name}
                       </h4>
-                      <p className="text-xs text-[#44544A] mt-0.5">
-                        {f.country} {f.barcode && `• EAN: ${f.barcode}`}
-                      </p>
+                      {(f.country || f.barcode) && (
+                        <p className="text-xs text-[#44544A] mt-0.5">{f.country} {f.barcode && `EAN: ${f.barcode}`}</p>
+                      )}
                     </div>
 
                     <div className="text-right shrink-0">
                       <span className="text-[11px] font-extrabold px-2.5 py-1 rounded-full bg-[#EAF4EC] text-[#0B5D2E] border border-[#0B5D2E20]">
-                        {f.proteinPct > 0 || hasValidKcal ? 'Ficha en catálogo' : 'Sin dato verificado'}
+                        {showingLibrary ? (isEs ? 'Ficha personal' : 'Personal entry') : (isEs ? 'Catálogo' : 'Catalog')}
                       </span>
                     </div>
                   </div>
 
-                  {/* Nutritional tags & Calculated grams */}
-                  <div className="grid grid-cols-2 gap-2 bg-[#F8FAF8] p-3 rounded-2xl text-xs border border-gray-100">
-                    <div>
-                      <span className="text-[#44544A] block">Para {pet.name}:</span>
-                      <span className="font-heading font-extrabold text-sm text-[#0B5D2E]">
-                        {hasValidKcal ? `${formatRation(gramsPerDay, units)} / día` : 'Sin dato verificado'}
-                      </span>
+                  <div className="space-y-2 rounded-2xl border border-gray-100 bg-[#F8FAF8] p-3 text-xs">
+                    <div className="flex flex-wrap justify-between gap-2 text-[#44544A]">
+                      <span>{kcalPerKg ? `${kcalPerKg} kcal/kg` : (isEs ? 'Energía sin dato' : 'Energy unavailable')}</span>
+                      {gramsPerDay !== undefined && (
+                        <span>{pet.name} · {formatRation(gramsPerDay, units)} {isEs ? 'al día' : 'per day'}</span>
+                      )}
                     </div>
-                    <div>
-                      <span className="text-[#44544A] block">Composición (tal como se vende):</span>
-                      <span className="font-semibold text-[#1C2B21]">
-                        {hasValidKcal || f.proteinPct > 0
-                          ? `${hasValidKcal ? `${f.kcalPerKg} kcal/kg` : 'Sin dato verificado kcal'} • Prot: ${f.proteinPct > 0 ? `${f.proteinPct}%` : 'Sin dato'} • Gras: ${f.fatPct > 0 ? `${f.fatPct}%` : 'Sin dato'}`
-                          : 'Sin dato verificado'}
-                      </span>
-                    </div>
+                    <FoodLabelComposition food={f} language={userAccount.language} />
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center justify-between pt-1">
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                    {showingLibrary && (
+                      <button type="button" onClick={() => setLabelDraft({ food: f })} className="min-h-11 rounded-xl border border-gray-200 px-3 text-xs font-bold text-[#0B5D2E]">
+                        {isEs ? 'Editar ficha' : 'Edit food'}
+                      </button>
+                    )}
                     <button
                       type="button"
                       onClick={() => handleToggleCompare(f.id)}
@@ -918,6 +902,16 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
           </div>
         </div>
       )}
+
+      <LabelReviewModal
+        isOpen={labelDraft !== null}
+        onClose={() => setLabelDraft(null)}
+        pet={pet}
+        initialFood={labelDraft?.food}
+        mode={labelDraft?.food ? 'review' : 'new'}
+        onSaveLabel={saveLibraryFood}
+        lang={userAccount.language}
+      />
 
       {/* ================= REUSED UNIFIED FOOD SEARCH MODAL (Hoy -> Ajustar) ================= */}
       <UnifiedFoodSearchModal

@@ -1,4 +1,4 @@
-import {
+import type {
   FeedingPlan,
   FoodItem,
   MealLog,
@@ -8,17 +8,37 @@ import {
   NutrientValue,
   NutritionDatasheet,
 } from '../types';
-import { getComponentPlanFood, getFoodKcalPerKg, getPlannedMeals, getPrimaryPlanFood, splitMixedPortion } from './mealPortions';
+import {
+  getComponentPlanFood,
+  getFoodKcalPerKg,
+  getPlannedMeals,
+  getPrimaryPlanFood,
+  splitMixedPortion,
+} from './mealPortions';
+
+const trackedNutrients = ['proteina', 'grasa', 'fibra', 'carbohidratos'] as const;
+export type TrackedMealNutrient = typeof trackedNutrients[number];
+
+export interface MealNutrientTotal {
+  grams: number | null;
+  qualifier?: NutrientQualifier;
+  coverage: 'complete' | 'partial' | 'unavailable' | 'empty';
+  mixedQualifiers: boolean;
+}
+
+export type MealNutrientTotals = Record<TrackedMealNutrient, MealNutrientTotal>;
+
+type PortionNutrient = TrackedMealNutrient | 'humedad' | 'cenizas';
+type LabelNutrient = PortionNutrient | 'kcalPerKg';
 
 export interface NutrientPortionComputation {
-  key: 'energia' | 'proteina' | 'grasa' | 'fibra' | 'humedad' | 'cenizas' | 'carbohidratos';
+  key: PortionNutrient | 'energia';
   label: string;
   available: boolean;
   grams?: number;
   kcal?: number;
   qualifier?: NutrientQualifier;
   basis?: MeasurementBasis;
-  /** Human phrasing required by spec, e.g. "Al menos 12 g de proteína según la etiqueta" or "Sin dato verificado" */
   displayText: string;
 }
 
@@ -42,6 +62,7 @@ export interface DailyMealNutritionSummary {
   totalServedGrams: number;
   completedMealsCount: number;
   kcalServedTotal: number | null;
+  kcalServedPartial: boolean;
   proteinaGramsTotal: number | null;
   proteinaQualifier?: NutrientQualifier;
   proteinaPhrase: string;
@@ -55,16 +76,39 @@ export interface DailyMealNutritionSummary {
   isPartialTotal: boolean;
   partialWarning?: string;
   perFoodBreakdown: FoodPortionNutrition[];
+  plannedPerFoodBreakdown: FoodPortionNutrition[];
+  plannedNutrients: MealNutrientTotals;
+  servedNutrients: MealNutrientTotals;
+  usesCurrentPlanForLegacyLogs: boolean;
 }
 
-function roundNutrientGrams(val: number): number {
-  const rounded = Math.round(val * 10) / 10;
-  return Number.isInteger(rounded) ? rounded : rounded;
-}
+const labels: Record<PortionNutrient, string> = {
+  proteina: 'Proteína',
+  grasa: 'Grasa',
+  fibra: 'Fibra cruda',
+  carbohidratos: 'Carbohidratos',
+  humedad: 'Humedad',
+  cenizas: 'Cenizas',
+};
 
-function formatNumEs(val: number): string {
-  const r = roundNutrientGrams(val);
-  return Number.isInteger(r) ? String(r) : r.toFixed(1).replace('.', ',');
+const legacyFields: Record<LabelNutrient, keyof Pick<FoodItem,
+  'kcalPerKg' | 'proteinPct' | 'fatPct' | 'fiberPct' | 'moisturePct' | 'ashPct' | 'carbsPct'>> = {
+  kcalPerKg: 'kcalPerKg',
+  proteina: 'proteinPct',
+  grasa: 'fatPct',
+  fibra: 'fiberPct',
+  humedad: 'moisturePct',
+  cenizas: 'ashPct',
+  carbohidratos: 'carbsPct',
+};
+
+/** Rounds once for display, without tightening a guaranteed minimum or maximum. */
+export function roundNutrientGrams(grams: number, qualifier: NutrientQualifier = 'tipico'): number {
+  // Normalize floating-point residue around a whole tenth before directed rounding.
+  const scaled = Number((grams * 10).toPrecision(14));
+  if (qualifier === 'minimo') return Math.floor(scaled) / 10;
+  if (qualifier === 'maximo') return Math.ceil(scaled) / 10;
+  return Math.round(scaled) / 10;
 }
 
 export function formatQualifierNutrientPhrase(
@@ -72,7 +116,8 @@ export function formatQualifierNutrientPhrase(
   nutrientLabelLower: string,
   qualifier: NutrientQualifier = 'tipico'
 ): string {
-  const numStr = formatNumEs(grams);
+  const rounded = roundNutrientGrams(grams, qualifier);
+  const numStr = String(rounded).replace('.', ',');
   if (qualifier === 'minimo') {
     return `Al menos ${numStr} g de ${nutrientLabelLower} según la etiqueta`;
   }
@@ -82,146 +127,125 @@ export function formatQualifierNutrientPhrase(
   return `Aprox. ${numStr} g de ${nutrientLabelLower} según la etiqueta`;
 }
 
-function getEffectiveNutrientField(
+/** Returns the label value in its original basis, including explicitly declared zero. */
+export function getEffectiveNutrientField(
   food: FoodItem | undefined,
-  field: 'kcalPerKg' | 'proteina' | 'grasa' | 'fibra' | 'humedad' | 'cenizas' | 'carbohidratos'
+  field: LabelNutrient
 ): NutrientValue | undefined {
-  if (!food || food.labelStatus === 'unconfirmed') return undefined;
+  if (!food) return undefined;
   const ficha: NutritionDatasheet | undefined = food.fichaNutricional;
-  if (ficha && ficha[field] && ficha[field]!.valor > 0) {
-    return ficha[field];
+  const value = ficha?.[field];
+  const unit = field === 'kcalPerKg' ? 'kcal/kg' : '%';
+
+  if (value) {
+    // An unconfirmed calorie density does not invalidate an independently verified nutrient.
+    return ficha?.coincidenciaEstado === 'verificado' &&
+      Number.isFinite(value.valor) &&
+      (field === 'kcalPerKg' ? value.valor > 0 : value.valor >= 0 && value.valor <= 100) &&
+      (value.baseMedicion === 'tal_como_se_vende' || value.baseMedicion === 'materia_seca') &&
+      (value.calificador === 'tipico' || value.calificador === 'minimo' || value.calificador === 'maximo') &&
+      value.unidadOriginal === unit
+      ? value
+      : undefined;
   }
 
-  // Fallback to flat legacy FoodItem numeric fields only if > 0 and not unconfirmed empty
-  const defaultQual: NutrientQualifier =
-    field === 'fibra' || field === 'humedad' || field === 'cenizas'
-      ? 'maximo'
-      : field === 'kcalPerKg' || field === 'carbohidratos'
-      ? 'tipico'
-      : 'minimo';
-
-  let raw = 0;
-  if (field === 'kcalPerKg') raw = food.kcalPerKg;
-  else if (field === 'proteina') raw = food.proteinPct;
-  else if (field === 'grasa') raw = food.fatPct;
-  else if (field === 'fibra') raw = food.fiberPct;
-  else if (field === 'humedad') raw = food.moisturePct;
-  else if (field === 'cenizas') raw = food.ashPct || 0;
-  else if (field === 'carbohidratos') raw = food.carbsPct || 0;
-
-  if (!raw || raw <= 0) return undefined;
+  if (food.labelStatus === 'unconfirmed' || ficha) return undefined;
+  // Older manual cards could fill in default percentages when only kcal/kg were entered.
+  if (field !== 'kcalPerKg' && (food.labelStatus === 'user_confirmed_label' || /^(label|custom)_/.test(food.id))) {
+    return undefined;
+  }
+  const raw = food[legacyFields[field]];
+  if (typeof raw !== 'number' || !Number.isFinite(raw) || raw <= 0 || (unit === '%' && raw > 100)) {
+    return undefined;
+  }
 
   return {
     valor: raw,
-    unidadOriginal: field === 'kcalPerKg' ? 'kcal/kg' : '%',
+    unidadOriginal: unit,
     baseMedicion: 'tal_como_se_vende',
-    calificador: defaultQual,
+    // The original catalogue did not store guarantee qualifiers for its flat fields.
+    calificador: 'tipico',
   };
 }
 
 function computeSinglePctNutrient(
-  key: 'proteina' | 'grasa' | 'fibra' | 'humedad' | 'cenizas' | 'carbohidratos',
-  labelCapitalized: string,
-  labelLower: string,
+  key: PortionNutrient,
   gramsServed: number,
-  nVal?: NutrientValue
+  value?: NutrientValue,
+  moisture?: NutrientValue
 ): NutrientPortionComputation {
-  if (!nVal || nVal.valor <= 0) {
-    return {
-      key,
-      label: labelCapitalized,
-      available: false,
-      displayText: 'Sin dato verificado',
-    };
+  const label = labels[key];
+  if (!value) return { key, label, available: false, displayText: 'Sin dato verificado' };
+
+  let basisGrams = gramsServed;
+  if (value.baseMedicion === 'materia_seca') {
+    // Maximum moisture cannot convert a dry-matter percentage into a typical as-sold percentage.
+    // Likewise, typical moisture cannot guarantee a serving-level minimum or maximum.
+    if (
+      value.calificador !== 'tipico' || moisture?.baseMedicion !== 'tal_como_se_vende' ||
+      moisture.calificador !== 'tipico' || moisture.valor >= 100
+    ) {
+      return {
+        key,
+        label,
+        available: false,
+        qualifier: value.calificador,
+        basis: value.baseMedicion,
+        displayText: 'Sin dato tal como se vende',
+      };
+    }
+    basisGrams *= (100 - moisture.valor) / 100;
   }
 
-  // Only "tal como se vende" percentages apply directly to served grams
-  if (nVal.baseMedicion === 'materia_seca') {
-    return {
-      key,
-      label: labelCapitalized,
-      available: false,
-      qualifier: nVal.calificador,
-      basis: nVal.baseMedicion,
-      displayText: 'Sin dato verificado (dato solo en materia seca)',
-    };
-  }
-
-  const grams = roundNutrientGrams((gramsServed * nVal.valor) / 100);
+  const grams = (basisGrams * value.valor) / 100;
   return {
     key,
-    label: labelCapitalized,
+    label,
     available: true,
     grams,
-    qualifier: nVal.calificador,
-    basis: nVal.baseMedicion,
-    displayText: formatQualifierNutrientPhrase(grams, labelLower, nVal.calificador),
+    qualifier: value.calificador,
+    basis: value.baseMedicion,
+    displayText: formatQualifierNutrientPhrase(grams, label.toLowerCase(), value.calificador),
   };
 }
 
-/**
- * Calculates exact nutrient intake for a single food and served weight in grams ("tal como se vende").
- * Energy = (kcalPerKg * gramsServed) / 1000
- * Nutrients (%) = (gramsServed * pct) / 100
- */
 export function calculateFoodPortionNutrients(
   food: FoodItem | undefined,
   gramsServed: number,
   fallbackIdentity?: { brand: string; name: string }
 ): FoodPortionNutrition {
-  const brand = food?.brand || fallbackIdentity?.brand || 'Alimento';
-  const name = food?.name || fallbackIdentity?.name || 'Sin especificar';
-  const safeGrams = Math.max(0, gramsServed || 0);
-
+  const safeGrams = nonnegative(gramsServed);
   const kcalField = getEffectiveNutrientField(food, 'kcalPerKg');
-  const kcalPerKg = getFoodKcalPerKg(food);
-  const protField = getEffectiveNutrientField(food, 'proteina');
-  const fatField = getEffectiveNutrientField(food, 'grasa');
-  const fiberField = getEffectiveNutrientField(food, 'fibra');
-  const moistureField = getEffectiveNutrientField(food, 'humedad');
-  const ashField = getEffectiveNutrientField(food, 'cenizas');
-  const carbsField = getEffectiveNutrientField(food, 'carbohidratos');
+  const kcalPerKg = kcalField?.baseMedicion === 'tal_como_se_vende' ? getFoodKcalPerKg(food) : undefined;
+  const moisture = getEffectiveNutrientField(food, 'humedad');
+  const nutrient = (key: PortionNutrient) =>
+    computeSinglePctNutrient(key, safeGrams, getEffectiveNutrientField(food, key), moisture);
 
-  const energia: NutrientPortionComputation =
-    kcalPerKg && safeGrams > 0
-      ? {
-          key: 'energia',
-          label: 'Energía',
-          available: true,
-          kcal: (kcalPerKg * safeGrams) / 1000,
-          qualifier: kcalField?.calificador,
-          basis: kcalField?.baseMedicion,
-          displayText: `${Math.round((kcalPerKg * safeGrams) / 1000)} kcal`,
-        }
-      : {
-          key: 'energia',
-          label: 'Energía',
-          available: false,
-          displayText: 'Sin dato verificado',
-        };
+  const energia: NutrientPortionComputation = kcalPerKg && safeGrams > 0
+    ? {
+        key: 'energia',
+        label: 'Energía',
+        available: true,
+        kcal: kcalPerKg * safeGrams / 1000,
+        qualifier: kcalField?.calificador,
+        basis: kcalField?.baseMedicion,
+        displayText: `${Math.round(kcalPerKg * safeGrams / 1000)} kcal`,
+      }
+    : { key: 'energia', label: 'Energía', available: false, displayText: 'Sin dato verificado' };
 
-  const proteina = computeSinglePctNutrient('proteina', 'Proteína', 'proteína', safeGrams, protField);
-  const grasa = computeSinglePctNutrient('grasa', 'Grasa', 'grasa', safeGrams, fatField);
-  const fibra = computeSinglePctNutrient('fibra', 'Fibra cruda', 'fibra cruda', safeGrams, fiberField);
-  const humedad = moistureField
-    ? computeSinglePctNutrient('humedad', 'Humedad', 'humedad', safeGrams, moistureField)
-    : undefined;
-  const cenizas = ashField
-    ? computeSinglePctNutrient('cenizas', 'Cenizas', 'cenizas', safeGrams, ashField)
-    : undefined;
-  const carbohidratos = carbsField
-    ? computeSinglePctNutrient('carbohidratos', 'Carbohidratos', 'carbohidratos', safeGrams, carbsField)
-    : undefined;
-
-  const missingFields: string[] = [];
-  if (!energia.available) missingFields.push('Energía (kcal/kg)');
-  if (!proteina.available) missingFields.push('Proteína');
-  if (!grasa.available) missingFields.push('Grasa');
-  if (!fibra.available) missingFields.push('Fibra cruda');
+  const proteina = nutrient('proteina');
+  const grasa = nutrient('grasa');
+  const fibra = nutrient('fibra');
+  const carbohidratos = nutrient('carbohidratos');
+  const humedad = nutrient('humedad');
+  const cenizas = nutrient('cenizas');
+  const missingFields = [energia, proteina, grasa, fibra, carbohidratos]
+    .filter((entry) => !entry.available)
+    .map((entry) => entry.label);
 
   return {
-    foodBrand: brand,
-    foodName: name,
+    foodBrand: food?.brand || fallbackIdentity?.brand || 'Alimento',
+    foodName: food?.name || fallbackIdentity?.name || 'Sin especificar',
     gramsServed: safeGrams,
     basisNote: 'Tal como se vende',
     energia,
@@ -235,14 +259,22 @@ export function calculateFoodPortionNutrients(
   };
 }
 
-function resolveComponentFromMeal(
+function nonnegative(value: number): number {
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+function snapshotFood(
   comp: MealMixedComponent,
-  plan?: FeedingPlan
+  fallback?: FoodItem
 ): FoodItem | undefined {
   const hasSnapshot = comp.kcalPerKg !== undefined || comp.proteinPct !== undefined ||
-    comp.fatPct !== undefined || comp.fiberPct !== undefined || comp.fichaNutricional !== undefined;
-  const fallback = getComponentPlanFood(comp, plan);
-  if (!hasSnapshot) return fallback;
+    comp.fatPct !== undefined || comp.fiberPct !== undefined || comp.moisturePct !== undefined ||
+    comp.ashPct !== undefined || comp.carbsPct !== undefined || comp.fichaNutricional !== undefined;
+  if (!hasSnapshot) return undefined;
+  // Preserve the original status on new records. Older records used flat default macros for manual labels.
+  const labelStatus = comp.foodLabelStatus === null ? undefined : comp.foodLabelStatus ?? (
+    fallback?.labelStatus === 'user_confirmed_label' ? fallback.labelStatus : undefined
+  );
   return {
     id: comp.foodId || comp.foodName,
     brand: fallback?.brand || '',
@@ -254,16 +286,108 @@ function resolveComponentFromMeal(
     proteinPct: comp.proteinPct ?? 0,
     fatPct: comp.fatPct ?? 0,
     fiberPct: comp.fiberPct ?? 0,
-    moisturePct: 0,
+    moisturePct: comp.moisturePct ?? 0,
+    ashPct: comp.ashPct,
+    carbsPct: comp.carbsPct,
     country: fallback?.country || '',
+    labelStatus,
     fichaNutricional: comp.fichaNutricional,
   };
 }
 
-/**
- * Aggregates planned vs served grams and verified nutrient intake across completed meals today.
- * Distinguishes mixed meals and marks "Total parcial" if any component lacks verified data.
- */
+type Components = Map<string, { food?: FoodItem; brand: string; name: string; grams: number }>;
+
+function addComponent(components: Components, grams: number, brand: string, name: string, food?: FoodItem) {
+  if (nonnegative(grams) === 0) return;
+  // Keep distinct versions of a label separate, even if they have the same brand and name.
+  const key = JSON.stringify([
+    food?.id, brand, name, food?.labelStatus, food?.fichaNutricional,
+    ...Object.values(legacyFields).map((field) => food?.[field]),
+  ]);
+  const previous = components.get(key);
+  components.set(key, { food, brand, name, grams: (previous?.grams ?? 0) + grams });
+}
+
+function addPlanPortion(
+  components: Components,
+  plan: FeedingPlan | undefined,
+  grams: number,
+  fallbackFood?: FoodItem,
+  portions?: { dryGrams: number; wetGrams: number }
+): boolean {
+  if (grams <= 0) return false;
+  if (plan?.isVetLocked) {
+    const kcalPerKg = plan.rationConfirmed && plan.gramsPerDay > 0
+      ? (plan.foodMerKcal ?? plan.mer) * 1000 / plan.gramsPerDay
+      : undefined;
+    const food = snapshotFood({
+      foodName: plan.foodName,
+      role: 'main',
+      gramsFed: grams,
+      gramsPlanned: grams,
+      kcalPerKg,
+    });
+    addComponent(components, grams, 'Pauta veterinaria', plan.foodName, food);
+    return Boolean(food);
+  }
+  if (plan?.foodType === 'mixed') {
+    const split = portions ?? splitMixedPortion(plan, grams);
+    if (!split) {
+      addComponent(components, grams, 'Ración mixta', plan.foodName);
+      return false;
+    }
+    const { dryFood, wetFood } = plan;
+    addComponent(components, split.dryGrams, dryFood?.brand ?? 'Seco', dryFood?.name ?? plan.foodName, dryFood);
+    addComponent(components, split.wetGrams, wetFood?.brand ?? 'Húmedo', wetFood?.name ?? plan.foodName, wetFood);
+    return Boolean((dryFood && split.dryGrams > 0) || (wetFood && split.wetGrams > 0));
+  }
+  const food = getPrimaryPlanFood(plan) ?? fallbackFood;
+  addComponent(components, grams, food?.brand || plan?.foodBrand || 'Alimento habitual', food?.name || plan?.foodName || '', food);
+  return Boolean(food);
+}
+
+function nutritionBreakdown(components: Components): FoodPortionNutrition[] {
+  return Array.from(components.values(), ({ food, grams, brand, name }) =>
+    calculateFoodPortionNutrients(food, grams, { brand, name })
+  );
+}
+
+function sumNutrient(key: TrackedMealNutrient, portions: FoodPortionNutrition[]): MealNutrientTotal {
+  const declared = portions
+    .map((portion) => portion[key])
+    .filter((value): value is NutrientPortionComputation & { grams: number; qualifier: NutrientQualifier } =>
+      value?.available === true && value.grams !== undefined && value.qualifier !== undefined
+    );
+  if (declared.length === 0) {
+    return { grams: null, mixedQualifiers: false, coverage: portions.length === 0 ? 'empty' : 'unavailable' };
+  }
+  const coverage = declared.length === portions.length ? 'complete' : 'partial';
+  const qualifier = declared[0].qualifier;
+  if (declared.some((value) => value.qualifier !== qualifier)) {
+    // A minimum plus a maximum cannot be presented as a guaranteed bound or a typical amount.
+    return { grams: null, mixedQualifiers: true, coverage };
+  }
+  const grams = declared.reduce((sum, value) => sum + value.grams, 0);
+  return { grams: roundNutrientGrams(grams, qualifier), qualifier, mixedQualifiers: false, coverage };
+}
+
+function summarizeNutrients(portions: FoodPortionNutrition[]): MealNutrientTotals {
+  return {
+    proteina: sumNutrient('proteina', portions),
+    grasa: sumNutrient('grasa', portions),
+    fibra: sumNutrient('fibra', portions),
+    carbohidratos: sumNutrient('carbohidratos', portions),
+  };
+}
+
+function formatLegacyTotal(total: MealNutrientTotal, label: string): string {
+  if (total.mixedQualifiers) return 'Consulta los valores de cada alimento';
+  if (total.grams === null) return 'Sin dato verificado';
+  const phrase = formatQualifierNutrientPhrase(total.grams, label, total.qualifier);
+  return total.coverage === 'partial' ? `${phrase} (Total parcial)` : phrase;
+}
+
+/** Compares the full planned ration with the food recorded in completed meals. */
 export function calculateDailyMealNutritionSummary(params: {
   plan?: FeedingPlan;
   mealLogs: MealLog[];
@@ -271,186 +395,95 @@ export function calculateDailyMealNutritionSummary(params: {
   wetFood?: FoodItem;
 }): DailyMealNutritionSummary {
   const { plan, mealLogs, dryFood, wetFood } = params;
-  const completedLogs = mealLogs.filter((m) => m.completed);
-
-  const plannedMeals = plan ? getPlannedMeals(plan, plan.trainingRationGramsToday) : [];
-
-  let totalPlannedGrams = plan?.rationConfirmed ? plan.gramsPerDay : 0;
+  const completed = mealLogs.filter((meal) => meal.completed);
+  const plannedComponents: Components = new Map();
+  const servedComponents: Components = new Map();
+  const basePortions = plan ? getPlannedMeals(plan) : [];
+  const currentPortions = plan?.trainingRationGramsToday
+    ? getPlannedMeals(plan, plan.trainingRationGramsToday)
+    : basePortions;
+  const fallbackFood = dryFood ?? wetFood;
+  let totalPlannedGrams = 0;
   let totalServedGrams = 0;
+  let usesCurrentPlanForLegacyLogs = false;
 
-  // Map component intakes keyed by "brand__name"
-  const componentMap = new Map<
-    string,
-    { food?: FoodItem; brand: string; name: string; gramsServed: number }
-  >();
-  const addComponent = (brand: string, name: string, gramsServed: number, food?: FoodItem) => {
-    if (gramsServed <= 0) return;
-    // A label change does not change the nutrition of a meal already served.
-    const key = JSON.stringify([
-      food?.id, brand, name, food?.kcalPerKg, food?.proteinPct, food?.fatPct, food?.fiberPct, food?.fichaNutricional,
-    ]);
-    const previous = componentMap.get(key);
-    componentMap.set(key, { food, brand, name, gramsServed: (previous?.gramsServed || 0) + gramsServed });
-  };
+  for (const portion of basePortions) {
+    totalPlannedGrams += portion.grams;
+    const split = portion.dryGrams !== undefined && portion.wetGrams !== undefined
+      ? { dryGrams: portion.dryGrams, wetGrams: portion.wetGrams }
+      : undefined;
+    addPlanPortion(plannedComponents, plan, portion.grams, fallbackFood, split);
+  }
 
-  for (const log of completedLogs) {
-    const served = Math.max(0, log.gramsFed ?? log.plannedGrams ?? plannedMeals[log.mealIndex]?.grams ?? 0);
+  for (const log of completed) {
+    const components = Array.isArray(log.mixedComponents) ? log.mixedComponents : [];
+    const componentGrams = components.reduce((total, component) => total + nonnegative(component.gramsFed), 0);
+    const recordedAmount = components.length > 0 ? componentGrams : log.plannedGrams ?? currentPortions[log.mealIndex]?.grams ?? 0;
+    const served = nonnegative(log.gramsFed ?? recordedAmount);
     totalServedGrams += served;
+    if (!plan?.rationConfirmed) totalPlannedGrams += nonnegative(log.plannedGrams ?? 0);
 
-    if (log.plannedGrams && log.plannedGrams > 0 && !plan?.rationConfirmed) {
-      totalPlannedGrams += log.plannedGrams;
-    }
-
-    if (Array.isArray(log.mixedComponents) && log.mixedComponents.length > 0) {
-      for (const comp of log.mixedComponents) {
-        const food = resolveComponentFromMeal(comp, plan);
-        const brand = food?.brand || (comp.role === 'wet' ? 'Húmedo' : comp.role === 'dry' ? 'Seco' : 'Alimento');
-        addComponent(brand, comp.foodName, comp.gramsFed, food);
+    if (components.length > 0) {
+      if (componentGrams - served > 0.001) {
+        addComponent(servedComponents, served, 'Alimento', 'Sin especificar');
+        continue;
       }
-    } else if (plan?.isVetLocked) {
-      const prescribedKcal = plan.foodMerKcal ?? plan.mer;
-      const food = resolveComponentFromMeal({
-        foodName: plan.foodName,
-        role: 'main',
-        gramsFed: served,
-        gramsPlanned: served,
-        kcalPerKg: plan.rationConfirmed && plan.gramsPerDay > 0
-          ? prescribedKcal * 1000 / plan.gramsPerDay
-          : undefined,
-      }, plan);
-      addComponent('Pauta veterinaria', plan.foodName, served, food);
-    } else if (plan?.foodType === 'mixed' && plan.dryFood && plan.wetFood) {
-      const portions = splitMixedPortion(plan, served);
-      if (portions) {
-        addComponent(plan.dryFood.brand, plan.dryFood.name, portions.dryGrams, plan.dryFood);
-        addComponent(plan.wetFood.brand, plan.wetFood.name, portions.wetGrams, plan.wetFood);
-      } else {
-        addComponent('Ración mixta', plan.foodName, served);
+      for (const component of components) {
+        const grams = nonnegative(component.gramsFed);
+        if (grams === 0) continue;
+        const fallback = getComponentPlanFood(component, plan);
+        const snapshot = snapshotFood(component, fallback);
+        if (!snapshot && fallback) usesCurrentPlanForLegacyLogs = true;
+        const food = snapshot ?? fallback;
+        const brand = fallback?.brand || (component.role === 'wet' ? 'Húmedo' : component.role === 'dry' ? 'Seco' : 'Alimento');
+        addComponent(servedComponents, grams, brand, component.foodName, food);
       }
-    } else {
-      const primaryFood = getPrimaryPlanFood(plan) || dryFood || wetFood;
-      const brand = primaryFood?.brand || plan?.foodBrand || 'Alimento habitual';
-      const name = primaryFood?.name || plan?.foodName || '';
-      addComponent(brand, name, served, primaryFood);
+      // A legacy log with an incomplete component list cannot claim complete nutrient totals.
+      if (served - componentGrams > 0.001) {
+        addComponent(servedComponents, served - componentGrams, 'Alimento', 'Sin especificar');
+      }
+    } else if (addPlanPortion(servedComponents, plan, served, fallbackFood)) {
+      usesCurrentPlanForLegacyLogs = true;
     }
   }
 
-  // Fallback if 0 meals served yet, show plan target breakdown preview if needed
-  const perFoodBreakdown: FoodPortionNutrition[] = Array.from(componentMap.values()).map((c) =>
-    calculateFoodPortionNutrients(c.food, c.gramsServed, { brand: c.brand, name: c.name })
-  );
+  const perFoodBreakdown = nutritionBreakdown(servedComponents);
+  const plannedPerFoodBreakdown = nutritionBreakdown(plannedComponents);
+  const servedNutrients = summarizeNutrients(perFoodBreakdown);
+  const plannedNutrients = summarizeNutrients(plannedPerFoodBreakdown);
+  const availableEnergy = perFoodBreakdown.flatMap((item) => item.energia.kcal ?? []);
+  const kcalServedTotal = availableEnergy.length
+    ? Math.round(availableEnergy.reduce((sum, kcal) => sum + kcal, 0))
+    : perFoodBreakdown.length === 0 ? 0 : null;
+  const kcalServedPartial = availableEnergy.length > 0 && availableEnergy.length < perFoodBreakdown.length;
 
-  const isMixedMealOrDay = perFoodBreakdown.length > 1 || plan?.foodType === 'mixed';
-
-  if (perFoodBreakdown.length === 0) {
-    return {
-      totalPlannedGrams,
-      totalServedGrams,
-      completedMealsCount: completedLogs.length,
-      kcalServedTotal: 0,
-      proteinaGramsTotal: 0,
-      proteinaPhrase: 'Registra una toma para calcular proteína servida',
-      grasaGramsTotal: 0,
-      grasaPhrase: 'Registra una toma para calcular grasa servida',
-      fibraGramsTotal: 0,
-      fibraPhrase: 'Registra una toma para calcular fibra servida',
-      isMixedMealOrDay,
-      isPartialTotal: false,
-      perFoodBreakdown: [],
-    };
-  }
-
-  let kcalSum = 0;
-  let kcalHasAny = false;
-  let kcalMissingAny = false;
-
-  let protSum = 0;
-  let protHasAny = false;
-  let protMissingAny = false;
-  let protQual: NutrientQualifier | undefined;
-
-  let fatSum = 0;
-  let fatHasAny = false;
-  let fatMissingAny = false;
-  let fatQual: NutrientQualifier | undefined;
-
-  let fiberSum = 0;
-  let fiberHasAny = false;
-  let fiberMissingAny = false;
-  let fiberQual: NutrientQualifier | undefined;
-
-  for (const item of perFoodBreakdown) {
-    if (item.energia.available && item.energia.kcal !== undefined) {
-      kcalSum += item.energia.kcal;
-      kcalHasAny = true;
-    } else {
-      kcalMissingAny = true;
-    }
-
-    if (item.proteina.available && item.proteina.grams !== undefined) {
-      protSum += item.proteina.grams;
-      protHasAny = true;
-      protQual = protQual === undefined ? item.proteina.qualifier : protQual === item.proteina.qualifier ? protQual : 'tipico';
-    } else {
-      protMissingAny = true;
-    }
-
-    if (item.grasa.available && item.grasa.grams !== undefined) {
-      fatSum += item.grasa.grams;
-      fatHasAny = true;
-      fatQual = fatQual === undefined ? item.grasa.qualifier : fatQual === item.grasa.qualifier ? fatQual : 'tipico';
-    } else {
-      fatMissingAny = true;
-    }
-
-    if (item.fibra.available && item.fibra.grams !== undefined) {
-      fiberSum += item.fibra.grams;
-      fiberHasAny = true;
-      fiberQual = fiberQual === undefined ? item.fibra.qualifier : fiberQual === item.fibra.qualifier ? fiberQual : 'tipico';
-    } else {
-      fiberMissingAny = true;
-    }
-  }
-
-  const isPartialTotal =
-    (isMixedMealOrDay && (kcalMissingAny || protMissingAny || fatMissingAny || fiberMissingAny)) ||
-    (!isMixedMealOrDay && (kcalMissingAny && protHasAny));
-
-  const missingNames: string[] = [];
-  if (kcalMissingAny) missingNames.push('energía');
-  if (protMissingAny) missingNames.push('proteína');
-  if (fatMissingAny) missingNames.push('grasa');
-  if (fiberMissingAny) missingNames.push('fibra');
-
-  const partialWarning = isPartialTotal
-    ? isMixedMealOrDay
-      ? `Total parcial: falta dato verificado de ${missingNames.join(', ')} en al menos uno de los alimentos de la comida mixta.`
-      : `Total parcial: falta confirmar ${missingNames.join(', ')} en la etiqueta del alimento.`
-    : undefined;
-
+  const { proteina, grasa, fibra } = servedNutrients;
+  const missing = trackedNutrients.filter((key) => servedNutrients[key].coverage === 'partial');
+  const isPartialTotal = missing.length > 0 || kcalServedPartial;
   return {
     totalPlannedGrams,
     totalServedGrams,
-    completedMealsCount: completedLogs.length,
-    kcalServedTotal: kcalHasAny ? Math.round(kcalSum) : null,
-    proteinaGramsTotal: protHasAny ? roundNutrientGrams(protSum) : null,
-    proteinaQualifier: protQual,
-    proteinaPhrase: protHasAny
-      ? `${formatQualifierNutrientPhrase(protSum, 'proteína', protQual)}${protMissingAny ? ' (Total parcial)' : ''}`
-      : 'Sin dato verificado',
-    grasaGramsTotal: fatHasAny ? roundNutrientGrams(fatSum) : null,
-    grasaQualifier: fatQual,
-    grasaPhrase: fatHasAny
-      ? `${formatQualifierNutrientPhrase(fatSum, 'grasa', fatQual)}${fatMissingAny ? ' (Total parcial)' : ''}`
-      : 'Sin dato verificado',
-    fibraGramsTotal: fiberHasAny ? roundNutrientGrams(fiberSum) : null,
-    fibraQualifier: fiberQual,
-    fibraPhrase: fiberHasAny
-      ? `${formatQualifierNutrientPhrase(fiberSum, 'fibra cruda', fiberQual)}${fiberMissingAny ? ' (Total parcial)' : ''}`
-      : 'Sin dato verificado',
-    isMixedMealOrDay,
+    completedMealsCount: completed.length,
+    kcalServedTotal,
+    kcalServedPartial,
+    proteinaGramsTotal: proteina.coverage === 'empty' ? 0 : proteina.grams,
+    proteinaQualifier: proteina.qualifier,
+    proteinaPhrase: formatLegacyTotal(proteina, 'proteína'),
+    grasaGramsTotal: grasa.coverage === 'empty' ? 0 : grasa.grams,
+    grasaQualifier: grasa.qualifier,
+    grasaPhrase: formatLegacyTotal(grasa, 'grasa'),
+    fibraGramsTotal: fibra.coverage === 'empty' ? 0 : fibra.grams,
+    fibraQualifier: fibra.qualifier,
+    fibraPhrase: formatLegacyTotal(fibra, 'fibra cruda'),
+    isMixedMealOrDay: perFoodBreakdown.length > 1 || plan?.foodType === 'mixed',
     isPartialTotal,
-    partialWarning,
+    partialWarning: missing.length
+      ? `Total parcial: falta confirmar ${missing.map((key) => labels[key].toLowerCase()).join(', ')} en al menos un alimento.`
+      : undefined,
     perFoodBreakdown,
+    plannedPerFoodBreakdown,
+    plannedNutrients,
+    servedNutrients,
+    usesCurrentPlanForLegacyLogs,
   };
 }

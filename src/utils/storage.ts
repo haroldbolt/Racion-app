@@ -432,16 +432,16 @@ export const StorageService = {
   getCustomFoods(): FoodItem[] {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.CUSTOM_FOODS);
-      return data ? JSON.parse(data) : [];
+      const list = data ? JSON.parse(data) : [];
+      return Array.isArray(list) ? list : [];
     } catch {
       return [];
     }
   },
 
   addCustomFood(food: FoodItem) {
-    const list = this.getCustomFoods();
-    list.unshift(food);
-    localStorage.setItem(STORAGE_KEYS.CUSTOM_FOODS, JSON.stringify(list));
+    const list = this.getCustomFoods().filter((saved) => saved.id !== food.id);
+    localStorage.setItem(STORAGE_KEYS.CUSTOM_FOODS, JSON.stringify([food, ...list]));
   },
 
   getFoodPurchases(petId?: string): FoodCostEntry[] {

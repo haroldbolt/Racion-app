@@ -254,6 +254,7 @@ export interface WeightRecord {
 export interface MealMixedComponent {
   foodId?: string;
   foodName: string;
+  foodLabelStatus?: LabelStatus | null;
   role: 'dry' | 'wet' | 'main';
   gramsPlanned: number;
   gramsFed: number;
@@ -261,6 +262,9 @@ export interface MealMixedComponent {
   proteinPct?: number;
   fatPct?: number;
   fiberPct?: number;
+  moisturePct?: number;
+  ashPct?: number;
+  carbsPct?: number;
   fichaNutricional?: NutritionDatasheet;
 }
 
