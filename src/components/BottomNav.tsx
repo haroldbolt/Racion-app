@@ -1,7 +1,7 @@
 import React from 'react';
 import { Calendar, Scale, Calculator, TrendingUp, MoreHorizontal } from 'lucide-react';
 
-export type TabId = 'today' | 'compare' | 'calculate' | 'progress' | 'more' | 'pets';
+export type TabId = 'today' | 'compare' | 'prices' | 'calculate' | 'progress' | 'more' | 'pets';
 
 interface BottomNavProps {
   currentTab: TabId;
@@ -36,12 +36,12 @@ export const BottomNav: React.FC<BottomNavProps> = ({
         <button
           onClick={() => onTabChange('compare')}
           className={`flex flex-col items-center justify-center min-h-[50px] min-w-[56px] py-1 transition-all relative ${
-            currentTab === 'compare'
+            (currentTab === 'compare' || currentTab === 'prices')
               ? 'text-[#0B5D2E] font-extrabold scale-105'
               : 'text-[#44544A] hover:text-[#0B5D2E]'
           }`}
         >
-          <Scale className="w-5 h-5 mb-0.5" strokeWidth={currentTab === 'compare' ? 2.5 : 2} />
+          <Scale className="w-5 h-5 mb-0.5" strokeWidth={(currentTab === 'compare' || currentTab === 'prices') ? 2.5 : 2} />
           <span className="text-[11px] font-heading tracking-tight">{isEs ? 'Alimentos' : 'Foods'}</span>
         </button>
 

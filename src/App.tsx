@@ -10,6 +10,7 @@ import { CalculatorView } from './views/CalculatorView';
 import { ProgressView } from './views/ProgressView';
 import { MoreView } from './views/MoreView';
 import { FoodsView } from './views/FoodsView';
+import { PriceComparisonView } from './views/PriceComparisonView';
 import { PetModal } from './components/PetModal';
 import { NotificationsCenterModal } from './components/NotificationsCenterModal';
 import {
@@ -17,6 +18,12 @@ import {
   determineFactor,
 } from './utils/calculator';
 import { getEffectiveFoodItem, hasConfirmedLabel } from './utils/feedingGuide';
+
+type PriceSelection = {
+  food: FoodItem;
+  packageKg?: number;
+  returnTo: 'today' | 'compare' | 'more';
+};
 
 export default function App() {
   // Primary reactive state
@@ -30,6 +37,7 @@ export default function App() {
 
   // Active Tab
   const [currentTab, setCurrentTab] = useState<TabId>('today');
+  const [priceSelection, setPriceSelection] = useState<PriceSelection>();
   const [calculatorSelection, setCalculatorSelection] = useState<{ petId: string; food: FoodItem }>();
 
   // Logs for active pet
@@ -82,6 +90,20 @@ export default function App() {
 
   const activePet = pets.find((p) => p.id === activePetId) || pets[0];
   const activePlan = activePet ? plans[activePet.id] : undefined;
+  const habitualFood = activePlan?.isVetLocked ? undefined : getEffectiveFoodItem(activePlan);
+
+  const openPriceComparison = (returnTo: PriceSelection['returnTo'], food = habitualFood) => {
+    if (!food || food.type === 'barf' || food.kcalPerPiece) return;
+    const packageKg = food.id === habitualFood?.id ? activePlan?.bagWeightKg || food.bagSizeKg : food.bagSizeKg;
+    setPriceSelection({ food, packageKg, returnTo });
+    setCurrentTab('prices');
+    window.scrollTo(0, 0);
+  };
+
+  const selectPetFromHeader = (id: string) => {
+    if (currentTab === 'prices' && id !== activePet?.id) setCurrentTab('today');
+    setActivePetId(id);
+  };
 
   // Meal toggle handler
   const handleToggleMeal = (
@@ -258,7 +280,8 @@ export default function App() {
       foodType: nextFoodType,
       dryFood: nextFoodType === 'wet' ? activePlan.dryFood : normalizedFood,
       wetFood: nextFoodType === 'wet' ? normalizedFood : activePlan.wetFood,
-      bagWeightKg: normalizedFood.bagSizeKg || activePlan.bagWeightKg,
+      bagWeightKg: normalizedFood.bagSizeKg ??
+        (normalizedFood.id === habitualFood?.id ? activePlan.bagWeightKg : undefined),
     };
 
     const recalculated = recalculatePlanForPet(effectivePet, draftPlan);
@@ -274,6 +297,7 @@ export default function App() {
     setActivePetId(StorageService.getActivePetId());
     setPlans(StorageService.getPlans());
     setCalculatorSelection(undefined);
+    setPriceSelection(undefined);
     setMealLogs([]);
     setWeightRecords([]);
     setHealthLogs([]);
@@ -291,7 +315,7 @@ export default function App() {
       <Header
         pets={pets}
         activePet={activePet}
-        onSelectPet={(id) => setActivePetId(id)}
+        onSelectPet={selectPetFromHeader}
         onAddNewPet={() => {
           setPetToEdit(null);
           setShowPetModal(true);
@@ -331,9 +355,6 @@ export default function App() {
             mealLogs={mealLogs.filter((log) => log.petId === activePet.id && log.date === diaryDay)}
             onToggleMeal={handleToggleMeal}
             userAccount={userAccount}
-            allPets={pets}
-            plans={plans}
-            onSelectFoodForPet={handleSelectFoodForPet}
             onSavePlan={handleSavePlan}
             onUpdatePetProfile={handleUpdatePetProfile}
             onAddWeightRecord={handleAddWeightRecord}
@@ -343,6 +364,7 @@ export default function App() {
               setShowPetModal(true);
             }}
             onNavigateTab={setCurrentTab}
+            onComparePrices={(food) => openPriceComparison('today', food)}
           />
         )}
 
@@ -368,7 +390,22 @@ export default function App() {
             plan={activePlan}
             onSelectFoodForPet={handleSelectFoodForPet}
             onPlanUpdate={handleUpdatePlanDetails}
+            onComparePrices={(food) => openPriceComparison('compare', food)}
             onClose={() => setCurrentTab('today')}
+          />
+        )}
+
+        {currentTab === 'prices' && priceSelection && (
+          <PriceComparisonView
+            key={priceSelection.food.id}
+            food={priceSelection.food}
+            packageKg={priceSelection.packageKg}
+            backTo={priceSelection.returnTo === 'compare' ? 'foods' : priceSelection.returnTo === 'more' ? 'more' : 'plan'}
+            language={userAccount.language}
+            onBack={() => {
+              setCurrentTab(priceSelection.returnTo);
+              window.scrollTo(0, 0);
+            }}
           />
         )}
 
@@ -438,6 +475,7 @@ export default function App() {
             onUpdateVetGuideline={handleUpdateVetGuideline}
             onSelectFoodForPet={handleSelectFoodForPet}
             onResetAllData={handleResetAllData}
+            onComparePrices={habitualFood && habitualFood.type !== 'barf' ? () => openPriceComparison('more') : undefined}
             onNavigateTab={setCurrentTab}
 
           />

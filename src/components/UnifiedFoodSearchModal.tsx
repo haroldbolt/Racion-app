@@ -25,6 +25,7 @@ interface UnifiedFoodSearchModalProps {
   category?: 'all' | 'main' | 'snacks';
   includeArchived?: boolean;
   titleOverride?: string;
+  formulaType?: Extract<FoodItem['type'], 'dry' | 'wet'>;
 }
 
 /**
@@ -91,6 +92,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
   category = 'all',
   includeArchived = true,
   titleOverride,
+  formulaType,
 }) => {
   const isEs = lang === 'es';
 
@@ -236,7 +238,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
     // Deduplicate identical brand+name prioritizing custom / verified built-in items ahead of pending Shopify entries
     const seen = new Set<string>();
     return merged.filter((f) => {
-      const k = `${normalizeText(f.brand)}__${normalizeText(f.name)}`;
+      const k = `${normalizeText(f.brand)}__${normalizeText(f.name)}__${f.species}__${f.type}`;
       if (seen.has(k)) return false;
       seen.add(k);
       return true;
@@ -264,11 +266,15 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
 
   // Filter Tier 3 (Catalog Database) instantly with smart ranking
   const filteredCatalog = useMemo(() => {
+    const eligibleFoods = formulaType
+      ? catalogFoods.filter((food) => food.type === formulaType && food.species === activePet?.species &&
+        !food.kcalPerPiece && food.estadoCatalogo !== 'archivado')
+      : catalogFoods;
     if (searchTokens.length === 0) {
       // Prioritize active pet's species first if query is empty
       const targetSpecies = activePet?.species || 'cat';
-      const speciesMatches = catalogFoods.filter((f) => f.species === targetSpecies);
-      const otherMatches = catalogFoods.filter((f) => f.species !== targetSpecies);
+      const speciesMatches = eligibleFoods.filter((f) => f.species === targetSpecies);
+      const otherMatches = eligibleFoods.filter((f) => f.species !== targetSpecies);
       return [...speciesMatches, ...otherMatches].slice(0, 12);
     }
 
@@ -278,7 +284,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
       score: number;
     }> = [];
 
-    catalogFoods.forEach((food) => {
+    eligibleFoods.forEach((food) => {
       const brandNorm = normalizeText(food.brand);
       const nameNorm = normalizeText(food.name);
       const speciesEs = food.species === 'cat' ? 'gato felino' : 'perro canino';
@@ -337,7 +343,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
 
     matches.sort((a, b) => b.score - a.score);
     return matches.slice(0, 20).map((m) => m.food);
-  }, [catalogFoods, searchTokens, activePet, extractedWeight]);
+  }, [catalogFoods, searchTokens, activePet, extractedWeight, formulaType]);
 
   // Handler to select a food item
   const handleSelectOption = (
@@ -349,10 +355,10 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
     customSizes?: number[]
   ) => {
     const confirmed = customSizes || getConfirmedPresentations(item);
-    let chosenWeight = preferredWeight || 15;
+    let chosenWeight = preferredWeight || (formulaType ? 0 : 15);
 
     // If query contained an extracted weight and it's valid, prioritize it
-    if (extractedWeight && (!confirmed || confirmed.length === 0 || confirmed.includes(extractedWeight))) {
+    if (extractedWeight && (confirmed?.includes(extractedWeight) || (!formulaType && !confirmed?.length))) {
       chosenWeight = extractedWeight;
     } else if (confirmed && confirmed.length > 0) {
       chosenWeight = preferredWeight && confirmed.includes(preferredWeight)
@@ -436,7 +442,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
               if (e.key === 'Enter') {
                 if (filteredCatalog.length > 0) {
                   const top = filteredCatalog[0];
-                  const sizes = getConfirmedPresentations(top) || (top.bagSizeKg ? [top.bagSizeKg] : [15]);
+                  const sizes = getConfirmedPresentations(top) || (top.bagSizeKg ? [top.bagSizeKg] : formulaType ? [] : [15]);
                   handleSelectOption(top.brand, top.name, sizes[0], top.imageUrl, top);
                 }
               }
@@ -474,7 +480,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
         {/* Scrollable suggestions container */}
         <div className="overflow-y-auto space-y-3.5 flex-1 pr-1 -mr-1">
           {/* Priority 1: User's registered pet foods */}
-          {filteredRegisteredFoods.length > 0 && (
+          {!formulaType && filteredRegisteredFoods.length > 0 && (
             <div className="space-y-1.5">
               <div className="flex items-center justify-between px-1">
                 <span className="text-[10px] font-black uppercase tracking-wider text-[#0B5D2E] flex items-center gap-1">
@@ -539,7 +545,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
           )}
 
           {/* Priority 2: Recent searches */}
-          {filteredRecentSearches.length > 0 && (
+          {!formulaType && filteredRecentSearches.length > 0 && (
             <div className="space-y-1.5 pt-0.5">
               <div className="flex items-center justify-between px-1">
                 <span className="text-[10px] font-black uppercase tracking-wider text-[#F57C1A] flex items-center gap-1">
@@ -604,7 +610,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
             {filteredCatalog.length > 0 ? (
               <div className="space-y-2">
                 {filteredCatalog.map((food) => {
-                  const sizes = getConfirmedPresentations(food) || (food.bagSizeKg ? [food.bagSizeKg] : [15]);
+                  const sizes = getConfirmedPresentations(food) || (food.bagSizeKg ? [food.bagSizeKg] : formulaType ? [] : [15]);
                   const thumbnail = resolveFoodThumbnail(food.brand, food.name, food.species, food.imageUrl);
                   const isCat = food.species === 'cat';
 
@@ -614,7 +620,8 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
                       className="p-2.5 bg-white hover:bg-[#F8FAF8] border border-gray-200/90 hover:border-[#0B5D2E40] rounded-2xl transition space-y-2 group shadow-2xs hover:shadow-xs"
                     >
                       {/* Top row: thumbnail + title + species + open action */}
-                      <div
+                      <button
+                        type="button"
                         onClick={() => {
                           const targetWeight =
                             extractedWeight && sizes.includes(extractedWeight)
@@ -622,7 +629,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
                               : sizes[0];
                           handleSelectOption(food.brand, food.name, targetWeight, thumbnail, food);
                         }}
-                        className="flex items-center justify-between cursor-pointer"
+                        className="flex w-full items-center justify-between text-left"
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
                           {/* Miniature packshot container */}
@@ -704,12 +711,12 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
                         <div className="p-1.5 rounded-full hover:bg-gray-100 text-gray-400 group-hover:text-[#0B5D2E] transition shrink-0 ml-2">
                           <ArrowRight className="w-4 h-4" />
                         </div>
-                      </div>
+                      </button>
 
                       {/* Presentation pills: user can tap directly on their desired presentation */}
                       <div className="flex items-center gap-1.5 flex-wrap pt-0.5 border-t border-gray-100">
                         <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider shrink-0">
-                          {isEs ? 'Presentaciones:' : 'Sizes:'}
+                          {sizes.length ? (isEs ? 'Presentaciones:' : 'Sizes:') : (isEs ? 'Presentación por confirmar' : 'Size to confirm')}
                         </span>
                         {sizes.map((size) => {
                           const isExtracted = extractedWeight === size;

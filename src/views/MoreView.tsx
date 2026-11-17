@@ -30,6 +30,7 @@ interface MoreViewProps {
   onUpdateVetGuideline: (guideline: VetGuideline | undefined) => void;
   onSelectFoodForPet: (food: FoodItem) => void;
   onResetAllData: () => void;
+  onComparePrices?: () => void;
   initialSubSection?: string | null;
   onNavigateTab?: (tab: 'pets' | 'compare' | 'calculate' | 'today' | 'progress') => void;
 }
@@ -45,6 +46,7 @@ export const MoreView: React.FC<MoreViewProps> = ({
   onUpdateVetGuideline,
   onSelectFoodForPet,
   onResetAllData,
+  onComparePrices,
   initialSubSection = null,
   onNavigateTab,
 }) => {
@@ -147,6 +149,16 @@ export const MoreView: React.FC<MoreViewProps> = ({
           </div>
 
           <div className="space-y-3 pt-2">
+            {onComparePrices && (
+              <button
+                type="button"
+                onClick={onComparePrices}
+                className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-2xl bg-[#0B5D2E] font-heading text-base font-extrabold text-white hover:bg-[#094723]"
+              >
+                <ShoppingBag className="w-4 h-4" />
+                {isEs ? 'Comparar precios' : 'Compare prices'}
+              </button>
+            )}
             <a
               href={`https://www.google.com/search?q=comprar+alimento+${encodeURIComponent(plan?.foodBrand || '')}+${encodeURIComponent(plan?.foodName || '')}`}
               target="_blank"

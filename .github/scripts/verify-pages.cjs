@@ -16,15 +16,114 @@ async function waitForPages(url) {
   throw failure;
 }
 
+async function verifyAdjustmentAndPrices(page, button, text) {
+  let calls = 0;
+  await page.route('https://prices.example.invalid/api/live-prices', async (route) => {
+    const headers = {
+      'access-control-allow-origin': new URL(page.url()).origin,
+      'access-control-allow-methods': 'POST, OPTIONS',
+      'access-control-allow-headers': 'content-type',
+    };
+    if (route.request().method() === 'OPTIONS') {
+      await route.fulfill({ status: 204, headers });
+      return;
+    }
+    assert.equal(route.request().method(), 'POST');
+    const { city, product } = route.request().postDataJSON();
+    assert.deepEqual(product, { brand: 'Marca de prueba', name: 'Seco de prueba', grams: 2000 });
+    calls++;
+
+    const offer = (id, retailer, grams, productPriceCop, shippingCop) => ({
+      id, title: `Marca de prueba Seco de prueba ${grams / 1000} kg`,
+      retailer, grams, productPriceCop, shippingCop,
+      totalCop: shippingCop === null ? null : productPriceCop + shippingCop,
+      pricePerKgCop: productPriceCop * 1000 / grams,
+      productUrl: `https://tienda-${id}.example/producto`,
+      stock: 'available',
+    });
+    const offers = [
+      offer('a', 'Tienda A', 2000, 90000, 18000),
+      offer('b', 'Tienda B', 2000, 99000, 0),
+      offer('c', 'Tienda C', 2000, 82000, null),
+      offer('d', 'Tienda D', 4000, 160000, 0),
+    ];
+    const response = city === 'Bogotá'
+      ? { status: 'current', city, queriedAt: new Date().toISOString(), offers, cheapestOfferId: 'b' }
+      : city === 'Medellín'
+        ? { status: 'stale', city, queriedAt: new Date(Date.now() - 86400000).toISOString(), offers, cheapestOfferId: null, reason: 'upstream_unavailable' }
+        : { status: 'unavailable', city, queriedAt: null, offers: [], cheapestOfferId: null, reason: 'quota_exhausted' };
+    await route.fulfill({ status: 200, headers, json: response });
+  });
+
+  await button('Cerrar').click();
+  await button('Hoy').click();
+  await button(/ajustar (la )?ración/i).first().click();
+  const editor = page.getByRole('dialog', { name: /ajustar (la )?ración/i });
+  await editor.getByLabel(/kcal\/kg/i).fill('4000');
+  await editor.getByLabel('Hora de la toma 1').fill('09:00');
+  await editor.getByLabel('Hora de la toma 2').fill('20:45');
+  const rationPreview = editor.getByRole('region', { name: 'Vista previa de la ración' });
+  await rationPreview.getByText('54 g al día', { exact: true }).waitFor();
+  assert.equal(await rationPreview.getByText('27 g', { exact: true }).count(), 2);
+  const nutrientsPreview = editor.getByRole('table', { name: 'Nutrientes del plan' });
+  await nutrientsPreview.getByRole('rowheader', { name: 'Fibra cruda' }).waitFor();
+  await editor.getByRole('button', { name: /guardar (cambios|ajustes|plan|ración)/i }).click();
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await text('Ración diaria: 54 g').waitFor();
+  await text('Comida 1 (09:00)').waitFor();
+  await page.getByText(/Servido: 29 g/).waitFor();
+  assert.equal(await button('Deshacer').count(), 1);
+  assert.equal(await button('Ya comió').count(), 1);
+
+  await button(/comparar precios|ver precios/i).first().click();
+  await page.getByRole('heading', { name: 'Comparar precios' }).waitFor();
+  assert.equal(await page.getByLabel('Presentación (kg)').inputValue(), '2');
+  const city = page.getByLabel('Ciudad');
+  assert.equal(await city.inputValue(), 'Bogotá');
+  assert.equal(calls, 0, 'Opening the comparison must not spend a lookup');
+
+  await button('Consultar precios').click();
+  const result = page.getByRole('region', { name: 'Resultado de precios' });
+  const winner = result.getByRole('article').filter({ hasText: 'Más barato hoy' });
+  await winner.getByRole('heading', { name: 'Tienda B' }).waitFor();
+  assert.match(await winner.innerText(), /99[.\s]000/);
+  assert.equal(await winner.getByRole('link').getAttribute('href'), 'https://tienda-b.example/producto');
+  const unknownDelivery = result.getByRole('article').filter({ has: page.getByRole('heading', { name: 'Tienda C' }) });
+  assert.match(await unknownDelivery.innerText(), /Por confirmar/i);
+  assert.doesNotMatch(await unknownDelivery.innerText(), /Más barato hoy/);
+  await result.getByRole('heading', { name: 'Tienda D' }).waitFor();
+
+  await city.selectOption('Medellín');
+  assert.equal(calls, 1, 'Changing city alone must not spend a lookup');
+  await button('Consultar precios').click();
+  await result.getByText(/última consulta/i).first().waitFor();
+  assert.equal(await result.getByText('Más barato hoy', { exact: true }).count(), 0);
+
+  await city.selectOption('Cali');
+  await button('Consultar precios').click();
+  await result.getByText(/agotaron las consultas/i).waitFor();
+  assert.equal(calls, 3);
+  assert.equal(await result.getByText('Más barato hoy', { exact: true }).count(), 0);
+  await button('Volver al plan').click();
+  await text('Ración diaria: 54 g').waitFor();
+  console.log('Chrome móvil con datos controlados: etiqueta y horarios guardados, toma histórica intacta, precio con envío, envío desconocido, consulta anterior y cuota agotada verificados.');
+}
+
 async function verifyDiary() {
   const url = new URL(process.argv[2]);
-  assert.equal(url.protocol, 'https:');
+  const usingPriceFixtures = process.argv.includes('--price-fixtures');
+  if (usingPriceFixtures) assert.equal(url.hostname, '127.0.0.1');
+  assert.equal(url.protocol, usingPriceFixtures ? 'http:' : 'https:');
   if (process.env.GITHUB_SHA) url.searchParams.set('release-check', process.env.GITHUB_SHA);
   await waitForPages(url);
 
   const browser = await chromium.launch({ channel: 'chrome', headless: true });
   try {
-    const page = await browser.newPage({ locale: 'es-CO', timezoneId: 'America/Bogota' });
+    const page = await browser.newPage({
+      locale: 'es-CO',
+      timezoneId: 'America/Bogota',
+      ...(usingPriceFixtures ? { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: 'block' } : {}),
+    });
     const button = (name) => page.getByRole('button', { name, exact: typeof name === 'string' });
     const text = (value) => page.getByText(value, { exact: true });
     const openCatFoodStep = async (trigger, name) => {
@@ -72,7 +171,7 @@ async function verifyDiary() {
     await button('Más').click();
     assert.doesNotMatch(await page.locator('main').innerText(), /iniciar sesión|activar licencia|activar pro|checkout/i);
     assert.equal(new URL(page.url()).origin, url.origin);
-    console.log('Chrome público anónimo: Luna conservó 59 g, horarios 08:30 y 19:30, toma servida de 29 g y pesaje de 4.3 kg tras recargar.');
+    console.log(`Chrome ${usingPriceFixtures ? 'móvil en entorno de prueba' : 'público anónimo'}: Luna conservó 59 g, horarios 08:30 y 19:30, toma servida de 29 g y pesaje de 4.3 kg tras recargar.`);
 
     await openCatFoodStep('+ Mascota', 'Nube');
     await button(/agregar alimento/i).click();
@@ -80,6 +179,7 @@ async function verifyDiary() {
     await label.getByLabel('Marca', { exact: true }).fill('Marca de prueba');
     await label.getByLabel('Nombre de la fórmula', { exact: true }).fill('Seco de prueba');
     await label.getByLabel('Energía metabolizable (kcal/kg)', { exact: true }).fill('3641');
+    if (usingPriceFixtures) await label.getByLabel('Tamaño del empaque (kg)').fill('2');
     const declarations = [
       ['Proteína', '30', 'minimo'],
       ['Grasa', '20', 'minimo'],
@@ -129,6 +229,7 @@ async function verifyDiary() {
     }
     assert.equal(await savedLabel.getByLabel('Carbohidratos (%)', { exact: true }).inputValue(), '');
     console.log('Alimento local: ficha, grasa, fibra y proteína planificadas y servidas persistieron. Carbohidratos sin declarar siguen sin dato.');
+    if (usingPriceFixtures) await verifyAdjustmentAndPrices(page, button, text);
   } finally {
     await browser.close();
   }

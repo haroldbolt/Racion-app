@@ -60,6 +60,7 @@ interface FoodsViewProps {
   userAccount: UserAccount;
   plan?: FeedingPlan;
   onSelectFoodForPet: (food: FoodItem) => void;
+  onComparePrices?: (food: FoodItem) => void;
   onPlanUpdate?: (updatedPlan: Partial<FeedingPlan>) => void;
   onClose?: () => void;
   initialSubTab?: FoodsSubTab;
@@ -73,6 +74,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
   userAccount,
   plan,
   onSelectFoodForPet,
+  onComparePrices,
   onPlanUpdate,
   initialSubTab = 'compare',
 }) => {
@@ -748,6 +750,15 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                       {isSelectedForCompare ? '✓ En Comparador' : '+ Comparar'}
                     </button>
 
+                    {onComparePrices && f.type !== 'barf' && !f.kcalPerPiece && (
+                      <button
+                        type="button"
+                        onClick={() => onComparePrices(f)}
+                        className="min-h-11 rounded-xl border border-[#0B5D2E30] px-3 text-xs font-bold text-[#0B5D2E]"
+                      >
+                        {isEs ? 'Ver precios' : 'See prices'}
+                      </button>
+                    )}
                     <button
                       type="button"
                       onClick={() => handleSelectAndToast(f)}

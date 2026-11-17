@@ -15,15 +15,15 @@ import {
 import { formatRation, formatCOP } from '../utils/i18n';
 import { StorageService } from '../utils/storage';
 import { localDateKey } from '../utils/localDate';
-import { getFoodKcalPerKg, getPlannedMeals, getPlannedMealComponents } from '../utils/mealPortions';
-import { UnifiedFoodSearchModal, resolveFoodThumbnail } from '../components/UnifiedFoodSearchModal';
+import { getPlannedMeals, getPlannedMealComponents } from '../utils/mealPortions';
+import { resolveFoodThumbnail } from '../components/UnifiedFoodSearchModal';
+import { FeedingPlanEditor } from '../components/FeedingPlanEditor';
 import { InventoryFoodSearchModal } from '../components/InventoryFoodSearchModal';
 import { DailyKcalRingChart } from '../components/DailyKcalRingChart';
 import { LabelReviewModal } from '../components/LabelReviewModal';
 import { NutritionSummary } from '../components/NutritionSummary';
 import { WhyThisResultModal } from '../components/WhyThisResultModal';
 import {
-  ScheduleConfigModal,
   ProfileRefinementModal,
   RegisterTreatModal,
   RegisterWeightModal,
@@ -53,7 +53,6 @@ import {
   Scale,
   Receipt,
   DollarSign,
-  X,
   AlertCircle,
   AlertTriangle,
   HelpCircle,
@@ -81,9 +80,7 @@ interface TodayViewProps {
   ) => void;
   userAccount: UserAccount;
   onNavigateTab: (tab: 'calculate' | 'progress' | 'more' | 'pets') => void;
-  allPets?: Pet[];
-  plans?: Record<string, FeedingPlan>;
-  onSelectFoodForPet?: (food: FoodItem) => void;
+  onComparePrices?: (food: FoodItem) => void;
   onEditPet?: (pet: Pet) => void;
   onSavePlan?: (plan: FeedingPlan) => void;
   onUpdatePetProfile?: (pet: Pet) => void;
@@ -98,9 +95,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
   onToggleMeal,
   userAccount,
   onNavigateTab,
-  allPets = [],
-  plans = {},
-  onSelectFoodForPet,
+  onComparePrices,
   onEditPet,
   onSavePlan,
   onUpdatePetProfile,
@@ -131,12 +126,10 @@ export const TodayView: React.FC<TodayViewProps> = ({
   }, [pet.id]);
 
   // Modals & UI panels
-  const [showAdjustChoiceModal, setShowAdjustChoiceModal] = useState(false);
-  const [showFoodSearchModal, setShowFoodSearchModal] = useState(false);
+  const [planAdjustment, setPlanAdjustment] = useState<{ food?: FoodItem }>();
   const [showInventorySearchModal, setShowInventorySearchModal] = useState(false);
   const [showLabelReview, setShowLabelReview] = useState(false);
   const [showWhyModal, setShowWhyModal] = useState(false);
-  const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [showRefineModal, setShowRefineModal] = useState(false);
   const [showTreatModal, setShowTreatModal] = useState(false);
   const [showWeightModal, setShowWeightModal] = useState(false);
@@ -208,53 +201,11 @@ export const TodayView: React.FC<TodayViewProps> = ({
   };
 
   const handleSaveLabel = (updatedFood: FoodItem) => {
-    if (!effectivePlan) {
-      onSelectFoodForPet?.(updatedFood);
-      return;
-    }
-    if (effectivePlan.isVetLocked) {
+    if (effectivePlan?.isVetLocked || pet.vetGuideline?.locked) {
       showToast(isEs ? 'Ficha guardada en Mis alimentos.' : 'Label saved in My foods.');
       return;
     }
-
-    const isMixed = effectivePlan.foodType === 'mixed';
-    const isWet = updatedFood.type === 'wet';
-    const isMainFood = !isMixed || !effectivePlan.dryFood || !isWet;
-    const previousFood = isWet ? effectivePlan.wetFood : effectivePlan.dryFood;
-    const updatedPlan: FeedingPlan = {
-      ...effectivePlan,
-      foodId: isMainFood ? updatedFood.id : effectivePlan.foodId,
-      foodBrand: isMainFood ? updatedFood.brand : effectivePlan.foodBrand,
-      foodName: isMainFood ? updatedFood.name : effectivePlan.foodName,
-      foodType: isMixed ? 'mixed' : updatedFood.type,
-      dryFood: isWet ? effectivePlan.dryFood : updatedFood,
-      wetFood: isWet ? updatedFood : effectivePlan.wetFood,
-      bagWeightKg: (isMainFood && updatedFood.bagSizeKg) || effectivePlan.bagWeightKg,
-    };
-    const portionInputsChanged = updatedPlan.foodType !== effectivePlan.foodType ||
-      updatedPlan.bagWeightKg !== effectivePlan.bagWeightKg ||
-      getFoodKcalPerKg(updatedFood) !== getFoodKcalPerKg(previousFood);
-    persistPlanUpdate(portionInputsChanged ? recalculatePlanForPet(pet, updatedPlan) : updatedPlan);
-    showToast(isEs ? `Ficha de ${updatedFood.name} guardada.` : `Saved ${updatedFood.name} label.`);
-  };
-
-  const handleSaveSchedule = (mealsPerDay: number, mealTimes: string[]) => {
-    if (!effectivePlan) return;
-    if (effectivePlan.isVetLocked && mealsPerDay !== effectivePlan.mealsPerDay) return;
-    const mealCountChanged = mealsPerDay !== effectivePlan.mealsPerDay;
-    persistPlanUpdate({
-      ...effectivePlan,
-      mealsPerDay,
-      mealTimes,
-      scheduleConfigured: true,
-      gramsPerMeal: mealCountChanged
-        ? Math.round(effectivePlan.gramsPerDay / mealsPerDay)
-        : effectivePlan.gramsPerMeal,
-      kcalPerMeal: mealCountChanged
-        ? Math.round(effectivePlan.kcalPerMeal * effectivePlan.mealsPerDay / mealsPerDay)
-        : effectivePlan.kcalPerMeal,
-    });
-    showToast(`Horarios actualizados (${mealsPerDay} comidas al día).`);
+    setPlanAdjustment({ food: updatedFood });
   };
 
   const handleSaveRefinement = (updatedPet: Pet) => {
@@ -340,49 +291,6 @@ export const TodayView: React.FC<TodayViewProps> = ({
     showToast(`Peso registrado: ${weightKg} kg.`);
   };
 
-  const handleFoodSelectedFromSearch = (selection: {
-    brand: string;
-    productName: string;
-    weightKg: number;
-    imageUrl?: string;
-    sourceFoodItem?: FoodItem;
-    confirmedSizesKg?: number[];
-  }) => {
-    setShowFoodSearchModal(false);
-
-    const foodToSet: FoodItem = selection.sourceFoodItem
-      ? {
-          ...selection.sourceFoodItem,
-          bagSizeKg: selection.weightKg || selection.sourceFoodItem.bagSizeKg,
-        }
-      : {
-          id: 'catalog_' + Date.now(),
-          brand: selection.brand,
-          name: selection.productName,
-          species: pet.species,
-          lifeStage: foodReview.isPuppy ? 'puppy' : 'adult',
-          type: 'dry',
-          kcalPerKg: 0,
-          proteinPct: 0,
-          fatPct: 0,
-          fiberPct: 0,
-          moisturePct: 10,
-          country: 'Colombia',
-          imageUrl: selection.imageUrl,
-          bagSizeKg: selection.weightKg,
-          availableSizesKg: selection.confirmedSizesKg,
-          labelStatus: 'unconfirmed',
-          dataSource: 'Catálogo (etiqueta pendiente)',
-        };
-
-    onSelectFoodForPet?.(foodToSet);
-    showToast(
-      foodToSet.labelStatus === 'unconfirmed'
-        ? `${foodToSet.brand} ${foodToSet.name} guardado. Revisa la etiqueta para calcular gramos.`
-        : `Alimento actualizado a ${foodToSet.brand} ${foodToSet.name}.`
-    );
-  };
-
   // Empty state if no feeding plan exists
   if (!effectivePlan) {
     return (
@@ -415,6 +323,12 @@ export const TodayView: React.FC<TodayViewProps> = ({
   }
 
   const currentFoodItem = getEffectiveFoodItem(effectivePlan);
+  const comparableFoods = (effectivePlan.foodType === 'mixed'
+    ? [effectivePlan.dryFood, effectivePlan.wetFood]
+    : [currentFoodItem]).filter((food): food is FoodItem =>
+      Boolean(food?.brand.trim() && food?.name.trim() && food.type !== 'barf' &&
+        (!(effectivePlan.isVetLocked || pet.vetGuideline?.locked) ||
+          food.name.trim() === effectivePlan.foodName.trim())));
   const foodThumb =
     currentFoodItem?.labelPhotoUrl ||
     currentFoodItem?.imageUrl ||
@@ -470,8 +384,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
           <button
             type="button"
             onClick={() => {
-              if (nextStep.id === 'complete_label') setShowLabelReview(true);
-              else if (nextStep.id === 'configure_schedule') setShowScheduleModal(true);
+              if (nextStep.id === 'complete_label' || nextStep.id === 'configure_schedule') setPlanAdjustment({});
               else setShowRefineModal(true);
             }}
             className="min-h-[44px] px-3.5 py-2 bg-[#0B5D2E] text-white rounded-xl text-xs font-heading font-extrabold shrink-0 flex items-center gap-1 hover:bg-[#094723] transition"
@@ -620,7 +533,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
           <div className="flex items-center gap-2.5 shrink-0">
             <button
               type="button"
-              onClick={() => setShowScheduleModal(true)}
+              onClick={() => setPlanAdjustment({})}
               className="text-[#0B5D2E] font-bold hover:underline"
             >
               Horarios
@@ -702,6 +615,11 @@ export const TodayView: React.FC<TodayViewProps> = ({
                           }`
                         : 'Pendiente'}
                     </p>
+                    {isFed && log.mealTime !== scheduledTime && (
+                      <p className="text-[11px] text-[#44544A]">
+                        {isEs ? 'Horario al registrar' : 'Scheduled when logged'} · {log.mealTime}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -713,10 +631,10 @@ export const TodayView: React.FC<TodayViewProps> = ({
                       setShowMealModal(true);
                       return;
                     }
-                    const components = getPlannedMealComponents(effectivePlan, portion);
+                    const components = isFed ? undefined : getPlannedMealComponents(effectivePlan, portion);
                     onToggleMeal(
-                      idx, selectedFeeder, portion.grams, scheduledTime,
-                      effectivePlan.rationConfirmed ? portion.grams : undefined, undefined, components
+                      idx, selectedFeeder, isFed ? 0 : portion.grams, scheduledTime,
+                      !isFed && effectivePlan.rationConfirmed ? portion.grams : undefined, undefined, components
                     );
                   }}
                   className={`min-h-[44px] px-3.5 rounded-xl font-heading font-bold text-xs flex items-center gap-1 transition shrink-0 ${
@@ -749,11 +667,11 @@ export const TodayView: React.FC<TodayViewProps> = ({
           </div>
           <button
             type="button"
-            onClick={() => setShowAdjustChoiceModal(true)}
+            onClick={() => setPlanAdjustment({})}
             className="text-xs font-bold text-[#0B5D2E] hover:underline flex items-center gap-1 min-h-[36px] shrink-0"
           >
             <Edit3 className="w-3.5 h-3.5" />
-            <span>Cambiar</span>
+            <span>{isEs ? 'Ajustar ración' : 'Adjust feeding plan'}</span>
           </button>
         </div>
 
@@ -849,6 +767,20 @@ export const TodayView: React.FC<TodayViewProps> = ({
 
         {/* Action buttons: Revisar etiqueta & Ver otras opciones */}
         <div className="flex flex-wrap gap-2">
+          {onComparePrices && comparableFoods.map((food) => (
+            <button
+              key={food.type}
+              type="button"
+              onClick={() => onComparePrices(food)}
+              className="flex min-h-11 items-center gap-1.5 rounded-xl bg-[#0B5D2E] px-3 py-2 text-xs font-extrabold text-white hover:bg-[#094723]"
+            >
+              <DollarSign className="size-4" />
+              <span>
+                {isEs ? 'Comparar precios' : 'Compare prices'}
+                {comparableFoods.length > 1 && (food.type === 'wet' ? (isEs ? ' · húmedo' : ' · wet') : (isEs ? ' · seco' : ' · dry'))}
+              </span>
+            </button>
+          ))}
           {!isBarf && (
             <button
               type="button"
@@ -917,9 +849,8 @@ export const TodayView: React.FC<TodayViewProps> = ({
                     <button
                       type="button"
                       onClick={() => {
-                        onSelectFoodForPet?.(alt.food);
+                        setPlanAdjustment({ food: alt.food });
                         setShowAlternatives(false);
-                        showToast(`Cambiado a ${alt.food.brand} ${alt.food.name}.`);
                       }}
                       className="min-h-[40px] px-3 py-1.5 bg-[#0B5D2E] text-white rounded-xl text-xs font-bold shrink-0 hover:bg-[#094723]"
                     >
@@ -1183,59 +1114,21 @@ export const TodayView: React.FC<TodayViewProps> = ({
 
       {/* ================= MODALS ================= */}
 
-      {/* Adjust Choice Modal */}
-      {showAdjustChoiceModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-3xl p-5 max-w-sm w-full shadow-2xl border border-[#0B5D2E20] space-y-3">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-2">
-              <h3 className="font-heading font-extrabold text-base text-[#1C2B21]">
-                Alimento de {pet.name}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowAdjustChoiceModal(false)}
-                className="p-1.5 rounded-full text-gray-400 hover:text-gray-600"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setShowAdjustChoiceModal(false);
-                setShowFoodSearchModal(true);
-              }}
-              className="w-full p-3.5 bg-[#EAF4EC] rounded-2xl text-left text-xs font-bold text-[#0B5D2E] flex items-center justify-between"
-            >
-              <span>Buscar o cambiar alimento habitual</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
-            {!isBarf && (
-              <button
-                type="button"
-                onClick={() => {
-                  setShowAdjustChoiceModal(false);
-                  setShowLabelReview(true);
-                }}
-                className="w-full p-3.5 bg-[#F8FAF8] rounded-2xl text-left text-xs font-bold text-[#1C2B21] border border-gray-200 flex items-center justify-between"
-              >
-                <span>Revisar o adjuntar foto de etiqueta</span>
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-        </div>
+      {planAdjustment && (
+        <FeedingPlanEditor
+          pet={pet}
+          plan={effectivePlan}
+          meals={mealLogs}
+          initialFood={planAdjustment.food}
+          language={userAccount.language}
+          onClose={() => setPlanAdjustment(undefined)}
+          onSave={(updated) => {
+            persistPlanUpdate(updated);
+            setPlanAdjustment(undefined);
+            showToast(isEs ? 'Ración y horarios guardados.' : 'Feeding plan and times saved.');
+          }}
+        />
       )}
-
-      <UnifiedFoodSearchModal
-        isOpen={showFoodSearchModal}
-        onClose={() => setShowFoodSearchModal(false)}
-        activePet={pet}
-        allPets={allPets}
-        plans={plans}
-        onSelectFood={handleFoodSelectedFromSearch}
-        lang={userAccount.language}
-      />
 
       <LabelReviewModal
         isOpen={showLabelReview}
@@ -1256,15 +1149,6 @@ export const TodayView: React.FC<TodayViewProps> = ({
         treats={treatsGuidance}
         lang={userAccount.language}
       />
-
-      {showScheduleModal && (
-        <ScheduleConfigModal
-          key={effectivePlan.petId}
-          onClose={() => setShowScheduleModal(false)}
-          plan={effectivePlan}
-          onSaveSchedule={handleSaveSchedule}
-        />
-      )}
 
       <ProfileRefinementModal
         isOpen={showRefineModal}
