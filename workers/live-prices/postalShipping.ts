@@ -36,7 +36,8 @@ async function storefrontJson(fetcher: typeof fetch, url: string | URL, init?: R
     ...init,
     headers: { Accept: 'application/json', ...init?.headers },
   });
-  return response.ok ? record(await response.json()) : {};
+  if (!response.ok) throw new Error('Storefront ' + response.status);
+  return record(await response.json());
 }
 
 function variantMatches(
@@ -78,7 +79,7 @@ function postalShippingAmount(options: unknown): number | null {
 }
 
 async function quoteLaiaDelivery(
-  offers: LivePriceOffer[], product: LivePriceProduct, postalCode: string, fetcher: typeof fetch,
+  offers: LivePriceOffer[], product: LivePriceProduct, postalCode: string, fetcher: typeof fetch, setStage: (stage: string) => void,
 ): Promise<{ title: string; productPriceCop: number; shippingCop: number } | null> {
   const eligible = offers.filter((offer) => offer.grams === product.grams && normalizePriceWords(offer.retailer) === retailerName);
   if (!eligible.length) return null;
@@ -90,23 +91,27 @@ async function quoteLaiaDelivery(
   if (query.length < 2 || query.length > 100) return null;
   const search = new URL(`${storefront}/search/products`);
   search.search = new URLSearchParams({ q: query, fields: variantFields, per_page: String(productsPerPage) }).toString();
+  setStage('catalog');
   const [store, result] = await Promise.all([
     storefrontJson(fetcher, `${storefront}?fields=id,country,currency`),
     storefrontJson(fetcher, search),
   ]);
   if (store.id !== storeId || store.country !== 'CO' || store.currency !== 'COP' || !Array.isArray(result.data)) return null;
+  setStage('variant');
   const candidates = result.data.slice(0, productsPerPage).flatMap((item) => variantMatches(record(item), product, offerPrices));
   if (candidates.length !== 1) return null;
 
   const candidate = candidates[0];
   const details = new URL(`${storefront}/products/${candidate.productId}`);
   details.searchParams.set('fields', variantFields);
+  setStage('product');
   const detail = await storefrontJson(fetcher, details);
   if (detail.id !== candidate.productId || typeof detail.name !== 'string' || displayTitle(detail.name) !== title ||
     !matchesFormula(detail.name, product)) return null;
   if (!variantMatches(detail, product, offerPrices, true).some(({ variantId, productPriceCop }) =>
     variantId === candidate.variantId && productPriceCop === candidate.productPriceCop)) return null;
 
+  setStage('shipping');
   const shipping = await storefrontJson(fetcher, `${storefront}/shipping-options`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -121,8 +126,15 @@ export async function quotePostalOffers(
 ): Promise<LivePriceResponse> {
   // Postal totals must refer to this destination. City-level delivery remains available in a city-only lookup.
   const offers = baseline.offers.map((offer) => ({ ...offer, shippingCop: null, shippingPostalCode: undefined, totalCop: null }));
-  const quote = baseline.status === 'current' ? await quoteLaiaDelivery(offers, product, postalCode, fetcher).catch(() => null) : null;
-  if (!quote) return { ...baseline, offers, cheapestOfferId: null };
+  let stage = 'start';
+  let outcome = 'no match';
+  const quote = baseline.status === 'current' ? await quoteLaiaDelivery(offers, product, postalCode, fetcher, (current) => {
+    stage = current;
+  }).catch((error: unknown) => {
+    if (error instanceof Error) outcome = /^Storefront \\d{3}$/.test(error.message) ? error.message : error.name;
+    return null;
+  }) : null;
+  if (!quote) return Object.assign({ ...baseline, offers, cheapestOfferId: null }, { postalQuoteDiagnostic: [stage, outcome] });
 
   const updated = offers.map((offer): LivePriceOffer =>
     offer.grams === product.grams && normalizePriceWords(offer.retailer) === retailerName &&
