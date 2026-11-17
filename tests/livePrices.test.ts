@@ -2,12 +2,13 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { colombiaPriceDay, type LivePriceRequest } from '../src/types/livePrices';
 import { collectShoppingOffers, quotedShippingCop, rankShoppingOffers } from '../workers/live-prices/offers';
-import { LivePriceService, parseLivePriceRequest, type PriceStorage, type PriceStorageTransactions } from '../workers/live-prices/service';
+import { hashValue, LivePriceService, parseLivePriceRequest, type PriceStorage, type PriceStorageTransactions } from '../workers/live-prices/service';
 
 const royalCanin = { brand: 'Royal Canin', name: 'Sterilised 37 Neutered Cat Dry', grams: 2000 };
 const request = parseLivePriceRequest({ product: royalCanin, city: 'Bogotá' });
 assert.ok(request);
 const regionalTitle = 'Royal Canin Sterilised 37 Gatos Adultos 2 kg';
+const bundleTitle = 'Royal Canin Neo Pet Market Sterilized 37 Neutered Cat Food 2kg. + Meo Crab Reward';
 
 const listings = [
   { title: regionalTitle, source: 'Tienda A', price: '$90.000', delivery: 'Envío $18.000', link: 'https://tienda-a.example/producto' },
@@ -89,6 +90,49 @@ test('skips mismatched formulas, multipacks, missing package, unusable links and
   const [grouped] = collectShoppingOffers([{ ...base, title: regionalTitle.replace('2 kg', '2.000 g') }], royalCanin);
   assert.equal(grouped.grams, 2000);
   assert.equal(grouped.productPriceCop, 90000);
+});
+
+test('excludes a named add-on after the package and keeps the plus sign used in the formula', () => {
+  assert.deepEqual(collectShoppingOffers([
+    { ...listings[0], title: bundleTitle },
+    { ...listings[0], title: `${regionalTitle}; + “Premio de regalo”` },
+  ], royalCanin), []);
+
+  const ageing = { ...royalCanin, name: 'Ageing 12+ Cat Dry' };
+  const [single] = collectShoppingOffers([
+    { ...listings[0], title: 'Royal Canin Ageing 12+ 2 kg' },
+  ], ageing);
+  assert.equal(single?.grams, 2000);
+});
+
+test('filters old same-day bundled offers and recomputes the winner without another query', async () => {
+  const mock = fakeSerpApi();
+  const storage = new MemoryTransactions();
+  const queriedAt = '2026-11-17T12:00:00.000Z';
+  const worker = new LivePriceService(storage, 'fixture-key', mock.fetcher, () => new Date(queriedAt));
+  const lookup = await hashValue(JSON.stringify(['royal canin sterilised 37 neutered cat dry', 2000, null, 'Bogotá']));
+  const original = collectShoppingOffers(listings, royalCanin);
+  const bundle = { ...original[0], id: 'old-bundle', title: bundleTitle, totalCop: 85000 };
+  const seed = (offers: typeof original) => storage.put(`lookup:${lookup}`, {
+    attemptedDay: '2026-11-17', latest: { queriedAt, offers, cheapestOfferId: bundle.id },
+  });
+
+  await seed([bundle, ...original]);
+  const sanitized = await worker.search(request, 'visitor');
+  assert.equal(sanitized.status, 'current');
+  assert.equal(sanitized.queriedAt, queriedAt);
+  assert.deepEqual(sanitized.offers.map(({ retailer }) => retailer), [
+    'Tienda B', 'Tienda A', 'Envío sin cotizar', 'Otra presentación',
+  ]);
+  assert.equal(sanitized.cheapestOfferId, sanitized.offers[0]?.id);
+
+  await seed([bundle]);
+  const noOffers = await worker.search(request, 'visitor');
+  assert.equal(noOffers.status, 'current');
+  assert.equal(noOffers.queriedAt, queriedAt);
+  assert.deepEqual(noOffers.offers, []);
+  assert.equal(noOffers.cheapestOfferId, null);
+  assert.equal(mock.urls.length, 0);
 });
 
 test('does not turn delivery estimates, dates, ranges, conditions or foreign amounts into a quoted total', () => {

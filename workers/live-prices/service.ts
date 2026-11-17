@@ -181,7 +181,9 @@ export class LivePriceService {
     const cacheKey = `lookup:${lookup}`;
     const today = colombiaPriceDay(this.now());
     const record = await this.store.get<LookupRecord>(cacheKey);
-    const previous = record?.latest;
+    const cached = record?.latest;
+    // Revalidate durable snapshots so a parser correction also applies to older cached offers.
+    const previous = cached && { queriedAt: cached.queriedAt, ...rankShoppingOffers(cached.offers, request.product.grams) };
     if (previous && colombiaPriceDay(new Date(previous.queriedAt)) === today) return freshResponse(request.city, previous);
     if (!key) return unavailablePriceResult(request.city, 'not_configured', previous);
     if (record?.attemptedDay === today) {

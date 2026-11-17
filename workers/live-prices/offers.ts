@@ -13,7 +13,9 @@ const wordAliases: Record<string, string> = {
 };
 const descriptors = new Set(['de', 'del', 'the', 'with', 'for', 'and', 'y', 'para', 'con', 'alimento', 'food']);
 const weightPattern = /(?<![\p{L}\p{N}])([0-9]+(?:[.,][0-9]+)?)\s*(kg|kilogramos?|kilos?|g|gr|gramos?|lbs?|libras?)\b/giu;
-const invalidPackage = /\b(?:combos?|multipacks?|packs?|lotes?|fraccionad[oa]s?|reempacad[oa]s?|repackaged|surtid[oa]s?|probar|muestras?)\b|\b[2-9]\d*\s*(?:x|×|unidades?|unds?|und|uds|sacos?|bultos?|bolsas?|latas?)\s*(?:\d|\b)|\b1\d+\s*[x×]\s*\d|\+\s*\d/i;
+const invalidPackage = /\b(?:combos?|multipacks?|packs?|lotes?|fraccionad[oa]s?|reempacad[oa]s?|repackaged|surtid[oa]s?|probar|muestras?)\b|\b[2-9]\d*\s*(?:x|×|unidades?|unds?|und|uds|sacos?|bultos?|bolsas?|latas?)\s*(?:\d|\b)|\b1\d+\s*[x×]\s*\d/i;
+// A plus sign before a package can be part of a formula (e.g. Ageing 12+).
+const packageAddOn = new RegExp(`${weightPattern.source}[\\s\\p{P}]*\\+[\\s\\p{P}]*[\\p{L}\\p{N}]`, 'iu');
 
 export function normalizePriceWords(value: string): string {
   return value.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
@@ -33,7 +35,7 @@ export function formulaSearchName(product: LivePriceProduct): string {
 }
 
 function packageGrams(title: string): number | null {
-  if (invalidPackage.test(title) || /\b(?:reacondicionad[oa]|usad[oa]|segunda mano|granel|por kilo|desde|a partir de)\b/i.test(title)) {
+  if (invalidPackage.test(title) || packageAddOn.test(title) || /\b(?:reacondicionad[oa]|usad[oa]|segunda mano|granel|por kilo|desde|a partir de)\b/i.test(title)) {
     return null;
   }
   if (/\s(?:kg|g|gr|lbs?|kilos?)\s*[x×]\s*(?:[2-9]\d*|1\d+)\b/i.test(title)) return null;
@@ -183,8 +185,9 @@ export function collectShoppingOffers(results: unknown[], product: LivePriceProd
 }
 
 export function rankShoppingOffers(offers: LivePriceOffer[], grams: number) {
-  const exact = offers.filter((offer) => offer.grams === grams);
-  const alternatives = offers.filter((offer) => offer.grams !== grams);
+  const singlePackages = offers.filter(({ title }) => !packageAddOn.test(title));
+  const exact = singlePackages.filter((offer) => offer.grams === grams);
+  const alternatives = singlePackages.filter((offer) => offer.grams !== grams);
   exact.sort((a, b) => (a.totalCop ?? Infinity) - (b.totalCop ?? Infinity) || a.productPriceCop - b.productPriceCop);
   alternatives.sort((a, b) => a.pricePerKgCop - b.pricePerKgCop);
   const cheapestOfferId = exact[0]?.totalCop != null ? exact[0].id : null;
