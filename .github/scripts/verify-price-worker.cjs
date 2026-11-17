@@ -29,7 +29,6 @@ function post(worker, body = request, origin = publicOrigin) {
 
 async function verifyWorkerRuntime() {
   const directory = await mkdtemp(path.join(tmpdir(), 'racion-worker-'));
-  const scriptPath = path.join(directory, 'index.mjs');
   let worker;
   try {
     const config = await readFile('workers/live-prices/wrangler.toml', 'utf8');
@@ -38,9 +37,9 @@ async function verifyWorkerRuntime() {
     assert.match(config, /new_sqlite_classes\s*=\s*\["PriceSearchBudget"\]/);
     assert.match(config, /name\s*=\s*"LIVE_PRICE_BUDGET"\s*\nclass_name\s*=\s*"PriceSearchBudget"/);
     assert.match(config, /ALLOWED_ORIGINS\s*=\s*"https:\/\/haroldbolt\.github\.io"/);
-    await build({
+    const bundle = await build({
       entryPoints: ['workers/live-prices/index.ts'],
-      outfile: scriptPath,
+      write: false,
       bundle: true,
       platform: 'browser',
       format: 'esm',
@@ -52,7 +51,7 @@ async function verifyWorkerRuntime() {
       return new Miniflare({
         name: 'racion-live-prices',
         modules: true,
-        scriptPath,
+        script: bundle.outputFiles[0].text,
         compatibilityDate: date,
         cf: false,
         bindings: { ALLOWED_ORIGINS: publicOrigin, ...(apiKey ? { SERPAPI_API_KEY: apiKey } : {}) },
@@ -84,6 +83,7 @@ async function verifyWorkerRuntime() {
     assert.equal((await post(worker, request, 'https://other.example')).status, 403);
     assert.equal((await post(worker, { ...request, city: 'Paris' })).status, 400);
     await worker.dispose();
+    worker = undefined;
 
     const mock = createFetchMock();
     const serpApi = mock.get('https://serpapi.com');
@@ -120,6 +120,7 @@ async function verifyWorkerRuntime() {
     assert.equal(current.offers.find((offer) => offer.retailer === 'Tienda C')?.totalCop, null);
     mock.assertNoPendingInterceptors();
     await worker.dispose();
+    worker = undefined;
 
     worker = start(createFetchMock(), fixtureKey);
     const cachedRequest = inputs.find((query) => query.city === current.city);
