@@ -1,4 +1,5 @@
 import { FoodItem, NutritionDatasheet, EmpaqueTipo } from '../types';
+import { publicAssetUrl } from '../utils/publicAssetUrl';
 
 export interface ShopifyVariant {
   id: string; // e.g. "gid://shopify/ProductVariant/48869877055768"
@@ -77,7 +78,7 @@ export async function loadShopifyCatalog(forceReload = false): Promise<ShopifyCa
   activeLoadPromise = (async () => {
     try {
       // Primary location: public/assets/aistudio/...
-      const res = await fetch('/assets/aistudio/Catalogo_Alimentos_Racion_App_68a4174d.json');
+      const res = await fetch(publicAssetUrl('/assets/aistudio/Catalogo_Alimentos_Racion_App_68a4174d.json'));
       if (res.ok) {
         const data: ShopifyCatalog = await res.json();
         cachedCatalog = data;
@@ -85,7 +86,7 @@ export async function loadShopifyCatalog(forceReload = false): Promise<ShopifyCa
       }
 
       // Fallback location: root public
-      const fallbackRes = await fetch('/Catalogo_Alimentos_Racion_App.json');
+      const fallbackRes = await fetch(publicAssetUrl('/Catalogo_Alimentos_Racion_App.json'));
       if (fallbackRes.ok) {
         const data: ShopifyCatalog = await fallbackRes.json();
         cachedCatalog = data;

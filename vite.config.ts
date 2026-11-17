@@ -5,37 +5,43 @@ import path from 'path';
 import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
+  const pagesPath = process.env.PAGES_BASE_PATH?.replace(/^\/+|\/+$/g, '');
+  const base = pagesPath ? `/${pagesPath}/` : '/';
+  const appIcon = `${base}assets/aistudio/Racio_n_App__Nutricio_n_con_carin_o_8fb59a2d.png`;
+
   return {
+    base,
     plugins: [
       react(),
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
+        scope: base,
         manifest: {
-          id: '/',
+          id: base,
           name: 'Ración App',
           short_name: 'Ración App',
           description: 'Estima la ración de tu perro o gato y lleva su diario de tomas y pesajes.',
           theme_color: '#0B5D2E',
           background_color: '#EAF4EC',
           display: 'standalone',
-          start_url: '/',
-          scope: '/',
+          start_url: base,
+          scope: base,
           icons: [
             {
-              src: '/assets/aistudio/Racio_n_App__Nutricio_n_con_carin_o_8fb59a2d.png',
+              src: appIcon,
               sizes: '192x192',
               type: 'image/png',
               purpose: 'any',
             },
             {
-              src: '/assets/aistudio/Racio_n_App__Nutricio_n_con_carin_o_8fb59a2d.png',
+              src: appIcon,
               sizes: '512x512',
               type: 'image/png',
               purpose: 'any',
             },
             {
-              src: '/assets/aistudio/Racio_n_App__Nutricio_n_con_carin_o_8fb59a2d.png',
+              src: appIcon,
               sizes: '512x512',
               type: 'image/png',
               purpose: 'maskable',
@@ -49,7 +55,7 @@ export default defineConfig(() => {
             'assets/aistudio/Racio_n_App__Nutricio_n_con_carin_o_8fb59a2d.png',
             'assets/aistudio/Catalogo_Alimentos_Racion_App_68a4174d.json',
           ],
-          navigateFallbackDenylist: [/^\/api(?:\/|$)/],
+          navigateFallbackDenylist: [/\/api(?:\/|$)/],
           maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
           runtimeCaching: [
             {

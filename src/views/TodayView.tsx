@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { publicAssetUrl } from '../utils/publicAssetUrl';
 import {
   Pet,
   FeedingPlan,
@@ -801,7 +802,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
           <div className="w-12 h-14 bg-white rounded-xl border border-gray-200 p-1 flex items-center justify-center shrink-0 overflow-hidden">
             {foodThumb ? (
               <img
-                src={foodThumb}
+                src={publicAssetUrl(foodThumb)}
                 alt={foodReview.productTitle}
                 className="w-full h-full object-contain"
               />

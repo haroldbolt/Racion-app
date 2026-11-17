@@ -22,7 +22,9 @@ bun run preview
 
 ## Publicar la beta
 
-Publica `dist/` como sitio estático en la raíz de un dominio con HTTPS. No necesita backend. Si tu alojamiento usa el servidor incluido, ejecuta `NODE_ENV=production bun run start` después de compilar. El puerto por defecto es 3000 y se puede cambiar con la variable de entorno `PORT`.
+Cada cambio en `main` actualiza la beta mediante GitHub Actions. [Abrir Ración App](https://haroldbolt.github.io/Racion-app/).
+
+Para publicarla en otro sitio, sirve `dist/` como contenido estático en un dominio con HTTPS. No necesita backend. Si tu alojamiento usa el servidor incluido, ejecuta `NODE_ENV=production bun run start` después de compilar. El puerto por defecto es 3000 y se puede cambiar con la variable de entorno `PORT`.
 
 La aplicación guarda perfiles, planes y registros en el almacenamiento local del navegador. Los datos no se sincronizan entre dispositivos; cambiar de navegador, dominio o borrar sus datos deja esos registros fuera de alcance. En **Más → Ajustes y Privacidad → Exportar JSON** puedes descargar una copia de tus datos. Tras la primera carga en producción, la PWA guarda los recursos principales para que el diario y el catálogo local estén disponibles sin conexión.
 

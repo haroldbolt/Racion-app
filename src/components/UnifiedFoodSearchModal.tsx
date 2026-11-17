@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { publicAssetUrl } from '../utils/publicAssetUrl';
 import { Pet, FoodItem, FeedingPlan, RecentFoodSearch } from '../types';
 import { PET_FOODS_DATABASE } from '../data/foods';
 import { StorageService } from '../utils/storage';
@@ -500,7 +501,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
                         <div className="w-10 h-12 bg-white rounded-xl p-0.5 border border-[#0B5D2E20] flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
                           {thumbnail ? (
                             <img
-                              src={thumbnail}
+                              src={publicAssetUrl(thumbnail)}
                               alt={rf.productName}
                               className="w-full h-full object-contain"
                               loading="lazy"
@@ -559,7 +560,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div className="w-9 h-10 bg-white rounded-lg p-0.5 border border-gray-200 flex items-center justify-center shrink-0 overflow-hidden">
                           {thumbnail ? (
-                            <img src={thumbnail} alt={rc.productName} className="w-full h-full object-contain" />
+                            <img src={publicAssetUrl(thumbnail)} alt={rc.productName} className="w-full h-full object-contain" />
                           ) : (
                             <Clock className="w-3.5 h-3.5 text-gray-400" />
                           )}
@@ -628,7 +629,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
                           <div className="w-11 h-14 bg-white rounded-xl p-0.5 border border-gray-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs group-hover:border-[#0B5D2E30] transition">
                             {thumbnail ? (
                               <img
-                                src={thumbnail}
+                                src={publicAssetUrl(thumbnail)}
                                 alt={food.name}
                                 className="w-full h-full object-contain"
                                 loading="lazy"

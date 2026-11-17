@@ -1,4 +1,10 @@
 import React, { useState } from 'react';
+import dogUnderweight from '../assets/images/bcs_dog_underweight_1794203446761.jpg';
+import dogIdeal from '../assets/images/bcs_dog_ideal_1794203446790.jpg';
+import dogOverweight from '../assets/images/bcs_dog_overweight_1794203449443.jpg';
+import catUnderweight from '../assets/images/bcs_cat_underweight_1794203447633.jpg';
+import catIdeal from '../assets/images/bcs_cat_ideal_1794203448613.jpg';
+import catOverweight from '../assets/images/bcs_cat_overweight_1794203448533.jpg';
 import { Species } from '../types';
 import { Eye, Check, Info, Maximize2, X, Sparkles } from 'lucide-react';
 
@@ -11,14 +17,14 @@ interface BCSSelectorProps {
 
 export const BCS_PHOTOS = {
   dog: {
-    underweight: '/src/assets/images/bcs_dog_underweight_1794203446761.jpg',
-    ideal: '/src/assets/images/bcs_dog_ideal_1794203446790.jpg',
-    overweight: '/src/assets/images/bcs_dog_overweight_1794203449443.jpg',
+    underweight: dogUnderweight,
+    ideal: dogIdeal,
+    overweight: dogOverweight,
   },
   cat: {
-    underweight: '/src/assets/images/bcs_cat_underweight_1794203447633.jpg',
-    ideal: '/src/assets/images/bcs_cat_ideal_1794203448613.jpg',
-    overweight: '/src/assets/images/bcs_cat_overweight_1794203448533.jpg',
+    underweight: catUnderweight,
+    ideal: catIdeal,
+    overweight: catOverweight,
   },
 };
 

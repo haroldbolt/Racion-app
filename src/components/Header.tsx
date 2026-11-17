@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { publicAssetUrl } from '../utils/publicAssetUrl';
 import { Pet, UserAccount } from '../types';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import { Plus, Download, Globe, Bell } from 'lucide-react';
@@ -46,7 +47,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Brand Icon Shield (In-app only shield icon according to Brand Manual Page 8) */}
           <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center bg-[#0B5D2E] shadow-xs">
             <img
-              src="/assets/aistudio/Racio_n_App__Nutricio_n_con_carin_o_8fb59a2d.png"
+              src={publicAssetUrl('/assets/aistudio/Racio_n_App__Nutricio_n_con_carin_o_8fb59a2d.png')}
               alt="Ración App Shield"
               className="w-full h-full object-cover scale-140"
             />

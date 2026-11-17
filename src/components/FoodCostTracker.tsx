@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { publicAssetUrl } from '../utils/publicAssetUrl';
 import { Pet, FeedingPlan, FoodCostEntry, UserAccount } from '../types';
 import { StorageService } from '../utils/storage';
 import { formatCOP } from '../utils/i18n';
@@ -580,7 +581,7 @@ export const FoodCostTracker: React.FC<FoodCostTrackerProps> = ({
                       <div className="w-11 h-11 rounded-xl bg-white border border-gray-100 flex items-center justify-center shrink-0 overflow-hidden">
                         {p.imageUrl ? (
                           <img
-                            src={p.imageUrl}
+                            src={publicAssetUrl(p.imageUrl)}
                             alt={p.foodName}
                             className="w-full h-full object-contain p-0.5"
                             loading="lazy"
