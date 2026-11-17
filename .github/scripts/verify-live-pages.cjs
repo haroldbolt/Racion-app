@@ -154,6 +154,7 @@ async function verifyDiary() {
     const endpoint = 'https://racion-live-prices.jumer4.workers.dev/api/live-prices';
     await page.getByLabel('Presentación (kg)').fill('2');
     await page.getByLabel('Ciudad').selectOption('Bogotá');
+    await page.getByLabel('Código postal de Bogotá').fill('110111');
     const lookup = page.waitForResponse(
       (response) => response.url() === endpoint && response.request().method() === 'POST',
       { timeout: 35000 },
@@ -164,31 +165,32 @@ async function verifyDiary() {
     assert.deepEqual(priceResponse.request().postDataJSON(), {
       product: { brand: 'Royal Canin', name: 'Sterilised 37 Neutered Cat Dry', grams: 2000 },
       city: 'Bogotá',
+      postalCode: '110111',
     });
     const prices = await priceResponse.json();
     assert.equal(prices.status, 'current');
-    assert.ok(prices.offers.some((offer) => offer.grams === 2000));
-    assert.ok(prices.offers.every((offer) => !/Meo Crab Reward/i.test(offer.title)));
+    const cheapest = prices.offers.find((offer) => offer.id === prices.cheapestOfferId);
+    assert.ok(cheapest, 'The postal query must return a quoted winner');
+    assert.equal(cheapest.retailer, 'Laia Pets');
+    assert.equal(cheapest.grams, 2000);
+    assert.equal(cheapest.productPriceCop, 137000);
+    assert.equal(cheapest.shippingCop, 15650);
+    assert.equal(cheapest.shippingPostalCode, '110111');
+    assert.equal(cheapest.totalCop, 152650);
+
     const results = page.getByRole('region', { name: 'Resultado de precios' });
     await results.getByText(/Consultado hoy/).waitFor();
     await results.getByRole('heading', { name: /Misma presentación.*2 kg/ }).waitFor();
-    for (const offer of prices.offers) {
-      const card = results.getByRole('article').filter({ hasText: offer.title }).filter({ hasText: offer.retailer }).first();
-      await card.getByText('Total con envío', { exact: true }).waitFor();
-      await card.getByRole('link').waitFor();
-      const productPrice = card.getByText('Producto', { exact: true }).locator('xpath=following-sibling::dd[1]');
-      assert.equal(Number((await productPrice.innerText()).replace(/[^0-9]/g, '')), offer.productPriceCop);
-      if (offer.shippingCop === null) await card.getByText('Por confirmar', { exact: true }).first().waitFor();
-    }
-    if (prices.cheapestOfferId) {
-      const cheapest = prices.offers.find((offer) => offer.id === prices.cheapestOfferId);
-      assert.ok(cheapest && cheapest.shippingCop !== null);
-      await results.getByRole('article').filter({ hasText: cheapest.retailer }).filter({ hasText: 'Más barato hoy' }).first().waitFor();
-    } else {
-      assert.equal(await results.getByText('Más barato hoy', { exact: true }).count(), 0);
+    const winner = results.getByRole('article').filter({ hasText: 'Más barato hoy' });
+    await winner.getByRole('heading', { name: 'Laia Pets' }).waitFor();
+    assert.match(await winner.innerText(), /110111/);
+    for (const [label, expected] of [['Producto', 137000], ['Envío', 15650], ['Total con envío', 152650]]) {
+      const displayed = winner.getByText(label, { exact: true }).locator('xpath=following-sibling::dd[1]');
+      const amount = (await displayed.innerText()).split('\n')[0];
+      assert.equal(Number(amount.replace(/[^0-9]/g, '')), expected);
     }
     await button('Volver al plan').click();
-    console.log('Comparador público de Chrome verificado con', prices.offers.length, 'ofertas de Google Shopping.');
+    console.log('Chrome público: Laia Pets es la más barata para Royal Canin Sterilised 37 de 2 kg, CP 110111, COP 152.650 con envío.');
 
     await button('Ya comió').last().click();
     await button('Progreso').click();
