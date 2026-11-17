@@ -29,9 +29,10 @@ async function verifyAdjustmentAndPrices(page, button, text) {
       return;
     }
     assert.equal(route.request().method(), 'POST');
-    const { city, product } = route.request().postDataJSON();
+    const { city, product, postalCode } = route.request().postDataJSON();
     assert.deepEqual(product, { brand: 'Marca de prueba', name: 'Seco de prueba', grams: 2000 });
     calls++;
+    if (city !== 'Bogotá') assert.equal(postalCode, undefined);
 
     const offer = (id, retailer, grams, productPriceCop, shippingCop) => ({
       id, title: `Marca de prueba Seco de prueba ${grams / 1000} kg`,
@@ -47,6 +48,11 @@ async function verifyAdjustmentAndPrices(page, button, text) {
       offer('c', 'Tienda C', 2000, 82000, null),
       offer('d', 'Tienda D', 4000, 160000, 0),
     ];
+    if (postalCode) {
+      assert.equal(city, 'Bogotá');
+      assert.equal(postalCode, '110111');
+      offers[1] = { ...offer('b', 'Tienda B', 2000, 99000, 15650), shippingPostalCode: postalCode };
+    }
     const response = city === 'Bogotá'
       ? { status: 'current', city, queriedAt: new Date().toISOString(), offers, cheapestOfferId: 'b' }
       : city === 'Medellín'
@@ -93,8 +99,25 @@ async function verifyAdjustmentAndPrices(page, button, text) {
   assert.doesNotMatch(await unknownDelivery.innerText(), /Más barato hoy/);
   await result.getByRole('heading', { name: 'Tienda D' }).waitFor();
 
+  const postalCode = page.getByLabel('Código postal de Bogotá');
+  await postalCode.fill('120000');
+  await button('Consultar precios').click();
+  assert.equal(await result.count(), 0);
+  assert.equal(calls, 1, 'An invalid Bogotá postal code must not submit a lookup');
+
+  await postalCode.fill('110111');
+  await button('Consultar precios').click();
+  const quoted = result.getByRole('article').filter({ has: page.getByRole('heading', { name: 'Tienda B' }) });
+  await quoted.getByText('Menor total confirmado').waitFor();
+  assert.match(await quoted.innerText(), /114[.\s]650/);
+  assert.match(await quoted.innerText(), /15[.\s]650/);
+  assert.match(await quoted.innerText(), /110111/);
+  await postalCode.fill('110851');
+  assert.equal(await result.count(), 0, 'An old quote must not display for a different postal code');
+
   await city.selectOption('Medellín');
-  assert.equal(calls, 1, 'Changing city alone must not spend a lookup');
+  assert.equal(await postalCode.count(), 0);
+  assert.equal(calls, 2, 'Changing city alone must not spend a lookup');
   await button('Consultar precios').click();
   await result.getByText(/última consulta/i).first().waitFor();
   assert.equal(await result.getByText('Más barato hoy', { exact: true }).count(), 0);
@@ -102,7 +125,7 @@ async function verifyAdjustmentAndPrices(page, button, text) {
   await city.selectOption('Cali');
   await button('Consultar precios').click();
   await result.getByText(/agotaron las consultas/i).waitFor();
-  assert.equal(calls, 3);
+  assert.equal(calls, 4);
   assert.equal(await result.getByText('Más barato hoy', { exact: true }).count(), 0);
   await button('Volver al plan').click();
   await text('Ración diaria: 54 g').waitFor();

@@ -5,6 +5,7 @@ import { CONFIRMED_FOOD_PRESENTATIONS } from '../data/foodPresentations';
 import type { FoodItem } from '../types';
 import {
   colombiaPriceDay,
+  isBogotaPostalCode,
   LIVE_PRICE_CITIES,
   LIVE_PRICE_MAX_GRAMS,
   LIVE_PRICE_MIN_GRAMS,
@@ -63,6 +64,10 @@ function hasOfferDetails(offer: LivePriceOffer) {
         offer.totalCop === offer.productPriceCop + offer.shippingCop);
 }
 
+function matchesShippingScope(offer: LivePriceOffer, postalCode?: string) {
+  return (offer.shippingPostalCode ?? undefined) === postalCode;
+}
+
 async function lookupPrices(body: LivePriceRequest, signal: AbortSignal): Promise<LivePriceResponse> {
   const endpoint = import.meta.env.VITE_PRICE_API_URL?.trim() ||
     (import.meta.env.DEV ? '/api/live-prices' : '');
@@ -88,31 +93,36 @@ function PriceOfferCard({
   offer,
   isEs,
   formatKg,
-  isWinner = false,
+  postalCode,
+  winnerLabel,
 }: {
   offer: LivePriceOffer;
   isEs: boolean;
   formatKg: (grams: number) => string;
-  isWinner?: boolean;
+  postalCode?: string;
+  winnerLabel?: string;
 }) {
   const link = storeUrl(offer.productUrl);
   const isShoppingLink = link && /(^|\.)google\.(com|com\.co)$/.test(new URL(link).hostname);
-  const shipping = offer.shippingCop === null
+  const quotedForSelection = matchesShippingScope(offer, postalCode);
+  const shippingCop = quotedForSelection ? offer.shippingCop : null;
+  const totalCop = quotedForSelection ? offer.totalCop : null;
+  const shipping = shippingCop === null
     ? (isEs ? 'Por confirmar' : 'To confirm')
-    : offer.shippingCop === 0
+    : shippingCop === 0
     ? (isEs ? 'Incluido' : 'Included')
-    : formatCOP(offer.shippingCop, true);
+    : formatCOP(shippingCop, true);
 
   return (
     <article className={
-      isWinner
+      winnerLabel
         ? 'rounded-2xl border border-[#0B5D2E55] bg-[var(--surface-inner)] p-4'
         : 'rounded-2xl border border-[var(--border-color)] bg-[var(--surface-card)] p-4'
     }>
-      {isWinner && (
+      {winnerLabel && (
         <p className="mb-2 flex items-center gap-1.5 text-xs font-black text-[#0B5D2E] dark:text-green-300">
           <Trophy aria-hidden="true" className="size-4" />
-          {isEs ? 'Más barato hoy' : 'Cheapest today'}
+          {winnerLabel}
         </p>
       )}
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
@@ -129,10 +139,17 @@ function PriceOfferCard({
         <dt>{isEs ? 'Producto' : 'Product'}</dt>
         <dd className="text-right tabular-nums">{formatCOP(offer.productPriceCop, true)}</dd>
         <dt>{isEs ? 'Envío' : 'Delivery'}</dt>
-        <dd className="text-right tabular-nums">{shipping}</dd>
+        <dd className="text-right tabular-nums">
+          {shipping}
+          {postalCode && shippingCop !== null && (
+            <span className="block text-[11px] text-[var(--text-secondary)]">
+              {isEs ? `Cotizado para ${postalCode}` : `Quoted for ${postalCode}`}
+            </span>
+          )}
+        </dd>
         <dt className="font-bold">{isEs ? 'Total con envío' : 'Total with delivery'}</dt>
         <dd className="text-right font-black tabular-nums text-[var(--text-primary)]">
-          {offer.totalCop === null ? (isEs ? 'Por confirmar' : 'To confirm') : formatCOP(offer.totalCop, true)}
+          {totalCop === null ? (isEs ? 'Por confirmar' : 'To confirm') : formatCOP(totalCop, true)}
         </dd>
         <dt>{isEs ? 'Producto por kilo' : 'Product per kilo'}</dt>
         <dd className="text-right tabular-nums">{formatCOP(offer.pricePerKgCop, true)} / kg</dd>
@@ -160,11 +177,14 @@ export function PriceComparisonView({ food, packageKg, language = 'es', backTo =
   ].filter(isPackageWeight))].sort((a, b) => a - b);
   const [packageInput, setPackageInput] = useState(() => initialKg?.toString() ?? '');
   const [inputError, setInputError] = useState(false);
+  const [postalCodeInput, setPostalCodeInput] = useState('');
+  const [postalCodeError, setPostalCodeError] = useState(false);
   const [lookup, setLookup] = useState<Lookup>({ state: 'idle' });
   const [today, setToday] = useState(colombiaPriceDay);
   const controller = useRef<AbortController>(null);
   const grams = parsePackageGrams(packageInput);
-  const selection = JSON.stringify([food.id, city, grams]);
+  const postalCode = city === 'Bogotá' ? postalCodeInput.trim() || undefined : undefined;
+  const selection = JSON.stringify([food.id, city, grams, postalCode]);
   const activeLookup = lookup.state !== 'idle' && lookup.key === selection ? lookup : undefined;
   const loading = activeLookup?.state === 'loading';
   const result = activeLookup?.state === 'result' ? activeLookup.result : undefined;
@@ -201,11 +221,15 @@ export function PriceComparisonView({ food, packageKg, language = 'es', backTo =
       setInputError(true);
       return;
     }
+    if (postalCode && !isBogotaPostalCode(postalCode)) {
+      setPostalCodeError(true);
+      return;
+    }
 
     controller.current?.abort();
     const request = new AbortController();
     controller.current = request;
-    const timeout = window.setTimeout(() => request.abort(), 20000);
+    const timeout = window.setTimeout(() => request.abort(), postalCode ? 35000 : 20000);
     setLookup({ state: 'loading', key: selection });
     const showResult = (nextResult: LivePriceResponse) => {
       if (controller.current !== request) return;
@@ -218,6 +242,7 @@ export function PriceComparisonView({ food, packageKg, language = 'es', backTo =
     try {
       const requestBody: LivePriceRequest = {
         city,
+        ...(postalCode ? { postalCode } : {}),
         product: {
           brand: food.brand,
           name: food.name,
@@ -241,10 +266,19 @@ export function PriceComparisonView({ food, packageKg, language = 'es', backTo =
   const exactOffers = result?.offers.filter((offer) => offer.grams === grams) ?? [];
   const otherSizes = (result?.offers.filter((offer) => offer.grams !== grams) ?? [])
     .sort((a, b) => a.pricePerKgCop - b.pricePerKgCop);
-  const winner = current ? exactOffers.find((offer) => offer.id === result?.cheapestOfferId && offer.totalCop !== null) : undefined;
+  const scopedTotal = (offer: LivePriceOffer) => matchesShippingScope(offer, postalCode) ? offer.totalCop : null;
+  const winner = current
+    ? exactOffers.find((offer) => offer.id === result?.cheapestOfferId && scopedTotal(offer) !== null)
+    : undefined;
+  const winnerTotal = winner?.totalCop;
+  const unresolvedLowerPrice = postalCode && typeof winnerTotal === 'number' &&
+    exactOffers.some((offer) => scopedTotal(offer) === null && offer.productPriceCop < winnerTotal);
+  const winnerLabel = unresolvedLowerPrice
+    ? (isEs ? 'Menor total confirmado' : 'Lowest confirmed total')
+    : (isEs ? 'Más barato hoy' : 'Cheapest today');
   const orderedExactOffers = exactOffers
     .filter((offer) => offer.id !== winner?.id)
-    .sort((a, b) => (a.totalCop ?? Infinity) - (b.totalCop ?? Infinity) || a.productPriceCop - b.productPriceCop);
+    .sort((a, b) => (scopedTotal(a) ?? Infinity) - (scopedTotal(b) ?? Infinity) || a.productPriceCop - b.productPriceCop);
 
   const unavailableMessages = {
     not_configured: isEs ? 'La consulta en vivo todavía no está habilitada.' : 'Live price lookup is not available yet.',
@@ -297,7 +331,10 @@ export function PriceComparisonView({ food, packageKg, language = 'es', backTo =
                 <MapPin aria-hidden="true" className="size-3.5" />
                 {isEs ? 'Ciudad' : 'City'}
               </span>
-              <select value={city} onChange={(event) => setCity(event.target.value)}
+              <select value={city} onChange={(event) => {
+                setPostalCodeError(false);
+                setCity(event.target.value);
+              }}
                 disabled={loading}
                 className="min-h-11 w-full min-w-0 rounded-xl border border-[var(--border-color)] bg-[var(--surface-subtle)] px-2.5 text-sm font-semibold focus-visible:outline-2">
                 {LIVE_PRICE_CITIES.map((option) => <option key={option} value={option}>{option}</option>)}
@@ -342,6 +379,35 @@ export function PriceComparisonView({ food, packageKg, language = 'es', backTo =
                 : `Enter a weight between ${formatKg(LIVE_PRICE_MIN_GRAMS)} and ${formatKg(LIVE_PRICE_MAX_GRAMS)} kg.`}
             </p>
           )}
+          {city === 'Bogotá' && (
+            <div className="space-y-1.5">
+              <div className="flex items-baseline gap-2">
+                <label htmlFor="price-postal-code" className="text-xs font-bold text-[var(--text-primary)]">
+                  {isEs ? 'Código postal de Bogotá' : 'Bogotá postal code'}
+                </label>
+                <span className="text-xs text-[var(--text-secondary)]">{isEs ? 'Opcional' : 'Optional'}</span>
+              </div>
+              <input id="price-postal-code" type="text" inputMode="numeric" autoComplete="off"
+                value={postalCodeInput}
+                onChange={(event) => {
+                  setPostalCodeInput(event.target.value);
+                  setPostalCodeError(false);
+                }}
+                disabled={loading}
+                aria-invalid={postalCodeError || undefined}
+                aria-describedby={postalCodeError ? 'price-postal-error price-postal-help' : 'price-postal-help'}
+                className="min-h-11 w-full rounded-xl border border-[var(--border-color)] bg-[var(--surface-subtle)] px-2.5 text-sm font-semibold tabular-nums focus-visible:outline-2"
+              />
+              {postalCodeError && (
+                <p id="price-postal-error" role="alert" className="text-xs font-bold text-red-800 dark:text-red-300">
+                  {isEs ? 'Escribe seis dígitos que empiecen por 11.' : 'Enter six digits starting with 11.'}
+                </p>
+              )}
+              <p id="price-postal-help" className="text-xs text-[var(--text-secondary)]">
+                {isEs ? 'Sirve para cotizar el envío en las tiendas compatibles.' : 'Use it for delivery quotes from participating stores.'}
+              </p>
+            </div>
+          )}
           <button type="submit" disabled={loading || unconfigured}
             className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#0B5D2E] px-4 text-sm font-extrabold text-white focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-55">
             {loading
@@ -363,6 +429,7 @@ export function PriceComparisonView({ food, packageKg, language = 'es', backTo =
                 <Clock3 aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />
                 <span>{current ? (isEs ? 'Consultado hoy' : 'Checked today') : (isEs ? 'Última consulta' : 'Last lookup')}{' · '}
                   <time dateTime={result.queriedAt ?? undefined}>{consulted}</time>{' · '}{isEs ? 'hora de Colombia' : 'Colombia time'}
+                  {postalCode && (isEs ? ` · CP ${postalCode}` : ` · Postal code ${postalCode}`)}
                 </span>
               </p>
             )}
@@ -389,8 +456,8 @@ export function PriceComparisonView({ food, packageKg, language = 'es', backTo =
                 </p>
               )}
               <div className="mt-2 space-y-2">
-                {winner && <PriceOfferCard offer={winner} isEs={isEs} formatKg={formatKg} isWinner />}
-                {orderedExactOffers.map((offer) => <PriceOfferCard key={offer.id} offer={offer} isEs={isEs} formatKg={formatKg} />)}
+                {winner && <PriceOfferCard offer={winner} isEs={isEs} formatKg={formatKg} postalCode={postalCode} winnerLabel={winnerLabel} />}
+                {orderedExactOffers.map((offer) => <PriceOfferCard key={offer.id} offer={offer} isEs={isEs} formatKg={formatKg} postalCode={postalCode} />)}
               </div>
             </div>
           )}
@@ -404,7 +471,7 @@ export function PriceComparisonView({ food, packageKg, language = 'es', backTo =
                 {isEs ? 'Ordenados por precio del producto por kilo.' : 'Sorted by product price per kg.'}
               </p>
               <div className="space-y-2">
-                {otherSizes.map((offer) => <PriceOfferCard key={offer.id} offer={offer} isEs={isEs} formatKg={formatKg} />)}
+                {otherSizes.map((offer) => <PriceOfferCard key={offer.id} offer={offer} isEs={isEs} formatKg={formatKg} postalCode={postalCode} />)}
               </div>
             </div>
           )}
