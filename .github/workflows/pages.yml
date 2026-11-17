@@ -28,15 +28,19 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run lint
       - run: bun run test
-      - name: Install browser test runner
-        run: npm install --prefix "$RUNNER_TEMP/racion-browser" --no-save --package-lock=false --no-audit --no-fund playwright-core@1.62.1
+      - name: Install browser and Worker test runners
+        run: npm install --prefix "$RUNNER_TEMP/racion-test-tools" --no-save --package-lock=false --no-audit --no-fund playwright-core@1.62.1 miniflare@4.20260730.0
+      - name: Verify Worker and persistent quota ledger
+        run: |
+          export MINIFLARE_PATH="$RUNNER_TEMP/racion-test-tools/node_modules/miniflare"
+          node .github/scripts/verify-price-worker.cjs
       - name: Verify adjustment and prices with controlled responses
         env:
           PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
           VITE_PRICE_API_URL: https://prices.example.invalid/api/live-prices
         run: |
           fixture_dist="$RUNNER_TEMP/racion-price-fixture"
-          export PLAYWRIGHT_PATH="$RUNNER_TEMP/racion-browser/node_modules/playwright-core"
+          export PLAYWRIGHT_PATH="$RUNNER_TEMP/racion-test-tools/node_modules/playwright-core"
           bun run build --outDir "$fixture_dist" --emptyOutDir
           bun run preview --outDir "$fixture_dist" --host 127.0.0.1 --port 4196 --strictPort &
           preview_pid=$!
