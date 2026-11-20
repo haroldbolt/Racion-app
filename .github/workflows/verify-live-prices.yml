@@ -20,4 +20,4 @@ jobs:
       - name: Comprueba ofertas reales y persistencia del diario en Chrome
         run: |
           export PLAYWRIGHT_PATH="$RUNNER_TEMP/racion-browser/node_modules/playwright-core"
-          node .github/scripts/verify-live-pages.cjs https://haroldbolt.github.io/Racion-app/
+          node .github/scripts/verify-live-pages.cjs https://racion-app.pages.dev/
