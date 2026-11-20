@@ -22,7 +22,7 @@ bun run preview
 
 ## Publicar la beta
 
-Cada cambio en `main` actualiza la beta mediante GitHub Actions. [Abrir Ración App](https://haroldbolt.github.io/Racion-app/).
+Cada cambio en `main` actualiza la beta en Cloudflare Pages. [Abrir Ración App](https://racion-app.pages.dev/).
 
 Para publicarla en otro sitio, sirve `dist/` como contenido estático en un dominio con HTTPS. El diario y el catálogo funcionan en el navegador. Si tu alojamiento usa el servidor incluido, ejecuta `NODE_ENV=production bun run start` después de compilar. El puerto por defecto es 3000 y se puede cambiar con la variable de entorno `PORT`.
 

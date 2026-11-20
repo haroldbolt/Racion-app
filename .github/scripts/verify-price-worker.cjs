@@ -6,6 +6,7 @@ const { build } = require('esbuild');
 const { createFetchMock, Miniflare } = require(process.env.MINIFLARE_PATH || 'miniflare');
 
 const publicOrigin = 'https://haroldbolt.github.io';
+const brandedOrigin = 'https://racion-app.pages.dev';
 const endpoint = 'http://localhost/api/live-prices';
 const fixtureKey = 'racion-test-key';
 const request = {
@@ -36,7 +37,12 @@ async function verifyWorkerRuntime() {
     assert.ok(date, 'Missing Worker compatibility date');
     assert.match(config, /new_sqlite_classes\s*=\s*\["PriceSearchBudget"\]/);
     assert.match(config, /name\s*=\s*"LIVE_PRICE_BUDGET"\s*\nclass_name\s*=\s*"PriceSearchBudget"/);
-    assert.match(config, /ALLOWED_ORIGINS\s*=\s*"https:\/\/haroldbolt\.github\.io"/);
+    const allowedOrigins = config.match(/^ALLOWED_ORIGINS\s*=\s*"([^"]+)"/m)?.[1];
+    assert.ok(allowedOrigins, 'Missing Worker allowed origins');
+    const configuredOrigins = allowedOrigins.split(',').map((origin) => origin.trim());
+    for (const origin of [publicOrigin, brandedOrigin]) {
+      assert.ok(configuredOrigins.includes(origin), `Missing production origin: ${origin}`);
+    }
     const bundle = await build({
       entryPoints: ['workers/live-prices/index.ts'],
       write: false,
@@ -54,7 +60,7 @@ async function verifyWorkerRuntime() {
         script: bundle.outputFiles[0].text,
         compatibilityDate: date,
         cf: false,
-        bindings: { ALLOWED_ORIGINS: publicOrigin, ...(apiKey ? { SERPAPI_API_KEY: apiKey } : {}) },
+        bindings: { ALLOWED_ORIGINS: allowedOrigins, ...(apiKey ? { SERPAPI_API_KEY: apiKey } : {}) },
         durableObjects: { LIVE_PRICE_BUDGET: { className: 'PriceSearchBudget', useSQLite: true } },
         durableObjectsPersist: path.join(directory, 'data'),
         fetchMock,
@@ -62,17 +68,19 @@ async function verifyWorkerRuntime() {
     };
 
     worker = start(createFetchMock());
-    const preflight = await worker.dispatchFetch(endpoint, {
-      method: 'OPTIONS',
-      headers: {
-        origin: publicOrigin,
-        'access-control-request-method': 'POST',
-        'access-control-request-headers': 'content-type',
-      },
-    });
-    assert.equal(preflight.status, 204);
-    assert.equal(preflight.headers.get('access-control-allow-origin'), publicOrigin);
-    assert.match(preflight.headers.get('access-control-allow-methods'), /POST/);
+    for (const origin of [publicOrigin, brandedOrigin]) {
+      const preflight = await worker.dispatchFetch(endpoint, {
+        method: 'OPTIONS',
+        headers: {
+          origin,
+          'access-control-request-method': 'POST',
+          'access-control-request-headers': 'content-type',
+        },
+      });
+      assert.equal(preflight.status, 204);
+      assert.equal(preflight.headers.get('access-control-allow-origin'), origin);
+      assert.match(preflight.headers.get('access-control-allow-methods'), /POST/);
+    }
     const unconfigured = await post(worker);
     assert.equal(unconfigured.status, 200);
     assert.equal(unconfigured.headers.get('cache-control'), 'no-store');
@@ -126,7 +134,11 @@ async function verifyWorkerRuntime() {
     const cachedRequest = inputs.find((query) => query.city === current.city);
     assert.ok(cachedRequest);
     assert.deepEqual(await (await post(worker, cachedRequest)).json(), current);
-    console.log('Worker local: origen autorizado, secreto ausente, última consulta reservada atómicamente y caché SQLite tras reiniciar.');
+    const brandedResponse = await post(worker, cachedRequest, brandedOrigin);
+    assert.equal(brandedResponse.status, 200);
+    assert.equal(brandedResponse.headers.get('access-control-allow-origin'), brandedOrigin);
+    assert.deepEqual(await brandedResponse.json(), current);
+    console.log('Worker local: ambos orígenes de producción autorizados, secreto ausente, última consulta reservada atómicamente y caché SQLite tras reiniciar.');
   } finally {
     try {
       await worker?.dispose();
