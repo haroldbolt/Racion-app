@@ -16,6 +16,7 @@ export interface OfficialFormula {
   url: string;
   verifiedOn: string;
   complete?: boolean;
+  ingredients?: string;
   feedingGuide?: FoodItem['feedingGuide'];
   registration?: string;
   sourceName?: string;
@@ -153,6 +154,7 @@ function withFormula(food: FoodItem, row:StoreManufacturerFood): FoodItem {
   return {...result, fichaNutricional:data, dataSource:source.name,
     declaredIcaRegistration:formula.registration || food.declaredIcaRegistration,
     feedingGuide:food.feedingGuide ?? formula.feedingGuide,
+    ingredientsSummary:formula.ingredients ?? food.ingredientsSummary,
     labelStatus:onlyOfficial ? 'verified_manufacturer' : 'unconfirmed',
     nutritionalUse:formula.complete ? 'complete' : food.nutritionalUse,
     isCompleteAndBalanced:formula.complete || food.isCompleteAndBalanced };

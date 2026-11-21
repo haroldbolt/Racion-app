@@ -63,7 +63,12 @@ async function verify() {
     assert.ok(money,'3 kg must have a real offer in COP');
     const price = Number(money[1].replace(/\D/g,''));
     assert.ok(price > 0);
-    assert.deepEqual([...sources].sort(),['Italcol','Laia Pets']);
+    assert.ok(sources.has('Laia Pets'), 'Expected a live package price from Laia Pets');
+    const expectedSheet = 'https://www.italcolmascotas.com/agility-gold-grandes-adultos-2/';
+    for (const [field] of qualifiers) {
+      const declaration = result.getByText(field, {exact:true}).locator('..');
+      assert.equal(await declaration.locator('details a').first().getAttribute('href'), expectedSheet);
+    }
     await chosen.click();
     await button('Contrastar con mi etiqueta').click();
 
