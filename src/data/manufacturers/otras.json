@@ -1700,7 +1700,14 @@
       2.5,
       12.0
     ],
-    "complete": true
+    "complete": true,
+    "kcalKg": 3850,
+    "kcalSourceUrl": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+    "kcalSourceName": "Veterinaria Especializada S.A.S. – Catálogo colombiano 2026",
+    "packageSources": {
+      "2.5": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+      "12": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1"
+    }
   },
   {
     "brand": "Fórmula Natural",
@@ -1719,9 +1726,18 @@
     "packagesKg": [
       1.0,
       2.5,
+      7,
       10.1
     ],
-    "complete": true
+    "complete": true,
+    "kcalKg": 3850,
+    "kcalSourceUrl": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+    "kcalSourceName": "Veterinaria Especializada S.A.S. – Catálogo colombiano 2026",
+    "packageSources": {
+      "1": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+      "2.5": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+      "7": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1"
+    }
   },
   {
     "brand": "Fórmula Natural",
@@ -1730,12 +1746,24 @@
     "handles": [
       "alimento-seco-para-perro-adulo-formula-natural-light-med-gra-pollo"
     ],
-    "url": "https://adimax.com.br/wp-content/uploads/2021/09/cat-formula-natural.pdf",
+    "url": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
     "packagesKg": [
       2.5,
       12
     ],
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "protein": 30,
+    "fat": 12,
+    "fiber": 4.5,
+    "sourceName": "Veterinaria Especializada S.A.S. – Catálogo colombiano 2026",
+    "kcalKg": 3620,
+    "kcalSourceUrl": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+    "kcalSourceName": "Veterinaria Especializada S.A.S. – Catálogo colombiano 2026",
+    "complete": true,
+    "packageSources": {
+      "2.5": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+      "12": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1"
+    }
   },
   {
     "brand": "Fórmula Natural",
@@ -1744,13 +1772,26 @@
     "handles": [
       "alimento-seco-para-perro-adulo-formula-natural-light-min-peq-pollo"
     ],
-    "url": "https://adimax.com.br/wp-content/uploads/2021/09/cat-formula-natural.pdf",
+    "url": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
     "packagesKg": [
       1,
       2.5,
       7
     ],
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "protein": 30,
+    "fat": 12,
+    "fiber": 4.5,
+    "sourceName": "Veterinaria Especializada S.A.S. – Catálogo colombiano 2026",
+    "kcalKg": 3620,
+    "kcalSourceUrl": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+    "kcalSourceName": "Veterinaria Especializada S.A.S. – Catálogo colombiano 2026",
+    "complete": true,
+    "packageSources": {
+      "1": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+      "2.5": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+      "7": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1"
+    }
   },
   {
     "brand": "Fórmula Natural",
@@ -1770,7 +1811,14 @@
       2.5,
       12.0
     ],
-    "complete": true
+    "complete": true,
+    "kcalKg": 4050,
+    "kcalSourceUrl": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+    "kcalSourceName": "Veterinaria Especializada S.A.S. – Catálogo colombiano 2026",
+    "packageSources": {
+      "2.5": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+      "12": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1"
+    }
   },
   {
     "brand": "Fórmula Natural",
@@ -1789,9 +1837,18 @@
     "packagesKg": [
       1.0,
       2.5,
+      7,
       10.1
     ],
-    "complete": true
+    "complete": true,
+    "kcalKg": 4050,
+    "kcalSourceUrl": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+    "kcalSourceName": "Veterinaria Especializada S.A.S. – Catálogo colombiano 2026",
+    "packageSources": {
+      "1": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+      "2.5": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+      "7": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1"
+    }
   },
   {
     "brand": "Fórmula Natural",
@@ -1812,7 +1869,15 @@
       2.5,
       12.0
     ],
-    "complete": true
+    "complete": true,
+    "kcalKg": 4050,
+    "kcalSourceUrl": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+    "kcalSourceName": "Veterinaria Especializada S.A.S. – Catálogo colombiano 2026",
+    "packageSources": {
+      "1": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+      "2.5": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+      "12": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1"
+    }
   },
   {
     "brand": "Fórmula Natural",
@@ -1832,7 +1897,14 @@
       2.5,
       12.0
     ],
-    "complete": true
+    "complete": true,
+    "kcalKg": 3950,
+    "kcalSourceUrl": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+    "kcalSourceName": "Veterinaria Especializada S.A.S. – Catálogo colombiano 2026",
+    "packageSources": {
+      "2.5": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+      "12": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1"
+    }
   },
   {
     "brand": "Fórmula Natural",
@@ -1853,7 +1925,15 @@
       2.5,
       12.0
     ],
-    "complete": true
+    "complete": true,
+    "kcalKg": 3950,
+    "kcalSourceUrl": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+    "kcalSourceName": "Veterinaria Especializada S.A.S. – Catálogo colombiano 2026",
+    "packageSources": {
+      "1": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+      "2.5": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+      "12": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1"
+    }
   },
   {
     "brand": "Fórmula Natural",
@@ -1874,7 +1954,15 @@
       2.5,
       10.1
     ],
-    "complete": true
+    "complete": true,
+    "kcalKg": 3950,
+    "kcalSourceUrl": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+    "kcalSourceName": "Veterinaria Especializada S.A.S. – Catálogo colombiano 2026",
+    "packageSources": {
+      "1": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+      "2.5": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1",
+      "10.1": "https://veterinariaespecializada.com/wp-content/uploads/2026/02/FN-FreshMeat2026.pdf#page=1"
+    }
   },
   {
     "brand": "Max",
