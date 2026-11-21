@@ -84,7 +84,21 @@ export interface NutritionDatasheet {
   notasRevision?: string;
 }
 
+export interface FoodPriceBasis {
+  packageKg: number;
+  priceCop: number;
+  source: 'online' | 'manual' | 'receipt';
+  observedAt: string;
+  selectedAt?: string;
+  storeName?: string;
+  sourceUrl?: string;
+  shippingCop?: number | null;
+  includeShipping?: boolean;
+  postalCode?: string;
+}
+
 export interface FoodItem {
+  sourceFoodId?: string;
   id: string;
   brand: string;
   name: string;
@@ -109,6 +123,8 @@ export interface FoodItem {
   priceApproxCop?: number; // Price in Colombian Pesos (COP)
   bagSizeKg?: number;
   availableSizesKg?: number[]; // Confirmed real commercial package sizes in kg
+  packagePrices?: FoodPriceBasis[];
+  priceBasis?: FoodPriceBasis;
   imageUrl?: string;
   buyUrl?: string;
   // Label & compatibility validation fields
@@ -163,10 +179,14 @@ export interface HydrationDailyState {
 export interface FoodCostEntry {
   id: string;
   petId: string;
+  foodId?: string;
+  sourceFoodId?: string;
+  foodSourceUrl?: string;
+  componentRole?: 'dry' | 'wet' | 'main';
   date: string; // YYYY-MM-DD
   foodBrand: string;
   foodName: string;
-  foodType: 'dry' | 'wet' | 'mixed' | 'snack';
+  foodType: 'dry' | 'wet' | 'mixed' | 'snack' | 'barf';
   bagSizeKg: number; // e.g. 15 kg
   pricePaidCop: number; // Price in Colombian Pesos (COP), e.g. 280000
   costPerKgCop: number; // calculated e.g. pricePaidCop / bagSizeKg

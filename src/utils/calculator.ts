@@ -2,6 +2,7 @@ import { Pet, FoodItem, Goal, FeedingPlan, BreedSize } from '../types';
 import { findBreedProfile, getIdealWeightForBreedAndSex, BreedProfile } from '../data/breeds';
 import { distributeWholeGrams, getFoodKcalPerKg } from './mealPortions';
 import { localDateKey } from './localDate';
+import { withPlanCosts } from './foodCosts';
 
 export interface CalculationInputs {
   pet: Pet;
@@ -372,8 +373,9 @@ export function calculateFeedingPlan(inputs: CalculationInputs): CalculationResu
     const vetGramsPerMeal = pet.vetGuideline.prescribedGramsPerMeal;
     const vetGramsPerDay = vetGramsPerMeal * vetMeals;
     const vetMer = pet.vetGuideline.prescribedKcal;
-    const bagToUseKg = dryFood?.name === pet.vetGuideline.prescribedFoodName
-      ? bagWeightKg || dryFood.bagSizeKg || 0
+    const prescribedFood = foodType === 'wet' ? wetFood : dryFood;
+    const bagToUseKg = prescribedFood?.name === pet.vetGuideline.prescribedFoodName
+      ? bagWeightKg || prescribedFood.bagSizeKg || 0
       : 0;
     let bagDaysRemaining: number | undefined;
     let reorderDate: string | undefined;
@@ -490,10 +492,12 @@ export function calculateFeedingPlan(inputs: CalculationInputs): CalculationResu
   let bagDaysRemaining: number | undefined;
   let reorderDate: string | undefined;
 
-  const bagToUseKg = bagWeightKg || dryFood?.bagSizeKg;
-  if (rationConfirmed && dryGramsPerDay > 0 && bagToUseKg && bagToUseKg > 0) {
+  const mainFood = foodType === 'wet' ? wetFood : dryFood;
+  const mainGramsPerDay = foodType === 'wet' ? wetGramsPerDay : dryGramsPerDay;
+  const bagToUseKg = bagWeightKg || mainFood?.bagSizeKg;
+  if (rationConfirmed && mainGramsPerDay > 0 && bagToUseKg && bagToUseKg > 0) {
     const totalBagGrams = bagToUseKg * 1000;
-    const days = Math.floor(totalBagGrams / dryGramsPerDay);
+    const days = Math.floor(totalBagGrams / mainGramsPerDay);
     bagDaysRemaining = days;
 
     const alertDays = Math.max(3, days - 5);
@@ -546,7 +550,7 @@ export function buildFeedingPlan(inputs: CalculationInputs, result: CalculationR
   const chosenTimes = mealTimes.length === mealsPerDay ? mealTimes : defaultMealTimes(mealsPerDay);
   const mainFood = foodType === 'dry' ? dryFood : (foodType === 'wet' ? wetFood : dryFood);
 
-  return {
+  return withPlanCosts({
     id: 'plan_' + Date.now(),
     petId: pet.id,
     createdAt: new Date().toISOString(),
@@ -582,12 +586,12 @@ export function buildFeedingPlan(inputs: CalculationInputs, result: CalculationR
     treatsCountToday: 0,
     manualAdjustmentPct: inputs.manualAdjustmentPct || 0,
     manualAdjustmentReason: inputs.manualAdjustmentReason,
-    bagWeightKg: inputs.bagWeightKg || dryFood?.bagSizeKg,
+    bagWeightKg: inputs.bagWeightKg || mainFood?.bagSizeKg,
     bagDaysRemaining: result.bagDaysRemaining,
     isVetLocked: Boolean(vet),
     rationConfirmed: result.rationConfirmed,
     scheduleConfigured: scheduleConfigured ?? false,
-  };
+  });
 }
 
 export function defaultMealTimes(meals: number): string[] {

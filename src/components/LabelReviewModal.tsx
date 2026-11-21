@@ -11,6 +11,7 @@ import type {
 import { getEffectiveNutrientField } from '../utils/mealNutrition';
 import { StorageService } from '../utils/storage';
 import { getConfirmedPresentations } from '../data/foodPresentations';
+import { selectFoodPackage } from '../services/onlineFoodCatalog';
 
 interface LabelReviewModalProps {
   isOpen: boolean;
@@ -108,6 +109,12 @@ const LabelForm: React.FC<LabelFormProps> = ({
       setError(isEs ? 'Ingresa la marca y el nombre de la fórmula.' : 'Enter the brand and formula name.');
       return;
     }
+    const normalizeIdentity = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase().replace(/[^a-z0-9+]+/g, ' ').trim();
+    const identityUnchanged = !currentFood || (
+      normalizeIdentity(brand) === normalizeIdentity(currentFood.brand) &&
+      normalizeIdentity(name) === normalizeIdentity(currentFood.name)
+    );
 
     const kcal = readDecimal(data, 'energy');
     const bagSizeKg = readDecimal(data, 'bag');
@@ -124,8 +131,8 @@ const LabelForm: React.FC<LabelFormProps> = ({
     const ficha: NutritionDatasheet = {
       coincidenciaEstado: 'pendiente',
       fuenteNombre: isEs ? `${source} · ingresada por ti` : 'Label values entered by you',
-      fuenteUrl: currentFood?.fichaNutricional?.fuenteUrl,
-      fechaConsulta: currentFood?.fichaNutricional?.fechaConsulta,
+      fuenteUrl: identityUnchanged ? currentFood?.fichaNutricional?.fuenteUrl : undefined,
+      fechaConsulta: identityUnchanged ? currentFood?.fichaNutricional?.fechaConsulta : undefined,
     };
     if (kcal !== undefined) {
       ficha.kcalPerKg = { valor: kcal, unidadOriginal: 'kcal/kg', baseMedicion: 'tal_como_se_vende', calificador: 'tipico' };
@@ -161,6 +168,8 @@ const LabelForm: React.FC<LabelFormProps> = ({
     const declaresGrowth = data.has('growth');
     const updatedFood: FoodItem = {
       id: inLibrary ? currentFood.id : `custom_${crypto.randomUUID()}`,
+      sourceFoodId: identityUnchanged ? currentFood?.sourceFoodId ||
+        (currentFood?.id.startsWith('online_') ? currentFood.id : undefined) : undefined,
       brand,
       name,
       species: currentFood?.species ?? pet.species,
@@ -176,15 +185,17 @@ const LabelForm: React.FC<LabelFormProps> = ({
       ashPct: asSold('cenizas'),
       carbsPct: asSold('carbohidratos'),
       country: currentFood?.country ?? '',
-      barcode: bagSizeKg === currentFood?.bagSizeKg ? currentFood?.barcode : undefined,
+      barcode: identityUnchanged && bagSizeKg === currentFood?.bagSizeKg ? currentFood?.barcode : undefined,
       bagSizeKg,
       availableSizesKg: getConfirmedPresentations({
-        id: currentFood?.id,
-        availableSizesKg: getConfirmedPresentations(currentFood) ?? [],
+        id: identityUnchanged ? currentFood?.id : undefined,
+        availableSizesKg: identityUnchanged ? getConfirmedPresentations(currentFood) ?? [] : [],
         bagSizeKg,
       }) ?? undefined,
-      imageUrl: currentFood?.imageUrl,
-      buyUrl: currentFood?.buyUrl,
+      packagePrices: identityUnchanged ? currentFood?.packagePrices : undefined,
+      priceBasis: identityUnchanged && currentFood ? selectFoodPackage(currentFood, bagSizeKg).priceBasis : undefined,
+      imageUrl: identityUnchanged ? currentFood?.imageUrl : undefined,
+      buyUrl: identityUnchanged ? currentFood?.buyUrl : undefined,
       labelStatus: hasNutrition ? 'user_confirmed_label' : 'unconfirmed',
       labelPhotoUrl: labelPhotoUrl || undefined,
       isCompleteAndBalanced: data.has('complete') || undefined,

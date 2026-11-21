@@ -6,21 +6,16 @@ import {
   FeedingPlan,
   NutrientQualifier,
 } from '../types';
-import { PET_FOODS_DATABASE } from '../data/foods';
 import { TOXIC_FOODS } from '../data/toxicFoods';
 import { StorageService } from '../utils/storage';
-import { formatRation } from '../utils/i18n';
+import { formatCOP, formatRation } from '../utils/i18n';
 import { FoodCostTracker } from '../components/FoodCostTracker';
 import { FoodLabelComposition } from '../components/FoodLabelComposition';
 import { LabelReviewModal } from '../components/LabelReviewModal';
 import { OnlineFoodSearch } from '../components/OnlineFoodSearch';
-import { mergeFoodCatalog } from '../data/foodPresentations';
+import { getConfirmedPresentations } from '../data/foodPresentations';
+import { selectFoodPackage } from '../services/onlineFoodCatalog';
 import { UnifiedFoodSearchModal } from '../components/UnifiedFoodSearchModal';
-import {
-  loadShopifyCatalog,
-  getCatalogStats,
-  shopifyProductToFoodItem,
-} from '../services/shopifyCatalogService';
 import { calculateFoodPortionNutrients, getEffectiveNutrientField } from '../utils/mealNutrition';
 import { getFoodKcalPerKg } from '../utils/mealPortions';
 import {
@@ -78,7 +73,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
   onSelectFoodForPet,
   onComparePrices,
   onPlanUpdate,
-  initialSubTab = 'compare',
+  initialSubTab = 'search',
 }) => {
   const isEs = userAccount.language === 'es';
   const units = userAccount.units;
@@ -95,39 +90,13 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
     }
   }, [initialSubTab]);
 
-  // Search & filter for Catalog
   const [query, setQuery] = useState('');
-  const [searchSource, setSearchSource] = useState<'catalog' | 'internet'>('catalog');
   const [filterType, setFilterType] = useState<'all' | 'dry' | 'wet'>('all');
-
-  // Shopify Catalog load
-  const [shopifyFoods, setShopifyFoods] = useState<FoodItem[]>([]);
-  const [catalogStats, setCatalogStats] = useState<ReturnType<typeof getCatalogStats> | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    loadShopifyCatalog()
-      .then((cat) => {
-        if (!mounted) return;
-        const mapped = cat.productos.map((sp) => shopifyProductToFoodItem(sp));
-        setShopifyFoods(mapped);
-        setCatalogStats(getCatalogStats(cat));
-      })
-      .catch(() => {});
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  // The public catalog keeps its own entries; personal fichas can use the same product name.
-  const catalogFoods = useMemo(() => {
-    return mergeFoodCatalog([
-      ...PET_FOODS_DATABASE,
-      ...shopifyFoods.filter((f) => f.estadoCatalogo !== 'archivado'),
-      ...shopifyFoods.filter((f) => f.estadoCatalogo === 'archivado'),
-    ]);
-  }, [shopifyFoods]);
-  const allFoods = useMemo(() => [...customFoods, ...catalogFoods], [customFoods, catalogFoods]);
+  const [libraryPackages, setLibraryPackages] = useState<Record<string, number>>({});
+  const allFoods = useMemo(() => {
+    const planFoods = [plan?.dryFood, plan?.wetFood].filter((food): food is FoodItem => Boolean(food));
+    return [...customFoods, ...planFoods].filter((food, index, foods) => foods.findIndex((item) => item.id === food.id) === index);
+  }, [customFoods, plan?.dryFood, plan?.wetFood]);
 
   // Initial smart defaults for comparison based on species & pet current food
   const initialCompareFoods = useMemo(() => {
@@ -135,7 +104,8 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
       (f) => f.species === pet.species && f.estadoCatalogo !== 'archivado' && !f.kcalPerPiece
     );
     const list: FoodItem[] = [];
-    if (plan?.dryFood) list.push(plan.dryFood);
+    const primaryFood = plan?.foodType === 'wet' ? plan.wetFood : plan?.dryFood;
+    if (primaryFood) list.push(primaryFood);
     for (const f of speciesFoods) {
       if (list.length >= 2) break;
       if (!list.some((x) => x.id === f.id || (x.brand === f.brand && x.name === f.name))) {
@@ -145,7 +115,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
     return list;
   }, [pet.id, pet.species]);
 
-  // Food comparer: up to 3 FoodItem objects (supports any Shopify/catalog item even before kcal verified)
+  // Compare personal foods and explicitly chosen online results without fabricating nutrition.
   const [selectedCompareFoods, setSelectedCompareFoods] = useState<FoodItem[]>(initialCompareFoods);
   useEffect(() => {
     setSelectedCompareFoods(initialCompareFoods);
@@ -160,10 +130,9 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
   // Toxic item search
   const [toxicQuery, setToxicQuery] = useState('');
 
-  // Catalog filtered list (prioritizes active items, limits display to 80 for smooth rendering)
+  // Personal food labels remain available without an internet connection.
   const filteredFoods = useMemo(() => {
-    const source = showingLibrary ? customFoods : catalogFoods;
-    const matches = source.filter((f) => {
+    const matches = customFoods.filter((f) => {
       if (f.species !== pet.species) return false;
       if (filterType !== 'all' && f.type !== filterType) return false;
       if (!query) return true;
@@ -175,7 +144,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
       );
     });
     return matches;
-  }, [catalogFoods, customFoods, showingLibrary, filterType, query, pet.species]);
+  }, [customFoods, filterType, query, pet.species]);
 
   const addOrToggleCompareFood = (food: FoodItem) => {
     const existsIdx = selectedCompareFoods.findIndex((f) => f.id === food.id);
@@ -190,18 +159,13 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
     }
   };
 
-  const handleToggleCompare = (id: string) => {
-    const found = allFoods.find((f) => f.id === id);
-    if (found) addOrToggleCompareFood(found);
-  };
-
   const handleRemoveFromCompare = (id: string) => {
     setSelectedCompareFoods((prev) => prev.filter((f) => f.id !== id));
   };
 
   const saveLibraryFood = (food: FoodItem) => {
     setCustomFoods(StorageService.getCustomFoods());
-    setSelectedCompareFoods((previous) => previous.map((item) => item.id === food.id ? food : item));
+    setSelectedCompareFoods((previous) => previous.map((item) => item.id === food.id || item.id === labelDraft?.food?.id ? food : item));
     setQuery('');
     setFilterType('all');
     setActiveSubTab('library');
@@ -265,7 +229,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
         {([
           { id: 'compare', label: isEs ? 'Comparar otros alimentos' : 'Compare other foods', icon: Scale },
           { id: 'costs', label: isEs ? 'Gastos ($ COP)' : 'Food Costs ($ COP)', icon: DollarSign },
-          { id: 'search', label: isEs ? 'Catálogo' : 'Catalog', icon: Search },
+          { id: 'search', label: isEs ? 'Buscar en internet' : 'Search online', icon: Search },
           { id: 'library', label: isEs ? 'Mis alimentos' : 'My foods', icon: Layers },
           { id: 'toxic', label: isEs ? 'Alimentos Tóxicos' : 'Toxic Foods', icon: ShieldAlert },
           { id: 'rubric', label: isEs ? 'Rúbrica' : 'Rubric', icon: Award },
@@ -308,7 +272,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                   {isEs ? 'Comparar alimentos' : 'Compare foods'}
                 </h3>
                 <p className="text-xs text-[#44544A] mt-0.5 leading-relaxed">
-                  Reutiliza el buscador del catálogo para elegir fórmulas y compara calorías, proteína, grasa y fibra cruda por 100 g tal como se vende y por porción de {pet.name} ({merTargetKcal} kcal/día).
+                  Busca en internet o reutiliza tus fichas personales para comparar calorías, proteína, grasa y fibra cruda por 100 g tal como se vende y por porción de {pet.name} ({merTargetKcal} kcal/día).
                 </p>
               </div>
 
@@ -356,7 +320,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                 Selecciona al menos 2 alimentos para comparar
               </h4>
               <p className="text-xs text-[#44544A] max-w-sm mx-auto">
-                Elige dos o tres fórmulas del catálogo. La comparación se actualiza al agregar o quitar un alimento.
+                Elige dos o tres fórmulas de internet o de tus fichas personales. La comparación se actualiza al agregar o quitar un alimento.
               </p>
               <button
                 type="button"
@@ -577,7 +541,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                       className="w-full min-h-[42px] py-2 px-3 bg-[#0B5D2E] text-white rounded-2xl font-heading font-extrabold text-xs hover:bg-[#094723] transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
                     >
                       <Check className="w-3.5 h-3.5 stroke-[3]" />
-                      <span>{isEs ? `Elegir para ${pet.name}` : `Select for ${pet.name}`}</span>
+                      <span>{isEs ? 'Usar en plan' : 'Use in plan'}</span>
                     </button>
                   </div>
                 );
@@ -598,212 +562,136 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
         />
       )}
 
-      {/* ================= SUBTAB 2: CATALOG & SEARCH ================= */}
       {(activeSubTab === 'search' || showingLibrary) && (
-        <div className="space-y-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl p-4 border border-[#0B5D2E20] shadow-sm space-y-3">
+        <section className="space-y-4 animate-in fade-in" aria-label={showingLibrary ? (isEs ? 'Mis alimentos' : 'My foods') : (isEs ? 'Buscar en internet' : 'Search online')}>
+          <div className="space-y-3 rounded-3xl border border-[#0B5D2E20] bg-white p-4 shadow-sm">
             <div className="flex items-center justify-between gap-2">
               <h3 className="font-heading text-base font-extrabold text-[#1C2B21]">
-                {showingLibrary ? (isEs ? 'Mis alimentos' : 'My foods') : (isEs ? 'Catálogo' : 'Catalog')}
+                {showingLibrary ? (isEs ? 'Mis alimentos' : 'My foods') : (isEs ? 'Buscar en internet' : 'Search online')}
               </h3>
               <button
                 type="button"
                 onClick={() => setLabelDraft({})}
                 className="flex min-h-11 items-center gap-1 rounded-xl bg-[#EAF4EC] px-3 text-xs font-bold text-[#0B5D2E]"
               >
-                <Plus className="size-4" />
+                <Plus className="size-4" aria-hidden="true" />
                 {isEs ? 'Agregar alimento' : 'Add food'}
               </button>
             </div>
-            {!showingLibrary && (
-              <div role="group" aria-label={isEs ? 'Origen del alimento' : 'Food source'} className="flex gap-1 rounded-xl bg-[#EAF4EC] p-1">
-                {(['catalog', 'internet'] as const).map((source) => (
-                  <button
-                    key={source}
-                    type="button"
-                    aria-pressed={searchSource === source}
-                    onClick={() => setSearchSource(source)}
-                    className={`min-h-11 rounded-lg px-3 text-xs font-bold ${searchSource === source ? 'bg-white text-[#0B5D2E] shadow-xs' : 'text-[#44544A]'}`}
-                  >
-                    {source === 'internet' ? 'Internet' : (isEs ? 'Catálogo guardado' : 'Saved catalog')}
-                  </button>
-                ))}
-              </div>
+            {showingLibrary ? (
+              <label className="relative block">
+                <span className="sr-only">{isEs ? 'Buscar mis alimentos' : 'Search my foods'}</span>
+                <Search className="absolute left-3 top-3.5 size-4 text-gray-400" aria-hidden="true" />
+                <input
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder={isEs ? 'Marca o fórmula guardada' : 'Saved brand or formula'}
+                  className="min-h-11 w-full rounded-xl border border-gray-200 bg-[#EAF4EC]/40 py-2 pl-9 pr-3 text-sm text-[#1C2B21]"
+                />
+              </label>
+            ) : (
+              <>
+                <p className="text-xs text-[#44544A]">
+                  {isEs ? 'Elige el empaque, revisa su etiqueta y después toca “Usar en plan” en Mis alimentos.' : 'Choose a package, review its label, then select “Use in plan” in My foods.'}
+                </p>
+                <OnlineFoodSearch
+                  species={pet.species}
+                  foodType={filterType === 'all' ? undefined : filterType}
+                  lang={userAccount.language}
+                  onSelect={(food) => setLabelDraft({ food })}
+                />
+              </>
             )}
-            {searchSource === 'internet' && !showingLibrary ? (
-              <OnlineFoodSearch
-                species={pet.species}
-                foodType={filterType === 'all' ? undefined : filterType}
-                initialQuery={query}
-                lang={userAccount.language}
-                onSelect={(food) => setLabelDraft({ food })}
-              />
-            ) : <>
-            {!showingLibrary && catalogStats && (
-              <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] bg-[#F8FAF8] px-3 py-2 rounded-xl border border-gray-100 text-[#44544A]">
-                <span>
-                  Catálogo Perros:{' '}
-                  <strong className="text-[#0B5D2E]">
-                    {catalogStats.dogActiveMain} alimentos activos · {catalogStats.dogActiveSnacks} snacks activos · {catalogStats.dogArchived} archivados
-                  </strong>
-                </span>
-              </div>
-            )}
-
-            <div className="relative">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                aria-label={isEs ? 'Buscar alimento' : 'Search foods'}
-                placeholder={isEs ? 'Buscar por marca, fórmula o EAN' : 'Search by brand, formula or EAN'}
-                className="w-full pl-10 pr-4 py-2.5 bg-[#EAF4EC]/40 border border-gray-200 rounded-xl text-xs text-[#1C2B21] focus:ring-2 focus:ring-[#0B5D2E] min-h-[44px]"
-              />
-            </div>
-
-            <div className="flex items-center justify-between text-xs font-bold pt-1">
-              <div className="flex gap-1.5">
-                {(['all', 'dry', 'wet'] as const).map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setFilterType(t)}
-                    className={`px-3 py-1.5 rounded-lg border transition ${
-                      filterType === t
-                        ? 'bg-[#0B5D2E] text-white border-[#0B5D2E]'
-                        : 'bg-white text-[#44544A] border-gray-200'
-                    }`}
-                  >
-                    {t === 'all' ? (isEs ? 'Todos' : 'All') : t === 'dry' ? (isEs ? 'Seco' : 'Dry') : (isEs ? 'Húmedo' : 'Wet')}
-                  </button>
-                ))}
-              </div>
-
-              <span className="text-[#44544A] text-[11px]">
-                {filteredFoods.length} {isEs ? 'alimentos' : 'foods'}
-              </span>
-            </div>
-            </>}
-            {searchSource === 'internet' && !showingLibrary && (
-              <div role="group" aria-label={isEs ? 'Tipo de alimento' : 'Food type'} className="flex gap-1.5">
-                {(['all', 'dry', 'wet'] as const).map((type) => (
-                  <button
-                    key={type}
-                    type="button"
-                    aria-pressed={filterType === type}
-                    onClick={() => setFilterType(type)}
-                    className={`min-h-11 rounded-lg border px-3 text-xs font-bold ${filterType === type ? 'bg-[#0B5D2E] text-white' : 'bg-white text-[#44544A]'}`}
-                  >
-                    {type === 'all' ? (isEs ? 'Todos' : 'All') : type === 'dry' ? (isEs ? 'Seco' : 'Dry') : (isEs ? 'Húmedo' : 'Wet')}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Foods list (slice first 60 matches for snappy DOM) */}
-          {(showingLibrary || searchSource === 'catalog') && <div className="space-y-3">
-            {filteredFoods.length === 0 && (
-              <p className="rounded-2xl bg-white p-4 text-sm text-[#44544A]">
-                {showingLibrary && !query
-                  ? (isEs ? 'Guarda una etiqueta para reutilizar su ficha en las raciones.' : 'Save a food label to reuse it in feeding plans.')
-                  : (isEs ? 'No hay alimentos que coincidan con la búsqueda.' : 'No foods match your search.')}
-              </p>
-            )}
-            {filteredFoods.slice(0, 60).map((f) => {
-              const kcalPerKg = getFoodKcalPerKg(f);
-              const gramsPerDay = kcalPerKg && merTargetKcal > 0 ? Math.round(merTargetKcal * 1000 / kcalPerKg) : undefined;
-              const isSelectedForCompare = selectedCompareFoods.some((sf) => sf.id === f.id);
-
-              return (
-                <div
-                  key={f.id}
-                  className="bg-white rounded-3xl p-4 border border-[#0B5D2E20] shadow-sm space-y-3 transition hover:border-[#0B5D2E50]"
+            <div role="group" aria-label={isEs ? 'Tipo de alimento' : 'Food type'} className="flex gap-1.5">
+              {(['all', 'dry', 'wet'] as const).map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  aria-pressed={filterType === type}
+                  onClick={() => setFilterType(type)}
+                  className={`min-h-11 rounded-lg border px-3 text-xs font-bold ${filterType === type ? 'bg-[#0B5D2E] text-white' : 'bg-white text-[#44544A]'}`}
                 >
-                  <div className="flex justify-between items-start gap-2">
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs font-black text-[#0B5D2E] uppercase tracking-wide">
-                          {f.brand}
-                        </span>
-                        <span className="text-[10px] bg-[#EAF4EC] text-[#0B5D2E] font-bold px-2 py-0.5 rounded-full border border-[#0B5D2E15]">
-                          {f.type === 'wet' ? 'Húmedo' : f.type === 'barf' ? 'BARF' : f.kcalPerPiece ? 'Snack' : 'Seco'}
-                        </span>
-                        <span className="text-[10px] bg-white text-[#44544A] font-semibold px-2 py-0.5 rounded-full border border-gray-200">
-                          {f.species === 'dog' ? 'Perro' : 'Gato'}
-                        </span>
-                        {f.estadoCatalogo === 'archivado' && (
-                          <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">
-                            Archivado
-                          </span>
-                        )}
+                  {type === 'all' ? (isEs ? 'Todos' : 'All') : type === 'dry' ? (isEs ? 'Seco' : 'Dry') : (isEs ? 'Húmedo' : 'Wet')}
+                </button>
+              ))}
+            </div>
+          </div>
+          {showingLibrary && (
+            <div className="space-y-3">
+              {filteredFoods.length === 0 && (
+                <p className="rounded-2xl bg-white p-4 text-sm text-[#44544A]">
+                  {isEs ? 'Guarda una etiqueta para reutilizar su ficha en los planes.' : 'Save a label to reuse its details in feeding plans.'}
+                </p>
+              )}
+              {filteredFoods.map((entry) => {
+                const sizes = getConfirmedPresentations(entry) || [];
+                const selectedKg = libraryPackages[entry.id] ?? entry.bagSizeKg;
+                const food = selectFoodPackage(entry, selectedKg);
+                const kcalPerKg = getFoodKcalPerKg(food);
+                const isCompared = selectedCompareFoods.some((item) => item.id === food.id);
+                return (
+                  <article key={food.id} aria-label={`${food.brand} ${food.name}`} className="space-y-3 rounded-3xl border border-[#0B5D2E20] bg-white p-4 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      {food.imageUrl && <img src={food.imageUrl} alt="" className="size-16 shrink-0 rounded-xl object-contain" />}
+                      <div>
+                        <p className="text-xs font-bold uppercase text-[#0B5D2E]">{food.brand}</p>
+                        <h4 className="font-heading text-base font-extrabold text-[#1C2B21]">{food.name}</h4>
+                        <p className="text-xs text-[#44544A]">
+                          {food.type === 'wet' ? (isEs ? 'Húmedo' : 'Wet') : (isEs ? 'Seco' : 'Dry')} · {kcalPerKg ? `${kcalPerKg} kcal/kg` : (isEs ? 'Energía sin dato' : 'Energy unavailable')}
+                        </p>
                       </div>
-                      <h4 className="font-heading font-extrabold text-base text-[#1C2B21] mt-0.5">
-                        {f.name}
-                      </h4>
-                      {(f.country || f.barcode) && (
-                        <p className="text-xs text-[#44544A] mt-0.5">{f.country} {f.barcode && `EAN: ${f.barcode}`}</p>
-                      )}
                     </div>
-
-                    <div className="text-right shrink-0">
-                      <span className="text-[11px] font-extrabold px-2.5 py-1 rounded-full bg-[#EAF4EC] text-[#0B5D2E] border border-[#0B5D2E20]">
-                        {showingLibrary ? (isEs ? 'Ficha personal' : 'Personal entry') : (isEs ? 'Catálogo' : 'Catalog')}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2 rounded-2xl border border-gray-100 bg-[#F8FAF8] p-3 text-xs">
-                    <div className="flex flex-wrap justify-between gap-2 text-[#44544A]">
-                      <span>{kcalPerKg ? `${kcalPerKg} kcal/kg` : (isEs ? 'Energía sin dato' : 'Energy unavailable')}</span>
-                      {gramsPerDay !== undefined && (
-                        <span>{pet.name} · {formatRation(gramsPerDay, units)} {isEs ? 'al día' : 'per day'}</span>
-                      )}
-                    </div>
-                    <FoodLabelComposition food={f} language={userAccount.language} />
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-                    {showingLibrary && (
-                      <button type="button" onClick={() => setLabelDraft({ food: f })} className="min-h-11 rounded-xl border border-gray-200 px-3 text-xs font-bold text-[#0B5D2E]">
+                    {sizes.length > 0 && (
+                      <label className="block space-y-1 text-xs font-bold text-[#1C2B21]">
+                        <span>{isEs ? 'Empaque' : 'Package'}</span>
+                        <select
+                          aria-label={isEs ? `Empaque de ${food.name}` : `Package for ${food.name}`}
+                          value={selectedKg ?? ''}
+                          onChange={(event) => setLibraryPackages((previous) => ({ ...previous, [food.id]: Number(event.target.value) }))}
+                          className="min-h-11 w-full rounded-xl border border-gray-200 px-3"
+                        >
+                          {selectedKg === undefined && <option value="">{isEs ? 'Elige el empaque' : 'Choose a package'}</option>}
+                          {sizes.map((size) => (
+                            <option key={size} value={size}>{size < 1 ? `${size * 1000} g` : `${size} kg`}</option>
+                          ))}
+                        </select>
+                      </label>
+                    )}
+                    <FoodLabelComposition food={food} language={userAccount.language} />
+                    {food.priceBasis && (
+                      <p className="text-xs text-[#44544A]">
+                        {formatCOP(food.priceBasis.priceCop, true)} COP · {food.priceBasis.packageKg} kg · {food.priceBasis.storeName || (isEs ? 'Precio guardado' : 'Saved price')}
+                      </p>
+                    )}
+                    {food.buyUrl && (
+                      <a href={food.buyUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center gap-1 text-xs font-bold text-[#0B5D2E] underline">
+                        <ExternalLink className="size-3" aria-hidden="true" />
+                        {isEs ? 'Ver producto original' : 'View original product'}
+                      </a>
+                    )}
+                    <div className="flex flex-wrap gap-2">
+                      <button type="button" onClick={() => setLabelDraft({ food })} className="min-h-11 rounded-xl border border-gray-200 px-3 text-xs font-bold text-[#0B5D2E]">
                         {isEs ? 'Editar ficha' : 'Edit food'}
                       </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => handleToggleCompare(f.id)}
-                      className={`text-xs font-bold px-3 py-1.5 rounded-xl border transition min-h-[44px] ${
-                        isSelectedForCompare
-                          ? 'bg-[#0B5D2E] text-white border-[#0B5D2E]'
-                          : 'bg-white text-[#44544A] border-gray-200 hover:bg-gray-50'
-                      }`}
-                    >
-                      {isSelectedForCompare ? '✓ En Comparador' : '+ Comparar'}
-                    </button>
-
-                    {onComparePrices && f.type !== 'barf' && !f.kcalPerPiece && (
-                      <button
-                        type="button"
-                        onClick={() => onComparePrices(f)}
-                        className="min-h-11 rounded-xl border border-[#0B5D2E30] px-3 text-xs font-bold text-[#0B5D2E]"
-                      >
-                        {isEs ? 'Ver precios' : 'See prices'}
+                      <button type="button" onClick={() => addOrToggleCompareFood(food)} className="min-h-11 rounded-xl border border-gray-200 px-3 text-xs font-bold text-[#0B5D2E]">
+                        {isCompared ? (isEs ? '✓ En comparador' : '✓ Comparing') : (isEs ? '+ Comparar' : '+ Compare')}
                       </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => handleSelectAndToast(f)}
-                      className="min-h-[44px] px-4 py-1.5 bg-[#0B5D2E] text-white rounded-xl font-heading font-bold text-xs hover:bg-[#094723] transition flex items-center gap-1 shadow-xs"
-                    >
-                      <span>Usar para mi mascota</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>}
-        </div>
+                      {onComparePrices && food.type !== 'barf' && !food.kcalPerPiece && (
+                        <button type="button" onClick={() => onComparePrices(food)} className="min-h-11 rounded-xl border border-[#0B5D2E30] px-3 text-xs font-bold text-[#0B5D2E]">
+                          {isEs ? 'Ver precios' : 'See prices'}
+                        </button>
+                      )}
+                      <button type="button" onClick={() => handleSelectAndToast(food)} className="flex min-h-11 items-center gap-1 rounded-xl bg-[#0B5D2E] px-4 text-xs font-bold text-white">
+                        <ArrowRight className="size-3.5" aria-hidden="true" />
+                        {isEs ? 'Usar en plan' : 'Use in plan'}
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </section>
       )}
 
       {/* ================= SUBTAB 4: TOXIC FOODS ALERT ================= */}

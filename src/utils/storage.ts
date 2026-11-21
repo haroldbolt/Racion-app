@@ -12,6 +12,7 @@ import {
   HydrationDailyState,
 } from '../types';
 import { localDateKey } from './localDate';
+import { withPlanCosts } from './foodCosts';
 
 const STORAGE_KEYS = {
   PETS: 'racion_pets_v1',
@@ -180,7 +181,7 @@ export const StorageService = {
 
   savePlan(plan: FeedingPlan) {
     const plans = this.getPlans();
-    plans[plan.petId] = plan;
+    plans[plan.petId] = withPlanCosts(plan, this.getFoodPurchases(plan.petId));
     localStorage.setItem(STORAGE_KEYS.PLANS, JSON.stringify(plans));
   },
 
@@ -459,12 +460,17 @@ export const StorageService = {
     const all = this.getFoodPurchases();
     all.unshift(entry);
     localStorage.setItem(STORAGE_KEYS.FOOD_PURCHASES, JSON.stringify(all));
+    const plan = this.getPlan(entry.petId);
+    if (plan) this.savePlan(plan);
   },
 
   deleteFoodPurchase(id: string) {
     const all = this.getFoodPurchases();
     const filtered = all.filter(p => p.id !== id);
     localStorage.setItem(STORAGE_KEYS.FOOD_PURCHASES, JSON.stringify(filtered));
+    const removed = all.find((entry) => entry.id === id);
+    const plan = removed && this.getPlan(removed.petId);
+    if (plan) this.savePlan(plan);
   },
 
   updateFoodPurchase(entry: FoodCostEntry) {
@@ -473,6 +479,8 @@ export const StorageService = {
     if (idx >= 0) {
       all[idx] = entry;
       localStorage.setItem(STORAGE_KEYS.FOOD_PURCHASES, JSON.stringify(all));
+      const plan = this.getPlan(entry.petId);
+      if (plan) this.savePlan(plan);
     }
   },
 

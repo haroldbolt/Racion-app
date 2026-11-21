@@ -18,7 +18,8 @@ import { localDateKey } from '../utils/localDate';
 import { getPlannedMeals, getPlannedMealComponents } from '../utils/mealPortions';
 import { resolveFoodThumbnail } from '../components/UnifiedFoodSearchModal';
 import { FeedingPlanEditor } from '../components/FeedingPlanEditor';
-import { InventoryFoodSearchModal } from '../components/InventoryFoodSearchModal';
+import { FoodCostTracker } from '../components/FoodCostTracker';
+import { getPlanCostSummary } from '../utils/foodCosts';
 import { DailyKcalRingChart } from '../components/DailyKcalRingChart';
 import { LabelReviewModal } from '../components/LabelReviewModal';
 import { NutritionSummary } from '../components/NutritionSummary';
@@ -127,7 +128,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
 
   // Modals & UI panels
   const [planAdjustment, setPlanAdjustment] = useState<{ food?: FoodItem }>();
-  const [showInventorySearchModal, setShowInventorySearchModal] = useState(false);
+  const [showCostTracker, setShowCostTracker] = useState(false);
   const [showLabelReview, setShowLabelReview] = useState(false);
   const [showWhyModal, setShowWhyModal] = useState(false);
   const [showRefineModal, setShowRefineModal] = useState(false);
@@ -151,10 +152,8 @@ export const TodayView: React.FC<TodayViewProps> = ({
     return { ...safePlan, trainingRationGramsToday: trainingGramsToday };
   }, [pet, plan, trainingGramsToday]);
 
-  const latestFoodPurchase = useMemo(
-    () => StorageService.getFoodPurchases(pet.id)[0] || null,
-    [pet.id, purchaseRefreshKey]
-  );
+  const purchases = useMemo(() => StorageService.getFoodPurchases(pet.id), [pet.id, purchaseRefreshKey]);
+  const costSummary = useMemo(() => getPlanCostSummary(effectivePlan, purchases), [effectivePlan, purchases]);
 
   // Core personalized feeding guide evaluations
   const foodReview = useMemo(
@@ -1054,52 +1053,39 @@ export const TodayView: React.FC<TodayViewProps> = ({
         </div>
       </div>
 
-      {/* Compact Card: Alimento restante (ONLY when ration confirmed and > 0) */}
       {effectivePlan.rationConfirmed && effectivePlan.gramsPerDay > 0 && (
-        <div className="bg-white rounded-3xl p-5 border border-[#0B5D2E20] shadow-sm space-y-3">
-          <div className="flex items-center justify-between">
+        <section role="region" aria-label={isEs ? 'Costo de su ración' : 'Their feeding cost'} aria-hidden={showCostTracker} inert={showCostTracker} className="space-y-3 rounded-3xl border border-[var(--border-color)] bg-[var(--surface-card)] p-5">
+          <h3 className="font-heading text-base font-extrabold text-[var(--text-primary)]">{isEs ? 'Costo de su ración' : 'Their feeding cost'}</h3>
+          <div className="grid grid-cols-2 gap-3 rounded-2xl bg-[var(--surface-inner)] p-3">
             <div>
-              <h3 className="font-heading font-extrabold text-base text-[#1C2B21]">
-                Alimento restante
-              </h3>
-              <p className="text-xs text-[#44544A]">
-                Estimado con su ración diaria confirmada ({formatRation(effectivePlan.gramsPerDay, units)}/día)
-              </p>
+              <span className="text-xs text-[var(--text-secondary)]">{isEs ? 'Por día' : 'Per day'}</span>
+              <strong className="mt-1 block text-lg tabular-nums text-[var(--text-primary)]">{costSummary.costPerDayCop === undefined ? (isEs ? 'Por definir' : 'To confirm') : formatCOP(costSummary.costPerDayCop, true)}</strong>
             </div>
-            <div className="text-right">
-              <span className="font-heading font-black text-2xl text-[#0B5D2E] tabular-nums">
-                {effectivePlan.bagDaysRemaining ? `~${effectivePlan.bagDaysRemaining} días` : 'Por definir'}
-              </span>
+            <div>
+              <span className="text-xs text-[var(--text-secondary)]">{isEs ? 'Por mes estimado' : 'Estimated month'}</span>
+              <strong className="mt-1 block text-lg tabular-nums text-[var(--text-primary)]">{costSummary.costPerMonthCop === undefined ? (isEs ? 'Por definir' : 'To confirm') : formatCOP(costSummary.costPerMonthCop, true)}</strong>
             </div>
           </div>
-
-          <div className="bg-[#F8FAF8] p-3 rounded-2xl border border-gray-100 flex items-center justify-between gap-2 text-xs">
-            <div className="space-y-0.5">
-              <span className="text-[10px] uppercase font-bold text-gray-500 block">
-                Gasto registrado ($ COP)
-              </span>
-              <div className="flex items-center gap-1 font-bold text-[#0B5D2E]">
-                <DollarSign className="w-3.5 h-3.5" />
-                <span>
-                  {latestFoodPurchase
-                    ? `${formatCOP(latestFoodPurchase.pricePaidCop, true)} (${latestFoodPurchase.bagSizeKg} kg)`
-                    : effectivePlan.bagPriceCop
-                    ? `${formatCOP(effectivePlan.bagPriceCop, true)} (${effectivePlan.bagWeightKg || 10} kg)`
-                    : 'Sin costo registrado'}
-                </span>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setShowInventorySearchModal(true)}
-              className="px-3 py-2 bg-[#EAF4EC] hover:bg-[#d5ebd7] text-[#0B5D2E] rounded-xl text-xs font-bold transition flex items-center gap-1.5 border border-[#0B5D2E20] min-h-[42px] shrink-0"
-            >
-              <Receipt className="w-4 h-4" />
-              <span>Subir recibo</span>
-            </button>
-          </div>
-        </div>
+          {costSummary.partial && <p className="text-xs font-bold text-amber-800 dark:text-amber-200">{isEs ? 'Costo parcial. Falta precio de una parte de la ración.' : 'Partial cost. A food in this ration has no price yet.'}</p>}
+          {costSummary.estimated && <p className="text-xs text-[var(--text-secondary)]">{isEs ? 'Incluye una referencia de precio consultada en internet.' : 'Includes an online price reference.'}</p>}
+          <ul className="space-y-1.5">
+            {costSummary.meals.map((meal) => (
+              <li key={meal.index} className="flex justify-between gap-2 text-xs text-[var(--text-primary)]">
+                <span>{isEs ? 'Toma' : 'Meal'} {meal.index + 1} · {meal.time}</span>
+                <strong className="tabular-nums">{meal.costCop === undefined ? (isEs ? 'Por definir' : 'To confirm') : formatCOP(meal.costCop, true)}{meal.partial && meal.costCop !== undefined ? (isEs ? ' · parcial' : ' · partial') : ''}</strong>
+              </li>
+            ))}
+          </ul>
+          {costSummary.components.map((component) => component.packageKg && component.gramsPerDay > 0 ? (
+            <p key={component.role} className="text-xs text-[var(--text-secondary)]">
+              {component.food.brand} {component.food.name} · {isEs ? 'Un empaque rinde' : 'One package lasts'} ~{new Intl.NumberFormat(isEs ? 'es-CO' : 'en', { maximumFractionDigits: 1 }).format(component.packageKg * 1000 / component.gramsPerDay)} {isEs ? 'días' : 'days'}
+            </p>
+          ) : null)}
+          <button type="button" onClick={() => setShowCostTracker(true)} className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#EAF4EC] px-3 text-xs font-bold text-[#0B5D2E]">
+            <Receipt className="size-4" />
+            {isEs ? 'Registrar compra o factura' : 'Log purchase or receipt'}
+          </button>
+        </section>
       )}
 
       {nextMeal.targetKcalTotal > 0 && (
@@ -1189,17 +1175,19 @@ export const TodayView: React.FC<TodayViewProps> = ({
         }}
       />
 
-      <InventoryFoodSearchModal
-        isOpen={showInventorySearchModal}
-        onClose={() => setShowInventorySearchModal(false)}
-        pet={pet}
-        plan={effectivePlan}
-        lang={userAccount.language}
-        onPurchaseLogged={(entry) => {
-          setPurchaseRefreshKey((k) => k + 1);
-          showToast(`Compra de ${entry.foodBrand} guardada en el inventario de ${pet.name}.`);
-        }}
-      />
+      {showCostTracker && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/55 sm:items-center sm:p-4">
+          <section role="dialog" aria-modal="true" aria-labelledby="food-cost-dialog-title" className="flex max-h-[93dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl bg-[var(--surface-page)] shadow-xl sm:rounded-3xl">
+            <header className="flex items-center justify-between gap-3 border-b border-[var(--border-color)] px-4 py-3">
+              <h2 id="food-cost-dialog-title" className="font-heading text-lg font-extrabold text-[var(--text-primary)]">{isEs ? 'Gastos de alimentación' : 'Food expenses'}</h2>
+              <button type="button" onClick={() => setShowCostTracker(false)} aria-label={isEs ? 'Cerrar gastos' : 'Close expenses'} className="flex size-11 items-center justify-center rounded-full text-[var(--text-primary)]">×</button>
+            </header>
+            <div className="overflow-y-auto p-4">
+              <FoodCostTracker pet={pet} plan={effectivePlan} userAccount={userAccount} startWithForm onPurchasesChange={() => setPurchaseRefreshKey((key) => key + 1)} />
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 };

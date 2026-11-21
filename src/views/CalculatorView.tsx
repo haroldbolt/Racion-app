@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Pet, FoodItem, Goal, FeedingPlan, UserAccount, BreedSize } from '../types';
-import { PET_FOODS_DATABASE } from '../data/foods';
 import { BCSSelector } from '../components/BCSSelector';
 import { FoodLabelComposition } from '../components/FoodLabelComposition';
 import { LabelReviewModal } from '../components/LabelReviewModal';
 import { OnlineFoodSearch } from '../components/OnlineFoodSearch';
-import { getConfirmedPresentations, mergeFoodCatalog } from '../data/foodPresentations';
-import { loadShopifyCatalog, shopifyProductToFoodItem } from '../services/shopifyCatalogService';
+import { getConfirmedPresentations } from '../data/foodPresentations';
 import { NutritionSummary } from '../components/NutritionSummary';
 import { FoodsView } from './FoodsView';
 import {
@@ -134,23 +132,8 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
   const [showAddCustomModal, setShowAddCustomModal] = useState(false);
   const [labelDraft, setLabelDraft] = useState<FoodItem | undefined>(initialFood && !getFoodKcalPerKg(initialFood) ? initialFood : undefined);
   const [savedFoods, setSavedFoods] = useState(() => StorageService.getCustomFoods());
-  const [foodSource, setFoodSource] = useState<'catalog' | 'library' | 'internet'>(() =>
-    savedFoods.some(({ id }) => id === initialFood?.id || id === dryFood?.id || id === wetFood?.id) ? 'library' : 'catalog'
-  );
+  const [foodSource, setFoodSource] = useState<'library' | 'internet'>('internet');
   const [showComparerModal, setShowComparerModal] = useState(false);
-  const [catalogFoods, setCatalogFoods] = useState<FoodItem[]>(PET_FOODS_DATABASE);
-  useEffect(() => {
-    let mounted = true;
-    loadShopifyCatalog().then((catalog) => {
-      if (mounted) {
-        setCatalogFoods(mergeFoodCatalog([
-          ...PET_FOODS_DATABASE,
-          ...catalog.productos.map((product) => shopifyProductToFoodItem(product)),
-        ]));
-      }
-    }).catch(() => {});
-    return () => { mounted = false; };
-  }, []);
 
   // Treats mini-calculator
   const [treatsPerDay, setTreatsPerDay] = useState<number>(savedPlan?.treatsKcal ? 1 : 0);
@@ -165,9 +148,8 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
   const [manualAdjustmentReason] = useState(savedPlan?.manualAdjustmentReason ?? '');
   const [showFormulasDetails, setShowFormulasDetails] = useState<boolean>(false);
 
-  const availableFoods = foodSource === 'library' ? savedFoods : catalogFoods;
   const filter = foodSearchQuery.trim().toLowerCase();
-  const matchingFoods = availableFoods.filter((food) => {
+  const matchingFoods = savedFoods.filter((food) => {
     return food.species === editablePet.species && !food.kcalPerPiece && food.estadoCatalogo !== 'archivado' &&
       (foodType === 'mixed' ? food.type === 'dry' || food.type === 'wet' : food.type === foodType) && (
         food.name.toLowerCase().includes(filter) ||
@@ -844,7 +826,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
 
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div role="group" aria-label={isEs ? 'Origen del alimento' : 'Food source'} className="flex gap-1 rounded-xl bg-[#EAF4EC] p-1">
-                {(['catalog', 'library', 'internet'] as const).map((source) => (
+                {(['internet', 'library'] as const).map((source) => (
                   <button
                     key={source}
                     type="button"
@@ -852,7 +834,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                     onClick={() => setFoodSource(source)}
                     className={`min-h-9 rounded-lg px-3 text-xs font-bold ${foodSource === source ? 'bg-white text-[#0B5D2E] shadow-xs' : 'text-[#44544A]'}`}
                   >
-                    {source === 'catalog' ? (isEs ? 'Catálogo guardado' : 'Saved catalog') : source === 'internet' ? 'Internet' : (isEs ? 'Mis alimentos' : 'My foods')}
+                    {source === 'internet' ? 'Internet' : (isEs ? 'Mis alimentos' : 'My foods')}
                   </button>
                 ))}
               </div>
@@ -881,7 +863,8 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                 type="text"
                 value={foodSearchQuery}
                 onChange={(e) => setFoodSearchQuery(e.target.value)}
-                placeholder={isEs ? 'Buscar por marca (Royal Canin, Pro Plan, Hills, etc.)...' : 'Search by brand...'}
+                aria-label={isEs ? 'Buscar mis alimentos' : 'Search my foods'}
+                placeholder={isEs ? 'Marca o fórmula guardada' : 'Saved brand or formula'}
                 className="w-full pl-9 pr-4 py-2.5 bg-[#EAF4EC]/40 border border-gray-200 rounded-xl text-xs text-[#1C2B21] focus:ring-2 focus:ring-[#0B5D2E] min-h-[44px]"
               />
             </div>

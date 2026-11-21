@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ExternalLink, Search } from 'lucide-react';
 import { FoodItem, Species } from '../types';
-import { searchOnlineFoods } from '../services/onlineFoodCatalog';
+import { searchOnlineFoods, selectFoodPackage } from '../services/onlineFoodCatalog';
+import { formatCOP } from '../utils/i18n';
 
 interface OnlineFoodSearchProps {
   species: Species;
@@ -133,7 +134,12 @@ export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 
           const safeSource = sourceUrl && /^https:\/\//i.test(sourceUrl) ? sourceUrl : undefined;
           return (
             <article key={food.id} aria-label={`${food.brand} ${food.name}`} className="space-y-2 rounded-2xl border border-[#0B5D2E20] bg-white p-3 text-xs">
-              <h4 className="font-heading text-sm font-extrabold text-[#1C2B21]">{food.brand} {food.name}</h4>
+              <div className="flex items-center gap-3">
+                {food.imageUrl && (
+                  <img src={food.imageUrl} alt={food.name} loading="lazy" className="size-16 shrink-0 rounded-xl bg-white object-contain" />
+                )}
+                <h4 className="font-heading text-sm font-extrabold text-[#1C2B21]">{food.brand} {food.name}</h4>
+              </div>
               <div className="flex flex-wrap items-center justify-between gap-2 text-[#44544A]">
                 <span>{isEs ? 'Fuente: Laia Pets' : 'Source: Laia Pets'}</span>
                 {safeSource && (
@@ -145,26 +151,38 @@ export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 
               </div>
               <p className="text-[#44544A]">{isEs ? 'Nutrientes pendientes de confirmar en la etiqueta.' : 'Nutrition pending label confirmation.'}</p>
               <div className="flex flex-wrap gap-2">
-                {sizes.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => onSelect({ ...food, bagSizeKg: size, availableSizesKg: sizes })}
-                    className="min-h-11 rounded-xl border border-[#0B5D2E40] bg-[#EAF4EC] px-3 font-bold text-[#0B5D2E]"
-                  >
-                    {isEs ? 'Elegir' : 'Choose'} {packageLabel(size)}
-                  </button>
-                ))}
+                {sizes.map((size) => {
+                  const price = food.packagePrices?.find((basis) => basis.packageKg === size);
+                  return (
+                    <div key={size} className="space-y-1">
+                      <button
+                        type="button"
+                        onClick={() => onSelect(selectFoodPackage({ ...food, availableSizesKg: sizes }, size))}
+                        className="min-h-11 rounded-xl border border-[#0B5D2E40] bg-[#EAF4EC] px-3 font-bold text-[#0B5D2E]"
+                      >
+                        {isEs ? 'Elegir' : 'Choose'} {packageLabel(size)}
+                      </button>
+                      <p className="max-w-36 text-[11px] text-[#44544A]">
+                        {price ? `${formatCOP(price.priceCop, true)} COP` : (isEs ? 'Precio por confirmar' : 'Price to confirm')}
+                      </p>
+                    </div>
+                  );
+                })}
                 {sizes.length === 0 && (
                   <button
                     type="button"
-                    onClick={() => onSelect({ ...food, bagSizeKg: undefined })}
+                    onClick={() => onSelect(selectFoodPackage(food))}
                     className="min-h-11 rounded-xl border border-[#0B5D2E40] px-3 font-bold text-[#0B5D2E]"
                   >
                     {isEs ? 'Revisar etiqueta · empaque sin dato' : 'Review label · package size unknown'}
                   </button>
                 )}
               </div>
+              {food.packagePrices?.length ? (
+                <p className="text-[11px] text-[#44544A]">
+                  {isEs ? 'Precio consultado en la tienda, sin envío. Se conserva el precio del empaque que elijas.' : 'Observed product price, excluding delivery. The chosen package keeps its own price.'}
+                </p>
+              ) : null}
             </article>
           );
         })}

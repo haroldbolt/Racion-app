@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test, type TestContext } from 'node:test';
-import { searchOnlineFoods } from '../src/services/onlineFoodCatalog';
+import { searchOnlineFoods, selectFoodPackage } from '../src/services/onlineFoodCatalog';
 
 const storePath = '/2026-11/stores/5624899';
 const detail = {
@@ -13,10 +13,10 @@ const detail = {
   tags: 'gatos, feline health nutrition dry',
   images: [{ src: 'https://acdn-us.mitiendanube.com/stores/example.webp' }],
   variants: [
-    { id: 1, visible: true, values: ['400 g'], weight: '0.001', barcode: '3182550737555' },
-    { id: 2, visible: true, values: ['2 kg'], weight: '0.002', barcode: '3182550737555' },
-    { id: 3, visible: true, values: ['4 kg'], weight: '0.004', barcode: '3182550737555' },
-    { id: 4, visible: true, values: ['10 kg'], weight: '0.010', barcode: '3182550737555' },
+    { id: 1, visible: true, values: ['400 g'], price: '30200.00', weight: '0.001', barcode: '3182550737555' },
+    { id: 2, visible: true, values: ['2 kg'], price: '137000.00', weight: '0.002', barcode: '3182550737555' },
+    { id: 3, visible: true, values: ['4 kg'], price: '253000.00', promotional_price: '245000.00', weight: '0.004', barcode: '3182550737555' },
+    { id: 4, visible: true, values: ['10 kg'], price: '499000.00', weight: '0.010', barcode: '3182550737555' },
     { id: 5, visible: false, values: ['20 kg'] },
     { id: 6, visible: true, values: ['3 x 85 g'] },
     { id: 7, visible: true, values: ['Default Title'], weight: '7.000' },
@@ -52,6 +52,7 @@ test('online food metadata preserves real package labels while nutrition awaits 
   assert.equal(results.length, 1);
   const food = results[0];
   assert.equal(food.name, 'Sterilised 37 Concentrado para Gatos Adultos');
+  assert.equal(food.sourceFoodId, 'online_laia_354674514');
   assert.equal(food.brand, 'Royal Canin');
   assert.equal(food.type, 'dry');
   assert.equal(food.species, 'cat');
@@ -65,11 +66,63 @@ test('online food metadata preserves real package labels while nutrition awaits 
   assert.equal(food.barcode, undefined);
   assert.equal(food.fichaNutricional?.fuenteUrl, 'https://www.laiapets.com.co/productos/royal-canin-sterilised-37-x-400-g/');
   assert.equal(food.fichaNutricional?.coincidenciaEstado, 'pendiente');
+  assert.deepEqual(food.packagePrices?.map(({ packageKg, priceCop }) => [packageKg, priceCop]), [
+    [0.4, 30200], [2, 137000], [4, 245000], [10, 499000],
+  ]);
+  assert.equal(food.priceBasis?.packageKg, 0.4);
+  assert.equal(food.priceBasis?.priceCop, 30200);
+  assert.equal(food.priceBasis?.source, 'online');
+  assert.equal(food.priceBasis?.storeName, 'Laia Pets');
+  assert.equal(food.priceBasis?.shippingCop, null);
+  assert.equal(food.priceBasis?.sourceUrl, food.buyUrl);
+  assert.equal(food.priceBasis?.observedAt, food.fichaNutricional?.fechaConsulta);
 
   food.availableSizesKg?.push(99);
   const cached = await searchOnlineFoods('Royal Canin Sterilised 37', 'cat', 'dry');
   assert.deepEqual(cached[0].availableSizesKg, [0.4, 2, 4, 10]);
   assert.equal(calls.length, 4, 'Cached metadata must not start another search');
+});
+
+test('package selection keeps formula and source metadata but only the exact package price', async (context) => {
+  mockStore(context, [{ ...detail, id: 55 }]);
+  const [food] = await searchOnlineFoods('Package selection test', 'cat', 'dry');
+  const twoKg = selectFoodPackage({ ...food, barcode: 'first-package-only' }, 2);
+  assert.equal(twoKg.id, food.id);
+  assert.equal(twoKg.sourceFoodId, food.sourceFoodId);
+  assert.equal(twoKg.name, food.name);
+  assert.equal(twoKg.imageUrl, food.imageUrl);
+  assert.equal(twoKg.buyUrl, food.buyUrl);
+  assert.equal(twoKg.fichaNutricional?.fuenteUrl, food.fichaNutricional?.fuenteUrl);
+  assert.equal(twoKg.bagSizeKg, 2);
+  assert.equal(twoKg.priceBasis?.priceCop, 137000);
+  assert.equal(twoKg.priceBasis?.packageKg, 2);
+  assert.equal(twoKg.barcode, undefined);
+  const manualPack = selectFoodPackage(twoKg, 3);
+  assert.equal(manualPack.bagSizeKg, 3);
+  assert.equal(manualPack.priceBasis, undefined);
+  assert.equal(selectFoodPackage(twoKg).priceBasis, undefined);
+  assert.equal(food.priceBasis?.packageKg, 0.4, 'Changing the chosen package must not mutate the cached source');
+});
+
+test('missing, malformed or conflicting prices never borrow a price from another presentation', async (context) => {
+  mockStore(context, [{
+    ...detail,
+    id: 56,
+    variants: [
+      { visible: true, values: ['400 g'], price: '30200.00', promotional_price: '0.00' },
+      { visible: true, values: ['2 kg'], price: 'not-a-price' },
+      { visible: true, values: ['4 kg'], price: '253000.00' },
+      { visible: true, values: ['4 kg'], price: '240000.00' },
+      { visible: true, values: ['10 kg'], price: '-100.00' },
+      { visible: false, values: ['15 kg'], price: '400000.00' },
+    ],
+  }]);
+  const [food] = await searchOnlineFoods('Invalid pricing test', 'cat');
+  assert.deepEqual(food.availableSizesKg, [0.4, 2, 4, 10]);
+  assert.deepEqual(food.packagePrices?.map(({ packageKg, priceCop }) => [packageKg, priceCop]), [[0.4, 30200]]);
+  assert.equal(selectFoodPackage(food, 2).priceBasis, undefined);
+  assert.equal(selectFoodPackage(food, 4).priceBasis, undefined);
+  assert.equal(selectFoodPackage(food, 10).priceBasis, undefined);
 });
 
 test('only the requested explicit species and food type are eligible', async (context) => {

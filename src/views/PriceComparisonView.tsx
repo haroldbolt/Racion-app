@@ -2,7 +2,7 @@ import { ArrowLeft, Clock3, ExternalLink, LoaderCircle, MapPin, Package, Search,
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useCity } from '../contexts/CityContext';
 import { CONFIRMED_FOOD_PRESENTATIONS } from '../data/foodPresentations';
-import type { FoodItem } from '../types';
+import type { FoodItem, FoodPriceBasis } from '../types';
 import {
   colombiaPriceDay,
   isBogotaPostalCode,
@@ -22,6 +22,7 @@ interface PriceComparisonViewProps {
   language?: 'es' | 'en';
   backTo?: 'plan' | 'foods' | 'more';
   onBack: () => void;
+  onUsePrice?: (food: FoodItem, basis: FoodPriceBasis) => void;
 }
 
 type Lookup =
@@ -95,12 +96,14 @@ function PriceOfferCard({
   formatKg,
   postalCode,
   winnerLabel,
+  onUsePrice,
 }: {
   offer: LivePriceOffer;
   isEs: boolean;
   formatKg: (grams: number) => string;
   postalCode?: string;
   winnerLabel?: string;
+  onUsePrice?: (includeShipping: boolean) => void;
 }) {
   const link = storeUrl(offer.productUrl);
   const isShoppingLink = link && /(^|\.)google\.(com|com\.co)$/.test(new URL(link).hostname);
@@ -161,11 +164,28 @@ function PriceOfferCard({
           <ExternalLink aria-hidden="true" className="size-3.5" />
         </a>
       )}
+      {onUsePrice && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button type="button" onClick={() => onUsePrice(false)}
+            className="min-h-11 rounded-xl bg-[#0B5D2E] px-3 py-2 text-sm font-bold text-white">
+            {isEs ? 'Usar precio del producto' : 'Use product price'}
+          </button>
+          {totalCop !== null && (
+            <button type="button" onClick={() => onUsePrice(true)}
+              className="min-h-11 rounded-xl border border-[var(--border-color)] px-3 py-2 text-sm font-bold">
+              {isEs ? 'Usar total con envío' : 'Use total with delivery'}
+            </button>
+          )}
+          <p className="w-full text-xs text-[var(--text-secondary)]">
+            {isEs ? 'Actualiza el costo de las tomas del plan. Precio de referencia; registra el importe pagado en Gastos.' : 'Updates your plan’s meal cost. Reference price; record your actual purchase in Expenses.'}
+          </p>
+        </div>
+      )}
     </article>
   );
 }
 
-export function PriceComparisonView({ food, packageKg, language = 'es', backTo = 'plan', onBack }: PriceComparisonViewProps) {
+export function PriceComparisonView({ food, packageKg, language = 'es', backTo = 'plan', onBack, onUsePrice }: PriceComparisonViewProps) {
   const isEs = language === 'es';
   const { selectedCity, setCity } = useCity();
   const city = LIVE_PRICE_CITIES.find((candidate) => candidate === selectedCity) ?? LIVE_PRICE_CITIES[0];
@@ -263,6 +283,18 @@ export function PriceComparisonView({ food, packageKg, language = 'es', backTo =
 
   const localizeKg = new Intl.NumberFormat(isEs ? 'es-CO' : 'en', { maximumFractionDigits: 3 });
   const formatKg = (weight: number) => localizeKg.format(weight / 1000);
+  const applyOffer = (offer: LivePriceOffer) => current && onUsePrice ? (includeShipping: boolean) => onUsePrice(food, {
+    packageKg: offer.grams / 1000,
+    priceCop: offer.productPriceCop,
+    source: 'online',
+    observedAt: result?.queriedAt || new Date().toISOString(),
+    selectedAt: new Date().toISOString(),
+    storeName: offer.retailer,
+    sourceUrl: storeUrl(offer.productUrl),
+    shippingCop: matchesShippingScope(offer, postalCode) ? offer.shippingCop : null,
+    includeShipping,
+    postalCode,
+  }) : undefined;
   const exactOffers = result?.offers.filter((offer) => offer.grams === grams) ?? [];
   const otherSizes = (result?.offers.filter((offer) => offer.grams !== grams) ?? [])
     .sort((a, b) => a.pricePerKgCop - b.pricePerKgCop);
@@ -456,8 +488,8 @@ export function PriceComparisonView({ food, packageKg, language = 'es', backTo =
                 </p>
               )}
               <div className="mt-2 space-y-2">
-                {winner && <PriceOfferCard offer={winner} isEs={isEs} formatKg={formatKg} postalCode={postalCode} winnerLabel={winnerLabel} />}
-                {orderedExactOffers.map((offer) => <PriceOfferCard key={offer.id} offer={offer} isEs={isEs} formatKg={formatKg} postalCode={postalCode} />)}
+                {winner && <PriceOfferCard offer={winner} isEs={isEs} formatKg={formatKg} postalCode={postalCode} winnerLabel={winnerLabel} onUsePrice={applyOffer(winner)} />}
+                {orderedExactOffers.map((offer) => <PriceOfferCard key={offer.id} offer={offer} isEs={isEs} formatKg={formatKg} postalCode={postalCode} onUsePrice={applyOffer(offer)} />)}
               </div>
             </div>
           )}
@@ -471,7 +503,7 @@ export function PriceComparisonView({ food, packageKg, language = 'es', backTo =
                 {isEs ? 'Ordenados por precio del producto por kilo.' : 'Sorted by product price per kg.'}
               </p>
               <div className="space-y-2">
-                {otherSizes.map((offer) => <PriceOfferCard key={offer.id} offer={offer} isEs={isEs} formatKg={formatKg} postalCode={postalCode} />)}
+                {otherSizes.map((offer) => <PriceOfferCard key={offer.id} offer={offer} isEs={isEs} formatKg={formatKg} postalCode={postalCode} onUsePrice={applyOffer(offer)} />)}
               </div>
             </div>
           )}

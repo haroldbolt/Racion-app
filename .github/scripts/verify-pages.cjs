@@ -163,7 +163,13 @@ async function verifyDiary() {
     page.setDefaultTimeout(10000);
     await page.goto(url.href, { waitUntil: 'domcontentloaded' });
     await openCatFoodStep('Agregar mascota', 'Luna');
-    await button(/sterilised 37 neutered cat dry/i).click();
+    await button(/agregar alimento/i).click();
+    const lunaLabel = page.getByRole('dialog', { name: 'Agregar alimento' });
+    await lunaLabel.getByLabel('Marca', { exact: true }).fill('Royal Canin');
+    await lunaLabel.getByLabel('Nombre de la fórmula', { exact: true }).fill('Sterilised 37 Neutered Cat Dry');
+    await lunaLabel.getByLabel('Energía metabolizable (kcal/kg)', { exact: true }).fill('3641');
+    await lunaLabel.getByRole('checkbox', { name: /declara alimento completo y balanceado/i }).check();
+    await lunaLabel.getByRole('button', { name: 'Guardar ficha', exact: true }).click();
     await page.getByRole('spinbutton').nth(0).fill('2');
     await page.getByRole('spinbutton').nth(1).fill('15');
     await button(/continuar a comidas/i).click();
@@ -243,8 +249,9 @@ async function verifyDiary() {
     }
     await button('Alimentos').click();
     await button('Mis alimentos').click();
-    await page.getByRole('heading', { name: 'Seco de prueba', exact: true }).waitFor();
-    await button('Editar ficha').click();
+    const savedFood = page.getByRole('article', { name: 'Marca de prueba Seco de prueba', exact: true });
+    await savedFood.getByRole('heading', { name: 'Seco de prueba', exact: true }).waitFor();
+    await savedFood.getByRole('button', { name: 'Editar ficha', exact: true }).click();
     const savedLabel = page.getByRole('dialog', { name: 'Revisar etiqueta' });
     for (const [name, amount, qualifier] of declarations) {
       assert.equal(await savedLabel.getByLabel(`${name} (%)`, { exact: true }).inputValue(), amount);

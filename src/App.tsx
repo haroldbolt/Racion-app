@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Pet, FeedingPlan, MealLog, WeightRecord, HealthLog, UserAccount, FoodItem, VetGuideline, MealMixedComponent } from './types';
+import { Pet, FeedingPlan, MealLog, WeightRecord, HealthLog, UserAccount, FoodItem, FoodPriceBasis, VetGuideline, MealMixedComponent } from './types';
 import { localDateKey } from './utils/localDate';
 import { StorageService } from './utils/storage';
 import { Header } from './components/Header';
@@ -18,6 +18,8 @@ import {
   determineFactor,
 } from './utils/calculator';
 import { getEffectiveFoodItem, hasConfirmedLabel } from './utils/feedingGuide';
+import { sameFoodIdentity, withPlanCosts } from './utils/foodCosts';
+import { getFoodKcalPerKg } from './utils/mealPortions';
 
 type PriceSelection = {
   food: FoodItem;
@@ -240,7 +242,7 @@ export default function App() {
 
   // Use food for pet from Catalog / Comparer / Alternatives
   const handleSelectFoodForPet = (food: FoodItem) => {
-    if (!activePet) return;
+    if (!activePet || food.species !== activePet.species) return;
 
     // Respect locked vet plan: do not overwrite if locked
     if (activePlan?.isVetLocked || activePet.vetGuideline?.locked) {
@@ -263,7 +265,7 @@ export default function App() {
         food.labelStatus || (hasConfirmedLabel(food) ? 'verified_manufacturer' : 'unconfirmed'),
     };
 
-    if (!activePlan) {
+    if (!activePlan || !getFoodKcalPerKg(normalizedFood)) {
       setCalculatorSelection({ petId: activePet.id, food: normalizedFood });
       setCurrentTab('calculate');
       return;
@@ -282,11 +284,47 @@ export default function App() {
       wetFood: nextFoodType === 'wet' ? normalizedFood : activePlan.wetFood,
       bagWeightKg: normalizedFood.bagSizeKg ??
         (normalizedFood.id === habitualFood?.id ? activePlan.bagWeightKg : undefined),
+      bagPriceCop: undefined,
+      dailyCostCop: undefined,
+      monthlyCostCop: undefined,
     };
 
     const recalculated = recalculatePlanForPet(effectivePet, draftPlan);
     StorageService.savePlan(recalculated);
     setPlans(StorageService.getPlans());
+    setCurrentTab('today');
+  };
+
+  const handleUsePrice = (food: FoodItem, basis: FoodPriceBasis) => {
+    if (!activePet || food.species !== activePet.species) return;
+    const pricedFood: FoodItem = { ...food, bagSizeKg: basis.packageKg, priceBasis: basis,
+      barcode: food.bagSizeKg === basis.packageKg ? food.barcode : undefined };
+    if (StorageService.getCustomFoods().some((saved) => saved.id === pricedFood.id)) {
+      StorageService.addCustomFood(pricedFood);
+    }
+    const matchesPlan = activePlan && [activePlan.dryFood, activePlan.wetFood]
+      .some((component) => component && sameFoodIdentity(component, food));
+    if (!matchesPlan || !activePlan) {
+      handleSelectFoodForPet(pricedFood);
+      return;
+    }
+    const primaryFood = getEffectiveFoodItem(activePlan);
+    const isPrimary = Boolean(primaryFood && sameFoodIdentity(primaryFood, food));
+    const updateComponent = (component?: FoodItem) => component && sameFoodIdentity(component, food)
+      ? { ...component, bagSizeKg: pricedFood.bagSizeKg, priceBasis: basis,
+          barcode: component.bagSizeKg === basis.packageKg ? component.barcode : undefined } : component;
+    const updated = withPlanCosts({
+      ...activePlan,
+      dryFood: updateComponent(activePlan.dryFood),
+      wetFood: updateComponent(activePlan.wetFood),
+      ...(isPrimary ? { bagWeightKg: basis.packageKg,
+        bagDaysRemaining: activePlan.rationConfirmed && activePlan.gramsPerDay > 0
+          ? Math.floor(basis.packageKg * 1000 / (activePlan.foodType === 'mixed' ? activePlan.dryGramsPerDay || activePlan.gramsPerDay : activePlan.gramsPerDay))
+          : undefined } : {}),
+    }, StorageService.getFoodPurchases(activePet.id));
+    StorageService.savePlan(updated);
+    setPlans(StorageService.getPlans());
+    setPriceSelection(undefined);
     setCurrentTab('today');
   };
 
@@ -402,6 +440,7 @@ export default function App() {
             packageKg={priceSelection.packageKg}
             backTo={priceSelection.returnTo === 'compare' ? 'foods' : priceSelection.returnTo === 'more' ? 'more' : 'plan'}
             language={userAccount.language}
+            onUsePrice={handleUsePrice}
             onBack={() => {
               setCurrentTab(priceSelection.returnTo);
               window.scrollTo(0, 0);

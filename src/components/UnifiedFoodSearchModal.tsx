@@ -1,12 +1,11 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { publicAssetUrl } from '../utils/publicAssetUrl';
-import { Pet, FoodItem, FeedingPlan, RecentFoodSearch } from '../types';
-import { PET_FOODS_DATABASE } from '../data/foods';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Search, X } from 'lucide-react';
+import { Pet, FoodItem, FeedingPlan } from '../types';
 import { StorageService } from '../utils/storage';
-import { getConfirmedPresentations, mergeFoodCatalog } from '../data/foodPresentations';
+import { getConfirmedPresentations } from '../data/foodPresentations';
+import { selectFoodPackage } from '../services/onlineFoodCatalog';
 import { OnlineFoodSearch } from './OnlineFoodSearch';
-import { loadShopifyCatalog, ShopifyProduct, shopifyProductToFoodItem } from '../services/shopifyCatalogService';
-import { Search, X, Clock, ArrowRight, Package, Sparkles, Check } from 'lucide-react';
+import { formatCOP } from '../utils/i18n';
 
 interface UnifiedFoodSearchModalProps {
   isOpen: boolean;
@@ -29,9 +28,6 @@ interface UnifiedFoodSearchModalProps {
   formulaType?: Extract<FoodItem['type'], 'dry' | 'wet'>;
 }
 
-/**
- * Normalizes text for instant, accent-insensitive and lowercase token matching.
- */
 function normalizeText(text: string): string {
   return text
     .toLowerCase()
@@ -86,7 +82,6 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
   isOpen,
   onClose,
   activePet,
-  allPets = [],
   plans = {},
   onSelectFood,
   lang = 'es',
@@ -96,723 +91,145 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
   formulaType,
 }) => {
   const isEs = lang === 'es';
-
-  // Instant reactive state: typing immediately updates filtered results without any debounce delay
+  const [source, setSource] = useState<'internet' | 'library'>('internet');
   const [query, setQuery] = useState('');
-  const [searchSource, setSearchSource] = useState<'catalog' | 'internet'>('catalog');
-  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!isOpen) {
+      setSource('internet');
       setQuery('');
-      setSearchSource('catalog');
       return;
     }
-    // Auto-focus immediately when modal opens
-    const t = setTimeout(() => inputRef.current?.focus(), 50);
-    return () => clearTimeout(t);
-  }, [isOpen]);
-
-  // Listen to Escape key to close
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', escape);
+    return () => window.removeEventListener('keydown', escape);
   }, [isOpen, onClose]);
 
-  // Extract explicit package weight from query (e.g. "fit 32 4kg", "medium 15", "royal 7.5 kg")
-  const extractedWeight = useMemo(() => {
-    const trimmed = query.trim();
-    if (!trimmed) return null;
-
-    // Matches e.g. "4kg", "15 kg", "7.5kilos", "12k"
-    const kgMatch = trimmed.match(/(\d+(?:[.,]\d+)?)\s*(?:kg|kilos|kilo|k)\b/i);
-    if (kgMatch) {
-      const val = parseFloat(kgMatch[1].replace(',', '.'));
-      return val > 0 && val <= 50 ? val : null;
-    }
-    const gramsMatch = trimmed.match(/(\d+(?:[.,]\d+)?)\s*(?:g|gr|gramos?)\b/i);
-    if (gramsMatch) {
-      const value = Number(gramsMatch[1].replace(',', '.')) / 1000;
-      return value > 0 && value <= 50 ? value : null;
-    }
-
-    // Matches trailing standalone number like "fit 32 4" (avoid matching line numbers like 32)
-    const trailingNumMatch = trimmed.match(/\s+(\d+(?:[.,]\d+)?)$/);
-    if (trailingNumMatch) {
-      const val = parseFloat(trailingNumMatch[1].replace(',', '.'));
-      // Standard commercial bag sizes
-      if ([1, 1.5, 2, 3, 4, 6.8, 7.5, 8, 10, 12, 13.6, 14, 15, 17, 20].includes(val)) {
-        return val;
-      }
-    }
-
-    return null;
-  }, [query]);
-
-  // Tokenize query for smart multi-field matching
-  const searchTokens = useMemo(() => {
-    const rawTokens = normalizeText(query)
-      .replace(/(\d+(?:[.,]\d+)?)\s*(?:kg|kilos|kilo|k|g|gr|gramos?)\b/g, '') // strip explicit package weights
-      .split(/\s+/)
-      .filter((t) => t.length > 0);
-
-    if (extractedWeight && Number(rawTokens[rawTokens.length - 1]?.replace(',', '.')) === extractedWeight) {
-      rawTokens.pop();
-    }
-    return rawTokens.map((tok) => {
-      // Alias expansions
-      if (tok === 'rc') return 'royal';
-      if (tok === 'ppp') return 'pro';
-      if (tok === 'sd') return 'science';
-      return tok;
+  const personalFoods = useMemo(() => {
+    const planFoods = Object.values(plans).flatMap((plan) => [plan.dryFood, plan.wetFood])
+      .filter((food): food is FoodItem => Boolean(food));
+    const foods = [...StorageService.getCustomFoods(), ...planFoods];
+    const seen = new Set<string>();
+    const tokens = normalizeText(query).split(/\s+/).filter(Boolean);
+    return foods.filter((food) => {
+      if (seen.has(food.id)) return false;
+      seen.add(food.id);
+      if (activePet && food.species !== activePet.species) return false;
+      if (formulaType && (food.type !== formulaType || food.kcalPerPiece)) return false;
+      if (!includeArchived && food.estadoCatalogo === 'archivado') return false;
+      if (category === 'main' && food.kcalPerPiece) return false;
+      if (category === 'snacks' && !food.kcalPerPiece) return false;
+      const haystack = normalizeText(`${food.brand} ${food.name} ${food.barcode || ''}`);
+      return tokens.every((token) => haystack.includes(token));
     });
-  }, [query, extractedWeight]);
+  }, [plans, activePet?.species, formulaType, category, includeArchived, query, isOpen]);
 
-  // 1. Registered foods from all user pets
-  const registeredPetFoods = useMemo(() => {
-    const list: Array<{
-      petName: string;
-      petSpecies: string;
-      brand: string;
-      productName: string;
-      weightKg: number;
-      imageUrl?: string;
-      foodItem?: FoodItem;
-      searchableText: string;
-    }> = [];
-
-    allPets.forEach((p) => {
-      const plan = plans[p.id];
-      if (plan && plan.foodBrand && plan.foodName) {
-        const brand = plan.foodBrand;
-        const productName = plan.foodName;
-        const thumbnail =
-          plan.dryFood?.imageUrl ||
-          resolveFoodThumbnail(brand, productName, p.species);
-
-        list.push({
-          petName: p.name,
-          petSpecies: p.species,
-          brand,
-          productName,
-          weightKg: plan.bagWeightKg || plan.dryFood?.bagSizeKg || plan.wetFood?.bagSizeKg || 0,
-          imageUrl: thumbnail,
-          foodItem: plan.dryFood,
-          searchableText: normalizeText(`${p.name} ${brand} ${productName} ${p.species}`),
-        });
-      }
-    });
-
-    return list;
-  }, [allPets, plans]);
-
-  // 2. Recent searches
-  const recentSearches: RecentFoodSearch[] = useMemo(() => {
-    return StorageService.getRecentFoodSearches();
-  }, []);
-
-  // 3. Shopify Catalog Products (1,528 products)
-  const [shopifyProducts, setShopifyProducts] = useState<ShopifyProduct[]>([]);
-  useEffect(() => {
-    loadShopifyCatalog()
-      .then((cat) => {
-        if (cat?.productos) {
-          setShopifyProducts(cat.productos);
-        }
-      })
-      .catch((err) => console.warn('Catalog load note in search modal:', err));
-  }, []);
-
-  // Convert Shopify products into unified FoodItem array with enriched nutritional sheets & packaging metadata
-  const shopifyAsFoodItems = useMemo<FoodItem[]>(() => {
-    return shopifyProducts
-      .filter((sp) => {
-        if (!includeArchived && (sp.estado_catalogo === 'archivado' || sp.estado_shopify === 'ARCHIVED')) {
-          return false;
-        }
-        const isSnack = sp.categoria_catalogo === 'snack' || sp.tipo === 'Snacks';
-        if (category === 'snacks' && !isSnack) return false;
-        if (category === 'main' && isSnack) return false;
-        return true;
-      })
-      .map((sp) => shopifyProductToFoodItem(sp));
-  }, [shopifyProducts, category, includeArchived]);
-
-  // Combined Catalog database (built-in + user custom foods + Shopify full catalog)
-  const catalogFoods = useMemo(() => {
-    const custom = StorageService.getCustomFoods();
-    return mergeFoodCatalog([...custom, ...PET_FOODS_DATABASE, ...shopifyAsFoodItems]);
-  }, [shopifyAsFoodItems]);
-
-  // Filter Tier 1 (Registered Pet Foods) instantly
-  const filteredRegisteredFoods = useMemo(() => {
-    if (searchTokens.length === 0) return registeredPetFoods;
-    return registeredPetFoods.filter((rf) =>
-      searchTokens.every((token) => rf.searchableText.includes(token))
-    );
-  }, [registeredPetFoods, searchTokens]);
-
-  // Filter Tier 2 (Recent Searches) instantly
-  const filteredRecentSearches = useMemo(() => {
-    if (searchTokens.length === 0) return recentSearches.slice(0, 4);
-    return recentSearches
-      .filter((rs) => {
-        const hay = normalizeText(`${rs.brand} ${rs.productName} ${rs.weightKg}`);
-        return searchTokens.every((token) => hay.includes(token));
-      })
-      .slice(0, 3);
-  }, [recentSearches, searchTokens]);
-
-  // Filter Tier 3 (Catalog Database) instantly with smart ranking
-  const filteredCatalog = useMemo(() => {
-    const eligibleFoods = formulaType
-      ? catalogFoods.filter((food) => food.type === formulaType && food.species === activePet?.species &&
-        !food.kcalPerPiece && food.estadoCatalogo !== 'archivado')
-      : catalogFoods;
-    if (searchTokens.length === 0) {
-      // Prioritize active pet's species first if query is empty
-      const targetSpecies = activePet?.species || 'cat';
-      const speciesMatches = eligibleFoods.filter((f) => f.species === targetSpecies);
-      const otherMatches = eligibleFoods.filter((f) => f.species !== targetSpecies);
-      return [...speciesMatches, ...otherMatches].slice(0, 12);
-    }
-
-    // Match all tokens against brand, name, species, lifeStage, ingredients, barcode
-    const matches: Array<{
-      food: FoodItem;
-      score: number;
-    }> = [];
-
-    eligibleFoods.forEach((food) => {
-      const brandNorm = normalizeText(food.brand);
-      const nameNorm = normalizeText(food.name);
-      const speciesEs = food.species === 'cat' ? 'gato felino' : 'perro canino';
-      const stageEs =
-        food.lifeStage === 'puppy'
-          ? 'cachorro puppy gatito kitten'
-          : food.lifeStage === 'senior'
-          ? 'senior mayor'
-          : 'adulto adult';
-      const combined = normalizeText(
-        `${brandNorm} ${nameNorm} ${speciesEs} ${food.species} ${stageEs} ${food.barcode || ''}`
-      );
-
-      const allTokensMatch = searchTokens.every((token) => combined.includes(token));
-      if (!allTokensMatch) return;
-
-      // Calculate ranking score
-      let score = 0;
-      const firstToken = searchTokens[0];
-
-      // Exact brand match or prefix
-      if (brandNorm.startsWith(firstToken)) score += 50;
-      if (brandNorm.includes(firstToken)) score += 20;
-
-      // Name prefix
-      if (nameNorm.startsWith(firstToken)) score += 40;
-      if (nameNorm.includes(firstToken)) score += 15;
-
-      // Species match with active pet
-      if (activePet && food.species === activePet.species) score += 30;
-
-      // Has confirmed image
-      if (food.imageUrl || resolveFoodThumbnail(food.brand, food.name, food.species)) {
-        score += 10;
-      }
-
-      // Prioritize active products ahead of archived products
-      if (food.estadoCatalogo === 'archivado') score -= 40;
-      else score += 15;
-
-      // Boost items with verified datasheets
-      if (food.fichaNutricional?.coincidenciaEstado === 'verificado' || food.kcalPerKg > 400) {
-        score += 12;
-      }
-
-      // If user specified a weight, reward items that offer that exact presentation
-      if (extractedWeight) {
-        const sizes = getConfirmedPresentations(food);
-        if (sizes && sizes.includes(extractedWeight)) {
-          score += 25;
-        }
-      }
-
-      matches.push({ food, score });
-    });
-
-    matches.sort((a, b) => b.score - a.score);
-    return matches.slice(0, 20).map((m) => m.food);
-  }, [catalogFoods, searchTokens, activePet, extractedWeight, formulaType]);
-
-  // Handler to select a food item
-  const handleSelectOption = (
-    brand: string,
-    name: string,
-    preferredWeight?: number,
-    img?: string,
-    item?: FoodItem,
-    customSizes?: number[]
-  ) => {
-    const confirmed = customSizes || getConfirmedPresentations(item);
-    let chosenWeight = preferredWeight || item?.bagSizeKg || 0;
-
-    // If query contained an extracted weight and it's valid, prioritize it
-    if (extractedWeight && confirmed?.includes(extractedWeight)) {
-      chosenWeight = extractedWeight;
-    } else if (confirmed && confirmed.length > 0) {
-      chosenWeight = preferredWeight && confirmed.includes(preferredWeight)
-        ? preferredWeight
-        : confirmed.includes(chosenWeight)
-        ? chosenWeight
-        : confirmed[0];
-    }
-
-    const resolvedImg = img || resolveFoodThumbnail(brand, name, item?.species, item?.imageUrl);
-
+  function select(food: FoodItem) {
     onSelectFood({
-      brand,
-      productName: name,
-      weightKg: chosenWeight,
-      imageUrl: resolvedImg,
-      sourceFoodItem: item ? { ...item, bagSizeKg: chosenWeight > 0 ? chosenWeight : undefined } : undefined,
-      confirmedSizesKg: confirmed && confirmed.length > 0 ? confirmed : undefined,
+      brand: food.brand,
+      productName: food.name,
+      weightKg: food.bagSizeKg || 0,
+      imageUrl: food.imageUrl,
+      sourceFoodItem: food,
+      confirmedSizesKg: food.availableSizesKg,
     });
     onClose();
-  };
-
-  // Highlight matching characters in text
-  const renderHighlighted = (text: string) => {
-    if (searchTokens.length === 0) return <span>{text}</span>;
-    // Simple regex pattern for highlighting
-    const pattern = new RegExp(`(${searchTokens.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'gi');
-    const parts = text.split(pattern);
-
-    return (
-      <span>
-        {parts.map((part, i) =>
-          searchTokens.some((t) => normalizeText(t) === normalizeText(part)) ? (
-            <span key={i} className="text-[#0B5D2E] font-extrabold bg-[#0B5D2E15] px-0.5 rounded">
-              {part}
-            </span>
-          ) : (
-            <span key={i}>{part}</span>
-          )
-        )}
-      </span>
-    );
-  };
+  }
 
   if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4 animate-in fade-in">
-      <div className="bg-white rounded-3xl p-4 sm:p-5 max-w-md w-full shadow-2xl border border-[#0B5D2E20] space-y-3 relative max-h-[90vh] flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between pb-1 border-b border-gray-100 shrink-0">
-          <div>
-            <div className="flex items-center gap-2">
-              <label className="text-[11px] font-black uppercase tracking-wider text-[#0B5D2E] block">
-                {isEs ? 'Busca su alimento' : 'Find their food'}
-              </label>
-            </div>
-            <h3 className="font-heading font-black text-lg text-[#1C2B21]">
-              {titleOverride || (isEs ? 'Buscar alimento o marca' : 'Search food or brand')}
-            </h3>
-          </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-3 backdrop-blur-xs sm:p-4">
+      <section role="dialog" aria-modal="true" aria-labelledby="food-search-title" className="flex max-h-[90dvh] w-full max-w-md flex-col gap-3 rounded-3xl border border-[#0B5D2E20] bg-white p-4 shadow-2xl">
+        <header className="flex shrink-0 items-center justify-between gap-2 border-b border-gray-100 pb-2">
+          <h3 id="food-search-title" className="font-heading text-lg font-black text-[#1C2B21]">
+            {titleOverride || (isEs ? 'Buscar alimento' : 'Find food')}
+          </h3>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition"
-            aria-label="Cerrar"
+            aria-label={isEs ? 'Cerrar' : 'Close'}
+            className="flex min-h-11 min-w-11 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100"
           >
-            <X className="w-5 h-5" />
+            <X className="size-5" />
           </button>
-        </div>
-
+        </header>
         <div role="group" aria-label={isEs ? 'Origen del alimento' : 'Food source'} className="flex shrink-0 gap-1 rounded-xl bg-[#EAF4EC] p-1">
-          {(['catalog', 'internet'] as const).map((source) => (
+          {(['internet', 'library'] as const).map((option) => (
             <button
-              key={source}
+              key={option}
               type="button"
-              aria-pressed={searchSource === source}
-              onClick={() => setSearchSource(source)}
-              className={`min-h-11 rounded-lg px-3 text-xs font-bold ${searchSource === source ? 'bg-white text-[#0B5D2E] shadow-xs' : 'text-[#44544A]'}`}
+              aria-pressed={source === option}
+              onClick={() => setSource(option)}
+              className={`min-h-11 rounded-lg px-3 text-xs font-bold ${source === option ? 'bg-white text-[#0B5D2E] shadow-xs' : 'text-[#44544A]'}`}
             >
-              {source === 'internet' ? 'Internet' : (isEs ? 'Catálogo guardado' : 'Saved catalog')}
+              {option === 'internet' ? 'Internet' : (isEs ? 'Mis alimentos' : 'My foods')}
             </button>
           ))}
         </div>
-        {searchSource === 'internet' ? (
-          <div className="flex-1 overflow-y-auto">
+        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto">
+          {source === 'internet' ? (
             <OnlineFoodSearch
               species={activePet?.species || 'dog'}
               foodType={formulaType}
-              initialQuery={query}
               lang={lang}
-              onSelect={(food) => {
-                onSelectFood({
-                  brand: food.brand,
-                  productName: food.name,
-                  weightKg: food.bagSizeKg || 0,
-                  imageUrl: food.imageUrl,
-                  sourceFoodItem: food,
-                  confirmedSizesKg: food.availableSizesKg,
-                });
-                onClose();
-              }}
+              onSelect={select}
             />
-          </div>
-        ) : <>
-        {/* Unified Search Input with Instant Typing Feedback */}
-        <div className="relative shrink-0">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" />
-          <input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                if (filteredCatalog.length > 0) {
-                  const top = filteredCatalog[0];
-                  const sizes = getConfirmedPresentations(top) || [];
-                  handleSelectOption(top.brand, top.name, sizes[0], top.imageUrl, top);
-                }
-              }
-            }}
-            placeholder={isEs ? 'Ej. Agility Gold grandes adultos' : 'E.g. Agility Gold large adults'}
-            className="w-full pl-10 pr-9 py-2.5 bg-[#F8FAF8] border border-[#0B5D2E30] rounded-2xl text-xs font-bold text-[#1C2B21] focus:outline-none focus:ring-2 focus:ring-[#0B5D2E]/25 focus:border-[#0B5D2E] transition"
-          />
-          {query ? (
-            <button
-              type="button"
-              onClick={() => {
-                setQuery('');
-                inputRef.current?.focus();
-              }}
-              className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition"
-              aria-label="Limpiar búsqueda"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          ) : null}
-        </div>
-
-        {/* Extracted Weight Hint Pill if detected */}
-        {extractedWeight && (
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#EAF4EC] border border-[#0B5D2E25] rounded-xl text-[11px] font-bold text-[#0B5D2E] shrink-0 animate-in fade-in">
-            <Sparkles className="w-3.5 h-3.5 text-[#0B5D2E]" />
-            <span>
-              {isEs
-                ? `Presentación detectada en tu búsqueda: ${extractedWeight} kg`
-                : `Detected package size: ${extractedWeight} kg`}
-            </span>
-          </div>
-        )}
-
-        {/* Scrollable suggestions container */}
-        <div className="overflow-y-auto space-y-3.5 flex-1 pr-1 -mr-1">
-          {/* Priority 1: User's registered pet foods */}
-          {!formulaType && filteredRegisteredFoods.length > 0 && (
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between px-1">
-                <span className="text-[10px] font-black uppercase tracking-wider text-[#0B5D2E] flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-[#0B5D2E]" />
-                  <span>{isEs ? 'Alimentos de tus mascotas' : 'Your pets\' foods'}</span>
-                </span>
-                <span className="text-[10px] font-bold text-gray-400">
-                  {filteredRegisteredFoods.length}
-                </span>
-              </div>
-
-              <div className="space-y-1.5">
-                {filteredRegisteredFoods.map((rf, idx) => {
-                  const thumbnail = rf.imageUrl || resolveFoodThumbnail(rf.brand, rf.productName, rf.petSpecies);
-                  return (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => handleSelectOption(rf.brand, rf.productName, rf.weightKg, thumbnail, rf.foodItem)}
-                      className="w-full p-2.5 bg-[#EAF4EC]/70 hover:bg-[#EAF4EC] border border-[#0B5D2E30] rounded-2xl flex items-center justify-between text-left transition group min-h-[52px] shadow-2xs hover:shadow-xs"
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        {/* Thumbnail Miniature */}
-                        <div className="w-10 h-12 bg-white rounded-xl p-0.5 border border-[#0B5D2E20] flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
-                          {thumbnail ? (
-                            <img
-                              src={publicAssetUrl(thumbnail)}
-                              alt={rf.productName}
-                              className="w-full h-full object-contain"
-                              loading="lazy"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-[#0B5D2E10] flex items-center justify-center">
-                              <span className="text-sm">{rf.petSpecies === 'cat' ? '🐱' : '🐶'}</span>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-[9px] font-black uppercase tracking-wider bg-[#0B5D2E] text-white px-1.5 py-0.5 rounded-full shrink-0">
-                              {rf.petName}
-                            </span>
-                            <span className="text-xs font-bold text-[#1C2B21] truncate">
-                              {renderHighlighted(rf.brand)}
-                            </span>
-                          </div>
-                          <p className="text-[11px] font-semibold text-[#44544A] leading-tight truncate">
-                            {renderHighlighted(rf.productName)}
-                          </p>
-                          <p className="text-[10px] font-bold text-[#0B5D2E] mt-0.5">
-                            {rf.weightKg > 0 ? `${rf.weightKg} kg` : (isEs ? 'Empaque sin dato' : 'Package size unknown')} · {isEs ? 'Ración habitual' : 'Usual food'}
-                          </p>
-                        </div>
-                      </div>
-                      <ArrowRight className="w-4 h-4 text-[#0B5D2E] opacity-80 group-hover:translate-x-0.5 transition shrink-0 ml-2" />
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Priority 2: Recent searches */}
-          {!formulaType && filteredRecentSearches.length > 0 && (
-            <div className="space-y-1.5 pt-0.5">
-              <div className="flex items-center justify-between px-1">
-                <span className="text-[10px] font-black uppercase tracking-wider text-[#F57C1A] flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-[#F57C1A]" />
-                  <span>{isEs ? 'Búsquedas recientes' : 'Recent searches'}</span>
-                </span>
-              </div>
-              <div className="space-y-1.5">
-                {filteredRecentSearches.map((rc) => {
-                  const thumbnail = rc.imageUrl || resolveFoodThumbnail(rc.brand, rc.productName);
-                  return (
-                    <button
-                      key={rc.id}
-                      type="button"
-                      onClick={() => handleSelectOption(rc.brand, rc.productName, rc.weightKg, thumbnail)}
-                      className="w-full p-2 bg-[#F8FAF8] hover:bg-gray-100/90 border border-gray-200 rounded-2xl flex items-center justify-between text-left transition min-h-[46px] group"
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-9 h-10 bg-white rounded-lg p-0.5 border border-gray-200 flex items-center justify-center shrink-0 overflow-hidden">
-                          {thumbnail ? (
-                            <img src={publicAssetUrl(thumbnail)} alt={rc.productName} className="w-full h-full object-contain" />
-                          ) : (
-                            <Clock className="w-3.5 h-3.5 text-gray-400" />
-                          )}
-                        </div>
-                        <div className="min-w-0 truncate">
-                          <span className="text-xs font-bold text-[#1C2B21]">
-                            {renderHighlighted(rc.brand)} {renderHighlighted(rc.productName)}
-                          </span>
-                          <span className="text-[10px] font-semibold text-gray-500 ml-1.5">
-                            · {rc.weightKg} kg
-                          </span>
-                        </div>
-                      </div>
-                      <ArrowRight className="w-3.5 h-3.5 text-gray-400 group-hover:text-gray-600 transition shrink-0 ml-2" />
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Priority 3: Local catalog suggestions */}
-          <div className="space-y-1.5 pt-0.5">
-            <div className="flex items-center justify-between px-1">
-              <span className="text-[10px] font-black uppercase tracking-wider text-[#44544A]">
-                {query.trim()
-                  ? isEs
-                    ? `Catálogo Ración (${filteredCatalog.length})`
-                    : `Catalog Matches (${filteredCatalog.length})`
-                  : isEs
-                  ? 'Catálogo recomendado'
-                  : 'Recommended catalog'}
-              </span>
-              {filteredCatalog.length > 0 && (
-                <span className="text-[9px] font-semibold text-gray-400">
-                  {isEs ? 'Filtro instantáneo' : 'Instant filter'}
-                </span>
-              )}
-            </div>
-
-            {filteredCatalog.length > 0 ? (
-              <div className="space-y-2">
-                {filteredCatalog.map((food) => {
-                  const sizes = getConfirmedPresentations(food) || [];
-                  const thumbnail = resolveFoodThumbnail(food.brand, food.name, food.species, food.imageUrl);
-                  const isCat = food.species === 'cat';
-
-                  return (
-                    <div
-                      key={food.id}
-                      className="p-2.5 bg-white hover:bg-[#F8FAF8] border border-gray-200/90 hover:border-[#0B5D2E40] rounded-2xl transition space-y-2 group shadow-2xs hover:shadow-xs"
-                    >
-                      {/* Top row: thumbnail + title + species + open action */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const targetWeight =
-                            extractedWeight && sizes.includes(extractedWeight)
-                              ? extractedWeight
-                              : sizes[0];
-                          handleSelectOption(food.brand, food.name, targetWeight, thumbnail, food);
-                        }}
-                        className="flex w-full items-center justify-between text-left"
-                      >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          {/* Miniature packshot container */}
-                          <div className="w-11 h-14 bg-white rounded-xl p-0.5 border border-gray-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs group-hover:border-[#0B5D2E30] transition">
-                            {thumbnail ? (
-                              <img
-                                src={publicAssetUrl(thumbnail)}
-                                alt={food.name}
-                                className="w-full h-full object-contain"
-                                loading="lazy"
-                              />
-                            ) : (
-                              <div
-                                className={`w-full h-full rounded-lg flex flex-col items-center justify-center p-0.5 ${
-                                  isCat ? 'bg-amber-50' : 'bg-emerald-50'
-                                }`}
-                              >
-                                <span className="text-base">{isCat ? '🐱' : '🐶'}</span>
-                                <span className="text-[7px] font-black uppercase text-gray-400 truncate max-w-full">
-                                  {food.brand.split(' ')[0]}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Info */}
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="text-xs font-extrabold text-[#1C2B21]">
-                                {renderHighlighted(food.brand)}
-                              </span>
-                              <span
-                                className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded-full ${
-                                  isCat
-                                    ? 'bg-amber-100 text-amber-800'
-                                    : 'bg-emerald-100 text-emerald-800'
-                                }`}
-                              >
-                                {isCat ? 'Gato' : 'Perro'}
-                              </span>
-                              {food.lifeStage && (
-                                <span className="text-[9px] font-semibold text-gray-500 capitalize">
-                                  · {food.lifeStage === 'puppy' ? (isCat ? 'Gatito' : 'Cachorro') : food.lifeStage}
-                                </span>
-                              )}
-                            </div>
-
-                            <p className="text-[11px] font-medium text-[#44544A] leading-tight truncate mt-0.5">
-                              {renderHighlighted(food.name)}
-                            </p>
-                            <div className="flex items-center gap-1.5 flex-wrap mt-1">
-                              {food.estadoCatalogo === 'archivado' ? (
-                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">
-                                  Archivado
-                                </span>
-                              ) : food.fichaNutricional?.coincidenciaEstado === 'verificado' || food.labelStatus === 'verified_manufacturer' ? (
-                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
-                                  Ficha verificada
-                                </span>
-                              ) : (
-                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
-                                  Sin dato verificado
-                                </span>
-                              )}
-                              {food.fotoAlcance === 'referencial' && (
-                                <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">
-                                  Foto referencial
-                                </span>
-                              )}
-                              {food.empaqueTipo === 'fraccionado' && (
-                                <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-orange-50 text-orange-800">
-                                  Fraccionado
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="p-1.5 rounded-full hover:bg-gray-100 text-gray-400 group-hover:text-[#0B5D2E] transition shrink-0 ml-2">
-                          <ArrowRight className="w-4 h-4" />
-                        </div>
-                      </button>
-
-                      {/* Presentation pills: user can tap directly on their desired presentation */}
-                      <div className="flex items-center gap-1.5 flex-wrap pt-0.5 border-t border-gray-100">
-                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider shrink-0">
-                          {sizes.length ? (isEs ? 'Presentaciones:' : 'Sizes:') : (isEs ? 'Presentación por confirmar' : 'Size to confirm')}
-                        </span>
-                        {sizes.map((size) => {
-                          const isExtracted = extractedWeight === size;
-                          return (
-                            <button
-                              key={size}
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleSelectOption(food.brand, food.name, size, thumbnail, food);
-                              }}
-                              className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition flex items-center gap-1 ${
-                                isExtracted
-                                  ? 'bg-[#0B5D2E] text-white shadow-2xs'
-                                  : 'bg-[#F2F5F3] hover:bg-[#EAF4EC] text-[#1C2B21] hover:text-[#0B5D2E] border border-transparent hover:border-[#0B5D2E30]'
-                              }`}
-                            >
-                              {isExtracted && <Check className="w-2.5 h-2.5" />}
-                              <span>{size} kg</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })}
-
-            </div>
           ) : (
-              /* When 0 items in local catalog match */
-              <div className="p-4 bg-gray-50 rounded-2xl border border-gray-200 text-center space-y-2.5">
-                <div className="w-10 h-10 bg-white rounded-full mx-auto flex items-center justify-center text-gray-400 border border-gray-200">
-                  <Package className="w-5 h-5 text-gray-400" />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-[#1C2B21]">
-                    {isEs
-                      ? `No encontramos "${query}" en el catálogo precargado`
-                      : `No matches found for "${query}"`}
-                  </p>
-                  <p className="text-[11px] text-gray-500 mt-0.5">
-                    {isEs
-                      ? 'Prueba con la marca o con una parte del nombre.'
-                      : 'Try the brand or part of the name.'}
-                  </p>
-                </div>
-
-              </div>
-            )}
-          </div>
+            <>
+              <label className="relative block">
+                <span className="sr-only">{isEs ? 'Buscar mis alimentos' : 'Search my foods'}</span>
+                <Search className="absolute left-3 top-3.5 size-4 text-gray-400" aria-hidden="true" />
+                <input
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder={isEs ? 'Marca o fórmula guardada' : 'Saved brand or formula'}
+                  className="min-h-11 w-full rounded-xl border border-[#0B5D2E30] py-2 pl-9 pr-3 text-sm text-[#1C2B21]"
+                />
+              </label>
+              {personalFoods.length === 0 && (
+                <p className="text-xs text-[#44544A]">
+                  {isEs ? 'No hay fichas personales que coincidan. Busca en internet o guarda la etiqueta de tu alimento.' : 'No matching personal foods. Search online or save your food label.'}
+                </p>
+              )}
+              {personalFoods.map((food) => {
+                const sizes = getConfirmedPresentations(food) || [];
+                return (
+                  <article key={food.id} aria-label={`${food.brand} ${food.name}`} className="space-y-2 rounded-2xl border border-gray-200 p-3 text-xs">
+                    <div className="flex items-center gap-2">
+                      {food.imageUrl && <img src={food.imageUrl} alt="" className="size-12 object-contain" />}
+                      <h4 className="font-bold text-[#1C2B21]">{food.brand} {food.name}</h4>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {sizes.map((size) => (
+                        <button
+                          key={size}
+                          type="button"
+                          onClick={() => select(selectFoodPackage(food, size))}
+                          className="min-h-11 rounded-xl border border-[#0B5D2E40] bg-[#EAF4EC] px-3 font-bold text-[#0B5D2E]"
+                        >
+                          {isEs ? 'Elegir' : 'Choose'} {size < 1 ? `${size * 1000} g` : `${size} kg`}
+                        </button>
+                      ))}
+                      {sizes.length === 0 && (
+                        <button type="button" onClick={() => select(selectFoodPackage(food))} className="min-h-11 rounded-xl border border-[#0B5D2E40] px-3 font-bold text-[#0B5D2E]">
+                          {isEs ? 'Elegir · empaque por confirmar' : 'Choose · package to confirm'}
+                        </button>
+                      )}
+                    </div>
+                    {food.priceBasis && (
+                      <p className="text-[#44544A]">
+                        {formatCOP(food.priceBasis.priceCop, true)} COP · {food.priceBasis.packageKg} kg
+                      </p>
+                    )}
+                  </article>
+                );
+              })}
+            </>
+          )}
         </div>
-        </>}
-
-        {/* Footer info note */}
-        <div className="pt-1 border-t border-gray-100 flex items-center justify-between text-[10px] text-gray-400 shrink-0">
-          <span>{searchSource === 'internet' ? (isEs ? 'Fuente: Laia Pets' : 'Source: Laia Pets') : (isEs ? 'Filtro local sin esperas' : 'Instant local filter')}</span>
-          <span>{isEs ? 'Enter para seleccionar' : 'Enter to select'}</span>
-        </div>
-      </div>
+      </section>
     </div>
   );
 };

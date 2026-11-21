@@ -1,4 +1,4 @@
-import type { FoodItem, Species } from '../types';
+import type { FoodItem, FoodPriceBasis, Species } from '../types';
 import { parseVariantWeight } from './shopifyCatalogService';
 
 const storeId = 5624899;
@@ -42,6 +42,25 @@ function numericId(value: unknown): value is number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value > 0;
 }
 
+function positivePrice(value: unknown): number | undefined {
+  if (typeof value !== 'number' && (typeof value !== 'string' || !/^\d+(?:\.\d{1,2})?$/.test(value))) return undefined;
+  const price = Number(value);
+  return Number.isFinite(price) && price > 0 ? price : undefined;
+}
+
+/** A package change must never carry the previous package's price or barcode. */
+export function selectFoodPackage(food: FoodItem, packageKg?: number): FoodItem {
+  const priceBasis = packageKg === undefined ? undefined
+    : food.priceBasis?.packageKg === packageKg ? food.priceBasis
+    : food.packagePrices?.find((price) => price.packageKg === packageKg);
+  return {
+    ...food,
+    bagSizeKg: packageKg,
+    barcode: food.bagSizeKg === packageKg ? food.barcode : undefined,
+    priceBasis,
+  };
+}
+
 function speciesIn(value: string): Set<Species> {
   const found = new Set<Species>();
   if (/\b(?:gatos?|gatas?|gatitos?|felinos?|feline|cats?|kittens?)\b/.test(value)) found.add('cat');
@@ -82,23 +101,32 @@ function foodFromDetail(
   const type: FoodItem['type'] = wet ? 'wet' : raw ? 'barf' : 'dry';
   if (expectedType && expectedType !== type) return null;
 
+  const productUrl = `${merchantOrigin}/productos/${handle}/`;
+  const observedAt = new Date().toISOString();
   const variants = Array.isArray(detail.variants) ? detail.variants.map(record) : [];
-  const sizes = variants.flatMap((variant): number[] => {
+  const presentations = variants.flatMap((variant): Array<{ packageKg: number; priceCop?: number }> => {
     if (variant.visible === false || !Array.isArray(variant.values)) return [];
     const values = variant.values.map(text).filter(Boolean);
     // A gift, combo or multipack is a distinct presentation, not a single bag.
     if (/\b(?:packs?|combos?|gratis|regalos?|unidades?|units?)\b|\+|\bx\s*\d+\b|\d+\s*x\b/i.test(values.join(' '))) return [];
     const parsed = values.map(parseVariantWeight).filter((weight) => !weight.isAmbiguous && weight.kg !== null);
-    return parsed.length === 1 && parsed[0].kg! > 0 && parsed[0].kg! <= 100
-      ? [parsed[0].kg!]
-      : [];
+    if (parsed.length !== 1 || parsed[0].kg! <= 0 || parsed[0].kg! > 100) return [];
+    const regular = positivePrice(variant.price);
+    const promotional = positivePrice(variant.promotional_price);
+    const priceCop = promotional && (!regular || promotional < regular) ? promotional : regular;
+    return [{ packageKg: parsed[0].kg!, priceCop }];
   });
-  const availableSizesKg = [...new Set(sizes)].sort((a, b) => a - b);
+  const availableSizesKg = [...new Set(presentations.map(({ packageKg }) => packageKg))].sort((a, b) => a - b);
+  const packagePrices: FoodPriceBasis[] = availableSizesKg.flatMap((packageKg) => {
+    const prices = presentations.filter((pack) => pack.packageKg === packageKg).map((pack) => pack.priceCop);
+    // Conflicting or missing prices for the same weight need confirmation, not a guessed offer.
+    if (prices.some((price) => price === undefined) || new Set(prices).size !== 1) return [];
+    return [{ packageKg, priceCop: prices[0]!, source: 'online', observedAt, storeName: 'Laia Pets', sourceUrl: productUrl, shippingCop: null }];
+  });
   const brand = plainText(detail.brand);
   const name = brand && normalized(title).startsWith(normalized(brand) + ' ')
     ? title.slice(brand.length).trim()
     : title;
-  const productUrl = `${merchantOrigin}/productos/${handle}/`;
   const images = Array.isArray(detail.images) ? detail.images.map(record) : [];
   const imageUrl = images.map((image) => text(image.src)).find((source) => {
     try {
@@ -114,6 +142,7 @@ function foodFromDetail(
 
   return {
     id: `online_laia_${detail.id}`,
+    sourceFoodId: `online_laia_${detail.id}`,
     brand,
     name,
     species,
@@ -127,6 +156,8 @@ function foodFromDetail(
     country: 'Colombia',
     bagSizeKg: availableSizesKg[0],
     availableSizesKg,
+    packagePrices,
+    priceBasis: packagePrices.find((price) => price.packageKg === availableSizesKg[0]),
     imageUrl,
     buyUrl: productUrl,
     labelStatus: 'unconfirmed',
@@ -135,7 +166,7 @@ function foodFromDetail(
       coincidenciaEstado: 'pendiente',
       fuenteNombre: 'Laia Pets',
       fuenteUrl: productUrl,
-      fechaConsulta: new Date().toISOString(),
+      fechaConsulta: observedAt,
       mercado: 'Colombia',
       notasRevision: 'Presentaciones publicadas por la tienda. Confirma la etiqueta para guardar la composición nutricional.',
     },

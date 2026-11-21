@@ -234,10 +234,10 @@ export const MoreView: React.FC<MoreViewProps> = ({
     },
     {
       id: 'foods',
-      title: isEs ? 'Alimentos y Comparador' : 'Food Catalog & Comparer',
+      title: isEs ? 'Alimentos y Comparador' : 'Foods & Comparer',
       subtitle: isEs
-        ? 'Catálogo local, comparación nutricional y alimentos tóxicos'
-        : 'Local catalog, nutrition comparison and toxic foods',
+        ? 'Búsqueda en internet, comparación nutricional y alimentos tóxicos'
+        : 'Online search, nutrition comparison and toxic foods',
       icon: <UtensilsCrossed className="w-5 h-5 text-[#0B5D2E]" />,
       badge: isEs ? 'Nutrición' : 'Nutrition',
     },
@@ -262,7 +262,7 @@ export const MoreView: React.FC<MoreViewProps> = ({
       id: 'food_costs',
       title: isEs ? 'Gastos en Comida ($ COP)' : 'Food Expenses ($ COP)',
       subtitle: isEs
-        ? 'Sube tus facturas, recibos y supervisa el gasto diario/mensual en Pesos Colombianos'
+        ? 'Registra el importe pagado, adjunta el recibo y consulta el costo por toma y por día'
         : 'Log purchases, receipts, and monitor daily/monthly food expenses in COP',
       icon: <DollarSign className="w-5 h-5 text-[#0B5D2E]" />,
       badge: '$ COP',
