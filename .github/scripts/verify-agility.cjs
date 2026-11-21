@@ -126,9 +126,10 @@ async function verify() {
     await button('Guardar mascota').click();
     await page.reload({waitUntil:'domcontentloaded'});
     const alerts = page.getByRole('region',{name:'Revisión para ' + pet,exact:true}).first();
-    await alerts.getByText(/indicó evitar pollo.*«pollo»/i).waitFor();
+    await alerts.getByText(/indicó evitar pollo.*«[^»]*\bpollo\b[^»]*»/i).waitFor();
     await alerts.getByText(/grasa.*10 %.*al menos 15 %.*Supera el límite/i).waitFor();
     await ring.getByText('1 de 2 comidas',{exact:true}).waitFor();
+    await alerts.scrollIntoViewIfNeeded();
     await proof(page,'agility-alertas.png');
     console.log(JSON.stringify({
       site:url.origin, sources:[...sources], food:formula, sizesKg:[1.5,3,15], price3kgCop:price,
