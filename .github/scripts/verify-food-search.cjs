@@ -196,15 +196,21 @@ async function verifyFoodPriceCoherence(page, button) {
   const purchasedFood = expensesDialog.getByLabel('Alimento de la compra', { exact: true });
   assert.equal(await purchasedFood.locator('option:checked').innerText(), formula);
   assert.equal(await expensesDialog.getByLabel('Peso de cada empaque', { exact: true }).inputValue(), '2');
-  await expensesDialog.getByLabel('Unidad del peso', { exact: true }).selectOption('kg');
-  await expensesDialog.getByLabel('Cantidad de empaques', { exact: true }).fill('1');
-  await expensesDialog.getByLabel('Importe total de este alimento (COP)', { exact: true }).fill('140.000');
-  await expensesDialog.getByLabel('Tienda (opcional)', { exact: true }).fill('Factura de Nube');
-  await expensesDialog.getByLabel('Foto de factura o recibo (opcional)', { exact: true }).setInputFiles({
+  await expensesDialog.getByLabel('Leer factura (foto o PDF)', { exact: true }).setInputFiles({
     name: 'recibo-de-prueba.png', mimeType: 'image/png',
     buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=', 'base64'),
   });
   await expensesDialog.getByRole('img', { name: 'Factura adjunta', exact: true }).waitFor();
+  const cancelReading = expensesDialog.getByRole('button', { name: 'Cancelar lectura', exact: true });
+  if (await cancelReading.isVisible()) await cancelReading.click();
+  await expensesDialog.getByLabel('Peso de cada empaque', { exact: true }).fill('2');
+  await expensesDialog.getByLabel('Unidad del peso', { exact: true }).selectOption('kg');
+  await expensesDialog.getByLabel('Cantidad de empaques', { exact: true }).fill('1');
+  await expensesDialog.getByLabel('Importe total de este alimento (COP)', { exact: true }).fill('140.000');
+  await expensesDialog.getByLabel('Fecha de compra', { exact: true }).fill(
+    new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota' }).format(new Date())
+  );
+  await expensesDialog.getByLabel('Tienda (opcional)', { exact: true }).fill('Factura de Nube');
   await expensesDialog.getByRole('checkbox', { name: 'Confirmo el importe y el peso de este alimento', exact: true }).check();
   await expensesDialog.getByRole('button', { name: 'Guardar compra', exact: true }).click();
   await expectMealCosts(expensesDialog.getByRole('region', { name: 'Costo de la ración', exact: true }), 3780, 1890);

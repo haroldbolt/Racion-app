@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { FeedingPlan, FoodCostEntry, FoodItem, FoodPriceBasis, Pet } from '../src/types';
-import { getPlanCostSummary, resolveFoodPrice, sameFoodIdentity, withPlanCosts } from '../src/utils/foodCosts';
+import { getPlanCostSummary, resolveFoodPrice, sameFoodIdentity, withPlanCosts, withPurchasedPackage } from '../src/utils/foodCosts';
 import { buildFeedingPlan, calculateFeedingPlan } from '../src/utils/calculator';
 
 const dry: FoodItem = {
@@ -96,4 +96,18 @@ test('wet-only plan keeps the selected wet package and recalculates its linked c
   const built = buildFeedingPlan(inputs, calculateFeedingPlan(inputs));
   assert.equal(built.bagWeightKg, 0.085);
   assert.equal(built.dailyCostCop, built.gramsPerDay * (1299 / 85));
+});
+
+test('confirming a purchased package changes only packaging and its linked cost, preserving portions and labels', () => {
+  const updated = withPurchasedPackage(plan, dry, 4);
+  assert.equal(updated.bagWeightKg, 4);
+  assert.equal(updated.dryFood?.bagSizeKg, 4);
+  assert.equal(updated.dryFood?.kcalPerKg, plan.dryFood?.kcalPerKg);
+  assert.deepEqual(updated.mealTimes, plan.mealTimes);
+  assert.equal(updated.gramsPerDay, 54);
+  assert.equal(updated.foodId, plan.foodId);
+  assert.equal(getPlanCostSummary(updated, [{ ...purchase, bagSizeKg: 4, quantity: 1, pricePaidCop: 253000 }]).costPerDayCop, 253000 / 4000 * 54);
+  assert.equal(plan.bagWeightKg, 2);
+  assert.equal(withPurchasedPackage({ ...plan, isVetLocked: true }, dry, 4).bagWeightKg, 2);
+  assert.equal(withPurchasedPackage(plan, { ...dry, id: 'other', name: 'Otra fórmula' }, 4), plan);
 });

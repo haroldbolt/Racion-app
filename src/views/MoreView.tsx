@@ -30,7 +30,8 @@ interface MoreViewProps {
   onUpdateVetGuideline: (guideline: VetGuideline | undefined) => void;
   onSelectFoodForPet: (food: FoodItem) => void;
   onResetAllData: () => void;
-  onComparePrices?: () => void;
+  onComparePrices?: (food?: FoodItem) => void;
+  onPlanUpdate?: (patch: Partial<FeedingPlan>) => void;
   initialSubSection?: string | null;
   onNavigateTab?: (tab: 'pets' | 'compare' | 'calculate' | 'today' | 'progress') => void;
 }
@@ -47,6 +48,7 @@ export const MoreView: React.FC<MoreViewProps> = ({
   onSelectFoodForPet,
   onResetAllData,
   onComparePrices,
+  onPlanUpdate,
   initialSubSection = null,
   onNavigateTab,
 }) => {
@@ -69,6 +71,9 @@ export const MoreView: React.FC<MoreViewProps> = ({
         </div>
         <FoodsView
           pet={pet}
+          plan={plan}
+          onPlanUpdate={onPlanUpdate}
+          onComparePrices={onComparePrices}
           merTargetKcal={plan?.mer || 600}
           userAccount={userAccount}
           onSelectFoodForPet={(food) => {
@@ -152,7 +157,7 @@ export const MoreView: React.FC<MoreViewProps> = ({
             {onComparePrices && (
               <button
                 type="button"
-                onClick={onComparePrices}
+                onClick={() => onComparePrices?.()}
                 className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-2xl bg-[#0B5D2E] font-heading text-base font-extrabold text-white hover:bg-[#094723]"
               >
                 <ShoppingBag className="w-4 h-4" />
@@ -195,6 +200,7 @@ export const MoreView: React.FC<MoreViewProps> = ({
           pet={pet}
           plan={plan}
           userAccount={userAccount}
+          onPlanUpdate={onPlanUpdate}
         />
       </div>
     );

@@ -1,12 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { AlertCircle, Camera, Check, Plus, Receipt, Trash2, X } from 'lucide-react';
+import { AlertCircle, Check, Plus, Receipt, Trash2, X } from 'lucide-react';
 import type { FeedingPlan, FoodCostEntry, FoodItem, UserAccount, Pet } from '../types';
 import { StorageService } from '../utils/storage';
 import { formatCOP } from '../utils/i18n';
 import { localDateKey } from '../utils/localDate';
-import { getPlanCostSummary, sameFoodIdentity } from '../utils/foodCosts';
+import { getPlanCostSummary, sameFoodIdentity, withPurchasedPackage } from '../utils/foodCosts';
 import { parsePurchasedPriceCop } from '../utils/purchaseInput';
 import { OnlineFoodSearch } from './OnlineFoodSearch';
+import { ReceiptReview } from './ReceiptReview';
+import type { ReceiptReadResult } from '../services/receiptReader';
+import type { ReceiptExtraction, ReceiptItemCandidate } from '../utils/receiptExtraction';
 
 interface FoodCostTrackerProps {
   pet: Pet;
@@ -19,6 +22,8 @@ interface FoodCostTrackerProps {
 
 type ComponentRole = 'dry' | 'wet' | 'main';
 type SelectedFood = { food: FoodItem; role: ComponentRole };
+type PurchaseDraft = { packageWeight: string; weightUnit: 'kg' | 'g'; quantity: string; price: string; purchaseDate: string; store: string; notes: string };
+const emptyDraft = (food?: FoodItem): PurchaseDraft => ({ packageWeight: food?.bagSizeKg ? String(food.bagSizeKg) : '', weightUnit: 'kg', quantity: '1', price: '', purchaseDate: localDateKey(), store: '', notes: '' });
 const inputClass = 'w-full min-h-11 rounded-xl border border-[var(--border-color)] bg-[var(--surface-card)] px-3 py-2 text-sm text-[var(--text-primary)]';
 
 function decimal(value: FormDataEntryValue | null): number {
@@ -31,7 +36,7 @@ function weightLabel(kg: number, language: 'es' | 'en'): string {
   return kg < 1 ? `${format.format(kg * 1000)} g` : `${format.format(kg)} kg`;
 }
 
-export function FoodCostTracker({ pet, plan, userAccount, onPurchasesChange, startWithForm = false }: FoodCostTrackerProps) {
+export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurchasesChange, startWithForm = false }: FoodCostTrackerProps) {
   const isEs = userAccount.language === 'es';
   const [purchases, setPurchases] = useState(() => StorageService.getFoodPurchases(pet.id));
   const [showForm, setShowForm] = useState(false);
@@ -41,6 +46,15 @@ export function FoodCostTracker({ pet, plan, userAccount, onPurchasesChange, sta
   const [photoLoading, setPhotoLoading] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [draft, setDraft] = useState<PurchaseDraft>(() => emptyDraft());
+  const [confirmed, setConfirmed] = useState(false);
+  const [receiptFoodConfirmed, setReceiptFoodConfirmed] = useState(false);
+  const [receiptPresent, setReceiptPresent] = useState(false);
+  const [receiptSelectionRequired, setReceiptSelectionRequired] = useState(false);
+  const [receiptItemDescription, setReceiptItemDescription] = useState<string>();
+  const [receiptReadMethod, setReceiptReadMethod] = useState<ReceiptReadResult['method']>();
+  const [usePurchasedPackage, setUsePurchasedPackage] = useState(false);
+  const [receiptFormKey, setReceiptFormKey] = useState(0);
   const summary = useMemo(() => getPlanCostSummary(plan, purchases), [plan, purchases]);
   const formatNumber = new Intl.NumberFormat(isEs ? 'es-CO' : 'en', { maximumFractionDigits: 1 });
 
@@ -50,6 +64,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPurchasesChange, sta
     const first = getPlanCostSummary(plan, StorageService.getFoodPurchases(pet.id)).components[0];
     setSelected(first ? { food: first.food, role: first.role } : undefined);
     setSource(first ? 'plan' : 'internet');
+    resetForm(first?.food);
     setReceiptPhotoUrl('');
     setError('');
     setNotice('');
@@ -59,6 +74,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPurchasesChange, sta
     const first = summary.components[0];
     setSelected(first ? { food: first.food, role: first.role } : undefined);
     setSource(first ? 'plan' : 'internet');
+    resetForm(first?.food);
     setReceiptPhotoUrl('');
     setError('');
     setNotice('');
@@ -70,49 +86,87 @@ export function FoodCostTracker({ pet, plan, userAccount, onPurchasesChange, sta
     onPurchasesChange?.();
   }
 
-  function uploadPhoto(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    event.target.value = '';
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      setError(isEs ? 'Adjunta una imagen de la factura o del recibo.' : 'Attach a receipt image.');
-      return;
-    }
-    setPhotoLoading(true);
-    const reader = new FileReader();
-    reader.onerror = () => {
-      setPhotoLoading(false);
-      setError(isEs ? 'No pudimos abrir la imagen.' : 'Could not open the image.');
-    };
-    reader.onload = () => {
-      if (typeof reader.result !== 'string') {
-        setPhotoLoading(false);
-        return;
-      }
-      const image = new Image();
-      image.onerror = () => {
-        setPhotoLoading(false);
-        setError(isEs ? 'No pudimos abrir la imagen.' : 'Could not open the image.');
-      };
-      image.onload = () => {
-        const scale = Math.min(1, 1400 / Math.max(image.width, image.height));
-        const canvas = document.createElement('canvas');
-        canvas.width = Math.round(image.width * scale);
-        canvas.height = Math.round(image.height * scale);
-        const context = canvas.getContext('2d');
-        if (context) {
-          context.drawImage(image, 0, 0, canvas.width, canvas.height);
-          setReceiptPhotoUrl(canvas.toDataURL('image/jpeg', 0.85));
-          setError('');
-        } else {
-          setError(isEs ? 'No pudimos preparar la imagen.' : 'Could not prepare the image.');
-        }
-        setPhotoLoading(false);
-      };
-      image.src = reader.result;
-    };
-    reader.readAsDataURL(file);
+  function resetConfirmation() {
+    setConfirmed(false);
+    setReceiptFoodConfirmed(false);
   }
+
+  function resetForm(food?: FoodItem) {
+    setDraft(emptyDraft(food));
+    resetConfirmation();
+    setReceiptPresent(false);
+    setReceiptSelectionRequired(false);
+    setReceiptItemDescription(undefined);
+    setReceiptReadMethod(undefined);
+    setPhotoLoading(false);
+    setUsePurchasedPackage(false);
+    setReceiptFormKey((key) => key + 1);
+  }
+
+  function changeField<K extends keyof PurchaseDraft>(key: K, value: PurchaseDraft[K]) {
+    setDraft((previous) => ({ ...previous, [key]: value }));
+    resetConfirmation();
+    setUsePurchasedPackage(false);
+    setError('');
+  }
+
+  function chooseFood(next: SelectedFood | undefined) {
+    setSelected(next);
+    resetConfirmation();
+    setUsePurchasedPackage(false);
+    if (!receiptPresent) setDraft(emptyDraft(next?.food));
+    setError('');
+  }
+
+  function applyReceiptItem(item: ReceiptItemCandidate, extraction: ReceiptExtraction, method: ReceiptReadResult['method']) {
+    const kg = item.packageKg;
+    setDraft({
+      packageWeight: kg === undefined ? '' : String(kg < 1 ? Math.round(kg * 1_000_000) / 1000 : kg),
+      weightUnit: kg !== undefined && kg < 1 ? 'g' : 'kg',
+      quantity: item.quantity === undefined ? '' : String(item.quantity),
+      price: item.totalPaidCop === undefined ? '' : String(item.totalPaidCop),
+      purchaseDate: extraction.purchaseDate ?? '',
+      store: extraction.merchantName ?? '',
+      notes: '',
+    });
+    setReceiptItemDescription(item.description);
+    setReceiptReadMethod(method);
+    setUsePurchasedPackage(false);
+    resetConfirmation();
+    setError('');
+  }
+
+  const draftWeight = decimal(draft.packageWeight);
+  const draftPackageKg = draft.weightUnit === 'g' ? draftWeight / 1000 : draftWeight;
+  const draftQuantity = decimal(draft.quantity);
+  const draftPrice = parsePurchasedPriceCop(draft.price);
+  const draftComponent = selected && summary.components.find(({ food, role }) => sameFoodIdentity(food, selected.food) && role === selected.role);
+  const validDraftAmounts = Number.isFinite(draftPackageKg) && draftPackageKg > 0 && draftPackageKg <= 100 &&
+    Number.isSafeInteger(draftQuantity) && draftQuantity > 0 && draftQuantity <= 1000 && draftPrice !== undefined;
+  const draftChangesPackage = Boolean(validDraftAmounts && draftComponent &&
+    (draftComponent.packageKg === undefined || Math.abs(draftComponent.packageKg - draftPackageKg) > 0.000001));
+  const canUpdatePackage = Boolean(draftChangesPackage && onPlanUpdate && !plan?.isVetLocked && !pet.vetGuideline?.locked);
+  const draftSummary = useMemo(() => {
+    if (!plan || !selected || !draftComponent || !validDraftAmounts || draftPrice === undefined) return undefined;
+    // This is a cost preview only. It never changes the saved formula, ration or package.
+    const previewFood = { ...draftComponent.food, bagSizeKg: draftPackageKg };
+    const previewPlan = {
+      ...plan,
+      dryFood: plan.dryFood && sameFoodIdentity(plan.dryFood, draftComponent.food) ? previewFood : plan.dryFood,
+      wetFood: plan.wetFood && sameFoodIdentity(plan.wetFood, draftComponent.food) ? previewFood : plan.wetFood,
+      bagWeightKg: plan.foodId === draftComponent.food.id ? draftPackageKg : plan.bagWeightKg,
+    };
+    const previewPurchase: FoodCostEntry = {
+      id: 'preview', petId: pet.id, foodId: draftComponent.food.id,
+      sourceFoodId: draftComponent.food.sourceFoodId,
+      foodSourceUrl: draftComponent.food.buyUrl || draftComponent.food.fichaNutricional?.fuenteUrl,
+      componentRole: draftComponent.role, date: draft.purchaseDate,
+      foodBrand: draftComponent.food.brand, foodName: draftComponent.food.name, foodType: draftComponent.food.type,
+      bagSizeKg: draftPackageKg * draftQuantity, quantity: draftQuantity, pricePaidCop: draftPrice,
+      costPerKgCop: draftPrice / (draftPackageKg * draftQuantity), createdAt: new Date().toISOString(),
+    };
+    return getPlanCostSummary(previewPlan, [...purchases, previewPurchase]);
+  }, [plan, selected, draftComponent, validDraftAmounts, draftPrice, draftPackageKg, draftQuantity, draft.purchaseDate, pet.id, purchases]);
 
   function savePurchase(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -124,7 +178,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPurchasesChange, sta
     const price = parsePurchasedPriceCop(data.get('price'));
     const date = String(data.get('purchaseDate') ?? '');
     const massKg = packageKg * quantity;
-    if (!selected || !Number.isFinite(packageKg) || packageKg <= 0 || packageKg > 100 ||
+    if (photoLoading || receiptSelectionRequired || (receiptItemDescription && !receiptFoodConfirmed) || !selected || !Number.isFinite(packageKg) || packageKg <= 0 || packageKg > 100 ||
       !Number.isSafeInteger(quantity) || quantity < 1 || quantity > 1000 ||
       !Number.isFinite(massKg) || price === undefined ||
       !/^\d{4}-\d{2}-\d{2}$/.test(date) || date > localDateKey() || !data.has('confirmed')) {
@@ -161,6 +215,8 @@ export function FoodCostTracker({ pet, plan, userAccount, onPurchasesChange, sta
       currency: 'COP',
       storeName: store || undefined,
       receiptPhotoUrl: receiptPhotoUrl || undefined,
+      receiptReadMethod: receiptReadMethod,
+      receiptItemDescription: receiptItemDescription,
       notes: String(data.get('notes') ?? '').trim() || undefined,
       imageUrl: selected.food.imageUrl,
       createdAt: new Date().toISOString(),
@@ -168,19 +224,23 @@ export function FoodCostTracker({ pet, plan, userAccount, onPurchasesChange, sta
 
     try {
       StorageService.addFoodPurchase(entry);
+      if (canUpdatePackage && usePurchasedPackage && plan && onPlanUpdate) {
+        onPlanUpdate(withPurchasedPackage(plan, selected.food, packageKg));
+      }
       refreshPurchases();
     } catch {
       setError(isEs ? 'No pudimos guardar la compra en este navegador. Prueba con una imagen más pequeña.' : 'Could not save the purchase in this browser. Try a smaller image.');
       return;
     }
     setShowForm(false);
+    setPhotoLoading(false);
+    resetConfirmation();
     setReceiptPhotoUrl('');
-    const differentPackage = component?.packageKg !== undefined &&
-      Math.abs(component.packageKg - packageKg) > 0.000001;
-    setNotice(differentPackage
+    const differentPackage = component && (component.packageKg === undefined || Math.abs(component.packageKg - packageKg) > 0.000001);
+    setNotice(differentPackage && !(canUpdatePackage && usePurchasedPackage)
       ? (isEs
-        ? `Compra guardada. El costo de la ración sigue usando el empaque de ${weightLabel(component.packageKg!, userAccount.language)}. Para usar otro tamaño, vuelve a elegir la presentación del alimento en Ajustar.`
-        : `Purchase saved. The feeding cost still uses the ${weightLabel(component.packageKg!, userAccount.language)} package. To use another size, choose that package again when adjusting the food.`)
+        ? `Compra guardada. ${component.packageKg ? `El costo de la ración sigue usando el empaque de ${weightLabel(component.packageKg, userAccount.language)}.` : 'El empaque de la ración sigue pendiente de confirmar.'} Para usar el empaque de esta compra, vuelve a elegir su presentación en Ajustar.`
+        : `Purchase saved. ${component.packageKg ? `The feeding cost still uses the ${weightLabel(component.packageKg, userAccount.language)} package.` : 'The feeding plan package still needs confirmation.'} To use the purchased package, choose that package when adjusting the food.`)
       : (isEs ? 'Compra guardada para este alimento y esta mascota.' : 'Purchase saved for this food and pet.'));
   }
 
@@ -260,26 +320,44 @@ export function FoodCostTracker({ pet, plan, userAccount, onPurchasesChange, sta
         <div className="space-y-4 rounded-3xl border border-[#0B5D2E55] bg-[var(--surface-card)] p-5">
           <div className="flex justify-between gap-3">
             <h3 className="font-heading text-lg font-extrabold text-[var(--text-primary)]">{isEs ? 'Registrar compra o factura' : 'Log purchase or receipt'}</h3>
-            <button type="button" onClick={() => setShowForm(false)} aria-label={isEs ? 'Cerrar formulario de compra' : 'Close purchase form'} className="flex size-10 items-center justify-center rounded-full"><X className="size-5" /></button>
+            <button type="button" onClick={() => { setShowForm(false); setPhotoLoading(false); resetConfirmation(); }} aria-label={isEs ? 'Cerrar formulario de compra' : 'Close purchase form'} className="flex size-10 items-center justify-center rounded-full"><X className="size-5" /></button>
           </div>
+          <ReceiptReview key={`${pet.id}-${receiptFormKey}`} language={userAccount.language}
+            onReadingChange={setPhotoLoading}
+            onSelectionRequiredChange={setReceiptSelectionRequired}
+            onNewFile={() => {
+              setReceiptPresent(true);
+              setReceiptPhotoUrl('');
+              setReceiptItemDescription(undefined);
+              setReceiptReadMethod(undefined);
+              setDraft({ packageWeight: '', weightUnit: 'kg', quantity: '', price: '', purchaseDate: '', store: '', notes: '' });
+              setUsePurchasedPackage(false);
+              resetConfirmation();
+              setError('');
+            }}
+            onPreview={setReceiptPhotoUrl}
+            onSelect={applyReceiptItem}
+            onManual={() => { setReceiptItemDescription(undefined); setReceiptReadMethod(undefined); resetConfirmation(); }}
+            onRemove={() => { setReceiptPhotoUrl(''); setReceiptPresent(false); setReceiptItemDescription(undefined); setReceiptReadMethod(undefined); resetConfirmation(); }}
+          />
           <div className="flex gap-2">
             {summary.components.length > 0 && (
               <button type="button" onClick={() => {
                 setSource('plan');
                 const first = summary.components[0];
-                setSelected({ food: first.food, role: first.role });
+                chooseFood({ food: first.food, role: first.role });
               }} aria-pressed={source === 'plan'} className="min-h-11 rounded-xl border border-[var(--border-color)] px-3 text-xs font-bold text-[var(--text-primary)]">
                 {isEs ? 'Alimento del plan' : 'Plan food'}
               </button>
             )}
-            <button type="button" onClick={() => { setSource('internet'); setSelected(undefined); }} aria-pressed={source === 'internet'} className="min-h-11 rounded-xl border border-[var(--border-color)] px-3 text-xs font-bold text-[var(--text-primary)]">
+            <button type="button" onClick={() => { setSource('internet'); chooseFood(undefined); }} aria-pressed={source === 'internet'} className="min-h-11 rounded-xl border border-[var(--border-color)] px-3 text-xs font-bold text-[var(--text-primary)]">
               {isEs ? 'Buscar en internet' : 'Search online'}
             </button>
           </div>
           {source === 'internet' && (
             <OnlineFoodSearch species={pet.species} lang={userAccount.language} onSelect={(food) => {
               const component = summary.components.find((item) => sameFoodIdentity(item.food, food));
-              setSelected({
+              chooseFood({
                 food: component ? { ...component.food, bagSizeKg: food.bagSizeKg, availableSizesKg: food.availableSizesKg } : food,
                 role: component?.role ?? (food.type === 'wet' ? 'wet' : 'dry'),
               });
@@ -291,7 +369,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPurchasesChange, sta
               <span>{isEs ? 'Alimento de la compra' : 'Purchased food'}</span>
               <select aria-label={isEs ? 'Alimento de la compra' : 'Purchased food'} className={inputClass} value={selected ? `${selected.role}:${selected.food.id}` : ''} onChange={(event) => {
                 const component = summary.components.find((item) => `${item.role}:${item.food.id}` === event.target.value);
-                setSelected(component ? { food: component.food, role: component.role } : undefined);
+                chooseFood(component ? { food: component.food, role: component.role } : undefined);
                 setError('');
               }}>
                 {summary.components.map((component) => <option key={component.role} value={`${component.role}:${component.food.id}`}>{component.food.brand} {component.food.name}</option>)}
@@ -299,59 +377,60 @@ export function FoodCostTracker({ pet, plan, userAccount, onPurchasesChange, sta
             </label>
           )}
           {selected && (
-            <form key={`${selected.role}-${selected.food.id}-${selected.food.bagSizeKg ?? ''}`} onSubmit={savePurchase} className="space-y-4">
+            <form onSubmit={savePurchase} className="space-y-4">
               <p className="rounded-xl bg-[var(--surface-inner)] p-3 text-xs font-bold text-[var(--text-primary)]">{selected.food.brand} {selected.food.name}</p>
-              <div className="grid grid-cols-2 gap-3">
+              <fieldset disabled={photoLoading} className="grid grid-cols-2 gap-3 disabled:opacity-60">
+                <legend className="sr-only">{isEs ? 'Datos de la compra para confirmar' : 'Purchase details to confirm'}</legend>
                 <label className="space-y-1 text-xs font-bold text-[var(--text-primary)]">
                   <span>{isEs ? 'Peso de cada empaque' : 'Weight per package'}</span>
-                  <input className={inputClass} name="packageWeight" inputMode="decimal" required defaultValue={selected.food.bagSizeKg} />
+                  <input className={inputClass} name="packageWeight" inputMode="decimal" required value={draft.packageWeight} onChange={(event) => changeField('packageWeight', event.target.value)} />
                 </label>
                 <label className="space-y-1 text-xs font-bold text-[var(--text-primary)]">
                   <span>{isEs ? 'Unidad del peso' : 'Weight unit'}</span>
-                  <select aria-label={isEs ? 'Unidad del peso' : 'Weight unit'} className={inputClass} name="weightUnit"><option value="kg">kg</option><option value="g">g</option></select>
+                  <select aria-label={isEs ? 'Unidad del peso' : 'Weight unit'} className={inputClass} name="weightUnit" value={draft.weightUnit} onChange={(event) => changeField('weightUnit', event.target.value as 'kg' | 'g')}><option value="kg">kg</option><option value="g">g</option></select>
                 </label>
                 <label className="space-y-1 text-xs font-bold text-[var(--text-primary)]">
                   <span>{isEs ? 'Cantidad de empaques' : 'Number of packages'}</span>
-                  <input className={inputClass} name="quantity" type="number" min="1" max="1000" step="1" required defaultValue="1" />
+                  <input className={inputClass} name="quantity" type="number" min="1" max="1000" step="1" required value={draft.quantity} onChange={(event) => changeField('quantity', event.target.value)} />
                 </label>
                 <label className="space-y-1 text-xs font-bold text-[var(--text-primary)]">
                   <span>{isEs ? 'Importe total de este alimento (COP)' : 'Total amount for this food (COP)'}</span>
-                  <input className={inputClass} name="price" inputMode="decimal" placeholder={isEs ? 'Ej. 140.000' : 'E.g. 140000'} required />
+                  <input className={inputClass} name="price" inputMode="decimal" value={draft.price} onChange={(event) => changeField('price', event.target.value)} placeholder={isEs ? 'Ej. 140.000' : 'E.g. 140000'} required />
                 </label>
                 <label className="space-y-1 text-xs font-bold text-[var(--text-primary)]">
                   <span>{isEs ? 'Fecha de compra' : 'Purchase date'}</span>
-                  <input className={inputClass} name="purchaseDate" type="date" required max={localDateKey()} defaultValue={localDateKey()} />
+                  <input className={inputClass} name="purchaseDate" type="date" required max={localDateKey()} value={draft.purchaseDate} onChange={(event) => changeField('purchaseDate', event.target.value)} />
                 </label>
                 <label className="space-y-1 text-xs font-bold text-[var(--text-primary)]">
                   <span>{isEs ? 'Tienda (opcional)' : 'Store (optional)'}</span>
-                  <input className={inputClass} name="store" />
+                  <input className={inputClass} name="store" value={draft.store} onChange={(event) => changeField('store', event.target.value)} />
                 </label>
-              </div>
+              </fieldset>
               <p className="text-xs text-[var(--text-secondary)]">{isEs ? 'Ingresa el total pagado por todos estos empaques. Si la factura incluye otros productos, usa solo el importe de este alimento.' : 'Enter the total paid for these packages. If the receipt includes other products, use only this food’s amount.'}</p>
-              <div className="space-y-2">
-                <label className="flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-[var(--border-color)] px-3 text-xs font-bold text-[var(--text-primary)]">
-                  <Camera className="size-4" />
-                  {isEs ? 'Foto de factura o recibo (opcional)' : 'Receipt photo (optional)'}
-                  <input type="file" accept="image/*" capture="environment" onChange={uploadPhoto} className="sr-only" />
-                </label>
-                <p className="text-xs text-[var(--text-secondary)]">{isEs ? 'La foto queda adjunta a esta compra. Revisa e ingresa el importe y el peso.' : 'The photo is attached to this purchase. Review and enter the amount and weight.'}</p>
-                {receiptPhotoUrl && (
-                  <div className="relative overflow-hidden rounded-xl border border-[var(--border-color)]">
-                    <a href={receiptPhotoUrl} target="_blank" rel="noopener noreferrer"><img src={receiptPhotoUrl} alt={isEs ? 'Factura adjunta' : 'Attached receipt'} className="max-h-48 w-full object-contain" /></a>
-                    <button type="button" onClick={() => setReceiptPhotoUrl('')} aria-label={isEs ? 'Quitar foto de factura' : 'Remove receipt photo'} className="absolute right-2 top-2 rounded-lg bg-white p-2 text-red-700"><Trash2 className="size-4" /></button>
-                  </div>
-                )}
-              </div>
               <label className="block space-y-1 text-xs font-bold text-[var(--text-primary)]">
                 <span>{isEs ? 'Notas (opcional)' : 'Notes (optional)'}</span>
-                <textarea className={inputClass} name="notes" rows={2} />
+                <textarea className={inputClass} name="notes" rows={2} disabled={photoLoading} value={draft.notes} onChange={(event) => changeField('notes', event.target.value)} />
               </label>
+              <section role="region" aria-label={isEs ? 'Costo antes de guardar' : 'Cost before saving'} className="space-y-2 rounded-2xl bg-[var(--surface-inner)] p-3 text-xs">
+                <h4 className="font-extrabold text-[var(--text-primary)]">{isEs ? 'Costo de esta compra por porción' : 'This purchase’s cost per portion'}</h4>
+                {validDraftAmounts && draftPrice !== undefined && <p>{formatCOP(draftPrice / (draftPackageKg * draftQuantity), true)} / kg · {draftQuantity} × {weightLabel(draftPackageKg, userAccount.language)}</p>}
+                {draftSummary?.costPerDayCop !== undefined ? <>
+                  <dl className="grid grid-cols-2 gap-2"><div><dt>{isEs ? 'Por día' : 'Per day'}</dt><dd className="font-bold">{cost(draftSummary.costPerDayCop)}</dd></div><div><dt>{isEs ? 'Por mes estimado' : 'Estimated month'}</dt><dd className="font-bold">{cost(draftSummary.costPerMonthCop)}</dd></div></dl>
+                  <ul className="space-y-1">{draftSummary.meals.map((meal) => <li key={meal.index} className="flex justify-between gap-2"><span>{isEs ? 'Toma' : 'Meal'} {meal.index + 1} · {meal.time} · {formatNumber.format(meal.grams)} g</span><strong>{cost(meal.costCop)}{meal.partial ? (isEs ? ' · parcial' : ' · partial') : ''}</strong></li>)}</ul>
+                  {draftSummary.partial && <p className="font-bold text-amber-800 dark:text-amber-200">{isEs ? 'Costo parcial: falta precio de otra parte de la ración.' : 'Partial cost: another part of the ration has no price.'}</p>}
+                </> : <p className="text-[var(--text-secondary)]">{!draftComponent ? (isEs ? 'Selecciona el alimento de su plan para calcular el costo por porción. La compra de otro alimento se guarda sin cambiar su ración.' : 'Select the plan’s food to calculate cost per portion. A different food purchase does not change the feeding plan.') : (isEs ? 'Completa peso, cantidad e importe, y guarda una ración confirmada para calcular el costo por toma.' : 'Complete weight, quantity and amount, and save a confirmed feeding plan to calculate meal costs.')}</p>}
+                {draftChangesPackage && <p className="text-[var(--text-secondary)]">{isEs ? `Este costo corresponde al empaque de la compra. ${draftComponent?.packageKg ? `Tu plan usa ${weightLabel(draftComponent.packageKg, userAccount.language)}.` : 'Tu plan todavía no tiene un empaque confirmado.'}` : `This cost refers to the purchased package. ${draftComponent?.packageKg ? `Your plan uses ${weightLabel(draftComponent.packageKg, userAccount.language)}.` : 'Your plan does not have a confirmed package yet.'}`}</p>}
+              </section>
+              {canUpdatePackage && <label className="flex items-start gap-2 text-xs text-[var(--text-primary)]"><input type="checkbox" checked={usePurchasedPackage} onChange={(event) => { setUsePurchasedPackage(event.target.checked); resetConfirmation(); }} disabled={photoLoading} className="mt-0.5 accent-[#0B5D2E]" /><span>{isEs ? 'Usar este empaque en mi plan' : 'Use this package in my plan'}</span></label>}
+              {receiptItemDescription && <label className="flex items-start gap-2 text-xs text-[var(--text-primary)]"><input name="receiptFoodConfirmed" type="checkbox" required checked={receiptFoodConfirmed} onChange={(event) => setReceiptFoodConfirmed(event.target.checked)} disabled={photoLoading || receiptSelectionRequired} className="mt-0.5 accent-[#0B5D2E]" /><span>{isEs ? 'Este artículo corresponde al alimento seleccionado' : 'This item matches the selected food'}</span></label>}
+              {receiptItemDescription && <p className="text-xs text-[var(--text-secondary)]">{isEs ? 'Artículo leído:' : 'Recognized item:'} {receiptItemDescription}<br />{isEs ? 'Se guardará para:' : 'Will be saved for:'} {pet.name} · {selected.food.brand} {selected.food.name}</p>}
+              {receiptSelectionRequired && <p className="text-xs font-bold text-amber-800 dark:text-amber-200">{isEs ? 'Elige un artículo de la factura o completa los datos manualmente antes de guardar.' : 'Choose a receipt item or enter the details manually before saving.'}</p>}
               <label className="flex items-start gap-2 text-xs text-[var(--text-primary)]">
-                <input name="confirmed" type="checkbox" required className="mt-0.5 accent-[#0B5D2E]" />
+                <input name="confirmed" type="checkbox" required checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} disabled={photoLoading || receiptSelectionRequired} className="mt-0.5 accent-[#0B5D2E]" />
                 <span>{isEs ? 'Confirmo el importe y el peso de este alimento' : 'I confirm the amount and weight for this food'}</span>
               </label>
               {error && <p role="alert" className="flex gap-2 rounded-xl bg-red-50 p-3 text-xs text-red-800"><AlertCircle className="size-4 shrink-0" />{error}</p>}
-              <button type="submit" disabled={photoLoading} className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#0B5D2E] px-3 text-sm font-extrabold text-white disabled:opacity-50"><Receipt className="size-4" />{photoLoading ? (isEs ? 'Preparando imagen…' : 'Preparing image…') : (isEs ? 'Guardar compra' : 'Save purchase')}</button>
+              <button type="submit" disabled={photoLoading || receiptSelectionRequired} className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#0B5D2E] px-3 text-sm font-extrabold text-white disabled:opacity-50"><Receipt className="size-4" />{photoLoading ? (isEs ? 'Leyendo factura…' : 'Reading receipt…') : (isEs ? 'Guardar compra' : 'Save purchase')}</button>
             </form>
           )}
         </div>

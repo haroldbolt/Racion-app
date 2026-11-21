@@ -1184,7 +1184,9 @@ export const TodayView: React.FC<TodayViewProps> = ({
               <button type="button" onClick={() => setShowCostTracker(false)} aria-label={isEs ? 'Cerrar gastos' : 'Close expenses'} className="flex size-11 items-center justify-center rounded-full text-[var(--text-primary)]">×</button>
             </header>
             <div className="overflow-y-auto p-4">
-              <FoodCostTracker pet={pet} plan={effectivePlan} userAccount={userAccount} startWithForm onPurchasesChange={() => setPurchaseRefreshKey((key) => key + 1)} />
+              <FoodCostTracker pet={pet} plan={effectivePlan} userAccount={userAccount} startWithForm
+                onPlanUpdate={(patch) => persistPlanUpdate({ ...effectivePlan, ...patch })}
+                onPurchasesChange={() => setPurchaseRefreshKey((key) => key + 1)} />
             </div>
           </section>
         </div>

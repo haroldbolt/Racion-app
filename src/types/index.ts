@@ -195,6 +195,8 @@ export interface FoodCostEntry {
   estimatedDaysDuration?: number; // days the bag lasts
   storeName?: string; // e.g. "Agrocampo", "Laika", "Éxito", "Veterinaria"
   receiptPhotoUrl?: string; // photo or receipt image data URL
+  receiptReadMethod?: 'local_ocr' | 'pdf_text';
+  receiptItemDescription?: string;
   notes?: string;
   createdAt: string;
   // Shopify catalog integration identifiers & fields

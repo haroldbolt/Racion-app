@@ -126,3 +126,21 @@ export function withPlanCosts(plan: FeedingPlan, purchases: readonly FoodCostEnt
     monthlyCostCop: summary.partial ? undefined : summary.costPerMonthCop,
   };
 }
+
+/** Only an explicitly confirmed purchase may change the package; portions and labels stay intact. */
+export function withPurchasedPackage(plan: FeedingPlan, food: FoodItem, packageKg: number): FeedingPlan {
+  if (!positive(packageKg) || plan.isVetLocked || ![plan.dryFood, plan.wetFood].some((item) => item && sameFoodIdentity(item, food))) return plan;
+  const primary = getPrimaryPlanFood(plan);
+  const isPrimary = Boolean(primary && sameFoodIdentity(primary, food));
+  const component = getPlanCostSummary(plan).components.find((item) => sameFoodIdentity(item.food, food));
+  const replace = (item?: FoodItem) => item && sameFoodIdentity(item, food) ? {
+    ...item, bagSizeKg: packageKg,
+    barcode: item.bagSizeKg === packageKg ? item.barcode : undefined,
+    priceBasis: item.priceBasis?.packageKg === packageKg ? item.priceBasis :
+      item.packagePrices?.find((basis) => basis.packageKg === packageKg),
+  } : item;
+  return withPlanCosts({ ...plan, dryFood: replace(plan.dryFood), wetFood: replace(plan.wetFood),
+    ...(isPrimary ? { bagWeightKg: packageKg,
+      bagDaysRemaining: component?.gramsPerDay ? packageKg * 1000 / component.gramsPerDay : undefined } : {}),
+  });
+}

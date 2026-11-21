@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 import {defineConfig} from 'vite';
+import { receiptAssets } from './receiptAssets.ts';
 
 export default defineConfig(() => {
   const pagesPath = process.env.PAGES_BASE_PATH?.replace(/^\/+|\/+$/g, '');
@@ -14,6 +15,7 @@ export default defineConfig(() => {
     plugins: [
       react(),
       tailwindcss(),
+      receiptAssets(),
       VitePWA({
         registerType: 'autoUpdate',
         scope: base,
@@ -49,6 +51,7 @@ export default defineConfig(() => {
           ],
         },
         workbox: {
+          globIgnores: ['ocr/**'],
           globPatterns: [
             '**/*.{js,css,html,ico,woff,woff2}',
             'assets/food_*',

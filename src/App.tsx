@@ -514,7 +514,8 @@ export default function App() {
             onUpdateVetGuideline={handleUpdateVetGuideline}
             onSelectFoodForPet={handleSelectFoodForPet}
             onResetAllData={handleResetAllData}
-            onComparePrices={habitualFood && habitualFood.type !== 'barf' ? () => openPriceComparison('more') : undefined}
+            onComparePrices={habitualFood && habitualFood.type !== 'barf' ? (food) => openPriceComparison('more', food) : undefined}
+            onPlanUpdate={handleUpdatePlanDetails}
             onNavigateTab={setCurrentTab}
 
           />
