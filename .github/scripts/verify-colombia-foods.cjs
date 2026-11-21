@@ -124,11 +124,16 @@ async function verify() {
       assert.equal(await input(review,'Declaración de ' + name.toLowerCase()).inputValue(),qualifier);
     }
     await review.getByRole('button',{name:'Cerrar',exact:true}).click();
-    await page.getByRole('article',{name:'Marca de prueba ' + syntheticFormula,exact:true}).waitFor();
+    const savedManual = page.getByRole('article',{name:'Marca de prueba ' + syntheticFormula,exact:true});
+    await savedManual.getByRole('button',{name:'Editar ficha',exact:true}).click();
+    assert.equal(await input(review,'Especie indicada en el empaque').inputValue(),'cat');
+    assert.equal(await input(review,'Etapa indicada en el empaque').inputValue(),'adult');
+    assert.equal(await input(review,'Proteína (%)').inputValue(),'30');
+    await review.getByRole('button',{name:'Cerrar',exact:true}).click();
     console.log(JSON.stringify({site:url.origin,product:listing.name,retailer:listing.retailer,
       sizesKg:listing.presentations.map(item => item.packageKg),selectedPackageKg:packageKg,priceCop,
       prefilled:['proteinMin:36','fatMin:9','ashMax:4.5','moistureMax:10'],retailerConfirmation:true,
-      pastedLabelWithReview:true,persistedAfterReload:true}));
+      pastedLabelWithReview:true,manualSpecies:'cat',manualStage:'adult',persistedAfterReload:true}));
   } catch (error) {
     console.error('Colombia foods verification stopped on',page.url());
     console.error((await page.locator('main').innerText()).slice(-2000));
