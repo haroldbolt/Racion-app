@@ -247,7 +247,7 @@ export function shopifyProductToFoodItem(sp: ShopifyProduct, preferredWeightKg?:
     ashPct: ficha?.cenizas?.valor,
     carbsPct: ficha?.carbohidratos?.valor,
     country: sp.mercado || 'Colombia',
-    bagSizeKg: preferredWeightKg || (sizesKg.length > 0 ? sizesKg[0] : 15),
+    bagSizeKg: preferredWeightKg || sizesKg[0],
     availableSizesKg: sizesKg,
     imageUrl: sp.foto_url || undefined,
     labelStatus: hasVerifiedKcal

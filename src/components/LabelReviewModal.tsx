@@ -10,6 +10,7 @@ import type {
 } from '../types';
 import { getEffectiveNutrientField } from '../utils/mealNutrition';
 import { StorageService } from '../utils/storage';
+import { getConfirmedPresentations } from '../data/foodPresentations';
 
 interface LabelReviewModalProps {
   isOpen: boolean;
@@ -123,6 +124,8 @@ const LabelForm: React.FC<LabelFormProps> = ({
     const ficha: NutritionDatasheet = {
       coincidenciaEstado: 'pendiente',
       fuenteNombre: isEs ? `${source} · ingresada por ti` : 'Label values entered by you',
+      fuenteUrl: currentFood?.fichaNutricional?.fuenteUrl,
+      fechaConsulta: currentFood?.fichaNutricional?.fechaConsulta,
     };
     if (kcal !== undefined) {
       ficha.kcalPerKg = { valor: kcal, unidadOriginal: 'kcal/kg', baseMedicion: 'tal_como_se_vende', calificador: 'tipico' };
@@ -173,10 +176,15 @@ const LabelForm: React.FC<LabelFormProps> = ({
       ashPct: asSold('cenizas'),
       carbsPct: asSold('carbohidratos'),
       country: currentFood?.country ?? '',
-      barcode: currentFood?.barcode,
+      barcode: bagSizeKg === currentFood?.bagSizeKg ? currentFood?.barcode : undefined,
       bagSizeKg,
-      availableSizesKg: currentFood?.availableSizesKg,
+      availableSizesKg: getConfirmedPresentations({
+        id: currentFood?.id,
+        availableSizesKg: getConfirmedPresentations(currentFood) ?? [],
+        bagSizeKg,
+      }) ?? undefined,
       imageUrl: currentFood?.imageUrl,
+      buyUrl: currentFood?.buyUrl,
       labelStatus: hasNutrition ? 'user_confirmed_label' : 'unconfirmed',
       labelPhotoUrl: labelPhotoUrl || undefined,
       isCompleteAndBalanced: data.has('complete') || undefined,

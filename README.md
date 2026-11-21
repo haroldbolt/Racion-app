@@ -45,4 +45,6 @@ El servicio comparte resultados del mismo día para una fórmula, presentación 
 
 ## Catálogo
 
+El buscador ofrece **Catálogo guardado** e **Internet**. El catálogo guardado reúne las fichas precargadas, el catálogo adicional y las etiquetas personales. Internet consulta el catálogo público de Laia Pets, con un enlace para ampliar la búsqueda en la web. Las presentaciones elegidas se pueden guardar en **Mis alimentos** junto con la fuente y las kcal de la etiqueta, cuando estén disponibles.
+
 Las fichas locales están en `src/data/foods.ts` y el catálogo adicional en `public/assets/aistudio/Catalogo_Alimentos_Racion_App_68a4174d.json`. Al ampliar una ficha, registra las kcal/kg y su fuente cuando estén disponibles en la etiqueta; evita rellenar valores que no estén declarados.

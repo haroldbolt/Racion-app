@@ -3,7 +3,8 @@ import { publicAssetUrl } from '../utils/publicAssetUrl';
 import { Pet, FoodItem, FeedingPlan, RecentFoodSearch } from '../types';
 import { PET_FOODS_DATABASE } from '../data/foods';
 import { StorageService } from '../utils/storage';
-import { getConfirmedPresentations } from '../data/foodPresentations';
+import { getConfirmedPresentations, mergeFoodCatalog } from '../data/foodPresentations';
+import { OnlineFoodSearch } from './OnlineFoodSearch';
 import { loadShopifyCatalog, ShopifyProduct, shopifyProductToFoodItem } from '../services/shopifyCatalogService';
 import { Search, X, Clock, ArrowRight, Package, Sparkles, Check } from 'lucide-react';
 
@@ -98,11 +99,13 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
 
   // Instant reactive state: typing immediately updates filtered results without any debounce delay
   const [query, setQuery] = useState('');
+  const [searchSource, setSearchSource] = useState<'catalog' | 'internet'>('catalog');
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!isOpen) {
       setQuery('');
+      setSearchSource('catalog');
       return;
     }
     // Auto-focus immediately when modal opens
@@ -126,16 +129,21 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
     if (!trimmed) return null;
 
     // Matches e.g. "4kg", "15 kg", "7.5kilos", "12k"
-    const kgMatch = trimmed.match(/(\d+(?:\.\d+)?)\s*(?:kg|kilos|kilo|k)\b/i);
+    const kgMatch = trimmed.match(/(\d+(?:[.,]\d+)?)\s*(?:kg|kilos|kilo|k)\b/i);
     if (kgMatch) {
-      const val = parseFloat(kgMatch[1]);
+      const val = parseFloat(kgMatch[1].replace(',', '.'));
       return val > 0 && val <= 50 ? val : null;
+    }
+    const gramsMatch = trimmed.match(/(\d+(?:[.,]\d+)?)\s*(?:g|gr|gramos?)\b/i);
+    if (gramsMatch) {
+      const value = Number(gramsMatch[1].replace(',', '.')) / 1000;
+      return value > 0 && value <= 50 ? value : null;
     }
 
     // Matches trailing standalone number like "fit 32 4" (avoid matching line numbers like 32)
-    const trailingNumMatch = trimmed.match(/\s+(\d+(?:\.\d+)?)$/);
+    const trailingNumMatch = trimmed.match(/\s+(\d+(?:[.,]\d+)?)$/);
     if (trailingNumMatch) {
-      const val = parseFloat(trailingNumMatch[1]);
+      const val = parseFloat(trailingNumMatch[1].replace(',', '.'));
       // Standard commercial bag sizes
       if ([1, 1.5, 2, 3, 4, 6.8, 7.5, 8, 10, 12, 13.6, 14, 15, 17, 20].includes(val)) {
         return val;
@@ -148,10 +156,13 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
   // Tokenize query for smart multi-field matching
   const searchTokens = useMemo(() => {
     const rawTokens = normalizeText(query)
-      .replace(/(\d+(?:\.\d+)?)\s*(?:kg|kilos|kilo|k)\b/g, '') // strip weight token from name tokens
+      .replace(/(\d+(?:[.,]\d+)?)\s*(?:kg|kilos|kilo|k|g|gr|gramos?)\b/g, '') // strip explicit package weights
       .split(/\s+/)
       .filter((t) => t.length > 0);
 
+    if (extractedWeight && Number(rawTokens[rawTokens.length - 1]?.replace(',', '.')) === extractedWeight) {
+      rawTokens.pop();
+    }
     return rawTokens.map((tok) => {
       // Alias expansions
       if (tok === 'rc') return 'royal';
@@ -159,7 +170,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
       if (tok === 'sd') return 'science';
       return tok;
     });
-  }, [query]);
+  }, [query, extractedWeight]);
 
   // 1. Registered foods from all user pets
   const registeredPetFoods = useMemo(() => {
@@ -188,7 +199,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
           petSpecies: p.species,
           brand,
           productName,
-          weightKg: plan.bagWeightKg || 15,
+          weightKg: plan.bagWeightKg || plan.dryFood?.bagSizeKg || plan.wetFood?.bagSizeKg || 0,
           imageUrl: thumbnail,
           foodItem: plan.dryFood,
           searchableText: normalizeText(`${p.name} ${brand} ${productName} ${p.species}`),
@@ -234,15 +245,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
   // Combined Catalog database (built-in + user custom foods + Shopify full catalog)
   const catalogFoods = useMemo(() => {
     const custom = StorageService.getCustomFoods();
-    const merged = [...custom, ...PET_FOODS_DATABASE, ...shopifyAsFoodItems];
-    // Deduplicate identical brand+name prioritizing custom / verified built-in items ahead of pending Shopify entries
-    const seen = new Set<string>();
-    return merged.filter((f) => {
-      const k = `${normalizeText(f.brand)}__${normalizeText(f.name)}__${f.species}__${f.type}`;
-      if (seen.has(k)) return false;
-      seen.add(k);
-      return true;
-    });
+    return mergeFoodCatalog([...custom, ...PET_FOODS_DATABASE, ...shopifyAsFoodItems]);
   }, [shopifyAsFoodItems]);
 
   // Filter Tier 1 (Registered Pet Foods) instantly
@@ -355,10 +358,10 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
     customSizes?: number[]
   ) => {
     const confirmed = customSizes || getConfirmedPresentations(item);
-    let chosenWeight = preferredWeight || (formulaType ? 0 : 15);
+    let chosenWeight = preferredWeight || item?.bagSizeKg || 0;
 
     // If query contained an extracted weight and it's valid, prioritize it
-    if (extractedWeight && (confirmed?.includes(extractedWeight) || (!formulaType && !confirmed?.length))) {
+    if (extractedWeight && confirmed?.includes(extractedWeight)) {
       chosenWeight = extractedWeight;
     } else if (confirmed && confirmed.length > 0) {
       chosenWeight = preferredWeight && confirmed.includes(preferredWeight)
@@ -375,7 +378,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
       productName: name,
       weightKg: chosenWeight,
       imageUrl: resolvedImg,
-      sourceFoodItem: item,
+      sourceFoodItem: item ? { ...item, bagSizeKg: chosenWeight > 0 ? chosenWeight : undefined } : undefined,
       confirmedSizesKg: confirmed && confirmed.length > 0 ? confirmed : undefined,
     });
     onClose();
@@ -430,6 +433,40 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
           </button>
         </div>
 
+        <div role="group" aria-label={isEs ? 'Origen del alimento' : 'Food source'} className="flex shrink-0 gap-1 rounded-xl bg-[#EAF4EC] p-1">
+          {(['catalog', 'internet'] as const).map((source) => (
+            <button
+              key={source}
+              type="button"
+              aria-pressed={searchSource === source}
+              onClick={() => setSearchSource(source)}
+              className={`min-h-11 rounded-lg px-3 text-xs font-bold ${searchSource === source ? 'bg-white text-[#0B5D2E] shadow-xs' : 'text-[#44544A]'}`}
+            >
+              {source === 'internet' ? 'Internet' : (isEs ? 'Catálogo guardado' : 'Saved catalog')}
+            </button>
+          ))}
+        </div>
+        {searchSource === 'internet' ? (
+          <div className="flex-1 overflow-y-auto">
+            <OnlineFoodSearch
+              species={activePet?.species || 'dog'}
+              foodType={formulaType}
+              initialQuery={query}
+              lang={lang}
+              onSelect={(food) => {
+                onSelectFood({
+                  brand: food.brand,
+                  productName: food.name,
+                  weightKg: food.bagSizeKg || 0,
+                  imageUrl: food.imageUrl,
+                  sourceFoodItem: food,
+                  confirmedSizesKg: food.availableSizesKg,
+                });
+                onClose();
+              }}
+            />
+          </div>
+        ) : <>
         {/* Unified Search Input with Instant Typing Feedback */}
         <div className="relative shrink-0">
           <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" />
@@ -442,7 +479,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
               if (e.key === 'Enter') {
                 if (filteredCatalog.length > 0) {
                   const top = filteredCatalog[0];
-                  const sizes = getConfirmedPresentations(top) || (top.bagSizeKg ? [top.bagSizeKg] : formulaType ? [] : [15]);
+                  const sizes = getConfirmedPresentations(top) || [];
                   handleSelectOption(top.brand, top.name, sizes[0], top.imageUrl, top);
                 }
               }
@@ -532,7 +569,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
                             {renderHighlighted(rf.productName)}
                           </p>
                           <p className="text-[10px] font-bold text-[#0B5D2E] mt-0.5">
-                            {rf.weightKg} kg · {isEs ? 'Ración habitual' : 'Usual food'}
+                            {rf.weightKg > 0 ? `${rf.weightKg} kg` : (isEs ? 'Empaque sin dato' : 'Package size unknown')} · {isEs ? 'Ración habitual' : 'Usual food'}
                           </p>
                         </div>
                       </div>
@@ -610,7 +647,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
             {filteredCatalog.length > 0 ? (
               <div className="space-y-2">
                 {filteredCatalog.map((food) => {
-                  const sizes = getConfirmedPresentations(food) || (food.bagSizeKg ? [food.bagSizeKg] : formulaType ? [] : [15]);
+                  const sizes = getConfirmedPresentations(food) || [];
                   const thumbnail = resolveFoodThumbnail(food.brand, food.name, food.species, food.imageUrl);
                   const isCat = food.species === 'cat';
 
@@ -768,10 +805,11 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
             )}
           </div>
         </div>
+        </>}
 
         {/* Footer info note */}
         <div className="pt-1 border-t border-gray-100 flex items-center justify-between text-[10px] text-gray-400 shrink-0">
-          <span>{isEs ? 'Filtro local sin esperas' : 'Instant local filter'}</span>
+          <span>{searchSource === 'internet' ? (isEs ? 'Fuente: Laia Pets' : 'Source: Laia Pets') : (isEs ? 'Filtro local sin esperas' : 'Instant local filter')}</span>
           <span>{isEs ? 'Enter para seleccionar' : 'Enter to select'}</span>
         </div>
       </div>

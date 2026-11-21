@@ -46,6 +46,7 @@ jobs:
           preview_pid=$!
           trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
           node .github/scripts/verify-pages.cjs "http://127.0.0.1:4196${PAGES_BASE_PATH%/}/" --price-fixtures
+          node .github/scripts/verify-food-search.cjs "http://127.0.0.1:4196${PAGES_BASE_PATH%/}/" --fixtures
       - run: bun run build
         env:
           PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}

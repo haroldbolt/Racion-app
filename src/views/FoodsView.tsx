@@ -13,6 +13,8 @@ import { formatRation } from '../utils/i18n';
 import { FoodCostTracker } from '../components/FoodCostTracker';
 import { FoodLabelComposition } from '../components/FoodLabelComposition';
 import { LabelReviewModal } from '../components/LabelReviewModal';
+import { OnlineFoodSearch } from '../components/OnlineFoodSearch';
+import { mergeFoodCatalog } from '../data/foodPresentations';
 import { UnifiedFoodSearchModal } from '../components/UnifiedFoodSearchModal';
 import {
   loadShopifyCatalog,
@@ -95,6 +97,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
 
   // Search & filter for Catalog
   const [query, setQuery] = useState('');
+  const [searchSource, setSearchSource] = useState<'catalog' | 'internet'>('catalog');
   const [filterType, setFilterType] = useState<'all' | 'dry' | 'wet'>('all');
 
   // Shopify Catalog load
@@ -118,23 +121,11 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
 
   // The public catalog keeps its own entries; personal fichas can use the same product name.
   const catalogFoods = useMemo(() => {
-    const merged: FoodItem[] = [];
-    const seenKeys = new Set<string>();
-    const addUnique = (item: FoodItem) => {
-      const k = `${item.species}__${item.type}__${item.brand.toLowerCase().trim()}__${item.name.toLowerCase().trim()}`;
-      if (seenKeys.has(k)) return;
-      seenKeys.add(k);
-      merged.push(item);
-    };
-    // Active curated foods with full datasheets first
-    PET_FOODS_DATABASE.filter((f) => f.kcalPerKg > 400).forEach(addUnique);
-    // Active Shopify foods
-    shopifyFoods.filter((f) => f.estadoCatalogo !== 'archivado').forEach(addUnique);
-    // Remaining curated foods
-    PET_FOODS_DATABASE.forEach(addUnique);
-    // Archived Shopify foods last
-    shopifyFoods.filter((f) => f.estadoCatalogo === 'archivado').forEach(addUnique);
-    return merged;
+    return mergeFoodCatalog([
+      ...PET_FOODS_DATABASE,
+      ...shopifyFoods.filter((f) => f.estadoCatalogo !== 'archivado'),
+      ...shopifyFoods.filter((f) => f.estadoCatalogo === 'archivado'),
+    ]);
   }, [shopifyFoods]);
   const allFoods = useMemo(() => [...customFoods, ...catalogFoods], [customFoods, catalogFoods]);
 
@@ -624,6 +615,30 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                 {isEs ? 'Agregar alimento' : 'Add food'}
               </button>
             </div>
+            {!showingLibrary && (
+              <div role="group" aria-label={isEs ? 'Origen del alimento' : 'Food source'} className="flex gap-1 rounded-xl bg-[#EAF4EC] p-1">
+                {(['catalog', 'internet'] as const).map((source) => (
+                  <button
+                    key={source}
+                    type="button"
+                    aria-pressed={searchSource === source}
+                    onClick={() => setSearchSource(source)}
+                    className={`min-h-11 rounded-lg px-3 text-xs font-bold ${searchSource === source ? 'bg-white text-[#0B5D2E] shadow-xs' : 'text-[#44544A]'}`}
+                  >
+                    {source === 'internet' ? 'Internet' : (isEs ? 'Catálogo guardado' : 'Saved catalog')}
+                  </button>
+                ))}
+              </div>
+            )}
+            {searchSource === 'internet' && !showingLibrary ? (
+              <OnlineFoodSearch
+                species={pet.species}
+                foodType={filterType === 'all' ? undefined : filterType}
+                initialQuery={query}
+                lang={userAccount.language}
+                onSelect={(food) => setLabelDraft({ food })}
+              />
+            ) : <>
             {!showingLibrary && catalogStats && (
               <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] bg-[#F8FAF8] px-3 py-2 rounded-xl border border-gray-100 text-[#44544A]">
                 <span>
@@ -668,10 +683,26 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                 {filteredFoods.length} {isEs ? 'alimentos' : 'foods'}
               </span>
             </div>
+            </>}
+            {searchSource === 'internet' && !showingLibrary && (
+              <div role="group" aria-label={isEs ? 'Tipo de alimento' : 'Food type'} className="flex gap-1.5">
+                {(['all', 'dry', 'wet'] as const).map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    aria-pressed={filterType === type}
+                    onClick={() => setFilterType(type)}
+                    className={`min-h-11 rounded-lg border px-3 text-xs font-bold ${filterType === type ? 'bg-[#0B5D2E] text-white' : 'bg-white text-[#44544A]'}`}
+                  >
+                    {type === 'all' ? (isEs ? 'Todos' : 'All') : type === 'dry' ? (isEs ? 'Seco' : 'Dry') : (isEs ? 'Húmedo' : 'Wet')}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Foods list (slice first 60 matches for snappy DOM) */}
-          <div className="space-y-3">
+          {(showingLibrary || searchSource === 'catalog') && <div className="space-y-3">
             {filteredFoods.length === 0 && (
               <p className="rounded-2xl bg-white p-4 text-sm text-[#44544A]">
                 {showingLibrary && !query
@@ -771,7 +802,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                 </div>
               );
             })}
-          </div>
+          </div>}
         </div>
       )}
 

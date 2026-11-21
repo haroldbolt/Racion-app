@@ -46,36 +46,30 @@ export const CONFIRMED_FOOD_PRESENTATIONS: Record<string, number[]> = {
   'agility-gold-gatos-adultos': [1.5, 3, 7],
 };
 
-/**
- * Helper to get verified presentations for a given food.
- * If not in database, falls back to the item's availableSizesKg, bagSizeKg, or null.
- */
-export function getConfirmedPresentations(food?: FoodItem | null): number[] | null {
+/** Returns sizes declared in the catalog or saved by the user. */
+export function getConfirmedPresentations(food?: Partial<FoodItem> | null): number[] | null {
   if (!food) return null;
-  if (food.id && CONFIRMED_FOOD_PRESENTATIONS[food.id]) {
-    return CONFIRMED_FOOD_PRESENTATIONS[food.id];
-  }
-  if (food.availableSizesKg && food.availableSizesKg.length > 0) {
-    return food.availableSizesKg;
-  }
-  // Brand/name heuristic match
-  const nameLower = `${food.brand} ${food.name}`.toLowerCase();
-  if (nameLower.includes('fit 32')) return [2, 4, 10];
-  if (nameLower.includes('medium adult')) return [1.5, 3, 7.5, 15];
-  if (nameLower.includes('maxi adult')) return [3, 15];
-  if (nameLower.includes('mini adult')) return [1, 3, 7.5];
-  if (nameLower.includes('sterilised')) return [2, 4, 10];
-  if (nameLower.includes('optiderma')) return [3, 7.5, 14];
-  if (nameLower.includes('science diet') && food.species === 'cat') return [1.5, 3.17, 7];
-  if (nameLower.includes('science diet') && food.species === 'dog') return [2, 7, 15];
-  // Agility Gold presentations
-  if (nameLower.includes('agility gold') && (nameLower.includes('pequeñ') || nameLower.includes('mini'))) return [1.5, 3, 7];
-  if (nameLower.includes('agility gold') && (nameLower.includes('cachorro') || nameLower.includes('puppy'))) return [1.5, 3, 7, 15];
-  if (nameLower.includes('agility gold') && (nameLower.includes('gato') || food.species === 'cat')) return [1.5, 3, 7];
-  if (nameLower.includes('agility gold')) return [3, 7, 15];
+  const sizes = [
+    ...(food.id ? CONFIRMED_FOOD_PRESENTATIONS[food.id] ?? [] : []),
+    ...(food.availableSizesKg ?? []),
+    food.bagSizeKg,
+  ].filter((size): size is number => typeof size === 'number' && Number.isFinite(size) && size > 0);
+  const unique = [...new Set(sizes)].sort((a, b) => a - b);
+  return unique.length > 0 ? unique : null;
+}
 
-  if (food.bagSizeKg && food.bagSizeKg > 0) {
-    return [food.bagSizeKg];
+/** Keeps the first nutritional label and combines declared packages of the same formula. */
+export function mergeFoodCatalog(items: FoodItem[]): FoodItem[] {
+  const merged = new Map<string, FoodItem>();
+  const normalize = (value: string) => value.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+  for (const item of items) {
+    const key = [item.brand, item.name, item.species, item.type].map(normalize).join('__');
+    const previous = merged.get(key);
+    const availableSizesKg = [...new Set([
+      ...(getConfirmedPresentations(previous) ?? []),
+      ...(getConfirmedPresentations(item) ?? []),
+    ])].sort((a, b) => a - b);
+    merged.set(key, { ...(previous ?? item), availableSizesKg });
   }
-  return null;
+  return [...merged.values()];
 }
