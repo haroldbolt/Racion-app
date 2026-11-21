@@ -1,0 +1,23 @@
+name: Verify published food and costs
+
+on:
+  push:
+    branches: ['verify/alimento-y-costo-publicado']
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --prefix "$RUNNER_TEMP/racion-browser" --no-save --package-lock=false --no-audit --no-fund playwright-core@1.62.1
+      - name: Verify live food, plan, prices, receipt and reload
+        run: |
+          export PLAYWRIGHT_PATH="$RUNNER_TEMP/racion-browser/node_modules/playwright-core"
+          node .github/scripts/verify-live-unified.cjs https://racion-app.pages.dev/

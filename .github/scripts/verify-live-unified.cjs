@@ -1,0 +1,293 @@
+const assert = require('node:assert/strict');
+const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright-core');
+
+const merchantOrigin = 'https://storefront-api.tiendanube.com';
+const livePriceEndpoint = 'https://racion-live-prices.jumer4.workers.dev/api/live-prices';
+const searchQuery = 'Royal Canin Sterilised 37';
+const formulaName = 'Sterilised 37 Concentrado para Gatos Adultos';
+const formula = `Royal Canin ${formulaName}`;
+
+async function waitForSite(url) {
+  let failure;
+  for (let attempt = 0; attempt < 10; attempt++) {
+    try {
+      const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
+      if (response.ok && (await response.text()).includes('<title>Ración App</title>')) return;
+      failure = new Error(`Unexpected site response: HTTP ${response.status}`);
+    } catch (error) {
+      failure = error;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+  }
+  throw failure;
+}
+
+const cop = (amount) => new RegExp(`^\\$\\s*${new Intl.NumberFormat('es-CO').format(amount).replaceAll('.', '[.\\s]')}\\s+COP$`);
+
+async function expectMealCosts(region, dailyCost, mealCost) {
+  await region.getByText(cop(dailyCost)).waitFor();
+  for (const [index, time] of [[1, '08:30'], [2, '19:30']]) {
+    const meal = region.getByRole('listitem').filter({ hasText: `Toma ${index} · ${time}` });
+    await meal.getByText(cop(mealCost)).waitFor();
+  }
+  assert.match(await region.innerText(), /Un empaque rinde ~37(?:[.,]0)? días/);
+}
+
+// Keep catalog and comparator responses separate: choosing a food never spends a price
+// lookup, and selecting a quote must use the formula and presentation in the saved plan.
+async function verifyFoodPriceCoherence(page, button, live) {
+  assert.equal(live.requests.length, 0, 'Food catalog lookup must not submit a price search');
+
+  await button('+ Mascota').click();
+  await button('🐱 Gato').click();
+  await page.getByRole('textbox', { name: 'Ej. Milo' }).fill('Nube');
+  await page.getByRole('spinbutton', { name: 'Peso Actual (kg)' }).fill('4.3');
+  await button('Guardar mascota').click();
+  await button('♀ Hembra').click();
+  await button(/continuar a condición/i).click();
+  await button(/continuar a objetivo/i).click();
+  await button(/continuar a alimento/i).click();
+  assert.equal(await button('Internet').getAttribute('aria-pressed'), 'true');
+  await page.getByRole('textbox', { name: 'Buscar alimentos en internet', exact: true }).fill(searchQuery);
+  await button('Buscar en internet').click();
+  const product = page.getByRole('region', { name: 'Resultados de internet' })
+    .getByRole('article', { name: formula, exact: true });
+  await product.waitFor({ timeout: 45000 });
+  await product.getByRole('button', { name: 'Elegir 2 kg', exact: true }).click();
+  const label = page.getByRole('dialog', { name: 'Revisar etiqueta', exact: true });
+  assert.equal(await label.getByLabel('Tamaño del empaque (kg)', { exact: true }).inputValue(), '2');
+  const energy = label.getByLabel('Energía metabolizable (kcal/kg)', { exact: true });
+  assert.equal(await energy.inputValue(), '', 'Merchant marketing must never supply inferred nutrition');
+  await energy.fill('4000');
+  await label.getByRole('checkbox', { name: /declara alimento completo y balanceado/i }).check();
+  await label.getByRole('button', { name: 'Guardar ficha', exact: true }).click();
+  await page.getByRole('spinbutton').nth(0).fill('2');
+  await page.getByRole('spinbutton').nth(1).fill('15');
+  await button(/continuar a comidas/i).click();
+  await page.getByLabel('Hora de la toma 1', { exact: true }).fill('08:30');
+  await page.getByLabel('Hora de la toma 2', { exact: true }).fill('19:30');
+  await button(/ver su plan nutricional/i).click();
+  await page.getByText('54 g', { exact: true }).waitFor();
+  assert.equal(await page.getByText('27 g', { exact: true }).count(), 2);
+  await button('Guardar este plan').click();
+  const todayCost = page.getByRole('region', { name: 'Costo de su ración', exact: true });
+  await expectMealCosts(todayCost, 3699, 1850);
+  assert.equal(live.requests.length, 0, 'Saving the merchant price must not run a comparator search');
+
+  await button('Alimentos').click();
+  await button('Gastos ($ COP)').click();
+  const expenseCost = page.getByRole('region', { name: 'Costo de la ración', exact: true });
+  await expectMealCosts(expenseCost, 3699, 1850);
+  assert.match(await expenseCost.innerText(), /68[.\s]500\s+COP\s*\/ kg/);
+  await button('Hoy').click();
+
+  await button(/comparar precios|ver precios/i).first().click();
+  await page.getByRole('heading', { name: 'Comparar precios', exact: true }).waitFor();
+  await page.getByText(formulaName, { exact: true }).waitFor();
+  assert.equal(await page.getByLabel('Presentación (kg)', { exact: true }).inputValue(), '2');
+  assert.equal(await page.getByLabel('Ciudad').inputValue(), 'Bogotá');
+  assert.equal(await page.getByLabel('Código postal de Bogotá', { exact: true }).inputValue(), '');
+  assert.equal(live.requests.length, 0, 'Opening the comparison must not spend a lookup');
+  const responsePromise = page.waitForResponse((response) =>
+    response.url() === livePriceEndpoint && response.request().method() === 'POST', { timeout: 45000 });
+  await button('Consultar precios').click();
+  const response = await responsePromise;
+  const requestBody = response.request().postDataJSON();
+  assert.deepEqual(requestBody, {
+    city: 'Bogotá', product: { brand: 'Royal Canin', name: formulaName, grams: 2000 },
+  });
+  const payload = await response.json();
+  console.log('Worker público real:', JSON.stringify({
+    endpoint: livePriceEndpoint, httpStatus: response.status(), request: requestBody,
+    status: payload.status, city: payload.city, queriedAt: payload.queriedAt, reason: payload.reason,
+    offers: (payload.offers || []).map((offer) => ({
+      retailer: offer.retailer, title: offer.title, grams: offer.grams, productPriceCop: offer.productPriceCop,
+      shippingCop: offer.shippingCop, totalCop: offer.totalCop, stock: offer.stock, productUrl: offer.productUrl,
+    })),
+  }));
+  assert.equal(response.status(), 200);
+  assert.equal(payload.status, 'current', 'The live comparator must return a current result');
+  assert.equal(payload.city, 'Bogotá');
+  assert.equal(live.requests.length, 1);
+  const target = payload.offers.find((offer) => /laia\s*pets/i.test(offer.retailer) &&
+    offer.grams === 2000 && offer.productPriceCop === 137000);
+  assert.ok(target, 'Expected the real Laia Pets RC37 2 kg offer at 137000 COP');
+  const offer = page.getByRole('region', { name: 'Resultado de precios' }).getByRole('article')
+    .filter({ has: page.getByRole('heading', { name: target.retailer, exact: true }) })
+    .filter({ has: page.getByText(target.title, { exact: true }) });
+  await offer.getByRole('button', { name: 'Usar precio del producto', exact: true }).waitFor();
+  assert.match(await offer.locator('dd').first().innerText(), cop(137000));
+  if (target.shippingCop === null) {
+    await offer.getByText('Por confirmar', { exact: true }).first().waitFor();
+    assert.equal(await offer.getByRole('button', { name: 'Usar total con envío', exact: true }).count(), 0);
+    console.log('Envío de Laia Pets sin confirmar: se usa solo el precio real del producto.');
+  } else {
+    assert.equal(target.totalCop, target.productPriceCop + target.shippingCop);
+    console.log('Envío observado en respuesta real:', JSON.stringify({ shippingCop: target.shippingCop, totalCop: target.totalCop }));
+  }
+  await offer.getByRole('button', { name: 'Usar precio del producto', exact: true }).click();
+  await expectMealCosts(todayCost, 3699, 1850);
+  await page.getByText('Ración diaria: 54 g', { exact: true }).waitFor();
+
+  await todayCost.getByRole('button', { name: 'Registrar compra o factura', exact: true }).click();
+  const expensesDialog = page.getByRole('dialog', { name: 'Gastos de alimentación', exact: true });
+  const purchasedFood = expensesDialog.getByLabel('Alimento de la compra', { exact: true });
+  assert.equal(await purchasedFood.locator('option:checked').innerText(), formula);
+  assert.equal(await expensesDialog.getByLabel('Peso de cada empaque', { exact: true }).inputValue(), '2');
+  await expensesDialog.getByLabel('Unidad del peso', { exact: true }).selectOption('kg');
+  await expensesDialog.getByLabel('Cantidad de empaques', { exact: true }).fill('1');
+  await expensesDialog.getByLabel('Importe total de este alimento (COP)', { exact: true }).fill('140.000');
+  await expensesDialog.getByLabel('Tienda (opcional)', { exact: true }).fill('Factura de Nube');
+  await expensesDialog.getByLabel('Foto de factura o recibo (opcional)', { exact: true }).setInputFiles({
+    name: 'recibo-de-prueba.png', mimeType: 'image/png',
+    buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=', 'base64'),
+  });
+  await expensesDialog.getByRole('img', { name: 'Factura adjunta', exact: true }).waitFor();
+  await expensesDialog.getByRole('checkbox', { name: 'Confirmo el importe y el peso de este alimento', exact: true }).check();
+  await expensesDialog.getByRole('button', { name: 'Guardar compra', exact: true }).click();
+  await expectMealCosts(expensesDialog.getByRole('region', { name: 'Costo de la ración', exact: true }), 3780, 1890);
+  await expensesDialog.getByRole('link', { name: /Ver recibo/ }).waitFor();
+  await expensesDialog.getByRole('button', { name: 'Cerrar gastos', exact: true }).click();
+  await expectMealCosts(todayCost, 3780, 1890);
+
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.getByText('Ración diaria: 54 g', { exact: true }).waitFor();
+  await expectMealCosts(todayCost, 3780, 1890);
+  await button('Alimentos').click();
+  await button('Gastos ($ COP)').click();
+  await expectMealCosts(expenseCost, 3780, 1890);
+  assert.match(await expenseCost.innerText(), /70[.\s]000\s+COP\s*\/ kg/);
+  const receipt = page.getByRole('region', { name: 'Gastos de alimentación', exact: true }).getByRole('article')
+    .filter({ hasText: 'Factura de Nube' });
+  await receipt.getByRole('heading', { name: formula, exact: true }).waitFor();
+  assert.match(await receipt.innerText(), /2 kg/);
+  assert.match(await receipt.innerText(), /140[.\s]000\s+COP/);
+  assert.match(await receipt.getByRole('link', { name: /Ver recibo/ }).getAttribute('href'), /^data:image\/jpeg;base64,/);
+  await receipt.getByRole('img', { name: 'Factura de esta compra', exact: true }).waitFor();
+
+  await button(/🐱\s*Bruma/).click();
+  await button('Hoy').click();
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.getByText('Etiqueta pendiente para calcular gramos', { exact: true }).waitFor();
+  assert.equal(await todayCost.count(), 0, 'Another pet must not inherit Nube’s ration or cost');
+  await button('Revisar etiqueta').first().click();
+  const brumaLabel = page.getByRole('dialog', { name: 'Revisar etiqueta', exact: true });
+  assert.equal(await brumaLabel.getByLabel('Tamaño del empaque (kg)', { exact: true }).inputValue(), '0.4');
+  assert.equal(await brumaLabel.getByLabel('Energía metabolizable (kcal/kg)', { exact: true }).inputValue(), '');
+  await brumaLabel.getByRole('button', { name: 'Cerrar', exact: true }).click();
+  await button('Alimentos').click();
+  await button('Gastos ($ COP)').click();
+  await page.getByText('Aún no hay compras registradas para esta mascota.', { exact: true }).waitFor();
+  assert.equal(await page.getByRole('link', { name: /Ver recibo/ }).count(), 0);
+  await button(/🐱\s*Nube/).click();
+  await button('Hoy').click();
+  await expectMealCosts(todayCost, 3780, 1890);
+  assert.equal(live.requests.length, 1, 'Reloads and pet switches must not spend additional price lookups');
+  assert.deepEqual(live.unexpectedProviders, [], 'The browser must never contact SerpApi directly or another price endpoint');
+  console.log('Producción real: RC37 2 kg/137000 COP, energía ingresada manualmente4000,54g/día27+27,3699/día1850/toma; factura140000→3780/día1890/toma persistente y Bruma400g sin energía ni compras, con una sola consulta real de precios.');
+}
+
+async function verifyLiveUnified() {
+  const url = new URL(process.argv[2] || 'https://racion-app.pages.dev/');
+  assert.equal(url.origin, 'https://racion-app.pages.dev');
+  assert.equal(url.pathname, '/');
+  assert.equal(process.argv.length <= 3, true, 'No fixture or interception mode is supported');
+  if (process.env.GITHUB_SHA) url.searchParams.set('food-check', process.env.GITHUB_SHA);
+  await waitForSite(url);
+
+  const browser = await chromium.launch({ channel: 'chrome', headless: true });
+  try {
+    const page = await browser.newPage({
+      locale: 'es-CO',
+      timezoneId: 'America/Bogota',
+      viewport: { width: 390, height: 844 },
+      isMobile: true,
+      hasTouch: true,
+      serviceWorkers: 'block',
+    });
+    page.setDefaultTimeout(15000);
+    const merchantRequests = [];
+    const live = { requests: [], unexpectedProviders: [] };
+    page.on('request', (request) => {
+      const destination = new URL(request.url());
+      if (destination.origin === merchantOrigin) merchantRequests.push(request);
+      if (destination.href === livePriceEndpoint && request.method() === 'POST') live.requests.push(request);
+      if (destination.hostname === 'serpapi.com' || (destination.pathname === '/api/live-prices' && destination.href !== livePriceEndpoint)) {
+        live.unexpectedProviders.push(request.url());
+      }
+    });
+    const button = (name) => page.getByRole('button', { name, exact: typeof name === 'string' });
+
+    await page.goto(url.href, { waitUntil: 'domcontentloaded' });
+    await button('Agregar mascota').click();
+    await button('🐱 Gato').click();
+    await page.getByRole('textbox', { name: 'Ej. Milo' }).fill('Bruma');
+    await page.getByRole('spinbutton', { name: 'Peso Actual (kg)' }).fill('4.3');
+    await button('Guardar mascota').click();
+    await button('♀ Hembra').click();
+    await button(/continuar a condición/i).click();
+    await button(/continuar a objetivo/i).click();
+    await button(/continuar a alimento/i).click();
+
+    assert.equal(await button('Catálogo guardado').count(), 0);
+    assert.equal(await button('Internet').getAttribute('aria-pressed'), 'true');
+    assert.equal(merchantRequests.length, 0, 'Opening Internet must not submit a search');
+    const queryInput = page.getByRole('textbox', { name: 'Buscar alimentos en internet', exact: true });
+    await queryInput.fill(searchQuery);
+    assert.equal(merchantRequests.length, 0, 'Typing alone must not submit an online search');
+    await button('Buscar en internet').click();
+
+    const results = page.getByRole('region', { name: 'Resultados de internet' });
+    const product = results.getByRole('article').filter({
+      has: page.getByRole('heading', { name: /Royal Canin Sterilised 37 Concentrado para Gatos Adultos/i }),
+    });
+    await product.waitFor({ timeout: 45000 });
+    await product.getByText('Fuente: Laia Pets', { exact: true }).waitFor();
+    for (const size of ['400 g', '2 kg', '4 kg', '10 kg']) {
+      await product.getByRole('button', { name: `Elegir ${size}`, exact: true }).waitFor();
+    }
+    assert.ok(merchantRequests.length > 0, 'The explicit search must retrieve the external catalog');
+    const searches = merchantRequests.filter((request) => new URL(request.url()).pathname.endsWith('/search/products'));
+    assert.equal(searches.length, 1);
+    assert.equal(new URL(searches[0].url()).searchParams.get('q'), searchQuery);
+
+    await product.getByRole('button', { name: 'Elegir 400 g', exact: true }).click();
+
+    const label = page.getByRole('dialog', { name: /Agregar alimento|Revisar etiqueta/ });
+    const packageInput = label.getByLabel('Tamaño del empaque (kg)', { exact: true });
+    await packageInput.waitFor();
+    assert.equal(await packageInput.inputValue(), '0.4');
+    for (const field of ['Energía metabolizable (kcal/kg)', 'Proteína (%)', 'Grasa (%)', 'Fibra cruda (%)']) {
+      assert.equal(await label.getByLabel(field, { exact: true }).inputValue(), '', `${field} must stay undeclared`);
+    }
+    await label.getByRole('button', { name: 'Guardar ficha', exact: true }).click();
+    await button(/continuar a comidas/i).click();
+    await button(/ver su plan nutricional/i).click();
+    await page.getByRole('heading', { name: 'Hace falta la energía de la etiqueta', exact: true }).waitFor();
+    assert.equal(await button('Guardar este plan').count(), 0, 'An undeclared energy value must not produce a gram ration');
+    await button('Guardar horario para el diario').click();
+
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await button('Alimentos').click();
+    await button('Mis alimentos').click();
+    const pendingFood = page.getByRole('article', { name: formula, exact: true });
+    await pendingFood.getByRole('heading', { name: formulaName, exact: true }).waitFor();
+    await pendingFood.getByRole('button', { name: 'Editar ficha', exact: true }).click();
+    const savedLabel = page.getByRole('dialog', { name: 'Revisar etiqueta', exact: true });
+    assert.equal(await savedLabel.getByLabel('Tamaño del empaque (kg)', { exact: true }).inputValue(), '0.4');
+    assert.equal(await savedLabel.getByLabel('Energía metabolizable (kcal/kg)', { exact: true }).inputValue(), '');
+    await savedLabel.getByRole('button', { name: 'Cerrar', exact: true }).click();
+
+    assert.deepEqual(live.unexpectedProviders, []);
+    assert.equal(live.requests.length, 0, 'Food catalog lookup must not request price searches');
+    await verifyFoodPriceCoherence(page, button, live);
+    console.log('Chrome público real: búsqueda explícita, cuatro presentaciones y400g guardados con energía pendiente conservados al recargar.');
+  } finally {
+    await browser.close();
+  }
+}
+
+verifyLiveUnified().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
