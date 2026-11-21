@@ -261,6 +261,7 @@ const LabelForm: React.FC<LabelFormProps> = ({
     const foodType = currentFood?.type ?? (selectedType === 'wet' ? 'wet' : 'dry');
     const hasSameEnergy = identityUnchanged && kcal !== undefined && currentFood?.kcalPerKg === kcal;
     const declaresGrowth = data.has('growth');
+    const ingredients = readText(data, 'ingredients');
     const updatedFood: FoodItem = {
       id: inLibrary ? currentFood.id : `custom_${crypto.randomUUID()}`,
       sourceFoodId: identityUnchanged ? currentFood?.sourceFoodId ||
@@ -271,7 +272,7 @@ const LabelForm: React.FC<LabelFormProps> = ({
       lifeStage: declaresGrowth ? (pet.species === 'cat' ? 'kitten' : 'puppy') : (identityUnchanged ? currentFood?.lifeStage : undefined) ?? 'all',
       lifeStageKnown: declaresGrowth || (identityUnchanged && currentFood?.lifeStageKnown),
       nutritionalUse: complete ? 'complete' : otherUse === 'treat' || otherUse === 'complementary' ? otherUse : undefined,
-      ingredientsSummary: readText(data, 'ingredients') || undefined,
+      ingredientsSummary: identityUnchanged || ingredients !== currentFood?.ingredientsSummary ? ingredients || undefined : undefined,
       feedingGuide: identityUnchanged ? currentFood?.feedingGuide : undefined,
       storeName: identityUnchanged ? currentFood?.storeName : undefined,
       storeProductUrl: identityUnchanged ? currentFood?.storeProductUrl : undefined,

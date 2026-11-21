@@ -42,7 +42,7 @@ export async function registryResponse(url: URL, clientSignal: AbortSignal, cach
   const cached = await cache?.match(cacheKey);
   if (cached) return cached;
   try {
-    const init = {signal:AbortSignal.any([clientSignal, AbortSignal.timeout(14000)]), redirect:'error' as const,
+    const init = {signal:AbortSignal.any([clientSignal, AbortSignal.timeout(14000)]), redirect:'manual' as const,
       headers:{'User-Agent':'RacionApp/1.0 (+https://racion-app.pages.dev)'}};
     const page = await limitedBytes(await fetch(registryPage, init), 1200000);
     const source = registryAttachment(new TextDecoder().decode(page));

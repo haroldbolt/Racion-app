@@ -197,7 +197,7 @@ export async function searchColombiaCatalog(query: string, species: Species, typ
     const url = new URL('/api/catalog_system/pub/products/search/', retailer.origin);
     // VTEX's public full-text parameter requires percent-encoded spaces.
     url.search = new URLSearchParams({ ft: query, _from: '0', _to: String(perRetailer - 1), sc: '1' }).toString().replace(/\+/g, '%20');
-    const response = await fetch(url, { signal: lookupSignal, credentials: 'omit', redirect: 'error', headers: { Accept: 'application/json' } });
+    const response = await fetch(url, { signal: lookupSignal, credentials: 'omit', redirect: 'manual', headers: { Accept: 'application/json' } });
     const products = await readProducts(response);
     return products.flatMap(product => {
       const food = catalogFood(object(product), retailer, query, species, type, observedAt);

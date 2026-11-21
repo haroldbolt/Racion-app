@@ -67,7 +67,23 @@ async function verifyWorkerRuntime() {
       });
     };
 
-    worker = start(createFetchMock());
+    const catalogMock = createFetchMock();
+    for (const site of ['www.puppis.com.co','www.jumbocolombia.com','www.olimpica.com','www.mercacentro.com']) {
+      catalogMock.get('https://'+site).intercept({method:'GET',path:/^\/api\/catalog_system\/pub\/products\/search\//})
+        .reply(200, [], {headers:{'content-type':'application/json'}});
+    }
+    const attachment = '/getattachment/Areas/Pecuaria/Servicios/Alimentos-para-Animales/LISTADO-DE-ALIMENTOS-PARA-ANIMALES-REGISTRADOS/Registro-prueba.pdf.aspx';
+    const ica = catalogMock.get('https://www.ica.gov.co');
+    ica.intercept({method:'GET',path:/^\/areas\/pecuaria\/servicios\/alimentos-para-animales\//})
+      .reply(200, '<a href="'+attachment+'">Consulte aquí</a>');
+    ica.intercept({method:'GET',path:attachment}).reply(200,'%PDF-1.7');
+    worker = start(catalogMock);
+    const liveCatalog = await worker.dispatchFetch('http://localhost/api/colombia-foods?q=prueba&species=cat',{headers:{origin:brandedOrigin}});
+    assert.deepEqual(await liveCatalog.json(),{foods:[],unavailableSources:[]});
+    const pdf = await worker.dispatchFetch('http://localhost/api/colombia-food-registry',{headers:{origin:brandedOrigin}});
+    assert.equal(pdf.status,200);
+    assert.equal(pdf.headers.get('x-ica-source'),'https://www.ica.gov.co'+attachment);
+    assert.equal(await pdf.text(),'%PDF-1.7');
     for (const origin of [publicOrigin, brandedOrigin]) {
       const preflight = await worker.dispatchFetch(endpoint, {
         method: 'OPTIONS',
