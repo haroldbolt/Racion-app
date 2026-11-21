@@ -91,7 +91,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
     breedSize: pet.breedSize || findBreedProfile(pet.breed, pet.species).size,
   });
   const [breedQuery, setBreedQuery] = useState<string>('');
-  const [bcs, setBcs] = useState<number>(pet.bcs || 5);
+  const bcs = editablePet.bcs || 5;
   const [goal, setGoal] = useState<Goal>(() => {
     if (savedPlan?.goal) return savedPlan.goal;
     if (pet.bcs >= 7) return 'lose';
@@ -105,7 +105,6 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
       ...pet,
       breedSize: pet.breedSize || findBreedProfile(pet.breed, pet.species).size,
     });
-    setBcs(pet.bcs || 5);
     setBreedQuery('');
   }, [pet.id]);
 
@@ -512,12 +511,11 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                 step="0.1"
                 min="0.1"
                 value={editablePet.ageYears || 2}
-                onChange={(e) =>
-                  setEditablePet({
-                    ...editablePet,
-                    ageYears: parseFloat(e.target.value) || 1,
-                  })
-                }
+                aria-label={isEs ? 'Edad aproximada (años)' : 'Age (years)'}
+                onChange={(e) => {
+                  const years = parseFloat(e.target.value) || 1;
+                  setEditablePet((previous) => ({ ...previous, ageYears: years, ageMonths: Math.max(1, Math.round(years * 12)) }));
+                }}
                 className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-center font-semibold text-sm min-h-[48px]"
               />
             </div>
@@ -602,7 +600,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
             species={editablePet.species}
             value={bcs}
             onChange={(val) => {
-              setBcs(val);
+              setEditablePet((previous) => ({ ...previous, bcs: val }));
               // Auto-suggest goal based on BCS rule: if BCS >= 7, suggest weight loss
               if (val >= 7) setGoal('lose');
               else if (val <= 3) setGoal('gain');

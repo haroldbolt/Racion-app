@@ -143,7 +143,15 @@ export default function App() {
   const handleAddWeightRecord = (record: WeightRecord) => {
     const changedWeight = StorageService.addWeightRecord(record);
     setWeightRecords(StorageService.getWeightRecords(record.petId));
-    setPets(StorageService.getPets());
+    const updatedPets = StorageService.getPets();
+    setPets(updatedPets);
+    const weightedPet = updatedPets.find(item => item.id === record.petId);
+    const previous = plans[record.petId];
+    if (changedWeight && weightedPet && previous?.manufacturerGramsPerDay && !previous.isVetLocked) {
+      // A previously approved range can cease to apply after a new weight.
+      StorageService.savePlan(recalculatePlanForPet(weightedPet, previous));
+      setPlans(StorageService.getPlans());
+    }
     return changedWeight;
   };
 
