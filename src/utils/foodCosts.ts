@@ -133,12 +133,19 @@ export function withPurchasedPackage(plan: FeedingPlan, food: FoodItem, packageK
   const primary = getPrimaryPlanFood(plan);
   const isPrimary = Boolean(primary && sameFoodIdentity(primary, food));
   const component = getPlanCostSummary(plan).components.find((item) => sameFoodIdentity(item.food, food));
-  const replace = (item?: FoodItem) => item && sameFoodIdentity(item, food) ? {
-    ...item, bagSizeKg: packageKg,
-    barcode: item.bagSizeKg === packageKg ? item.barcode : undefined,
-    priceBasis: item.priceBasis?.packageKg === packageKg ? item.priceBasis :
-      item.packagePrices?.find((basis) => basis.packageKg === packageKg),
-  } : item;
+  const replace = (item?: FoodItem): FoodItem | undefined => {
+    if (!item || !sameFoodIdentity(item, food)) return item;
+    const priceBasis = item.priceBasis?.packageKg === packageKg ? item.priceBasis :
+      item.packagePrices?.find((basis) => basis.packageKg === packageKg);
+    let buyUrl = item.buyUrl;
+    if (priceBasis?.sourceUrl) buyUrl = priceBasis.sourceUrl;
+    else if (item.bagSizeKg !== packageKg && buyUrl) {
+      try { const base = new URL(buyUrl); base.searchParams.delete('variant'); buyUrl = base.href; }
+      catch { buyUrl = undefined; }
+    }
+    return { ...item, bagSizeKg: packageKg, buyUrl, priceBasis,
+      barcode: item.bagSizeKg === packageKg ? item.barcode : undefined };
+  };
   return withPlanCosts({ ...plan, dryFood: replace(plan.dryFood), wetFood: replace(plan.wetFood),
     ...(isPrimary ? { bagWeightKg: packageKg,
       bagDaysRemaining: component?.gramsPerDay ? packageKg * 1000 / component.gramsPerDay : undefined } : {}),

@@ -49,6 +49,16 @@ function receiptPdf(lines) {
   return Buffer.from(pdf.output('arraybuffer'));
 }
 
+function hybridReceiptPdf(png, imageHeight) {
+  const pdf = new jsPDF({ unit: 'pt', format: 'a4', compress: false });
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(9);
+  pdf.text('Digitalizado por el escáner de oficina. Documento de compra, página 1.', 28, 28);
+  // Only the scanner watermark is native text. All purchase information is pixels.
+  pdf.addImage(`data:image/png;base64,${png.toString('base64')}`, 'PNG', 28, 60, 540, 540 * imageHeight / 1900);
+  return Buffer.from(pdf.output('arraybuffer'));
+}
+
 async function waitForSite(url) {
   let failure;
   for (let attempt = 0; attempt < 10; attempt++) {
@@ -111,7 +121,7 @@ async function expectMealCosts(region, dailyCost, mealCost) {
 async function saveProof(page, name) {
   if (!process.env.RECEIPT_SCREENSHOT_DIR) return;
   await fs.mkdir(process.env.RECEIPT_SCREENSHOT_DIR, { recursive: true });
-  await page.screenshot({ path: path.join(process.env.RECEIPT_SCREENSHOT_DIR, name), fullPage: true });
+  await page.screenshot({ path: path.join(process.env.RECEIPT_SCREENSHOT_DIR, name), fullPage: false });
 }
 
 async function verifyReceipt() {
@@ -126,6 +136,16 @@ async function verifyReceipt() {
     page = await browser.newPage({ locale: 'es-CO', timezoneId: 'America/Bogota', viewport: { width: 390, height: 844 },
       isMobile: true, hasTouch: true, serviceWorkers: 'block' });
     page.setDefaultTimeout(15000);
+    const preexistingFonts = new Set();
+    const observeInitialFonts = (request) => {
+      const target = new URL(request.url());
+      const type = request.resourceType();
+      if (request.method() === 'GET' && ['stylesheet', 'font'].includes(type) &&
+        ['fonts.googleapis.com', 'fonts.gstatic.com'].includes(target.hostname)) {
+        preexistingFonts.add(`${type}\n${request.url()}`);
+      }
+    };
+    page.context().on('request', observeInitialFonts);
     const button = (name) => page.getByRole('button', { name, exact: typeof name === 'string' });
     await page.goto(url.href, { waitUntil: 'domcontentloaded' });
     await createPetWithRation(page, 'Agregar mascota', 'Bruma recibos');
@@ -138,8 +158,11 @@ async function verifyReceipt() {
     const confirm = dialog.getByRole('checkbox', { name: 'Confirmo el importe y el peso de este alimento', exact: true });
     const confirmFood = dialog.getByRole('checkbox', { name: 'Este artículo corresponde al alimento seleccionado', exact: true });
     const save = dialog.getByRole('button', { name: 'Guardar compra', exact: true });
+    // Freeze exact font URLs observed before the invoice exists. Reloads may request
+    // these static assets again; this never permits a new external URL or a POST.
+    page.context().off('request', observeInitialFonts);
     const receiptNetwork = [];
-    page.context().on('request', (request) => receiptNetwork.push({ method: request.method(), url: request.url() }));
+    page.context().on('request', (request) => receiptNetwork.push({ method: request.method(), url: request.url(), type: request.resourceType() }));
 
     const png = await receiptPng(page, invoiceLines());
     await upload.setInputFiles({ name: 'factura-alimento-y-collar.png', mimeType: 'image/png', buffer: png });
@@ -147,6 +170,7 @@ async function verifyReceipt() {
     assert.ok(receiptNetwork.some((request) => new URL(request.url).pathname.endsWith('/ocr/worker.min.js')),
       'The receipt image must be read by the real local OCR worker');
     assert.match(await review.innerText(), /Royal Canin Sterilised 37/i);
+    await saveProof(page, 'receipt-article-detected.png');
     assert.equal(await dialog.getByLabel('Peso de cada empaque', { exact: true }).inputValue(), '2');
     assert.equal(await dialog.getByLabel('Cantidad de empaques', { exact: true }).inputValue(), '2');
     const extractedAmount = await dialog.getByLabel('Importe total de este alimento (COP)', { exact: true }).inputValue();
@@ -156,6 +180,7 @@ async function verifyReceipt() {
     await page.getByText('Aún no hay compras registradas para esta mascota.', { exact: true }).waitFor();
     const preview = dialog.getByRole('region', { name: 'Costo antes de guardar', exact: true });
     await expectMealCosts(preview, 3699, 1850);
+    await preview.scrollIntoViewIfNeeded();
     await saveProof(page, 'receipt-review-before-confirmation.png');
     if (await save.isEnabled()) await save.click();
     assert.equal(await dialog.getByRole('link', { name: /Ver recibo/ }).count(), 0, 'Unconfirmed OCR data must not be saved');
@@ -185,7 +210,42 @@ async function verifyReceipt() {
     assert.doesNotMatch(await purchase.innerText(), /312[.\s]000\s+COP/);
     await purchase.getByRole('img', { name: 'Factura de esta compra', exact: true }).waitFor();
 
-    // A digital PDF is read locally too. Its missing package/quantity must remain missing,
+    // A complete digital invoice must use its native text, without initializing OCR again.
+    const ocrWorkerRequests = () => receiptNetwork.filter((request) =>
+      new URL(request.url).pathname.endsWith('/ocr/worker.min.js')).length;
+    const beforeDigitalPdf = ocrWorkerRequests();
+    await button('Registrar compra o factura').click();
+    await page.getByLabel('Leer factura (foto o PDF)', { exact: true }).setInputFiles({
+      name: 'factura-digital-completa.pdf', mimeType: 'application/pdf', buffer: receiptPdf(invoiceLines()),
+    });
+    await chooseReceiptFood(page);
+    assert.equal(await page.getByLabel('Peso de cada empaque', { exact: true }).inputValue(), '2');
+    assert.equal(await page.getByLabel('Cantidad de empaques', { exact: true }).inputValue(), '2');
+    assert.equal(await page.getByLabel('Importe total de este alimento (COP)', { exact: true }).inputValue(), '274000');
+    await expectMealCosts(page.getByRole('region', { name: 'Costo antes de guardar', exact: true }), 3699, 1850);
+    assert.equal(ocrWorkerRequests(), beforeDigitalPdf, 'A complete native PDF must not need OCR');
+    assert.equal(await expenses.getByRole('article').count(), 1, 'Reviewing a PDF must not save another purchase');
+    await page.getByRole('button', { name: 'Cerrar formulario de compra', exact: true }).click();
+
+    // Scanner metadata is not a readable invoice. A hybrid PDF must still recognize
+    // its receipt image instead of stopping at the native watermark.
+    await button('Registrar compra o factura').click();
+    await page.getByLabel('Leer factura (foto o PDF)', { exact: true }).setInputFiles({
+      name: 'factura-escaneada-con-marca-nativa.pdf', mimeType: 'application/pdf',
+      buffer: hybridReceiptPdf(png, 100 + invoiceLines().length * 72),
+    });
+    await chooseReceiptFood(page);
+    assert.equal(await page.getByLabel('Peso de cada empaque', { exact: true }).inputValue(), '2');
+    assert.equal(await page.getByLabel('Cantidad de empaques', { exact: true }).inputValue(), '2');
+    assert.equal(await page.getByLabel('Importe total de este alimento (COP)', { exact: true }).inputValue(), '274000');
+    assert.ok(ocrWorkerRequests() > beforeDigitalPdf, 'A scanned receipt with only native metadata must run OCR');
+    await expectMealCosts(page.getByRole('region', { name: 'Costo antes de guardar', exact: true }), 3699, 1850);
+    assert.equal(await page.getByRole('checkbox', { name: 'Confirmo el importe y el peso de este alimento', exact: true }).isChecked(), false);
+    assert.equal(await page.getByRole('checkbox', { name: 'Este artículo corresponde al alimento seleccionado', exact: true }).isChecked(), false);
+    assert.equal(await expenses.getByRole('article').count(), 1, 'Reviewing a scanned PDF must not save another purchase');
+    await page.getByRole('button', { name: 'Cerrar formulario de compra', exact: true }).click();
+
+    // A PDF is read locally too. Its missing package/quantity must remain missing,
     // rather than inheriting the previous receipt or the selected plan’s 2 kg / 1 pack.
     await button('Registrar compra o factura').click();
     await page.getByLabel('Leer factura (foto o PDF)', { exact: true }).setInputFiles({
@@ -211,10 +271,71 @@ async function verifyReceipt() {
     await button('Hoy').click();
     await expectMealCosts(todayCost, 3699, 1850);
     assert.deepEqual(receiptNetwork.filter((request) => /^https?:/.test(request.url) &&
-      (request.method !== 'GET' || new URL(request.url).origin !== url.origin)), [],
+      (request.method !== 'GET' || (new URL(request.url).origin !== url.origin &&
+        !preexistingFonts.has(`${request.type}\n${request.url}`)))), [],
       'Receipt reading must use local pixels/text and same-origin support assets, without uploading the invoice');
-    console.log('Facturas reales en el navegador: OCR PNG de dos artículos, total propio274000/2×2kg, revisión sin guardado automático, costo3699/día1850/toma, PDF con datos ausentes, recarga y mascota aislada verificados.');
+    await todayCost.scrollIntoViewIfNeeded();
     await saveProof(page, 'receipt-costs-persisted.png');
+
+    // Initialization failures need a clean IndexedDB context, otherwise cached languages
+    // would hide a broken download. Only this isolated failure test replaces model GETs.
+    const failureContext = await browser.newContext({ locale: 'es-CO', timezoneId: 'America/Bogota',
+      viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: 'block' });
+    try {
+      let refusedModels = 0;
+      await failureContext.route('**/ocr/lang/*.traineddata.gz', async (route) => {
+        assert.equal(route.request().method(), 'GET');
+        assert.equal(new URL(route.request().url()).origin, url.origin);
+        refusedModels++;
+        await route.fulfill({ status: 503, contentType: 'text/plain', body: 'Model temporarily unavailable in the failure test' });
+      });
+      const failurePage = await failureContext.newPage();
+      failurePage.setDefaultTimeout(15000);
+      await failurePage.goto(url.href, { waitUntil: 'domcontentloaded' });
+      await createPetWithRation(failurePage, 'Agregar mascota', 'Error de lectura');
+      await failurePage.getByRole('region', { name: 'Costo de su ración', exact: true })
+        .getByRole('button', { name: 'Registrar compra o factura', exact: true }).click();
+      const failureDialog = failurePage.getByRole('dialog', { name: 'Gastos de alimentación', exact: true });
+      const closedOcrWorkers = [];
+      failurePage.on('worker', (worker) => {
+        if (new URL(worker.url()).pathname.endsWith('/ocr/worker.min.js')) {
+          closedOcrWorkers.push(new Promise((resolve) => worker.once('close', resolve)));
+        }
+      });
+      const started = Date.now();
+      await failureDialog.getByLabel('Leer factura (foto o PDF)', { exact: true }).setInputFiles({
+        name: 'factura-con-modelo-no-disponible.png', mimeType: 'image/png', buffer: png,
+      });
+      await failureDialog.getByRole('alert').filter({ hasText: /manualmente/i }).waitFor({ timeout: 15000 });
+      assert.ok(Date.now() - started < 15000, 'Model errors must become a manual fallback before the global OCR timeout');
+      assert.ok(refusedModels > 0, 'The isolated failure must actually request an uncached language model');
+      assert.ok(closedOcrWorkers.length > 0, 'OCR must have started a real worker before the initialization error');
+      let workerTimeout;
+      try {
+        await Promise.race([
+          Promise.all(closedOcrWorkers),
+          new Promise((_, reject) => { workerTimeout = setTimeout(() => reject(new Error('Failed OCR worker was not closed')), 5000); }),
+        ]);
+      } finally { clearTimeout(workerTimeout); }
+      assert.equal(failurePage.workers().filter((worker) => new URL(worker.url()).pathname.endsWith('/ocr/worker.min.js')).length, 0);
+      for (const field of ['Peso de cada empaque', 'Cantidad de empaques', 'Importe total de este alimento (COP)', 'Fecha de compra']) {
+        assert.equal(await failureDialog.getByLabel(field, { exact: true }).isEnabled(), true, `${field}: manual entry must recover after OCR failure`);
+      }
+      await failureDialog.getByLabel('Peso de cada empaque', { exact: true }).fill('2');
+      await failureDialog.getByLabel('Cantidad de empaques', { exact: true }).fill('1');
+      await failureDialog.getByLabel('Importe total de este alimento (COP)', { exact: true }).fill('137.000');
+      await failureDialog.getByLabel('Fecha de compra', { exact: true }).fill(
+        new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota' }).format(new Date())
+      );
+      await expectMealCosts(failureDialog.getByRole('region', { name: 'Costo antes de guardar', exact: true }), 3699, 1850);
+      assert.equal(await failureDialog.getByRole('checkbox', { name: 'Confirmo el importe y el peso de este alimento', exact: true }).isChecked(), false);
+      await failurePage.getByText('Aún no hay compras registradas para esta mascota.', { exact: true }).waitFor();
+      assert.equal(await failurePage.getByRole('link', { name: /Ver recibo/ }).count(), 0);
+      await failureDialog.getByRole('region', { name: 'Costo antes de guardar', exact: true }).scrollIntoViewIfNeeded();
+      await saveProof(failurePage, 'receipt-manual-after-model-error.png');
+    } finally { await failureContext.close(); }
+    console.log('Facturas reales en el navegador: OCR PNG de dos artículos, total propio274000/2×2kg, revisión sin guardado automático, costo3699/día1850/toma, PDF digital nativo, PDF escaneado con marca nativa, datos ausentes, recarga y mascota aislada verificados.');
+    console.log('Fallo de modelo503: aviso manual antes15s, campos recuperados, ningún guardado automático y workerOCR cerrado verificados en contexto nuevo.');
   } catch (error) {
     if (page) {
       console.error('Visible state at failure:', (await page.locator('body').innerText().catch(() => '')).slice(-16000));

@@ -28,6 +28,15 @@ export function receiptAssets(): Plugin {
     ['pdfjs', 'pdfjs-dist/LICENSE'],
   ]) assets.set(`ocr/licenses/${name}.txt`, resolve(root, location));
 
+  const sourceFor = (name: string, path: string) => {
+    const source = readFileSync(path);
+    if (name !== 'ocr/worker.min.js') return source;
+    // Tesseract 7 can leave createWorker pending after a language-init failure.
+    // Report the error first, then release that worker's WASM memory immediately.
+    const cleanup = `;(() => { const send = self.postMessage.bind(self); self.postMessage = (message, ...transfer) => { send(message, ...transfer); if (message && message.status === 'reject' && ['load', 'loadLanguage', 'initialize'].includes(message.action)) setTimeout(() => self.close(), 0); }; self.addEventListener('error', () => self.close()); })();\n`;
+    return Buffer.concat([Buffer.from(cleanup), source]);
+  };
+
   let base = '/';
   return {
     name: 'racion-receipt-assets',
@@ -43,12 +52,12 @@ export function receiptAssets(): Plugin {
           key.endsWith('.wasm') ? 'application/wasm' : 'application/octet-stream';
         response.setHeader('Content-Type', type);
         response.setHeader('X-Content-Type-Options', 'nosniff');
-        response.end(readFileSync(path));
+        response.end(sourceFor(key, path));
       });
     },
     generateBundle() {
       for (const [fileName, path] of assets) {
-        this.emitFile({ type: 'asset', fileName, source: readFileSync(path) });
+        this.emitFile({ type: 'asset', fileName, source: sourceFor(fileName, path) });
       }
     },
   };

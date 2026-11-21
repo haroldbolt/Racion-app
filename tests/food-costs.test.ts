@@ -110,4 +110,8 @@ test('confirming a purchased package changes only packaging and its linked cost,
   assert.equal(plan.bagWeightKg, 2);
   assert.equal(withPurchasedPackage({ ...plan, isVetLocked: true }, dry, 4).bagWeightKg, 2);
   assert.equal(withPurchasedPackage(plan, { ...dry, id: 'other', name: 'Otra fórmula' }, 4), plan);
+  const linked = { ...dry, buyUrl: 'https://www.laiapets.com.co/productos/rc37/?variant=2',
+    packagePrices: [{ ...dry.priceBasis!, packageKg: 4, sourceUrl: 'https://www.laiapets.com.co/productos/rc37/?variant=4' }] };
+  assert.equal(withPurchasedPackage({ ...plan, dryFood: linked }, linked, 4).dryFood?.buyUrl, linked.packagePrices[0].sourceUrl);
+  assert.equal(withPurchasedPackage({ ...plan, dryFood: linked }, linked, 10).dryFood?.buyUrl, 'https://www.laiapets.com.co/productos/rc37/');
 });

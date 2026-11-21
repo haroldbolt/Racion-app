@@ -191,3 +191,16 @@ test('recognizes abbreviated explicit unit-price columns and never treats a fore
   assert.equal(foreign.items[0].totalPaidCop, undefined);
   assert.ok(foreign.warnings.some((warning) => warning.includes('moneda distinta')));
 });
+
+test('leaves a gram weight with an ambiguous thousands separator pending instead of pricing a tiny package', () => {
+  for (const size of ['2.000 g', '1,000g']) {
+    const result = extractReceipt(`Alimento gato ${size}\nCantidad: 1\nTotal del articulo: $137.000`);
+    assert.equal(result.items.length, 1);
+    assert.equal(result.items[0].packageKg, undefined);
+    assert.equal(result.items[0].quantity, 1);
+    assert.equal(result.items[0].totalPaidCop, 137000);
+    assert.ok(result.items[0].warnings.some((warning) => warning.includes('separador de miles o decimal')));
+  }
+  assert.equal(extractReceipt('Alimento gato 2000g\nCantidad: 1\nTotal del articulo: $137.000').items[0].packageKg, 2);
+  assert.equal(extractReceipt('Alimento gato 0,085kg\nCantidad: 1\nTotal del articulo: $1299').items[0].packageKg, 0.085);
+});

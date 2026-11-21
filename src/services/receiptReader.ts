@@ -1,4 +1,5 @@
 import type { Worker as OcrWorker } from 'tesseract.js';
+import { extractReceipt } from '../utils/receiptExtraction';
 
 export type ReceiptProgress = { stage: 'preparing' | 'loading' | 'recognizing' | 'pdf'; progress: number };
 export interface ReceiptReadResult {
@@ -134,7 +135,9 @@ export async function readReceipt(file: File, options: ReceiptReadOptions = {}):
           else report('loading', message.progress ?? 0);
         },
         // Convert worker failures into recoverable errors; receipt contents are never logged.
-        errorHandler() {},
+        errorHandler() {
+          controller.abort(new Error('No pudimos preparar la lectura automática. Puedes volver a intentar o completar los datos manualmente.'));
+        },
       }).then(async (created) => {
         if (signal.aborted) { await created.terminate(); stopped(signal); }
         worker = created;
@@ -185,7 +188,12 @@ export async function readReceipt(file: File, options: ReceiptReadOptions = {}):
       const page = await abortable(pdf.getPage(number), signal);
       const content = await abortable(page.getTextContent(), signal);
       const nativeText = receiptPdfText(content.items);
-      const hasNativeText = page.rotate % 360 === 0 && nativeText.replace(/\s/g, '').length >= 35 && /[\p{L}]/u.test(nativeText) && /\d/.test(nativeText);
+      // A scanned PDF can contain only a selectable scanner watermark. That text is
+      // not the invoice: require usable item data before bypassing image recognition.
+      const nativeItems = extractReceipt(nativeText).items;
+      const hasNativeText = page.rotate % 360 === 0 && nativeText.replace(/\s/g, '').length >= 35 &&
+        nativeItems.some((item) => item.packageKg !== undefined || item.quantity !== undefined ||
+          item.totalPaidCop !== undefined || item.unitPriceCop !== undefined);
       let canvas: HTMLCanvasElement | undefined;
       if (number === 1 || !hasNativeText) {
         const viewport = page.getViewport({ scale: 1 });

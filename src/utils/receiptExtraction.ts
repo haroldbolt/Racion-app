@@ -124,7 +124,10 @@ function rowColumns(line: string, header?: Header): Partial<Record<Column, numbe
 function itemFrom(block: Block, index: number): ReceiptItemCandidate {
   const evidence = block.lines.join('\n');
   const allWeights = weights(evidence);
-  const packageKg = uniqueValue(allWeights.map((weight) => weight.kg), 0.000001);
+  const ambiguousGramSizes = [...evidence.matchAll(weightPattern)].filter((match) =>
+    !/^k/i.test(match[2]) && /^\d{1,3}[.,]\d{3}$/.test(match[1]));
+  const distinctWeight = uniqueValue(allWeights.map((weight) => weight.kg), 0.000001);
+  const packageKg = ambiguousGramSizes.length ? undefined : distinctWeight;
   const quantities = [...evidence.matchAll(quantityPattern)].map((match) => Number(match[1]));
   for (const match of evidence.matchAll(/\b(\d{1,4})\s*(?:x|×)\s*\d+(?:[.,]\d{1,3})?\s*(?:k\s*g|g|gr|gramos?|kilogramos?)\b/giu)) quantities.push(Number(match[1]));
   for (const match of evidence.matchAll(/\b\d+(?:[.,]\d{1,3})?\s*(?:k\s*g|g|gr|gramos?|kilogramos?)\s*(?:x|×)\s*(\d{1,4})\b/giu)) quantities.push(Number(match[1]));
@@ -148,7 +151,8 @@ function itemFrom(block: Block, index: number): ReceiptItemCandidate {
       warnings.push('El importe de la línea se calculó con el precio unitario y la cantidad explícitos. Confírmalo en la factura.');
     }
   }
-  if (allWeights.length && packageKg === undefined) warnings.push('Hay varios tamaños posibles en esta línea. Confirma el peso de cada empaque.');
+  if (ambiguousGramSizes.length) warnings.push(`El tamaño «${ambiguousGramSizes[0][0]}» puede usar un separador de miles o decimal. Confirma el peso de cada empaque.`);
+  else if (allWeights.length && distinctWeight === undefined) warnings.push('Hay varios tamaños posibles en esta línea. Confirma el peso de cada empaque.');
   if (quantities.length && quantity === undefined) warnings.push('Hay cantidades distintas en esta línea. Confirma cuántos empaques compraste.');
   if (totalAmounts.length && totalPaidCop === undefined) warnings.push('Hay importes distintos en esta línea. Confirma el importe final del alimento.');
   if (packageKg === undefined) warnings.push('No se identificó el peso de cada empaque.');
