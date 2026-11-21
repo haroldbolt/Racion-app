@@ -383,7 +383,8 @@ export const TodayView: React.FC<TodayViewProps> = ({
           <button
             type="button"
             onClick={() => {
-              if (nextStep.id === 'complete_label' || nextStep.id === 'configure_schedule') setPlanAdjustment({});
+              if (nextStep.id === 'complete_label') setShowLabelReview(true);
+              else if (nextStep.id === 'configure_schedule') setPlanAdjustment({});
               else setShowRefineModal(true);
             }}
             className="min-h-[44px] px-3.5 py-2 bg-[#0B5D2E] text-white rounded-xl text-xs font-heading font-extrabold shrink-0 flex items-center gap-1 hover:bg-[#094723] transition"
