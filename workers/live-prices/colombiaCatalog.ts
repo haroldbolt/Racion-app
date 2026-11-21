@@ -81,7 +81,7 @@ function category(product: JsonRecord, title: string, species: Species): FoodTyp
     ...strings(product['Tipo de alimento']), ...strings(product['Tipo de comida para mascotas'])].join(' '));
   if (/\b(?:juguetes?|accesorios?|higiene|arenas?|areneros?|champ[uú]|shampoo|aseo|medicamentos?|farmacia|antiparasitarios?|suplementos?|comedero[s]?|bebederos?|dispensadores?|contenedores?|ropa|correas?|collares?|bolsas para|portaalimentos?)\b/.test(evidence)) return;
   if (!/\b(?:alimentos?|comidas?|nutricion|croquetas?|concentrados?|barf|snacks?|premios?)\b/.test(evidence)) return;
-  const cat = /\b(?:gatos?|gatitos?|felinos?|cats?|kittens?|feline)\b/.test(evidence);
+  const cat = /\b(?:gatos?|gatitos?|gaticos?|felinos?|cats?|kittens?|feline)\b/.test(evidence);
   const dog = /\b(?:perros?|caninos?|dogs?|puppy|puppies|canine)\b/.test(evidence);
   if (cat === dog || (species === 'cat') !== cat) return;
   const wet = /\b(?:humed[oa]s?|mojad[oa]s?|wet|pate|pouch)\b/.test(evidence);
@@ -110,7 +110,9 @@ function presentations(product: JsonRecord, productUrl: URL): ColombiaCatalogFoo
     // Some VTEX stores encode variant weight in a dimension, others in the SKU name.
     const packageText = [sku.name, product.productName, ...strings(sku['Presentación/Talla/Tamaño'])].join(' ');
     if (/\b\d+\s*\/\s*\d+\s*(?:kg|g|gr)\b|(?:kg|gr?|lbs?)\s*[x×]\s*(?:[2-9]|\d{2,})\b/i.test(packageText)) continue;
-    const grams = packageGrams(packageText);
+    // Colombian retailers write single-package sizes as "x1kg". Keep numeric
+    // multipacks intact so packageGrams can reject them before quoting a portion.
+    const grams = packageGrams(packageText.replace(/\bx(?=\d+(?:[.,]\d+)?\s*(?:kg|g|gr)\b)/gi, 'x '));
     if (!grams) continue;
     const sellers = (Array.isArray(sku.sellers) ? sku.sellers : []).map(object);
     const primary = sellers.find(seller => seller.sellerDefault === true) ?? (sellers.length === 1 ? sellers[0] : undefined);
@@ -151,7 +153,7 @@ function catalogFood(product: JsonRecord, retailer: Retailer, query: string, spe
   if (queryTerms.some(t => /^\d+$/.test(t) && !terms.has(t)) || !(nameTerms.length ? nameTerms : queryTerms).some(t => terms.has(t))) return;
   const image = object((object((product.items as unknown[])?.[0]).images as unknown[])?.[0]).imageUrl;
   const cleanTitle = title.replace(/^alimento\s+(?:(?:seco|h[uú]medo)\s+)?(?:para\s+)?(?:perros?|gatos?)\s+/i, '').trim();
-  const formula = sizes.length ? withoutPackageWeight(cleanTitle.replace(/\b(?:x|por)\s+(?=\d+(?:[.,]\d+)?\s*(?:kg|g|gr)\b)/gi, '')) : cleanTitle;
+  const formula = sizes.length ? withoutPackageWeight(cleanTitle.replace(/\b(?:x|por)\s*(?=\d+(?:[.,]\d+)?\s*(?:kg|g|gr)\b)/gi, '')) : cleanTitle;
   const name = formula.replace(/\s+/g, ' ').replace(/^[-–·\s]+/, '').replace(/(?:\s+[xX]|\s+por|[-–,])\s*$/, '').trim() || title;
   return {
     id: retailer.id + ':' + productId, retailer: retailer.name, brand, name, species, type,

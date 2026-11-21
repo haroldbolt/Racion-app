@@ -16,7 +16,7 @@ export function registryAttachment(html: string): string | undefined {
   return candidates.size === 1 ? [...candidates][0] : undefined;
 }
 
-async function limitedBytes(response: Response, max: number) {
+export async function limitedBytes(response: Response, max: number) {
   if (!response.ok || !response.body || Number(response.headers.get('content-length')) > max) throw new Error('ICA unavailable');
   const reader = response.body.getReader();
   const chunks: Uint8Array[] = [];

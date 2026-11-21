@@ -439,7 +439,7 @@ export function calculateFeedingPlan(inputs: CalculationInputs): CalculationResu
   let rationConfirmed = false;
 
   const singleFood = foodType === 'dry' ? dryFood : foodType === 'wet' ? wetFood : undefined;
-  const guideRange = !vetGuidanceRequired && goal === 'maintain' ? getApplicableFeedingRange(singleFood, pet) : undefined;
+  const guideRange = !vetGuidanceRequired ? getApplicableFeedingRange(singleFood, pet, goal) : undefined;
   const chosenGrams = inputs.manufacturerGramsPerDay;
   const usingGuide = Boolean(guideRange && chosenGrams !== undefined && Number.isInteger(chosenGrams) &&
     chosenGrams >= guideRange.minGrams && chosenGrams <= guideRange.maxGrams);

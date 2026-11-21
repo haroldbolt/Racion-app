@@ -1,3 +1,4 @@
+import { isPetPuppy } from '../utils/petLifeStage';
 import React, { useState, useEffect, useMemo } from 'react';
 import { Pet, FoodItem, Goal, FeedingPlan, UserAccount, BreedSize } from '../types';
 import { BCSSelector } from '../components/BCSSelector';
@@ -96,7 +97,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
     if (savedPlan?.goal) return savedPlan.goal;
     if (pet.bcs >= 7) return 'lose';
     if (pet.bcs <= 3) return 'gain';
-    if (pet.ageYears && pet.ageYears < 1) return 'growth';
+    if (isPetPuppy(pet)) return 'growth';
     return 'maintain';
   });
 
@@ -173,6 +174,9 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
   // Calculate current treats total kcal
   const totalTreatsKcal = treatsPerDay * kcalPerTreat;
 
+  const selectedFood = foodType === 'dry' ? dryFood : foodType === 'wet' ? wetFood : undefined;
+  const guideRange = getApplicableFeedingRange(selectedFood, editablePet, goal);
+
   // Prepare calculation inputs
   const calculationInputs: CalculationInputs = {
     pet: editablePet,
@@ -185,7 +189,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
     mealsPerDay,
     mealTimes,
     treatsKcal: totalTreatsKcal,
-    manufacturerGramsPerDay: foodType !== 'mixed' && goal === 'maintain' ? manufacturerGrams : undefined,
+    manufacturerGramsPerDay: guideRange ? manufacturerGrams : undefined,
     manualAdjustmentPct,
     manualAdjustmentReason,
     scheduleConfigured: true,
@@ -195,8 +199,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
   const resultPlan = buildFeedingPlan(calculationInputs, result);
   const resultMeals = getPlannedMeals(resultPlan);
   const safetyMismatch = getPlanSafetyNotices(editablePet, resultPlan, userAccount.language).some((notice) => notice.level === 'mismatch');
-  const selectedFood = foodType === 'dry' ? dryFood : foodType === 'wet' ? wetFood : undefined;
-  const guideRange = goal === 'maintain' ? getApplicableFeedingRange(selectedFood, editablePet) : undefined;
+
   const invalidGuide = guideRange && manufacturerGrams !== undefined && (!Number.isInteger(manufacturerGrams) || manufacturerGrams < guideRange.minGrams || manufacturerGrams > guideRange.maxGrams);
 
   const handleNext = () => {
@@ -604,7 +607,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
               // Auto-suggest goal based on BCS rule: if BCS >= 7, suggest weight loss
               if (val >= 7) setGoal('lose');
               else if (val <= 3) setGoal('gain');
-              else setGoal('maintain');
+              else setGoal(isPetPuppy(editablePet) ? 'growth' : 'maintain');
             }}
             lang={userAccount.language}
           />
@@ -951,7 +954,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
               </button>
             </section>
           ))}
-          {guideRange && <ManufacturerRationInput food={selectedFood} pet={editablePet} value={manufacturerGrams} onChange={setManufacturerGrams} lang={userAccount.language} />}
+          {guideRange && <ManufacturerRationInput food={selectedFood} pet={editablePet} goal={goal} value={manufacturerGrams} onChange={setManufacturerGrams} lang={userAccount.language} />}
           <PlanSafetyAlerts pet={editablePet} plan={resultPlan} lang={userAccount.language} />
 
           {/* Treats Budget Mini-Calculator (Page 4: max 10% kcal, subtracted from food) */}

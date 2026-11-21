@@ -106,7 +106,7 @@ export async function enrichOnlineNutrition(food: FoodItem, title: string, descr
   };
   const use = (page && declaredUse(page.html)) || declaredUse(description) || food.nutritionalUse;
   return {
-    ...food, fichaNutricional:ficha,
+    ...food, fichaNutricional:ficha, declaredIcaRegistration:registration,
     labelStatus:manufacturerVerified ? 'verified_manufacturer' : 'unconfirmed',
     dataSource:productSource.name,
     ingredientsSummary:(page && declaredIngredients(page.html)) || declaredIngredients(description),

@@ -1,3 +1,4 @@
+import { registryNutritionPath, registryNutritionResponse } from './workers/live-prices/registryNutrition';
 import { registryPath, registryResponse } from './workers/live-prices/colombiaRegistry';
 import { catalogPath, colombiaFoodResponse } from './workers/live-prices/colombiaFoodRoute';
 import express from 'express';
@@ -16,9 +17,10 @@ app.get(registryPath, async (_req, res, next) => {
   } catch (error) { next(error); }
 });
 
-app.get(catalogPath, async (req, res, next) => {
+app.get([catalogPath, registryNutritionPath], async (req, res, next) => {
   try {
-    const result = await colombiaFoodResponse(new URL(req.originalUrl, 'http://localhost'), AbortSignal.timeout(15000));
+    const lookup = req.path === registryNutritionPath ? registryNutritionResponse : colombiaFoodResponse;
+    const result = await lookup(new URL(req.originalUrl, 'http://localhost'), AbortSignal.timeout(15000));
     res.status(result.status).type('json').send(await result.text());
   } catch (error) { next(error); }
 });

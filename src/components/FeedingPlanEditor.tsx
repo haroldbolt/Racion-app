@@ -175,8 +175,8 @@ export function FeedingPlanEditor({
                     );
                   })}
 
-                  {draft.foodType !== 'mixed' && (plan.goal ?? 'maintain') === 'maintain' && !(draft.foodType === 'dry' ? draft.dryEnergy : draft.wetEnergy).trim() && (
-                    <ManufacturerRationInput food={draft.foodType === 'dry' ? draft.dryFood : draft.wetFood} pet={pet} value={draft.manufacturerGramsPerDay}
+                  {draft.foodType !== 'mixed' && !(draft.foodType === 'dry' ? draft.dryEnergy : draft.wetEnergy).trim() && (
+                    <ManufacturerRationInput food={draft.foodType === 'dry' ? draft.dryFood : draft.wetFood} pet={pet} goal={plan.goal ?? 'maintain'} value={draft.manufacturerGramsPerDay}
                       onChange={(grams) => setDraft((previous) => ({ ...previous, manufacturerGramsPerDay: grams }))} lang={language} />
                   )}
 

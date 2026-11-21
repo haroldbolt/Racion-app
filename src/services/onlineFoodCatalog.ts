@@ -90,7 +90,7 @@ export function selectFoodPackage(food: FoodItem, packageKg?: number): FoodItem 
 
 function speciesIn(value: string): Set<Species> {
   const found = new Set<Species>();
-  if (/\b(?:gatos?|gatas?|gatitos?|felinos?|feline|cats?|kittens?)\b/.test(value)) found.add('cat');
+  if (/\b(?:gatos?|gatas?|gatitos?|gaticos?|felinos?|feline|cats?|kittens?)\b/.test(value)) found.add('cat');
   if (/\b(?:perros?|perras?|caninos?|canine|dogs?|pupp(?:y|ies))\b/.test(value)) found.add('dog');
   return found;
 }
@@ -174,7 +174,7 @@ function fromListing(listing: CatalogListing, identity: string): FoodItem {
   });
   const formula = title.replace(/\s+[–—|-]\s+(?:alimento|concentrado|croquetas)\b.*$/i, '').trim();
   const name = brand && normalized(formula).startsWith(normalized(brand) + ' ') ? formula.slice(brand.length).trim() : formula;
-  const lifeStage = /\b(?:gatitos?|kittens?)\b/.test(identity) ? 'kitten'
+  const lifeStage = /\b(?:gatitos?|gaticos?|kittens?)\b/.test(identity) ? 'kitten'
     : /\b(?:cachorros?|pupp(?:y|ies))\b/.test(identity) ? (species === 'cat' ? 'kitten' : 'puppy')
     : /\b(?:senior|mature)\b/.test(identity) ? 'senior'
     : /\b(?:adult[oa]s?|adults?)\b/.test(normalized(title)) ? 'adult' : 'all';

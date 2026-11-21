@@ -1,11 +1,11 @@
-import type { FoodItem, Pet } from '../types';
+import type { FoodItem, Goal, Pet } from '../types';
 import { getApplicableFeedingRange } from '../utils/manufacturerRation';
 import { assessFoodForPet } from '../utils/foodSafety';
 
-export function ManufacturerRationInput({food, pet, value, onChange, lang}: {
-  food?: FoodItem; pet: Pet; value?: number; onChange: (grams?: number) => void; lang: 'es' | 'en';
+export function ManufacturerRationInput({food, pet, goal, value, onChange, lang}: {
+  food?: FoodItem; pet: Pet; goal: Goal; value?: number; onChange: (grams?: number) => void; lang: 'es' | 'en';
 }) {
-  const range = getApplicableFeedingRange(food, pet);
+  const range = getApplicableFeedingRange(food, pet, goal);
   const guide = food?.feedingGuide;
   if (!range || !food || !guide || assessFoodForPet(pet, food).some((notice) => notice.level === 'mismatch')) return null;
   const es = lang === 'es';

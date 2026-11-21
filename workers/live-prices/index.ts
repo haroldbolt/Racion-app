@@ -1,3 +1,4 @@
+import { registryNutritionPath, registryNutritionResponse } from './registryNutrition';
 import { registryPath, registryResponse } from './colombiaRegistry';
 import { catalogPath, colombiaFoodResponse } from './colombiaFoodRoute';
 import { DurableObject } from 'cloudflare:workers';
@@ -67,7 +68,8 @@ export default {
   async fetch(request: Request, env: LivePriceWorkerEnv): Promise<Response> {
     const url = new URL(request.url);
     const isRegistry = url.pathname === registryPath;
-    const isCatalog = url.pathname === catalogPath || isRegistry;
+    const isNutrition = url.pathname === registryNutritionPath;
+    const isCatalog = url.pathname === catalogPath || isRegistry || isNutrition;
     if (!isCatalog && url.pathname !== ROUTE) return new Response(null, { status: 404 });
     const origin = request.headers.get('Origin');
     const allowedOrigins = (env.ALLOWED_ORIGINS ?? '').split(',').map((item) => item.trim());
@@ -92,7 +94,7 @@ export default {
         responseHeaders.set('Vary', 'Origin');
         return new Response(result.body, {status:result.status, headers:responseHeaders});
       }
-      const result = await colombiaFoodResponse(url, request.signal, cache);
+      const result = isNutrition ? await registryNutritionResponse(url, request.signal, cache) : await colombiaFoodResponse(url, request.signal, cache);
       return new Response(result.body, {status:result.status, headers:{
         ...headers, 'Content-Type':'application/json; charset=utf-8',
       }});

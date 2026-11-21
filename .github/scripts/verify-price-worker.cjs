@@ -80,6 +80,12 @@ async function verifyWorkerRuntime() {
     worker = start(catalogMock);
     const liveCatalog = await worker.dispatchFetch('http://localhost/api/colombia-foods?q=prueba&species=cat',{headers:{origin:brandedOrigin}});
     assert.deepEqual(await liveCatalog.json(),{foods:[],unavailableSources:[]});
+    const nutrition = await worker.dispatchFetch('http://localhost/api/registry-nutrition?q=otra&registration=1234AL&species=cat', {
+      headers:{origin:brandedOrigin},
+    });
+    assert.equal(nutrition.status,200);
+    assert.equal(nutrition.headers.get('access-control-allow-origin'),brandedOrigin);
+    assert.deepEqual(await nutrition.json(),{food:null});
     const pdf = await worker.dispatchFetch('http://localhost/api/colombia-food-registry',{headers:{origin:brandedOrigin}});
     assert.equal(pdf.status,200);
     assert.equal(pdf.headers.get('x-ica-source'),'https://www.ica.gov.co'+attachment);

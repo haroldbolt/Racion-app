@@ -152,8 +152,8 @@ export function previewFeedingPlanAdjustment(
   const wetFood = includesWet ? updateLabelEnergy(draft.wetFood, wetEnergy) : original.wetFood;
   const primaryFood = draft.foodType === 'wet' ? wetFood : dryFood;
   if (draft.manufacturerGramsPerDay !== undefined) {
-    const range = draft.foodType !== 'mixed' && (original.goal ?? 'maintain') === 'maintain'
-      ? getApplicableFeedingRange(primaryFood, pet) : undefined;
+    const range = draft.foodType !== 'mixed'
+      ? getApplicableFeedingRange(primaryFood, pet, original.goal ?? 'maintain') : undefined;
     if (!range || !Number.isInteger(draft.manufacturerGramsPerDay) ||
         draft.manufacturerGramsPerDay < range.minGrams || draft.manufacturerGramsPerDay > range.maxGrams) return { error: 'guide' };
   }

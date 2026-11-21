@@ -19,6 +19,7 @@ interface LabelReviewModalProps {
   onClose: () => void;
   pet: Pick<Pet, 'species'>;
   initialFormulaName?: string;
+  initialRegistry?: FoodItem['icaRegistry'];
   plan?: FeedingPlan;
   initialFood?: FoodItem;
   defaultFoodType?: FoodItem['type'];
@@ -63,6 +64,7 @@ const LabelForm: React.FC<LabelFormProps> = ({
   currentFood,
   defaultFoodType = 'dry',
   initialFormulaName,
+  initialRegistry,
   mode = 'review',
   mixed,
   component,
@@ -72,6 +74,7 @@ const LabelForm: React.FC<LabelFormProps> = ({
   lang = 'es',
 }) => {
   const isEs = lang === 'es';
+  const registry = currentFood?.icaRegistry ?? initialRegistry;
   const manualIdentity = !currentFood || (currentFood.id.startsWith('custom_') && !currentFood.sourceFoodId);
   const [labelPhotoUrl, setLabelPhotoUrl] = useState(currentFood?.labelPhotoUrl || '');
   const [error, setError] = useState<string>();
@@ -269,7 +272,14 @@ const LabelForm: React.FC<LabelFormProps> = ({
     const stage = enteredStage === 'growth' ? growthStage :
       enteredStage === 'adult' || enteredStage === 'senior' || enteredStage === 'all' ? enteredStage : undefined;
     const lifeStage = stage ?? (declaresGrowth ? growthStage : !manualIdentity && identityUnchanged ? currentFood?.lifeStage : undefined);
+    const registeredTitle = normalizeIdentity(name).startsWith(normalizeIdentity(brand) + ' ')
+      ? name : [brand, name].join(' ');
+    const sameRegistryFormula = initialRegistry && species === pet.species &&
+      normalizeIdentity(registeredTitle) === normalizeIdentity(initialRegistry.name);
     const updatedFood: FoodItem = {
+      declaredIcaRegistration: identityUnchanged ? currentFood?.declaredIcaRegistration : undefined,
+      icaRegistry: currentFood ? (identityUnchanged ? currentFood.icaRegistry : undefined)
+        : (sameRegistryFormula ? initialRegistry : undefined),
       id: inLibrary ? currentFood.id : `custom_${crypto.randomUUID()}`,
       sourceFoodId: identityUnchanged ? currentFood?.sourceFoodId ||
         (currentFood?.id.startsWith('online_') ? currentFood.id : undefined) : undefined,
@@ -337,6 +347,10 @@ const LabelForm: React.FC<LabelFormProps> = ({
         </div>
 
         <form ref={form} onSubmit={handleSubmit} className="space-y-4 overflow-y-auto px-5 py-4">
+          {registry?.sourceUrl?.startsWith('https://www.ica.gov.co/') && <p className="text-xs text-[#44544A]">
+            <a href={registry.sourceUrl} target="_blank" rel="noopener noreferrer" className="font-bold text-[#0B5D2E] underline">ICA {registry.registration}</a>
+            {' · '}{registry.name}
+          </p>}
           {mixed && (
             <label className="block space-y-1 text-xs font-bold text-[#1C2B21]">
               <span>{isEs ? 'Alimento de la ración mixta' : 'Food in the mixed ration'}</span>

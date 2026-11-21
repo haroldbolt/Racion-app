@@ -45,7 +45,7 @@ export function registryRows(words: PdfWord[]): RegistryFood[] {
 
 export function findRegistrations(foods: RegistryFood[], query: string, species: 'dog' | 'cat') {
   const norm = (text: string) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-  const words = norm(query).split(' ').filter(Boolean);
+  const words = norm(query).replace(/^(?:registro )?ica (?=\d)/, '').split(' ').filter(Boolean);
   if (!words.length) return [];
   return foods.filter(food => {
     const text = norm(food.name) + ' ' + food.registration.toLowerCase();

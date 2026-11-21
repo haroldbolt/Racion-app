@@ -80,3 +80,24 @@ test('distinguishes complete source failure, a confirmed empty result and cancel
   controller.abort(new Error('cancelled'));
   await assert.rejects(searchColombiaCatalog('Marca','dog',undefined,controller.signal),/cancelled/);
 });
+
+test('quotes a single Mirringo x1kg SKU without borrowing prices from numeric multipacks', async t => {
+  const packages = ['x1kg', '2 x1kg', '2x1kg', '2 × 1 kg', '12 x1kg', '1kg x 2'];
+  t.mock.method(globalThis, 'fetch', async (url: URL) => {
+    const seed = sample(url.origin);
+    return Response.json(packages.map((size, index) => ({
+      ...seed, productId: String(110 + index), productName: 'Mirringo Gaticos ' + size, brand: 'Mirringo',
+      items: [sku(String(80 + index), 'Mirringo Gaticos ' + size, 14900 * (index + 1))],
+    })));
+  });
+  const {foods} = await searchColombiaCatalog('Mirringo Gaticos', 'cat', 'dry');
+  assert.equal(foods.length, packages.length * 4);
+  for (const food of foods) {
+    if (food.id.endsWith(':110')) {
+      assert.equal(food.name, 'Mirringo Gaticos');
+      assert.deepEqual(food.presentations.map(({packageKg, priceCop}) => [packageKg, priceCop]), [[1, 14900]]);
+    } else {
+      assert.deepEqual(food.presentations, [], food.name);
+    }
+  }
+});

@@ -128,7 +128,9 @@ export function parseLabelValues(raw: string, requireAnalysisHeading: boolean): 
 }
 
 export function foodRegistration(raw: string): string | undefined {
-  return /\b(?:registro\s+)?ica\s*[:.#-]?\s*(\d{3,7})\s*(al|sl)\b/i.exec(labelText(raw))?.slice(1).join('').toUpperCase();
+  const matches = labelText(raw).matchAll(/\b(?:registro\s+)?ica\s*[:.#-]?\s*(\d{3,7})[\s-]*(al|sl)\b/gi);
+  const registrations = new Set(Array.from(matches, match => (match[1] + match[2]).toUpperCase()));
+  return registrations.size === 1 ? [...registrations][0] : undefined;
 }
 
 export function declaredIngredients(raw: string): string | undefined {

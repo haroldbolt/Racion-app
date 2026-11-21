@@ -111,9 +111,13 @@ export interface FoodPriceBasis {
 }
 
 export interface FoodItem {
+  declaredIcaRegistration?: string;
+  icaRegistry?: {registration:string; name:string; sourceUrl:string};
   storeName?: string;
   storeProductUrl?: string;
   feedingGuide?: {
+    lifeStage?: 'adult' | 'kitten';
+    aboveWeight?: { afterKg: number; startGrams: number; gramsPerKg: number };
     sourceUrl: string;
     sourceName: string;
     ranges: { minWeightKg: number; maxWeightKg: number; minGrams: number; maxGrams: number }[];

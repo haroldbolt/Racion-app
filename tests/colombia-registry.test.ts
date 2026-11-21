@@ -17,6 +17,7 @@ test('ICA rows retain their own species, wrapped names and registrations only', 
   assert.equal(foods.length,2);
   assert.equal(findRegistrations(foods,'gaticos mírringo','cat')[0]?.registration,'11705AL');
   assert.equal(findRegistrations(foods,'11705 AL','cat')[0]?.name,'MIRRINGO GATICOS');
+  assert.equal(findRegistrations(foods,'ICA 11705 AL','cat')[0]?.name,'MIRRINGO GATICOS');
   assert.deepEqual(findRegistrations(foods,'11705','dog'),[]);
   assert.deepEqual(findRegistrations(foods,'no existe','cat'),[]);
   assert.throws(() => registryRows([word('Registro ICA',58,35)]),/layout_changed/);
