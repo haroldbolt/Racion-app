@@ -72,6 +72,7 @@ const LabelForm: React.FC<LabelFormProps> = ({
   lang = 'es',
 }) => {
   const isEs = lang === 'es';
+  const manualIdentity = !currentFood || (currentFood.id.startsWith('custom_') && !currentFood.sourceFoodId);
   const [labelPhotoUrl, setLabelPhotoUrl] = useState(currentFood?.labelPhotoUrl || '');
   const [error, setError] = useState<string>();
   const fileInput = useRef<HTMLInputElement>(null);
@@ -177,7 +178,8 @@ const LabelForm: React.FC<LabelFormProps> = ({
     }
     const normalizeIdentity = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .toLowerCase().replace(/[^a-z0-9+]+/g, ' ').trim();
-    const identityUnchanged = !currentFood || (
+    const species = manualIdentity ? (readText(data, 'species') === 'cat' ? 'cat' : 'dog') : currentFood!.species;
+    const identityUnchanged = !currentFood || (species === currentFood.species &&
       normalizeIdentity(brand) === normalizeIdentity(currentFood.brand) &&
       normalizeIdentity(name) === normalizeIdentity(currentFood.name)
     );
@@ -262,15 +264,20 @@ const LabelForm: React.FC<LabelFormProps> = ({
     const hasSameEnergy = identityUnchanged && kcal !== undefined && currentFood?.kcalPerKg === kcal;
     const declaresGrowth = data.has('growth');
     const ingredients = readText(data, 'ingredients');
+    const enteredStage = readText(data, 'stage');
+    const growthStage = species === 'cat' ? 'kitten' : 'puppy';
+    const stage = enteredStage === 'growth' ? growthStage :
+      enteredStage === 'adult' || enteredStage === 'senior' || enteredStage === 'all' ? enteredStage : undefined;
+    const lifeStage = stage ?? (declaresGrowth ? growthStage : !manualIdentity && identityUnchanged ? currentFood?.lifeStage : undefined);
     const updatedFood: FoodItem = {
       id: inLibrary ? currentFood.id : `custom_${crypto.randomUUID()}`,
       sourceFoodId: identityUnchanged ? currentFood?.sourceFoodId ||
         (currentFood?.id.startsWith('online_') ? currentFood.id : undefined) : undefined,
       brand,
       name,
-      species: currentFood?.species ?? pet.species,
-      lifeStage: declaresGrowth ? (pet.species === 'cat' ? 'kitten' : 'puppy') : (identityUnchanged ? currentFood?.lifeStage : undefined) ?? 'all',
-      lifeStageKnown: declaresGrowth || (identityUnchanged && currentFood?.lifeStageKnown),
+      species,
+      lifeStage: lifeStage ?? 'all',
+      lifeStageKnown: !!stage || declaresGrowth || (!manualIdentity && identityUnchanged && currentFood?.lifeStageKnown),
       nutritionalUse: complete ? 'complete' : otherUse === 'treat' || otherUse === 'complementary' ? otherUse : undefined,
       ingredientsSummary: identityUnchanged || ingredients !== currentFood?.ingredientsSummary ? ingredients || undefined : undefined,
       feedingGuide: identityUnchanged ? currentFood?.feedingGuide : undefined,
@@ -379,6 +386,28 @@ const LabelForm: React.FC<LabelFormProps> = ({
               <span>{isEs ? 'Nombre de la fórmula' : 'Formula name'}</span>
               <input className={inputClass} name="formula" required defaultValue={currentFood?.name ?? initialFormulaName ?? (mixed ? '' : plan?.foodName)} />
             </label>
+            {manualIdentity && <>
+              <label className="space-y-1 text-xs font-bold">
+                <span>{isEs ? 'Especie indicada en el empaque' : 'Species on the package'}</span>
+                <select name="species" className={inputClass} defaultValue={currentFood?.species ?? pet.species}>
+                  <option value="dog">{isEs ? 'Perro' : 'Dog'}</option>
+                  <option value="cat">{isEs ? 'Gato' : 'Cat'}</option>
+                </select>
+              </label>
+              <label className="space-y-1 text-xs font-bold">
+                <span>{isEs ? 'Etapa indicada en el empaque' : 'Life stage on the package'}</span>
+                <select name="stage" className={inputClass} defaultValue={
+                  !currentFood || currentFood.lifeStageKnown === false ? '' :
+                    ['kitten','puppy'].includes(currentFood.lifeStage) ? 'growth' : currentFood.lifeStage
+                }>
+                  <option value="">{isEs ? 'Sin declarar' : 'Unspecified'}</option>
+                  <option value="growth">{isEs ? 'Crecimiento' : 'Growth'}</option>
+                  <option value="adult">{isEs ? 'Adulto' : 'Adult'}</option>
+                  <option value="senior">{isEs ? 'Sénior' : 'Senior'}</option>
+                  <option value="all">{isEs ? 'Todas las etapas' : 'All life stages'}</option>
+                </select>
+              </label>
+            </>}
             {!currentFood && !mixed && (
               <label className="space-y-1 text-xs font-bold text-[#1C2B21]">
                 <span>{isEs ? 'Tipo de alimento' : 'Food type'}</span>

@@ -89,6 +89,8 @@ async function verify() {
     const manual = page.getByRole('dialog',{name:'Agregar alimento',exact:true});
     assert.equal(await input(manual,'Nombre de la fórmula').inputValue(),syntheticFormula);
     await input(manual,'Marca').fill('Marca de prueba');
+    assert.equal(await input(manual,'Especie indicada en el empaque').inputValue(),'cat');
+    await input(manual,'Etapa indicada en el empaque').selectOption('adult');
     await manual.getByText('Pegar una ficha o etiqueta',{exact:true}).click();
     await input(manual,'Texto de la etiqueta de esta fórmula').fill(
       'Ingredientes: arroz, pollo. Análisis garantizado: Proteína cruda mínimo 30%, Grasa mínimo 14%, Fibra máximo 4%. Energía metabolizable: 4000 kcal/kg.',

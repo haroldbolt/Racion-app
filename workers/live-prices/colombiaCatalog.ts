@@ -151,7 +151,8 @@ function catalogFood(product: JsonRecord, retailer: Retailer, query: string, spe
   if (queryTerms.some(t => /^\d+$/.test(t) && !terms.has(t)) || !(nameTerms.length ? nameTerms : queryTerms).some(t => terms.has(t))) return;
   const image = object((object((product.items as unknown[])?.[0]).images as unknown[])?.[0]).imageUrl;
   const cleanTitle = title.replace(/^alimento\s+(?:(?:seco|h[uú]medo)\s+)?(?:para\s+)?(?:perros?|gatos?)\s+/i, '').trim();
-  const name = withoutPackageWeight(cleanTitle).replace(/^[-–·\s]+/, '').replace(/(?:\s+[xX]|\s+por|[-–,])\s*$/, '').trim() || title;
+  const formula = sizes.length ? withoutPackageWeight(cleanTitle.replace(/\b(?:x|por)\s+(?=\d+(?:[.,]\d+)?\s*(?:kg|g|gr)\b)/gi, '')) : cleanTitle;
+  const name = formula.replace(/\s+/g, ' ').replace(/^[-–·\s]+/, '').replace(/(?:\s+[xX]|\s+por|[-–,])\s*$/, '').trim() || title;
   return {
     id: retailer.id + ':' + productId, retailer: retailer.name, brand, name, species, type,
     nutritionalUse: /\b(?:snacks?|golosinas?|premios?|galle(tas?|tones?))\b/.test(card) ? 'treat'
