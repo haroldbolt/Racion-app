@@ -49,6 +49,11 @@ export function NutritionSummary({ summary, language, planOnly = false }: Nutrit
       totals: summary.servedNutrients,
       foods: summary.perFoodBreakdown,
     });
+    if (summary.hasSeparateConsumedTotal) columns.push({
+      name: isEs ? 'Consumido' : 'Eaten',
+      totals: summary.consumedNutrients,
+      foods: summary.consumedBreakdown,
+    });
   }
   const showBreakdown = columns.some(({ foods, totals }) =>
     foods.length > 1 || Object.values(totals).some((value) => value.mixedQualifiers)
@@ -73,7 +78,7 @@ export function NutritionSummary({ summary, language, planOnly = false }: Nutrit
       <table aria-label={title} className="mt-3 w-full table-fixed text-left text-xs">
         <thead>
           <tr className="border-b border-[#0B5D2E25] text-[#44544A]">
-            <th scope="col" className="w-[43%] pb-2 pr-2 font-semibold">
+            <th scope="col" className={columns.length > 2 ? 'w-[27%] pb-2 pr-1 font-semibold' : 'w-[43%] pb-2 pr-2 font-semibold'}>
               {isEs ? 'Nutriente' : 'Nutrient'}
             </th>
             {columns.map(({ name }) => (
@@ -109,6 +114,12 @@ export function NutritionSummary({ summary, language, planOnly = false }: Nutrit
           )}
         </p>
       )}
+      {!planOnly && summary.hasSeparateConsumedTotal && (
+        <p className="mt-1 text-xs text-[#44544A]">
+          {isEs ? 'Comido del plato' : 'Eaten from the bowl'} · {formatGrams(summary.totalEatenGrams)} g.
+          {summary.treatsWithoutLabel && (isEs ? ' Los premios sin análisis tienen calorías registradas y nutrientes pendientes.' : 'Treats without an analysis have logged calories and pending nutrients.')}
+        </p>
+      )}
       {!planOnly && summary.completedMealsCount === 0 && (
         <p className="mt-1 text-xs text-[#44544A]">
           {isEs ? 'Registra una toma para ver el aporte servido.' : 'Log a meal to see the nutrients you served.'}
@@ -129,7 +140,7 @@ export function NutritionSummary({ summary, language, planOnly = false }: Nutrit
               <ul className="space-y-2">
                 {foods.map((food, index) => (
                   <li key={index} className="rounded-xl bg-white px-2.5 py-2">
-                    <p className="font-bold text-[#1C2B21]">{food.foodName} · {formatGrams(food.gramsServed)} g</p>
+                    <p className="font-bold text-[#1C2B21]">{food.foodName}{food.gramsServed > 0 && ` · ${formatGrams(food.gramsServed)} g`}</p>
                     <dl className="mt-1 grid grid-cols-2 gap-x-3 gap-y-1">
                       {nutrients.map(({ key, es, en }) => {
                         const amount = food[key];

@@ -8,10 +8,12 @@ import {
   TreatCatalogItem,
   TreatLog,
 } from '../types';
+import { isPetPuppy } from './petLifeStage';
+import { assessFoodForPet, assessVetLimits, getPlanSafetyNotices } from './foodSafety';
+export { getPetAgeMonths, isPetPuppy, isPetSenior } from './petLifeStage';
 import { findBreedProfile } from '../data/breeds';
-import { PET_FOODS_DATABASE } from '../data/foods';
 import { defaultMealTimes, hasValidVetGuideline, isClinicalOrVetPlan, requiresVetGuidance } from './calculator';
-import { getFoodKcalPerKg, getLoggedMealKcal, getPlanFoodKcalForGrams, getPlannedMeals, getPrimaryPlanFood } from './mealPortions';
+import { getFoodKcalPerKg, getLoggedMealEnergy, getPlannedMeals, getPrimaryPlanFood } from './mealPortions';
 
 export interface RuleSourceItem {
   rule: string;
@@ -99,26 +101,9 @@ export interface NextMealStatus {
   consumedGramsMeals: number;
   trainingGramsToday: number;
   consumedKcalTotal: number;
+  consumedKcalUnrounded: number;
+  energyIncomplete: boolean;
   targetKcalTotal: number;
-}
-
-export function getPetAgeMonths(pet: Pet): number {
-  if (typeof pet.ageMonths === 'number' && pet.ageMonths > 0) {
-    return pet.ageMonths;
-  }
-  return Math.max(1, Math.round((pet.ageYears ?? 2) * 12));
-}
-
-export function isPetPuppy(pet: Pet): boolean {
-  const profile = findBreedProfile(pet.breed, pet.species, pet.breedSize);
-  const ageMonths = getPetAgeMonths(pet);
-  return ageMonths < profile.growthMonths;
-}
-
-export function isPetSenior(pet: Pet): boolean {
-  const profile = findBreedProfile(pet.breed, pet.species, pet.breedSize);
-  const ageYears = getPetAgeMonths(pet) / 12;
-  return ageYears >= profile.seniorAgeYears;
 }
 
 export function getEffectiveFoodItem(plan?: FeedingPlan): FoodItem | undefined {
@@ -195,7 +180,6 @@ function getVerifiedAlternatives(
 ): VerifiedFoodAlternative[] {
   const puppy = isPetPuppy(pet);
   const { size, isAdultWeightKnown } = getEffectiveBreedSize(pet);
-  const restrictionText = `${(pet.restrictions || []).join(' ')} ${pet.restrictionNotes || ''}`.toLowerCase();
 
   const candidates = catalog.filter((f) => {
     if (f.species !== pet.species) return false;
@@ -212,15 +196,9 @@ function getVerifiedAlternatives(
       if (f.lifeStage === 'puppy' || f.lifeStage === 'kitten') return false;
     }
 
-    // Basic mild ingredient avoidance if user noted one (e.g. "sin pollo")
-    if (restrictionText.includes('pollo') && /pollo|chicken|ave/i.test(f.ingredientsSummary || f.name)) {
-      return false;
-    }
-    if (restrictionText.includes('maíz') && /ma[íi]z/i.test(f.ingredientsSummary || '')) {
-      return false;
-    }
+    const restrictions = [...assessFoodForPet(pet, f), ...assessVetLimits(pet, [{food: f}])];
+    return !restrictions.some((notice) => notice.level !== 'within');
 
-    return true;
   });
 
   const scored = candidates.map((food) => {
@@ -265,10 +243,9 @@ function getVerifiedAlternatives(
 export function evaluateCurrentFood(
   pet: Pet,
   plan?: FeedingPlan,
-  catalog: FoodItem[] = PET_FOODS_DATABASE
+  catalog: FoodItem[] = []
 ): FoodCompatibilityReview {
   const puppy = isPetPuppy(pet);
-  const senior = isPetSenior(pet);
   const food = getEffectiveFoodItem(plan);
   const clinicalOrVet = hasClinicalOrVetPlan(pet, plan);
   const isBarf = pet.dietType === 'barf' || plan?.foodType === 'barf';
@@ -382,127 +359,29 @@ export function evaluateCurrentFood(
     };
   }
 
-  // 3. Healthy dog WITHOUT confirmed label / manufacturer sheet (e.g., Ringo Cachorros from catalog)
-  if (!labelOk) {
-    const missingDesc = puppy
-      ? 'Falta confirmar en la etiqueta su fórmula exacta, las kcal/kg y si declara ser alimento completo y adecuado para crecimiento.'
-      : 'El catálogo aporta nombre y presentación, pero falta confirmar en la etiqueta sus kcal/kg y datos de respaldo para calcular la ración.';
-
-    return {
-      status: 'needs_label',
-      productTitle,
-      oneSentenceReason: missingDesc,
-      isPuppy: puppy,
-      puppyGrowthChecks: {
-        applicable: puppy,
-        isCompleteConfirmed: false,
-        suitableForGrowthConfirmed: false,
-        summary: puppy
-          ? 'Pendiente por verificar en la etiqueta: (1) alimento completo y (2) adecuado para crecimiento.'
-          : 'No aplica verificación de crecimiento (etapa adulta).',
-      },
-      breedFormatGuidance,
-      needsLabelReview: true,
-      missingFields,
-      alternatives: getVerifiedAlternatives(pet, food, catalog),
-      alternativesBlockedByVetPlan: false,
-      vetLockNote: null,
-      sources: [
-        ...baseSources,
-        {
-          rule: 'Validación estricta de etiqueta o ficha técnica',
-          source: 'Regla de datos verificados Ración App',
-          detail: 'No asumimos ni inventamos kcal/kg ni declaraciones de crecimiento cuando el catálogo no trae ficha nutricional confirmada.',
-        },
-      ],
-    };
-  }
-
-  // 4. Label IS confirmed — evaluate life stage & breed fit
-  const isCompleteConfirmed = food?.isCompleteAndBalanced !== false;
-  const suitableForGrowthConfirmed =
-    Boolean(food?.suitableForGrowth) || food?.lifeStage === 'puppy' || food?.lifeStage === 'all';
-
-  if (puppy && (!isCompleteConfirmed || !suitableForGrowthConfirmed)) {
-    return {
-      status: 'incompatible',
-      productTitle,
-      oneSentenceReason: !isCompleteConfirmed
-        ? `La etiqueta de ${productTitle} no declara que sea un alimento completo; para un cachorro requiere una fórmula completa de crecimiento.`
-        : `${productTitle} figura para mantenimiento adulto y no declara adecuación para crecimiento de cachorro.`,
-      isPuppy: true,
-      puppyGrowthChecks: {
-        applicable: true,
-        isCompleteConfirmed,
-        suitableForGrowthConfirmed,
-        summary: 'No cumple ambos requisitos de etiqueta para cachorro (alimento completo + adecuado para crecimiento).',
-      },
-      breedFormatGuidance,
-      needsLabelReview: true,
-      missingFields: ['Confirmar declaración de alimento completo para crecimiento'],
-      alternatives: getVerifiedAlternatives(pet, food, catalog),
-      alternativesBlockedByVetPlan: false,
-      vetLockNote: null,
-      sources: baseSources,
-    };
-  }
-
-  if (!puppy && food?.lifeStage === 'puppy') {
-    return {
-      status: 'incompatible',
-      productTitle,
-      oneSentenceReason: `${productTitle} está formulado para cachorros en crecimiento y puede aportar exceso calórico para un perro adulto.`,
-      isPuppy: false,
-      puppyGrowthChecks: {
-        applicable: false,
-        isCompleteConfirmed,
-        suitableForGrowthConfirmed,
-        summary: 'No aplica (etapa adulta).',
-      },
-      breedFormatGuidance,
-      needsLabelReview: false,
-      missingFields: [],
-      alternatives: getVerifiedAlternatives(pet, food, catalog),
-      alternativesBlockedByVetPlan: false,
-      vetLockNote: null,
-      sources: baseSources,
-    };
-  }
-
-  const dataSourceLabel = food?.dataSource || 'ficha confirmada';
-  const stageSentence = puppy
-    ? `Compatible con crecimiento: ${dataSourceLabel} confirma alimento completo y adecuado para cachorros (${food?.kcalPerKg} kcal/kg).`
-    : senior
-    ? `Compatible para etapa senior/adulto: ${dataSourceLabel} respalda nutrición completa (${food?.kcalPerKg} kcal/kg).`
-    : `Compatible para ${pet.species === 'cat' ? 'gato adulto' : 'perro adulto'}: ${dataSourceLabel} confirma nutrición completa de mantenimiento (${food?.kcalPerKg} kcal/kg).`;
-
+  const complete = food?.nutritionalUse === 'complete' || food?.isCompleteAndBalanced === true;
+  const knownStage = food && food.lifeStageKnown !== false && (food.lifeStage !== 'all' || food.lifeStageKnown === true);
+  const growth = Boolean(food?.suitableForGrowth || (knownStage && ['puppy','kitten','all'].includes(food!.lifeStage)));
+  const checks = plan ? getPlanSafetyNotices(pet, plan) : [];
+  const mismatch = checks.find((notice) => notice.level === 'mismatch');
+  const pending = checks.find((notice) => notice.level === 'review');
+  const fields: string[] = [];
+  if (!food) fields.push('fórmula exacta');
+  if (!knownStage && !growth) fields.push('etapa indicada');
+  if (!complete) fields.push('declaración de alimento completo');
+  if (puppy && !growth) fields.push('adecuación para crecimiento');
+  if (!labelOk && !plan?.manufacturerGramsPerDay) fields.push('energía metabolizable (kcal/kg)');
+  const status = mismatch ? 'incompatible' : pending || fields.length ? 'needs_label' : 'compatible';
+  const reason = mismatch?.message || pending?.message || (fields.length
+    ? `Pendiente de confirmar para ${pet.name}: ${fields.join(', ')}.`
+    : `La ficha indica un alimento completo para la etapa de ${pet.name}.`);
   return {
-    status: 'compatible',
-    productTitle,
-    oneSentenceReason: stageSentence,
-    isPuppy: puppy,
-    puppyGrowthChecks: {
-      applicable: puppy,
-      isCompleteConfirmed,
-      suitableForGrowthConfirmed,
-      summary: puppy
-        ? 'Etiqueta confirmada: alimento completo y adecuado para crecimiento.'
-        : 'No aplica (etapa adulta).',
-    },
-    breedFormatGuidance,
-    needsLabelReview: false,
-    missingFields: [],
-    alternatives: getVerifiedAlternatives(pet, food, catalog),
-    alternativesBlockedByVetPlan: false,
-    vetLockNote: null,
-    sources: [
-      ...baseSources,
-      {
-        rule: 'Fuente del producto evaluado',
-        source: dataSourceLabel,
-        detail: `Densidad calórica verificada: ${food?.kcalPerKg} kcal/kg · Etapa: ${food?.lifeStage}.`,
-      },
-    ],
+    status, productTitle, oneSentenceReason: reason, isPuppy: puppy,
+    puppyGrowthChecks: { applicable: puppy, isCompleteConfirmed: complete, suitableForGrowthConfirmed: growth,
+      summary: growth && complete ? 'La etiqueta declara una fórmula completa de crecimiento.' : 'Revisa la declaración de uso y la etapa de la fórmula.' },
+    breedFormatGuidance, needsLabelReview: Boolean(fields.length || pending), missingFields: fields,
+    alternatives: getVerifiedAlternatives(pet, food, catalog), alternativesBlockedByVetPlan: false,
+    vetLockNote: null, sources: baseSources,
   };
 }
 
@@ -603,7 +482,8 @@ export function evaluateTreatsBudget(
   const isEligibleFor10PctCap = !clinicalOrVet && mer > 0;
   const dailyBudgetKcal = isEligibleFor10PctCap ? Math.round(mer * 0.1) : 0;
 
-  const usedKcalToday = treatsToday.reduce((sum, t) => sum + (Number(t.kcal) || 0), 0);
+  const extraTreats = treatsToday.filter((t) => !t.isTrainingFromRation);
+  const usedKcalToday = Math.round(extraTreats.reduce((sum, t) => sum + (Number(t.kcal) || 0), 0));
   const remainingKcalToday = Math.max(0, dailyBudgetKcal - usedKcalToday);
 
   let maxPiecesForSelectedTreat: number | null = null;
@@ -646,7 +526,7 @@ export function evaluateTreatsBudget(
     dailyBudgetKcal,
     usedKcalToday,
     remainingKcalToday,
-    treatCountToday: treatsToday.length,
+    treatCountToday: extraTreats.length,
     maxPiecesForSelectedTreat,
     pieceCalculationNote,
     canAllocatePuppyTrainingFromRation,
@@ -751,7 +631,7 @@ export function getNextBestStepForToday(
 
 export function getNextMealStatus(
   plan: FeedingPlan | undefined,
-  mealLogs: Array<Pick<MealLog, 'mealIndex' | 'completed' | 'gramsFed' | 'plannedGrams' | 'mixedComponents'>>,
+  mealLogs: Array<Pick<MealLog, 'mealIndex' | 'completed' | 'gramsFed' | 'gramsEaten' | 'plannedGrams' | 'mixedComponents'>>,
   treatLogsToday: TreatLog[] = [],
   now: Date = new Date()
 ): NextMealStatus {
@@ -766,6 +646,8 @@ export function getNextMealStatus(
       consumedGramsMeals: 0,
       trainingGramsToday: 0,
       consumedKcalTotal: 0,
+      consumedKcalUnrounded: 0,
+      energyIncomplete: true,
       targetKcalTotal: 0,
     };
   }
@@ -794,10 +676,10 @@ export function getNextMealStatus(
     }
   }
 
-  const consumedGramsMeals = completedLogs.reduce((sum, l) => sum + (l.gramsFed || 0), 0);
-  const consumedMealKcal = completedLogs.reduce((sum, log) => sum + getLoggedMealKcal(log, plan), 0);
+  const consumedGramsMeals = completedLogs.reduce((sum, l) => sum + (l.gramsEaten ?? l.gramsFed ?? 0), 0);
+  const energies = completedLogs.map((log) => getLoggedMealEnergy(log, plan));
+  const consumedMealKcal = energies.reduce((sum, item) => sum + item.kcal, 0);
   const treatsKcalToday = treatLogsToday.reduce((sum, t) => sum + (t.kcal || 0), 0);
-  const trainingKcalToday = getPlanFoodKcalForGrams(plan, trainingGramsToday);
 
   return {
     nextMealIndex,
@@ -808,7 +690,9 @@ export function getNextMealStatus(
     totalMealsCount,
     consumedGramsMeals,
     trainingGramsToday,
-    consumedKcalTotal: Math.round(consumedMealKcal + treatsKcalToday + trainingKcalToday),
+    consumedKcalTotal: Math.round(consumedMealKcal + treatsKcalToday),
+    consumedKcalUnrounded: consumedMealKcal + treatsKcalToday,
+    energyIncomplete: energies.some((entry) => entry.partial),
     targetKcalTotal: plan.mer || 0,
   };
 }

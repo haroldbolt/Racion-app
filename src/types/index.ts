@@ -46,6 +46,8 @@ export interface Pet {
   dietType?: DietType;
   restrictions?: string[];
   restrictionNotes?: string;
+  avoidedIngredients?: string[];
+  vetNutrientLimits?: VetNutrientLimit[];
   profileRefinementPending?: {
     adultWeight?: boolean;
     activity?: boolean;
@@ -56,11 +58,20 @@ export interface Pet {
   createdAt: string;
 }
 
+export type VetNutrient = 'proteina' | 'grasa' | 'fibra' | 'carbohidratos' | 'cenizas' | 'humedad';
+
+export interface VetNutrientLimit {
+  nutrient: VetNutrient;
+  maximum: number;
+  unit: 'pct_as_fed' | 'pct_dry_matter' | 'grams_per_day';
+}
+
 export type NutrientQualifier = 'minimo' | 'maximo' | 'tipico';
 export type MeasurementBasis = 'tal_como_se_vende' | 'materia_seca';
 export type EmpaqueTipo = 'fabrica' | 'fraccionado' | 'por_confirmar';
 
 export interface NutrientValue {
+  source?: { name: string; url?: string; observedAt: string };
   valor: number;
   unidadOriginal: string;
   baseMedicion: MeasurementBasis;
@@ -68,6 +79,7 @@ export interface NutrientValue {
 }
 
 export interface NutritionDatasheet {
+  discrepancies?: { field: string; other: NutrientValue; sourceUrl: string }[];
   kcalPerKg?: NutrientValue & { nota?: string };
   kcalPerUnit?: NutrientValue;
   proteina?: NutrientValue;
@@ -98,12 +110,20 @@ export interface FoodPriceBasis {
 }
 
 export interface FoodItem {
+  storeProductUrl?: string;
+  feedingGuide?: {
+    sourceUrl: string;
+    sourceName: string;
+    ranges: { minWeightKg: number; maxWeightKg: number; minGrams: number; maxGrams: number }[];
+  };
   sourceFoodId?: string;
   id: string;
   brand: string;
   name: string;
   species: Species;
   lifeStage: LifeStage | 'all';
+  lifeStageKnown?: boolean;
+  nutritionalUse?: 'complete' | 'complementary' | 'treat';
   type: 'dry' | 'wet' | 'barf';
   kcalPerKg: number;
   kcalPerCup?: number;
@@ -166,6 +186,7 @@ export interface TreatLog {
   hasKcalPerUnitOnLabel: boolean;
   isTrainingFromRation?: boolean;
   gramsFromRation?: number;
+  nutritionComponent?: MealMixedComponent;
   loggedAt: string;
 }
 
@@ -182,6 +203,10 @@ export interface FoodCostEntry {
   foodId?: string;
   sourceFoodId?: string;
   foodSourceUrl?: string;
+  formulaAtPurchase?: { name: string; analysis?: NutritionDatasheet };
+  plannedMealCostsAtPurchase?: Array<{ time: string; grams: number; costCop?: number; partial: boolean }>;
+  openedOn?: string;
+  sharedWithPetIds?: string[];
   componentRole?: 'dry' | 'wet' | 'main';
   date: string; // YYYY-MM-DD
   foodBrand: string;
@@ -239,6 +264,7 @@ export interface FeedingPlan {
   factor: number;
   goal?: Goal;
   mer: number; // total kcal/day
+  manufacturerGramsPerDay?: number; // Quantity confirmed within this formula’s published feeding guide
   foodMerKcal?: number; // daily kcal from meals, excluding reserved treats
   treatsKcal?: number; // daily kcal entered when calculating, before the budget cap
   gramsPerDay: number;
@@ -275,11 +301,15 @@ export interface WeightRecord {
 
 export interface MealMixedComponent {
   foodId?: string;
+  sourceFoodId?: string;
+  brand?: string;
   foodName: string;
   foodLabelStatus?: LabelStatus | null;
   role: 'dry' | 'wet' | 'main';
   gramsPlanned: number;
   gramsFed: number;
+  gramsEaten?: number;
+  priceSnapshot?: { copPerGram?: number; source?: FoodPriceBasis['source']; packageKg?: number };
   kcalPerKg?: number;
   proteinPct?: number;
   fatPct?: number;
@@ -298,6 +328,7 @@ export interface MealLog {
   mealTime: string;
   plannedGrams?: number;
   gramsFed: number;
+  gramsEaten?: number;
   fedBy: string; // "Carlos", "Marta", etc.
   completed: boolean;
   completedAt?: string;

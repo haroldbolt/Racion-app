@@ -112,6 +112,30 @@ export function getComponentPlanFood(component: MealMixedComponent, plan?: Feedi
     : undefined;
 }
 
+export function snapshotMealFood(food: FoodItem, role: MealMixedComponent['role'], planned: number, fed: number): MealMixedComponent {
+  const knownLabel = food.labelStatus !== 'unconfirmed';
+  return {
+    foodId: food.id,
+    sourceFoodId: food.sourceFoodId,
+    brand: food.brand,
+    foodName: food.name,
+    foodLabelStatus: food.labelStatus ?? null,
+    role,
+    gramsPlanned: planned,
+    gramsFed: fed,
+    kcalPerKg: getFoodKcalPerKg(food) ?? 0,
+    proteinPct: knownLabel ? food.proteinPct : undefined,
+    fatPct: knownLabel ? food.fatPct : undefined,
+    fiberPct: knownLabel ? food.fiberPct : undefined,
+    moisturePct: knownLabel ? food.moisturePct : undefined,
+    ashPct: knownLabel ? food.ashPct : undefined,
+    carbsPct: knownLabel ? food.carbsPct : undefined,
+    fichaNutricional: knownLabel || food.fichaNutricional?.coincidenciaEstado === 'verificado'
+      ? food.fichaNutricional
+      : undefined,
+  };
+}
+
 export function getPlannedMealComponents(
   plan: FeedingPlan,
   portion: PlannedMealPortion,
@@ -128,27 +152,6 @@ export function getPlannedMealComponents(
     }];
   }
 
-  function snapshot(food: FoodItem, role: MealMixedComponent['role'], planned: number, fed: number): MealMixedComponent {
-    const knownLabel = food.labelStatus !== 'unconfirmed';
-    return {
-      foodId: food.id,
-      foodName: food.name,
-      foodLabelStatus: food.labelStatus ?? null,
-      role,
-      gramsPlanned: planned,
-      gramsFed: fed,
-      kcalPerKg: getFoodKcalPerKg(food) ?? 0,
-      proteinPct: knownLabel ? food.proteinPct : undefined,
-      fatPct: knownLabel ? food.fatPct : undefined,
-      fiberPct: knownLabel ? food.fiberPct : undefined,
-      moisturePct: knownLabel ? food.moisturePct : undefined,
-      ashPct: knownLabel ? food.ashPct : undefined,
-      carbsPct: knownLabel ? food.carbsPct : undefined,
-      fichaNutricional: knownLabel || food.fichaNutricional?.coincidenciaEstado === 'verificado'
-        ? food.fichaNutricional
-        : undefined,
-    };
-  }
 
   if (plan.foodType === 'mixed' && plan.dryFood && plan.wetFood) {
     const planned = portion.dryGrams !== undefined && portion.wetGrams !== undefined
@@ -156,13 +159,13 @@ export function getPlannedMealComponents(
       : splitMixedPortion(plan, portion.grams);
     const actual = gramsFed === portion.grams ? planned : splitMixedPortion(plan, gramsFed);
     return planned && actual ? [
-      snapshot(plan.dryFood, 'dry', planned.dryGrams, actual.dryGrams),
-      snapshot(plan.wetFood, 'wet', planned.wetGrams, actual.wetGrams),
+      snapshotMealFood(plan.dryFood, 'dry', planned.dryGrams, actual.dryGrams),
+      snapshotMealFood(plan.wetFood, 'wet', planned.wetGrams, actual.wetGrams),
     ] : undefined;
   }
 
   const food = getPrimaryPlanFood(plan);
-  return food ? [snapshot(food, 'main', portion.grams, gramsFed)] : undefined;
+  return food ? [snapshotMealFood(food, 'main', portion.grams, gramsFed)] : undefined;
 }
 
 export function getPlanFoodKcalForGrams(plan: FeedingPlan | undefined, grams: number): number {
@@ -184,15 +187,29 @@ export function getPlanFoodKcalForGrams(plan: FeedingPlan | undefined, grams: nu
   return grams * (getFoodKcalPerKg(getPrimaryPlanFood(plan)) ?? 0) / 1000;
 }
 
-type LoggedPortion = Pick<MealLog, 'mealIndex' | 'gramsFed' | 'plannedGrams' | 'mixedComponents'>;
+type LoggedPortion = Pick<MealLog, 'mealIndex' | 'gramsFed' | 'gramsEaten' | 'plannedGrams' | 'mixedComponents'>;
+
+export function getLoggedMealEnergy(log: LoggedPortion, plan?: FeedingPlan): { kcal: number; partial: boolean } {
+  const eaten = log.gramsEaten ?? log.gramsFed ?? log.plannedGrams ?? (plan ? getPlannedMeals(plan)[log.mealIndex]?.grams : undefined);
+  if (log.mixedComponents?.length) {
+    let kcal = 0;
+    let totalGrams = 0;
+    let missingDensity = false;
+    for (const component of log.mixedComponents) {
+      const grams = component.gramsEaten ?? component.gramsFed;
+      if (!positive(grams)) continue;
+      totalGrams += grams;
+      const density = component.kcalPerKg ?? getFoodKcalPerKg(getComponentPlanFood(component, plan));
+      if (positive(density)) kcal += grams * density / 1000;
+      else missingDensity = true;
+    }
+    if (eaten !== undefined && totalGrams - eaten > 0.001) return { kcal: 0, partial: eaten > 0 };
+    return { kcal, partial: missingDensity || (eaten !== undefined && eaten - totalGrams > 0.001) };
+  }
+  const kcal = getPlanFoodKcalForGrams(plan, eaten ?? 0);
+  return { kcal, partial: eaten === undefined || (eaten > 0 && kcal === 0) };
+}
 
 export function getLoggedMealKcal(log: LoggedPortion, plan?: FeedingPlan): number {
-  if (log.mixedComponents?.length) {
-    return log.mixedComponents.reduce((total, component) => {
-      const density = component.kcalPerKg ?? getFoodKcalPerKg(getComponentPlanFood(component, plan));
-      return total + (positive(density) && positive(component.gramsFed) ? component.gramsFed * density / 1000 : 0);
-    }, 0);
-  }
-  const grams = log.gramsFed ?? log.plannedGrams ?? (plan ? getPlannedMeals(plan)[log.mealIndex]?.grams : 0);
-  return getPlanFoodKcalForGrams(plan, grams ?? 0);
+  return getLoggedMealEnergy(log, plan).kcal;
 }

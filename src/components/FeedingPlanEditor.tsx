@@ -7,10 +7,14 @@ import {
   createFeedingPlanAdjustment,
   minimumMealCount,
   previewFeedingPlanAdjustment,
+  retainManufacturerPortion,
   type FormulaType,
 } from '../utils/feedingPlanAdjustment';
 import { calculateDailyMealNutritionSummary } from '../utils/mealNutrition';
 import { getFoodKcalPerKg, getPlannedMeals } from '../utils/mealPortions';
+import { PlanChangePreview } from './PlanChangePreview';
+import { ManufacturerRationInput } from './ManufacturerRationInput';
+import { getPlanSafetyNotices } from '../utils/foodSafety';
 import { NutritionSummary } from './NutritionSummary';
 import { UnifiedFoodSearchModal } from './UnifiedFoodSearchModal';
 
@@ -41,6 +45,7 @@ export function FeedingPlanEditor({
   const minimum = editable ? minimumMealCount(meals) : plan.mealsPerDay;
   const preview = previewFeedingPlanAdjustment(pet, plan, draft, meals);
   const nextPlan = 'plan' in preview ? preview.plan : undefined;
+  const unsafeFormula = Boolean(editable && nextPlan && getPlanSafetyNotices(pet, nextPlan, language).some((notice) => notice.level === 'mismatch'));
   const portions = nextPlan ? getPlannedMeals(nextPlan) : [];
   const summary = nextPlan ? calculateDailyMealNutritionSummary({ plan: nextPlan, mealLogs: [] }) : undefined;
   const grams = new Intl.NumberFormat(isEs ? 'es-CO' : 'en-US', { maximumFractionDigits: 3 });
@@ -72,6 +77,7 @@ export function FeedingPlanEditor({
     schedule: isEs ? 'Completa la hora de cada toma.' : 'Choose a time for every serving.',
     mealCount: isEs ? 'Conserva los espacios de las tomas registradas hoy.' : 'Keep the slots for servings already logged today.',
     formula: isEs ? 'Elige cada fórmula que forma parte de la ración.' : 'Choose every formula in the ration.',
+    guide: isEs ? 'Elige una cantidad dentro del rango de la tabla que corresponda al peso actual.' : 'Choose an amount inside the guide range for the current weight.',
     density: isEs ? 'Ingresa las kcal/kg de la etiqueta con un valor mayor que cero.' : 'Enter a positive kcal/kg value from the label.',
   };
 
@@ -99,10 +105,10 @@ export function FeedingPlanEditor({
             className="flex min-h-0 flex-col"
             onSubmit={(event) => {
               event.preventDefault();
-              if (picking) return;
+              if (picking || unsafeFormula) return;
               const mealTimes = new FormData(event.currentTarget).getAll('mealTime').map(String);
               const saved = previewFeedingPlanAdjustment(pet, plan, { ...draft, mealTimes }, meals);
-              if ('plan' in saved) onSave(saved.plan);
+              if ('plan' in saved && (!editable || !getPlanSafetyNotices(pet, saved.plan, language).some((notice) => notice.level === 'mismatch'))) onSave(saved.plan);
             }}
           >
             <div className="space-y-5 overflow-y-auto overscroll-contain p-5">
@@ -115,7 +121,7 @@ export function FeedingPlanEditor({
                         key={type}
                         type="button"
                         aria-pressed={draft.foodType === type}
-                        onClick={() => setDraft((previous) => ({ ...previous, foodType: type }))}
+                        onClick={() => setDraft((previous) => ({ ...previous, foodType: type, manufacturerGramsPerDay: undefined }))}
                         className={`min-h-11 rounded-xl border px-2 text-sm font-bold transition ${draft.foodType === type
                           ? 'border-[#0B5D2E] bg-[#0B5D2E] text-white'
                           : 'border-[#0B5D2E30] bg-white text-[#0B5D2E] hover:bg-[#EAF4EC]'}`}
@@ -159,6 +165,7 @@ export function FeedingPlanEditor({
                               onChange={(event) => setDraft((previous) => ({
                                 ...previous,
                                 [dry ? 'dryEnergy' : 'wetEnergy']: event.target.value,
+                                manufacturerGramsPerDay: undefined,
                               }))}
                               className="mt-1 min-h-11 w-full rounded-xl border border-[#0B5D2E30] bg-white px-3 text-sm font-bold text-[#1C2B21]"
                             />
@@ -167,6 +174,11 @@ export function FeedingPlanEditor({
                       </div>
                     );
                   })}
+
+                  {draft.foodType !== 'mixed' && (plan.goal ?? 'maintain') === 'maintain' && !(draft.foodType === 'dry' ? draft.dryEnergy : draft.wetEnergy).trim() && (
+                    <ManufacturerRationInput food={draft.foodType === 'dry' ? draft.dryFood : draft.wetFood} pet={pet} value={draft.manufacturerGramsPerDay}
+                      onChange={(grams) => setDraft((previous) => ({ ...previous, manufacturerGramsPerDay: grams }))} lang={language} />
+                  )}
 
                   {draft.foodType === 'mixed' && (
                     <label className="block rounded-xl bg-[#EAF4EC] p-3 text-xs font-bold text-[#0B5D2E]">
@@ -273,6 +285,7 @@ export function FeedingPlanEditor({
                 ))}
               </section>
 
+              {nextPlan && <PlanChangePreview pet={pet} current={plan} proposed={nextPlan} lang={language} />}
               {summary && nextPlan?.rationConfirmed && (
                 <NutritionSummary summary={summary} language={language} planOnly />
               )}
@@ -282,9 +295,9 @@ export function FeedingPlanEditor({
               <button type="button" onClick={onClose} className="min-h-11 rounded-xl border border-[#0B5D2E30] px-3 text-sm font-bold text-[#0B5D2E]">
                 {isEs ? 'Cancelar' : 'Cancel'}
               </button>
-              <button type="submit" disabled={!nextPlan} className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-[#0B5D2E] px-3 text-sm font-extrabold text-white hover:bg-[#094723] disabled:opacity-45">
+              <button type="submit" disabled={!nextPlan || unsafeFormula} className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-[#0B5D2E] px-3 text-sm font-extrabold text-white hover:bg-[#094723] disabled:opacity-45">
                 <Check size={17} />
-                {isEs ? 'Guardar cambios' : 'Save changes'}
+                {isEs ? `Guardar cambios para ${pet.name}` : `Save changes for ${pet.name}`}
               </button>
             </footer>
           </form>
@@ -302,8 +315,8 @@ export function FeedingPlanEditor({
               : sourceFoodItem;
             const energy = String(getFoodKcalPerKg(food) ?? '');
             setDraft((previous) => picking === 'dry'
-              ? { ...previous, dryFood: food, dryEnergy: energy }
-              : { ...previous, wetFood: food, wetEnergy: energy });
+              ? { ...previous, dryFood: food, dryEnergy: energy, manufacturerGramsPerDay: retainManufacturerPortion(previous.dryFood, food, previous.manufacturerGramsPerDay) }
+              : { ...previous, wetFood: food, wetEnergy: energy, manufacturerGramsPerDay: retainManufacturerPortion(previous.wetFood, food, previous.manufacturerGramsPerDay) });
           }}
           activePet={pet}
           formulaType={picking}

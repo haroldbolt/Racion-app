@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Pet, FoodItem, Goal, FeedingPlan, UserAccount, BreedSize } from '../types';
 import { BCSSelector } from '../components/BCSSelector';
+import { PlanChangePreview } from '../components/PlanChangePreview';
+import { PlanSafetyAlerts } from '../components/FoodSafetyAlerts';
+import { ManufacturerRationInput } from '../components/ManufacturerRationInput';
+import { getPlanSafetyNotices } from '../utils/foodSafety';
+import { getApplicableFeedingRange } from '../utils/manufacturerRation';
 import { FoodLabelComposition } from '../components/FoodLabelComposition';
 import { LabelReviewModal } from '../components/LabelReviewModal';
 import { OnlineFoodSearch } from '../components/OnlineFoodSearch';
@@ -21,7 +26,8 @@ import {
   getIdealWeightForBreedAndSex,
   getBreedSizeLabel,
 } from '../data/breeds';
-import { getFoodKcalPerKg, getPlannedMeals } from '../utils/mealPortions';
+import { retainManufacturerPortion } from '../utils/feedingPlanAdjustment';
+import { getFoodKcalPerKg, getPlannedMeals, getPrimaryPlanFood } from '../utils/mealPortions';
 import { calculateDailyMealNutritionSummary } from '../utils/mealNutrition';
 import { StorageService } from '../utils/storage';
 import { formatRation, formatWeight } from '../utils/i18n';
@@ -58,6 +64,12 @@ const SIZE_OPTIONS: Array<{ id: BreedSize; es: string; en: string }> = [
   { id: 'giant', es: 'Gigante', en: 'Giant' },
 ];
 
+function needsManualReview(food: FoodItem) {
+  return food.type !== 'barf' && !getFoodKcalPerKg(food) &&
+    !(food.labelStatus === 'verified_manufacturer' && food.fichaNutricional?.coincidenciaEstado === 'verificado') &&
+    !food.feedingGuide;
+}
+
 export const CalculatorView: React.FC<CalculatorViewProps> = ({
   pet,
   onSavePlan,
@@ -71,7 +83,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
   const units = userAccount.units;
 
   // Wizard Step: 1, 2, 3, 4, 5, or 6 (Results screen)
-  const [step, setStep] = useState<number>(1);
+  const [step, setStep] = useState<number>(initialFood ? 4 : 1);
 
   // Form states initialized with pet data
   const [editablePet, setEditablePet] = useState<Pet>({
@@ -125,12 +137,13 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
   );
   const [dryFood, setDryFood] = useState(initialFood?.type === 'dry' ? initialFood : savedPlan?.dryFood);
   const [wetFood, setWetFood] = useState(initialFood?.type === 'wet' ? initialFood : savedPlan?.wetFood);
+  const [manufacturerGrams, setManufacturerGrams] = useState<number | undefined>(() => initialFood ? retainManufacturerPortion(getPrimaryPlanFood(savedPlan), initialFood, savedPlan?.manufacturerGramsPerDay) : savedPlan?.manufacturerGramsPerDay);
   const [mixedDryPct, setMixedDryPct] = useState(savedPlan?.mixedDryPct ?? 50);
 
   // Food search & filter
   const [foodSearchQuery, setFoodSearchQuery] = useState('');
   const [showAddCustomModal, setShowAddCustomModal] = useState(false);
-  const [labelDraft, setLabelDraft] = useState<FoodItem | undefined>(initialFood && !getFoodKcalPerKg(initialFood) ? initialFood : undefined);
+  const [labelDraft, setLabelDraft] = useState<FoodItem | undefined>(initialFood && needsManualReview(initialFood) ? initialFood : undefined);
   const [savedFoods, setSavedFoods] = useState(() => StorageService.getCustomFoods());
   const [foodSource, setFoodSource] = useState<'library' | 'internet'>('internet');
   const [showComparerModal, setShowComparerModal] = useState(false);
@@ -173,6 +186,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
     mealsPerDay,
     mealTimes,
     treatsKcal: totalTreatsKcal,
+    manufacturerGramsPerDay: foodType !== 'mixed' && goal === 'maintain' ? manufacturerGrams : undefined,
     manualAdjustmentPct,
     manualAdjustmentReason,
     scheduleConfigured: true,
@@ -181,6 +195,10 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
   const result: CalculationResult = calculateFeedingPlan(calculationInputs);
   const resultPlan = buildFeedingPlan(calculationInputs, result);
   const resultMeals = getPlannedMeals(resultPlan);
+  const safetyMismatch = getPlanSafetyNotices(editablePet, resultPlan, userAccount.language).some((notice) => notice.level === 'mismatch');
+  const selectedFood = foodType === 'dry' ? dryFood : foodType === 'wet' ? wetFood : undefined;
+  const guideRange = goal === 'maintain' ? getApplicableFeedingRange(selectedFood, editablePet) : undefined;
+  const invalidGuide = guideRange && manufacturerGrams !== undefined && (!Number.isInteger(manufacturerGrams) || manufacturerGrams < guideRange.minGrams || manufacturerGrams > guideRange.maxGrams);
 
   const handleNext = () => {
     if (step < 5) {
@@ -203,6 +221,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
   };
 
   const handleSaveAndApply = () => {
+    if (safetyMismatch || invalidGuide) return;
     if (onUpdatePet) {
       onUpdatePet({ ...editablePet, bcs });
     }
@@ -211,7 +230,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
   };
 
   const selectFood = (food: FoodItem) => {
-    if (!getFoodKcalPerKg(food) && food.type !== 'barf') {
+    if (needsManualReview(food)) {
       setLabelDraft(food);
       setShowAddCustomModal(true);
       return;
@@ -220,6 +239,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
   };
 
   const applyFood = (food: FoodItem) => {
+    setManufacturerGrams((grams) => retainManufacturerPortion(selectedFood, food, grams));
     if (food.type === 'barf') {
       setFoodType('barf');
       return;
@@ -722,6 +742,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                 onClick={() => {
                   const nextType = ft.id as 'dry' | 'wet' | 'mixed' | 'barf';
                   setFoodType(nextType);
+                  setManufacturerGrams(undefined);
                   if (nextType === 'barf') {
                     setEditablePet({ ...editablePet, dietType: 'barf' });
                   } else if (editablePet.dietType === 'barf') {
@@ -853,7 +874,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                 foodType={foodType === 'mixed' ? undefined : foodType}
                 initialQuery={foodSearchQuery}
                 lang={userAccount.language}
-                onSelect={(food) => { setLabelDraft(food); setShowAddCustomModal(true); }}
+                onSelect={selectFood}
               />
             ) : <>
             {/* Search bar */}
@@ -886,18 +907,15 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                 const kcalPerKg = getFoodKcalPerKg(item);
 
                 return (
-                  <button
+                  <article
                     key={item.id}
-                    type="button"
-                    onClick={() => selectFood(item)}
-                    aria-pressed={isSelected}
                     className={`w-full p-2.5 rounded-xl border text-left transition ${
                       isSelected
                         ? 'border-[#0B5D2E] bg-[#EAF4EC] font-semibold ring-1 ring-[#0B5D2E]'
                         : 'border-gray-200 bg-white hover:bg-gray-50'
                     }`}
                   >
-                    <div>
+                    <button type="button" onClick={() => selectFood(item)} aria-pressed={isSelected} className="block w-full text-left">
                       <span className="text-[11px] font-bold text-[#0B5D2E] uppercase">
                         {item.brand} ({item.type === 'wet' ? 'Húmedo' : 'Seco'})
                       </span>
@@ -912,19 +930,31 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                       <p className="text-[11px] text-[#44544A]">
                         {(getConfirmedPresentations(item) || []).map((size) => `${size} kg`).join(' · ') || (isEs ? 'Empaque sin dato' : 'Package size unknown')}
                       </p>
-                    </div>
+                    </button>
 
                     {foodSource === 'library' && (
                       <div className="mt-2 border-t border-[#0B5D2E15] pt-2">
                         <FoodLabelComposition food={item} language={userAccount.language} />
                       </div>
                     )}
-                  </button>
+                  </article>
                 );
               })}
             </div>
             </>}
           </div>
+
+          {foodSource === 'internet' && (foodType === 'mixed' ? [dryFood, wetFood] : [selectedFood]).filter((food): food is FoodItem => Boolean(food)).map((food) => (
+            <section key={food.id} aria-label={isEs ? 'Fórmula seleccionada' : 'Selected formula'} className="space-y-2 rounded-xl border border-[#0B5D2E25] p-3">
+              <h3 className="text-sm font-bold">{food.brand} {food.name}{food.bagSizeKg ? ` · ${food.bagSizeKg} kg` : ''}</h3>
+              <FoodLabelComposition food={food} language={userAccount.language} />
+              <button type="button" className="min-h-11 font-bold text-[#0B5D2E] underline" onClick={() => { setLabelDraft(food); setShowAddCustomModal(true); }}>
+                {isEs ? 'Contrastar con mi etiqueta' : 'Check against my label'}
+              </button>
+            </section>
+          ))}
+          {guideRange && <ManufacturerRationInput food={selectedFood} pet={editablePet} value={manufacturerGrams} onChange={setManufacturerGrams} lang={userAccount.language} />}
+          <PlanSafetyAlerts pet={editablePet} plan={resultPlan} lang={userAccount.language} />
 
           {/* Treats Budget Mini-Calculator (Page 4: max 10% kcal, subtracted from food) */}
           <div className="bg-[#FFF7ED] p-4 rounded-2xl border border-[#F57C1A]/30 space-y-3">
@@ -933,7 +963,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                 🍪 {isEs ? 'Presupuesto de premios (máx 10% kcal)' : 'Treats budget (max 10% kcal)'}
               </span>
               <span className="text-xs font-extrabold text-[#F57C1A]">
-                {totalTreatsKcal} kcal {isEs ? 'descontadas de la comida' : 'subtracted from food'}
+                {totalTreatsKcal} kcal {guideRange ? (isEs ? 'en premios' : 'in treats') : (isEs ? 'descontadas de la comida' : 'subtracted from food')}
               </span>
             </div>
 
@@ -967,7 +997,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
               </div>
             </div>
             <p className="text-[11px] text-[#9A3412]">
-              {isEs
+              {guideRange ? (isEs ? 'La tabla indica gramos de alimento. Para ajustar los gramos por premios se necesitan las kcal/kg.' : 'The guide lists grams of food. Adjusting that portion for treats needs kcal/kg.') : isEs
                 ? 'ℹ️ Los premios se restan de la ración de comida, nunca se añaden por encima.'
                 : 'ℹ️ Treats are subtracted from the food ration, never added on top.'}
             </p>
@@ -1094,11 +1124,14 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                   </p>
                   <p className="mt-2 text-xs text-[#44544A]">
                     {result.mer} kcal {isEs ? 'de meta diaria' : 'daily target'}
-                    {result.mer > result.foodMerKcal && (
+                    {!resultPlan.manufacturerGramsPerDay && result.mer > result.foodMerKcal && (
                       isEs ? ` · ${result.mer - result.foodMerKcal} kcal reservadas para premios` : ` · ${result.mer - result.foodMerKcal} kcal reserved for treats`
                     )}
                   </p>
                 </div>
+                {resultPlan.manufacturerGramsPerDay && (
+                  <p className="mt-2 text-center text-xs">{isEs ? 'Gramos elegidos en la tabla del fabricante. Energía por toma pendiente de kcal/kg.' : 'Daily grams chosen from the manufacturer guide. Energy per meal needs kcal/kg.'}</p>
+                )}
                 <ul className="mt-4 space-y-2">
                   {resultMeals.map((portion, idx) => (
                     <li key={idx} className="flex justify-between gap-2 rounded-xl bg-white px-3 py-2 text-xs">
@@ -1140,6 +1173,8 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
             )}
           </div>
 
+          <PlanChangePreview pet={editablePet} current={savedPlan} proposed={resultPlan} lang={userAccount.language} />
+
           {/* Cat hepatic lipidosis warning (Page 4) */}
           {result.catHepaticLipidosisWarning && (
             <div className="bg-[#FEF2F2] p-3.5 rounded-2xl border border-[#C0392B]/30 text-xs text-[#991B1B] space-y-1">
@@ -1167,7 +1202,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
             </div>
           )}
 
-          {result.rationConfirmed && !resultPlan.isVetLocked && (
+          {result.rationConfirmed && !resultPlan.isVetLocked && !resultPlan.manufacturerGramsPerDay && (
             <>
               {/* Manual +/- 10% adjustment slider (Page 4) */}
           <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 space-y-2">
@@ -1255,14 +1290,18 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
               : 'Ración App is an educational feeding guide based on NRC 2006, WSAVA and AAHA. It does not diagnose, prescribe therapeutic diets or replace a licensed veterinarian.'}
           </p>
 
-          {/* Primary Action Button: Guardar este plan (Rule 1, 4) */}
+          {safetyMismatch && <button type="button" className="min-h-11 rounded-lg border px-3 text-sm font-bold text-[#0b5d2e]" onClick={() => setStep(4)}>
+            {isEs ? 'Revisar el alimento seleccionado' : 'Review selected food'}
+          </button>}
+          {invalidGuide && <p role="alert">{isEs ? 'Revisa los gramos elegidos en la tabla del fabricante.' : 'Review the daily grams selected from the guide.'}</p>}
           <button
+            disabled={safetyMismatch || Boolean(invalidGuide)}
             onClick={handleSaveAndApply}
             className="w-full min-h-[52px] bg-[#0B5D2E] text-white rounded-2xl font-heading font-extrabold text-lg flex items-center justify-center gap-2 hover:bg-[#094723] transition active:scale-98 shadow-md"
           >
             <Check className="w-5 h-5 stroke-[3]" />
             <span>{result.rationConfirmed
-              ? (isEs ? 'Guardar este plan' : 'Save this plan')
+              ? (savedPlan?.rationConfirmed ? (isEs ? `Aplicar a ${editablePet.name}` : `Apply to ${editablePet.name}`) : (isEs ? 'Guardar este plan' : 'Save this plan'))
               : (isEs ? 'Guardar horario para el diario' : 'Save the diary schedule')}</span>
           </button>
         </div>

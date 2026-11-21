@@ -1,5 +1,7 @@
 import React from 'react';
 import { Bell, Clock, X } from 'lucide-react';
+import { readPetStock } from './FoodInventory';
+import { localDateKey } from '../utils/localDate';
 import { Pet, FeedingPlan, UserAccount } from '../types';
 
 interface NotificationsCenterModalProps {
@@ -22,7 +24,11 @@ export const NotificationsCenterModal: React.FC<NotificationsCenterModalProps> =
 
   const isEs = lang === 'es';
   const daysRemaining = plan?.bagDaysRemaining;
-  const showRestock = daysRemaining !== undefined && daysRemaining <= 14;
+  const stock = pet ? readPetStock(pet.id) : [];
+  const horizon = new Date();
+  horizon.setDate(horizon.getDate() + 14);
+  const due = stock.filter(group => group.runsOut && group.runsOut <= localDateKey(horizon));
+  const showRestock = !stock.length && daysRemaining !== undefined && daysRemaining <= 14;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in">
@@ -48,6 +54,7 @@ export const NotificationsCenterModal: React.FC<NotificationsCenterModalProps> =
             <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
+        {due.map(group => <p key={group.key} className="rounded-xl bg-amber-50 p-3 text-sm">{group.foodName} · {isEs ? 'Reposición estimada' : 'Estimated refill'} {group.runsOut}</p>)}
         {showRestock ? (
           <div className="p-3.5 rounded-2xl border border-amber-200 bg-amber-50/50">
             <p className="flex items-center gap-2 text-xs font-bold text-[#1C2B21]">
@@ -60,7 +67,7 @@ export const NotificationsCenterModal: React.FC<NotificationsCenterModalProps> =
                 : `According to ${pet?.name || 'your pet'}’s plan, one bag lasts about ${daysRemaining} days.`}
             </p>
           </div>
-        ) : (
+        ) : !due.length && (
           <p className="text-xs text-[#44544A]">{isEs ? 'No hay avisos de reposición.' : 'No reorder alerts.'}</p>
         )}
       </div>

@@ -65,3 +65,30 @@ test('same and backdated weigh-ins persist without changing the latest weight or
   assert.deepEqual(StorageService.getWeightRecords('milo'), []);
   assert.deepEqual(StorageService.getPets().map((pet) => pet.currentWeightKg), [4.4, 14.2]);
 });
+
+test('keeps the food, price paid per gram, servings and intake bound to the original meal across plan changes', () => {
+  const food = {
+    id:'agility', sourceFoodId:'store-agility', name:'Grandes Adultos', brand:'Agility Gold', type:'dry', species:'dog',
+    lifeStage:'adult', country:'Colombia', kcalPerKg:0, proteinPct:23, fatPct:15, fiberPct:4, moisturePct:11,
+    bagSizeKg:3, priceBasis:{packageKg:3, priceCop:90000, source:'online', observedAt:'2026-10-01'},
+  } as const;
+  const original = {
+    id:'p', petId:'luna', createdAt:'2026-11-20', foodId:food.id, foodName:food.name, foodBrand:food.brand, foodType:'dry',
+    dryFood:food, mixedDryPct:100, mixedWetPct:0, mealsPerDay:2, mealTimes:['08:00','20:00'], rer:600, mer:1000,
+    factor:1.5, gramsPerDay:300, gramsPerMeal:150, kcalPerMeal:0, treatsBudgetKcal:100, treatsCountToday:0,
+    manualAdjustmentPct:0, rationConfirmed:true, bagWeightKg:3,
+  } as const;
+  const plan = {...original, mealTimes:[...original.mealTimes]};
+  StorageService.savePlan(plan);
+  StorageService.toggleMealCompleted('luna', 0, 'Ana', 150, '08:00', 150, true, undefined, 100);
+  StorageService.savePlan({...plan, dryFood:{ ...food, proteinPct:35, priceBasis:{...food.priceBasis,priceCop:120000} }});
+  const past = StorageService.getMealHistory('luna')[0];
+  assert.deepEqual([past.gramsFed, past.gramsEaten], [150,100]);
+  assert.equal(past.mixedComponents?.[0].sourceFoodId, 'store-agility');
+  assert.equal(past.mixedComponents?.[0].proteinPct, 23);
+  assert.equal(past.mixedComponents?.[0].priceSnapshot?.copPerGram, 30);
+  assert.equal(past.mixedComponents?.[0].gramsEaten, 100);
+  assert.equal(StorageService.getMealHistory('milo').length, 0);
+  StorageService.toggleMealCompleted('luna', 0, 'Ana', 0, '08:00');
+  assert.equal(StorageService.getMealHistory('luna').length, 0);
+});

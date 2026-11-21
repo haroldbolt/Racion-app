@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AlertCircle, Camera, Check, Trash2, X } from 'lucide-react';
 import type {
   FeedingPlan,
@@ -8,6 +8,7 @@ import type {
   NutrientQualifier,
   Pet,
 } from '../types';
+import { labelFields, parseLabelValues, type LabelValues } from '../utils/nutritionLabel';
 import { getEffectiveNutrientField } from '../utils/mealNutrition';
 import { StorageService } from '../utils/storage';
 import { getConfirmedPresentations } from '../data/foodPresentations';
@@ -76,28 +77,66 @@ const LabelForm: React.FC<LabelFormProps> = ({
   const labelEnergy = getEffectiveNutrientField(currentFood, 'kcalPerKg');
   const startingEnergy = labelEnergy?.baseMedicion === 'tal_como_se_vende' ? labelEnergy.valor : undefined;
 
-  function handlePhoto(event: React.ChangeEvent<HTMLInputElement>) {
+  const form = useRef<HTMLFormElement>(null);
+  const reader = useRef<AbortController | null>(null);
+  const [reading, setReading] = useState(false);
+  const [photoMessage, setPhotoMessage] = useState('');
+  const [suggestions, setSuggestions] = useState<LabelValues>({});
+  const [otherUse, setOtherUse] = useState(currentFood?.nutritionalUse === 'treat' || currentFood?.nutritionalUse === 'complementary' ? currentFood.nutritionalUse : '');
+  const [complete, setComplete] = useState(Boolean(currentFood?.isCompleteAndBalanced || currentFood?.nutritionalUse === 'complete'));
+  useEffect(() => () => reader.current?.abort(), []);
+
+  function clearPhoto() {
+    reader.current?.abort();
+    setReading(false);
+    setLabelPhotoUrl('');
+    setPhotoMessage('');
+    setSuggestions({});
+  }
+
+  async function handlePhoto(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result !== 'string') return;
-      const image = new Image();
-      image.onload = () => {
-        const scale = Math.min(1, 960 / Math.max(image.width, image.height));
-        const canvas = document.createElement('canvas');
-        canvas.width = Math.round(image.width * scale);
-        canvas.height = Math.round(image.height * scale);
-        const context = canvas.getContext('2d');
-        if (context) {
-          context.drawImage(image, 0, 0, canvas.width, canvas.height);
-          setLabelPhotoUrl(canvas.toDataURL('image/jpeg', 0.82));
-        }
-      };
-      image.src = reader.result;
-    };
-    reader.readAsDataURL(file);
     event.target.value = '';
+    if (!file) return;
+    clearPhoto();
+    const controller = new AbortController();
+    reader.current = controller;
+    setReading(true);
+    try {
+      const {readReceipt} = await import('../services/receiptReader');
+      const result = await readReceipt(file, {
+        signal: controller.signal,
+        onPreview: (preview) => { if (!controller.signal.aborted) setLabelPhotoUrl(preview); },
+      });
+      if (controller.signal.aborted) return;
+      const found = parseLabelValues(result.text, false);
+      setSuggestions(found);
+      setPhotoMessage(Object.keys(found).length
+        ? (isEs ? 'Comprueba estos valores con tu foto antes de usarlos.' : 'Check these values against your photo before using them.')
+        : (isEs ? 'No se reconocieron valores con sus unidades. Puedes escribirlos en los campos de abajo.' : 'No values with units were recognized. You can enter them below.'));
+    } catch {
+      if (!controller.signal.aborted) setPhotoMessage(isEs ? 'No se pudo leer esta etiqueta. Prueba otra foto o ingresa los valores.' : 'Could not read the label. Try a different photo or enter its values.');
+    } finally {
+      if (!controller.signal.aborted) setReading(false);
+    }
+  }
+
+  function applyPhotoValues() {
+    if (!form.current) return;
+    const input = (name: string) => form.current?.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | null;
+    for (const field of labelFields) {
+      const value = suggestions[field];
+      if (!value) continue;
+      const target = input(field === 'kcalPerKg' ? 'energy' : field);
+      if (target) target.value = String(value.valor);
+      if (field !== 'kcalPerKg') {
+        input(field + '-qualifier')!.value = value.calificador;
+        input(field + '-basis')!.value = value.baseMedicion;
+      }
+    }
+    input('source')!.value = 'package';
+    setSuggestions({});
+    setPhotoMessage(isEs ? 'Revisa los campos y guarda la ficha cuando estén correctos.' : 'Review the fields and save when correct.');
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -155,6 +194,21 @@ const LabelForm: React.FC<LabelFormProps> = ({
 
     const hasNutrition = kcal !== undefined || NUTRIENT_FIELDS.some(({ key }) => ficha[key] !== undefined);
     if (hasNutrition) ficha.coincidenciaEstado = 'verificado';
+    const retainedConflicts: NonNullable<NutritionDatasheet['discrepancies']> = [];
+    for (const key of labelFields) {
+      const value = ficha[key];
+      if (!value) continue;
+      const previous = identityUnchanged ? currentFood?.fichaNutricional?.[key] : undefined;
+      const unchanged = previous && value.valor === previous.valor && value.calificador === previous.calificador && value.baseMedicion === previous.baseMedicion;
+      const checkedAgainstPackage = data.has(key + '-reconciled');
+      if (unchanged && !checkedAgainstPackage) retainedConflicts.push(...(currentFood?.fichaNutricional?.discrepancies?.filter(item => item.field === key) ?? []));
+      value.source = unchanged && !checkedAgainstPackage ? previous.source || {
+        name: currentFood!.fichaNutricional!.fuenteNombre || source,
+        url: currentFood!.fichaNutricional!.fuenteUrl,
+        observedAt: currentFood!.fichaNutricional!.fechaConsulta || new Date().toISOString(),
+      } : {name: checkedAgainstPackage ? packageSource : source, observedAt: new Date().toISOString()};
+    }
+    if (retainedConflicts.length) ficha.discrepancies = retainedConflicts;
 
     // Keep required legacy slots as zero when the structured label has no as-sold value.
     function asSold(key: (typeof NUTRIENT_FIELDS)[number]['key']): number | undefined {
@@ -164,7 +218,7 @@ const LabelForm: React.FC<LabelFormProps> = ({
     const inLibrary = currentFood && StorageService.getCustomFoods().some(({ id }) => id === currentFood.id);
     const selectedType = readText(data, 'foodType');
     const foodType = currentFood?.type ?? (selectedType === 'wet' ? 'wet' : 'dry');
-    const hasSameEnergy = kcal !== undefined && currentFood?.kcalPerKg === kcal;
+    const hasSameEnergy = identityUnchanged && kcal !== undefined && currentFood?.kcalPerKg === kcal;
     const declaresGrowth = data.has('growth');
     const updatedFood: FoodItem = {
       id: inLibrary ? currentFood.id : `custom_${crypto.randomUUID()}`,
@@ -173,7 +227,12 @@ const LabelForm: React.FC<LabelFormProps> = ({
       brand,
       name,
       species: currentFood?.species ?? pet.species,
-      lifeStage: declaresGrowth ? (pet.species === 'cat' ? 'kitten' : 'puppy') : currentFood?.lifeStage ?? 'all',
+      lifeStage: declaresGrowth ? (pet.species === 'cat' ? 'kitten' : 'puppy') : (identityUnchanged ? currentFood?.lifeStage : undefined) ?? 'all',
+      lifeStageKnown: declaresGrowth || (identityUnchanged && currentFood?.lifeStageKnown),
+      nutritionalUse: complete ? 'complete' : otherUse === 'treat' || otherUse === 'complementary' ? otherUse : undefined,
+      ingredientsSummary: identityUnchanged ? currentFood?.ingredientsSummary : undefined,
+      feedingGuide: identityUnchanged ? currentFood?.feedingGuide : undefined,
+      storeProductUrl: identityUnchanged ? currentFood?.storeProductUrl : undefined,
       type: foodType,
       kcalPerKg: kcal ?? 0,
       kcalPerCup: hasSameEnergy ? currentFood?.kcalPerCup : undefined,
@@ -195,12 +254,12 @@ const LabelForm: React.FC<LabelFormProps> = ({
       packagePrices: identityUnchanged ? currentFood?.packagePrices : undefined,
       priceBasis: identityUnchanged && currentFood ? selectFoodPackage(currentFood, bagSizeKg).priceBasis : undefined,
       imageUrl: identityUnchanged ? currentFood?.imageUrl : undefined,
-      buyUrl: identityUnchanged ? currentFood?.buyUrl : undefined,
+      buyUrl: identityUnchanged && currentFood ? selectFoodPackage(currentFood, bagSizeKg).buyUrl : undefined,
       labelStatus: hasNutrition ? 'user_confirmed_label' : 'unconfirmed',
       labelPhotoUrl: labelPhotoUrl || undefined,
       isCompleteAndBalanced: data.has('complete') || undefined,
       suitableForGrowth: declaresGrowth || undefined,
-      kibbleSizeSuitability: currentFood?.kibbleSizeSuitability,
+      kibbleSizeSuitability: identityUnchanged ? currentFood?.kibbleSizeSuitability : undefined,
       dataSource: ficha.fuenteNombre,
       fichaNutricional: ficha,
     };
@@ -227,7 +286,7 @@ const LabelForm: React.FC<LabelFormProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 overflow-y-auto px-5 py-4">
+        <form ref={form} onSubmit={handleSubmit} className="space-y-4 overflow-y-auto px-5 py-4">
           {mixed && (
             <label className="block space-y-1 text-xs font-bold text-[#1C2B21]">
               <span>{isEs ? 'Alimento de la ración mixta' : 'Food in the mixed ration'}</span>
@@ -237,6 +296,28 @@ const LabelForm: React.FC<LabelFormProps> = ({
               </select>
             </label>
           )}
+
+          <div className="space-y-2 rounded-2xl bg-[#F8FAF8] p-3 text-xs">
+            <input ref={fileInput} type="file" aria-label={isEs ? 'Foto de la etiqueta' : 'Label photo'} accept="image/*" onChange={handlePhoto} className="hidden" />
+            <button type="button" onClick={() => fileInput.current?.click()} className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#EAF4EC] px-3 font-bold text-[#0B5D2E]">
+              <Camera className="size-4" /> {isEs ? 'Leer la etiqueta con una foto' : 'Read label from a photo'}
+            </button>
+            {labelPhotoUrl && <div className="relative">
+              <img src={labelPhotoUrl} alt={isEs ? 'Etiqueta del alimento' : 'Food label'} className="max-h-44 w-full object-contain" />
+              <button type="button" onClick={clearPhoto} aria-label={isEs ? 'Quitar foto' : 'Remove photo'} className="absolute right-1 top-1 rounded-lg bg-white p-2 text-red-700"><Trash2 className="size-4" /></button>
+            </div>}
+            {reading && <p role="status">{isEs ? 'Leyendo la etiqueta en este dispositivo…' : 'Reading the label on this device…'} <button type="button" className="underline" onClick={clearPhoto}>{isEs ? 'Cancelar' : 'Cancel'}</button></p>}
+            {photoMessage && <p role="status">{photoMessage}</p>}
+            {Object.keys(suggestions).length > 0 && <div className="space-y-2">
+              <ul>{labelFields.map(field => {
+                const value = suggestions[field];
+                if (!value) return null;
+                const label = NUTRIENT_FIELDS.find(({key}) => key === field);
+                return <li key={field}>{label ? (isEs ? label.es : label.en) : (isEs ? 'Energía' : 'Energy')} · {value.calificador === 'minimo' ? '≥' : value.calificador === 'maximo' ? '≤' : '≈'} {value.valor} {value.unidadOriginal}</li>;
+              })}</ul>
+              <button type="button" onClick={applyPhotoValues} className="rounded-lg border border-green-700 p-2 font-bold text-green-800">{isEs ? 'Copiar estos valores a la ficha' : 'Copy these values into the form'}</button>
+            </div>}
+          </div>
 
           <div className="grid grid-cols-2 gap-3">
             <label className="space-y-1 text-xs font-bold text-[#1C2B21]">
@@ -304,38 +385,40 @@ const LabelForm: React.FC<LabelFormProps> = ({
             })}
           </fieldset>
 
+          {currentFood?.fichaNutricional?.discrepancies?.map(conflict => {
+            const name = NUTRIENT_FIELDS.find(({key}) => key === conflict.field);
+            const label = name ? (isEs ? name.es : name.en) : (isEs ? 'Energía' : 'Energy');
+            return <label key={conflict.field} className="block rounded-xl bg-amber-50 p-3 text-xs text-amber-950">
+              <span className="block">{label} · {isEs ? 'La tienda publica' : 'Store lists'} {conflict.other.calificador === 'minimo' ? '≥' : conflict.other.calificador === 'maximo' ? '≤' : '≈'} {conflict.other.valor} {conflict.other.unidadOriginal}. {isEs ? 'Las fuentes difieren.' : 'Sources differ.'}</span>
+              <input type="checkbox" name={conflict.field + '-reconciled'} className="mr-2 mt-2" />
+              {isEs ? 'Verifiqué el valor, la base y la declaración en mi empaque.' : 'I checked the value, basis and declaration on my package.'}
+            </label>;
+          })}
+
           <div className="space-y-2 rounded-2xl bg-[#F8FAF8] p-3 text-xs text-[#1C2B21]">
             <label className="flex items-start gap-2">
-              <input type="checkbox" name="complete" defaultChecked={currentFood?.isCompleteAndBalanced} className="mt-0.5 accent-[#0B5D2E]" />
+              <input type="checkbox" name="complete" checked={complete} onChange={(event) => {setComplete(event.target.checked); if (event.target.checked) setOtherUse('');}} className="mt-0.5 accent-[#0B5D2E]" />
               <span>{isEs ? 'La etiqueta declara alimento completo y balanceado' : 'Label declares complete and balanced food'}</span>
             </label>
+            {!complete && <label className="block">{isEs ? 'Otro uso declarado' : 'Other declared use'}
+              <select value={otherUse} onChange={event => setOtherUse(event.target.value)} className={inputClass}>
+                <option value="">{isEs ? 'Sin declarar' : 'Undeclared'}</option>
+                <option value="complementary">{isEs ? 'Alimento complementario' : 'Complementary food'}</option>
+                <option value="treat">{isEs ? 'Premio' : 'Treat'}</option>
+              </select>
+            </label>}
             <label className="flex items-start gap-2">
               <input type="checkbox" name="growth" defaultChecked={currentFood?.suitableForGrowth} className="mt-0.5 accent-[#0B5D2E]" />
               <span>{isEs ? 'La etiqueta declara apto para crecimiento' : 'Label declares suitability for growth'}</span>
             </label>
           </div>
 
-          <input ref={fileInput} type="file" accept="image/*" capture="environment" onChange={handlePhoto} className="hidden" />
-          {labelPhotoUrl ? (
-            <div className="relative overflow-hidden rounded-2xl border border-gray-200">
-              <img src={labelPhotoUrl} alt={isEs ? 'Etiqueta del alimento' : 'Food label'} className="max-h-44 w-full object-contain" />
-              <button type="button" onClick={() => setLabelPhotoUrl('')} aria-label={isEs ? 'Quitar foto' : 'Remove photo'} className="absolute right-2 top-2 rounded-xl bg-white p-2 text-red-600">
-                <Trash2 className="size-4" />
-              </button>
-            </div>
-          ) : (
-            <button type="button" onClick={() => fileInput.current?.click()} className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-[#EAF4EC] px-3 text-xs font-bold text-[#0B5D2E]">
-              <Camera className="size-4" />
-              {isEs ? 'Adjuntar foto de la etiqueta (opcional)' : 'Attach label photo (optional)'}
-            </button>
-          )}
-
           {error && (
             <p role="alert" className="flex gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700">
               <AlertCircle className="size-4 shrink-0" /> {error}
             </p>
           )}
-          <button type="submit" className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-[#0B5D2E] px-3 text-sm font-extrabold text-white hover:bg-[#094723]">
+          <button type="submit" disabled={reading} className="flex disabled:opacity-50 min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-[#0B5D2E] px-3 text-sm font-extrabold text-white hover:bg-[#094723]">
             <Check className="size-4" /> {isEs ? 'Guardar ficha' : 'Save food'}
           </button>
         </form>

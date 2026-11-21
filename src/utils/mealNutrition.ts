@@ -7,6 +7,7 @@ import type {
   NutrientQualifier,
   NutrientValue,
   NutritionDatasheet,
+  TreatLog,
 } from '../types';
 import {
   getComponentPlanFood,
@@ -60,6 +61,11 @@ export interface FoodPortionNutrition {
 export interface DailyMealNutritionSummary {
   totalPlannedGrams: number;
   totalServedGrams: number;
+  totalEatenGrams: number;
+  consumedNutrients: MealNutrientTotals;
+  consumedBreakdown: FoodPortionNutrition[];
+  hasSeparateConsumedTotal: boolean;
+  treatsWithoutLabel: boolean;
   completedMealsCount: number;
   kcalServedTotal: number | null;
   kcalServedPartial: boolean;
@@ -277,7 +283,7 @@ function snapshotFood(
   );
   return {
     id: comp.foodId || comp.foodName,
-    brand: fallback?.brand || '',
+    brand: comp.brand ?? fallback?.brand ?? '',
     name: comp.foodName,
     species: fallback?.species || 'dog',
     lifeStage: fallback?.lifeStage || 'adult',
@@ -387,13 +393,16 @@ function formatLegacyTotal(total: MealNutrientTotal, label: string): string {
   return total.coverage === 'partial' ? `${phrase} (Total parcial)` : phrase;
 }
 
-/** Compares the full planned ration with the food recorded in completed meals. */
-export function calculateDailyMealNutritionSummary(params: {
+interface SummaryInput {
   plan?: FeedingPlan;
   mealLogs: MealLog[];
   dryFood?: FoodItem;
   wetFood?: FoodItem;
-}): DailyMealNutritionSummary {
+  treatLogs?: TreatLog[];
+}
+
+/** Compares the full planned ration with the food recorded in completed meals. */
+function summarizeServings(params: SummaryInput) {
   const { plan, mealLogs, dryFood, wetFood } = params;
   const completed = mealLogs.filter((meal) => meal.completed);
   const plannedComponents: Components = new Map();
@@ -435,7 +444,7 @@ export function calculateDailyMealNutritionSummary(params: {
         const snapshot = snapshotFood(component, fallback);
         if (!snapshot && fallback) usesCurrentPlanForLegacyLogs = true;
         const food = snapshot ?? fallback;
-        const brand = fallback?.brand || (component.role === 'wet' ? 'Húmedo' : component.role === 'dry' ? 'Seco' : 'Alimento');
+        const brand = component.brand ?? fallback?.brand ?? (component.role === 'wet' ? 'Húmedo' : component.role === 'dry' ? 'Seco' : 'Alimento');
         addComponent(servedComponents, grams, brand, component.foodName, food);
       }
       // A legacy log with an incomplete component list cannot claim complete nutrient totals.
@@ -485,5 +494,28 @@ export function calculateDailyMealNutritionSummary(params: {
     plannedNutrients,
     servedNutrients,
     usesCurrentPlanForLegacyLogs,
+  };
+}
+
+export function calculateDailyMealNutritionSummary(params: SummaryInput): DailyMealNutritionSummary {
+  const served = summarizeServings(params);
+  const treats = params.treatLogs ?? [];
+  const hasLeftovers = params.mealLogs.some((log) => log.completed && log.gramsEaten !== undefined && log.gramsEaten !== log.gramsFed);
+  const eatenLogs = hasLeftovers ? params.mealLogs.map((log) => ({
+    ...log, gramsFed: log.gramsEaten ?? log.gramsFed,
+    mixedComponents: log.mixedComponents?.map((item) => ({ ...item, gramsFed: item.gramsEaten ?? item.gramsFed })),
+  })) : params.mealLogs;
+  const eaten = hasLeftovers ? summarizeServings({ ...params, mealLogs: eatenLogs }) : served;
+  const consumedBreakdown = [...eaten.perFoodBreakdown];
+  for (const treat of treats) {
+    const item = treat.nutritionComponent;
+    consumedBreakdown.push(calculateFoodPortionNutrients(item ? snapshotFood(item) : undefined,
+      item?.gramsEaten ?? item?.gramsFed ?? 0, { brand: treat.brand || 'Premio', name: treat.name }));
+  }
+  return {
+    ...served, totalEatenGrams: eaten.totalServedGrams,
+    consumedBreakdown, consumedNutrients: treats.length ? summarizeNutrients(consumedBreakdown) : eaten.servedNutrients,
+    hasSeparateConsumedTotal: hasLeftovers || treats.length > 0,
+    treatsWithoutLabel: treats.some((treat) => !treat.nutritionComponent),
   };
 }

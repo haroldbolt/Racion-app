@@ -1,4 +1,5 @@
 import type { FoodItem, FoodPriceBasis, Species } from '../types';
+import { enrichOnlineNutrition } from './manufacturerNutrition';
 import { parseVariantWeight } from './shopifyCatalogService';
 
 const storeId = 5624899;
@@ -59,7 +60,7 @@ export function selectFoodPackage(food: FoodItem, packageKg?: number): FoodItem 
     bagSizeKg: packageKg,
     barcode: food.bagSizeKg === packageKg ? food.barcode : undefined,
     priceBasis,
-    buyUrl: priceBasis?.sourceUrl || packageQuote?.sourceUrl || food.fichaNutricional?.fuenteUrl || food.buyUrl,
+    buyUrl: priceBasis?.sourceUrl || packageQuote?.sourceUrl || food.storeProductUrl || food.fichaNutricional?.fuenteUrl || food.buyUrl,
   };
 }
 
@@ -89,7 +90,7 @@ function foodFromDetail(
   }).join(' ') : '';
   const tags = Array.isArray(detail.tags) ? detail.tags.map(text).join(' ') : text(detail.tags);
   const identity = normalized(`${title} ${categories} ${tags}`);
-  if (/\b(?:juguet\w*|collar\w*|correas?|camas?|arener\w*|arenas?|palas?|pipetas?|desparas\w*|shamp\w*|champ\w*|medicamentos?|antiparas\w*|comeder\w*|bebeder\w*|platos?|contenedor\w*|transportador\w*|snacks?|premios?|golosinas?|galletas?|suplement\w*|vitaminas?)\b/.test(
+  if (/\b(?:juguet\w*|collar\w*|correas?|camas?|arener\w*|arenas?|palas?|pipetas?|desparas\w*|shamp\w*|champ\w*|medicamentos?|antiparas\w*|comeder\w*|bebeder\w*|platos?|contenedor\w*|transportador\w*|suplement\w*|vitaminas?)\b/.test(
     normalized(`${title} ${categories}`),
   )) return null;
 
@@ -107,7 +108,7 @@ function foodFromDetail(
   const observedAt = new Date().toISOString();
   const variants = Array.isArray(detail.variants) ? detail.variants.map(record) : [];
   const presentations = variants.flatMap((variant): Array<{ packageKg: number; priceCop?: number; sourceUrl: string }> => {
-    if (variant.visible === false || !Array.isArray(variant.values)) return [];
+    if (variant.visible === false || (variant.stock_management === true && typeof variant.stock === 'number' && variant.stock <= 0) || !Array.isArray(variant.values)) return [];
     const values = variant.values.map(text).filter(Boolean);
     // A gift, combo or multipack is a distinct presentation, not a single bag.
     if (/\b(?:packs?|combos?|gratis|regalos?|unidades?|units?)\b|\+|\bx\s*\d+\b|\d+\s*x\b/i.test(values.join(' '))) return [];
@@ -127,10 +128,11 @@ function foodFromDetail(
     if (prices.some((price) => price === undefined) || new Set(prices).size !== 1) return [];
     return [{ packageKg, priceCop: prices[0]!, source: 'online', observedAt, storeName: 'Laia Pets', sourceUrl: matching[0].sourceUrl, shippingCop: null }];
   });
-  const brand = plainText(detail.brand);
-  const name = brand && normalized(title).startsWith(normalized(brand) + ' ')
-    ? title.slice(brand.length).trim()
-    : title;
+  const brand = /^agility gold\b/i.test(title) ? 'Agility Gold' : plainText(detail.brand);
+  const formula = title.replace(/\s+[–—|-]\s+(?:alimento|concentrado|croquetas)\b.*$/i, '').trim();
+  const name = brand && normalized(formula).startsWith(normalized(brand) + ' ')
+    ? formula.slice(brand.length).trim()
+    : formula;
   const images = Array.isArray(detail.images) ? detail.images.map(record) : [];
   const imageUrl = images.map((image) => text(image.src)).find((source) => {
     try {
@@ -142,7 +144,8 @@ function foodFromDetail(
   });
   const lifeStage = /\b(?:gatitos?|kittens?)\b/.test(identity) ? 'kitten'
     : /\b(?:cachorros?|pupp(?:y|ies))\b/.test(identity) ? (species === 'cat' ? 'kitten' : 'puppy')
-    : /\b(?:senior|mature)\b/.test(identity) ? 'senior' : 'all';
+    : /\b(?:senior|mature)\b/.test(identity) ? 'senior'
+    : /\b(?:adult[oa]s?|adults?)\b/.test(normalized(title)) ? 'adult' : 'all';
 
   return {
     id: `online_laia_${detail.id}`,
@@ -151,6 +154,9 @@ function foodFromDetail(
     name,
     species,
     lifeStage,
+    lifeStageKnown: lifeStage !== 'all' || /todas las etapas|all life stages/.test(normalized(title)),
+    nutritionalUse: /\b(?:snacks?|premios?|golosinas?|galletas?)\b/.test(normalized(title)) ? 'treat' : undefined,
+    storeProductUrl: productUrl,
     type,
     kcalPerKg: 0,
     proteinPct: 0,
@@ -232,7 +238,8 @@ export async function searchOnlineFoods(
       const detailUrl = new URL(`${storefront}/products/${id}`);
       detailUrl.searchParams.set('fields', detailFields);
       const detail = await storefrontJson(detailUrl, combined);
-      return detail.id === id ? foodFromDetail(detail, species, queryNumbers, foodType) : null;
+      const food = detail.id === id ? foodFromDetail(detail, species, queryNumbers, foodType) : null;
+      return food ? enrichOnlineNutrition(food, plainText(detail.name), text(detail.description), combined) : null;
     }));
     foods.push(...products.filter((food): food is FoodItem => food !== null));
   }

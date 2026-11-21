@@ -18,8 +18,10 @@ import {
   determineFactor,
 } from './utils/calculator';
 import { getEffectiveFoodItem, hasConfirmedLabel } from './utils/feedingGuide';
-import { sameFoodIdentity, withPlanCosts } from './utils/foodCosts';
-import { getFoodKcalPerKg } from './utils/mealPortions';
+import { withPlanCosts } from './utils/foodCosts';
+import { previewFoodChoice } from './utils/offerPlan';
+import { PlanChangePreview } from './components/PlanChangePreview';
+import { getPlanSafetyNotices } from './utils/foodSafety';
 
 type PriceSelection = {
   food: FoodItem;
@@ -41,6 +43,9 @@ export default function App() {
   const [currentTab, setCurrentTab] = useState<TabId>('today');
   const [priceSelection, setPriceSelection] = useState<PriceSelection>();
   const [calculatorSelection, setCalculatorSelection] = useState<{ petId: string; food: FoodItem }>();
+
+  const [planChoice, setPlanChoice] = useState<{ pet: Pet; plan: FeedingPlan }>();
+  const isEs = userAccount.language === 'es';
 
   // Logs for active pet
   const [mealLogs, setMealLogs] = useState<MealLog[]>(() => StorageService.getTodayMealLogs(activePetId));
@@ -96,7 +101,7 @@ export default function App() {
 
   const openPriceComparison = (returnTo: PriceSelection['returnTo'], food = habitualFood) => {
     if (!food || food.type === 'barf' || food.kcalPerPiece) return;
-    const packageKg = food.id === habitualFood?.id ? activePlan?.bagWeightKg || food.bagSizeKg : food.bagSizeKg;
+    const packageKg = food.bagSizeKg ?? (food.id === habitualFood?.id ? activePlan?.bagWeightKg : undefined);
     setPriceSelection({ food, packageKg, returnTo });
     setCurrentTab('prices');
     window.scrollTo(0, 0);
@@ -104,6 +109,7 @@ export default function App() {
 
   const selectPetFromHeader = (id: string) => {
     if (currentTab === 'prices' && id !== activePet?.id) setCurrentTab('today');
+    setPlanChoice(undefined);
     setActivePetId(id);
   };
 
@@ -115,7 +121,8 @@ export default function App() {
     time: string,
     plannedGrams?: number,
     forceComplete?: boolean,
-    mixedComponents?: MealMixedComponent[]
+    mixedComponents?: MealMixedComponent[],
+    gramsEaten?: number
   ) => {
     if (!activePet) return;
     StorageService.toggleMealCompleted(
@@ -126,7 +133,8 @@ export default function App() {
       time,
       plannedGrams,
       forceComplete,
-      mixedComponents
+      mixedComponents,
+      gramsEaten
     );
     setDiaryDay(localDateKey());
     setMealLogs(StorageService.getTodayMealLogs(activePet.id));
@@ -241,7 +249,7 @@ export default function App() {
   };
 
   // Use food for pet from Catalog / Comparer / Alternatives
-  const handleSelectFoodForPet = (food: FoodItem) => {
+  const handleSelectFoodForPet = (food: FoodItem, price?: FoodPriceBasis) => {
     if (!activePet || food.species !== activePet.species) return;
 
     // Respect locked vet plan: do not overwrite if locked
@@ -250,82 +258,23 @@ export default function App() {
       return;
     }
 
-    const effectivePet: Pet =
-      activePet.dietType === 'barf' && food.type !== 'barf'
-        ? { ...activePet, dietType: 'commercial' }
-        : activePet;
-
-    if (effectivePet !== activePet) {
-      handleUpdatePetProfile(effectivePet);
-    }
-
-    const normalizedFood: FoodItem = {
-      ...food,
-      labelStatus:
-        food.labelStatus || (hasConfirmedLabel(food) ? 'verified_manufacturer' : 'unconfirmed'),
+    const normalizedFood: FoodItem = { ...food,
+      labelStatus: food.labelStatus || (hasConfirmedLabel(food) ? 'verified_manufacturer' : 'unconfirmed'),
     };
-
-    if (!activePlan || !getFoodKcalPerKg(normalizedFood)) {
+    const effectivePet = activePet.dietType === 'barf' && food.type !== 'barf'
+      ? { ...activePet, dietType: 'commercial' as const } : activePet;
+    const proposed = activePlan && previewFoodChoice(effectivePet, activePlan, normalizedFood, price);
+    if (!proposed || !proposed.rationConfirmed) {
       setCalculatorSelection({ petId: activePet.id, food: normalizedFood });
       setCurrentTab('calculate');
       return;
     }
-
-    const nextFoodType: 'dry' | 'wet' | 'barf' =
-      normalizedFood.type === 'barf' ? 'barf' : normalizedFood.type === 'wet' ? 'wet' : 'dry';
-
-    const draftPlan: FeedingPlan = {
-      ...activePlan,
-      foodId: normalizedFood.id,
-      foodBrand: normalizedFood.brand,
-      foodName: normalizedFood.name,
-      foodType: nextFoodType,
-      dryFood: nextFoodType === 'wet' ? activePlan.dryFood : normalizedFood,
-      wetFood: nextFoodType === 'wet' ? normalizedFood : activePlan.wetFood,
-      bagWeightKg: normalizedFood.bagSizeKg ??
-        (normalizedFood.id === habitualFood?.id ? activePlan.bagWeightKg : undefined),
-      bagPriceCop: undefined,
-      dailyCostCop: undefined,
-      monthlyCostCop: undefined,
-    };
-
-    const recalculated = recalculatePlanForPet(effectivePet, draftPlan);
-    StorageService.savePlan(recalculated);
-    setPlans(StorageService.getPlans());
-    setCurrentTab('today');
+    setPlanChoice({ pet: effectivePet, plan: proposed });
   };
 
   const handleUsePrice = (food: FoodItem, basis: FoodPriceBasis) => {
-    if (!activePet || food.species !== activePet.species) return;
-    const pricedFood: FoodItem = { ...food, bagSizeKg: basis.packageKg, priceBasis: basis,
-      barcode: food.bagSizeKg === basis.packageKg ? food.barcode : undefined };
-    if (StorageService.getCustomFoods().some((saved) => saved.id === pricedFood.id)) {
-      StorageService.addCustomFood(pricedFood);
-    }
-    const matchesPlan = activePlan && [activePlan.dryFood, activePlan.wetFood]
-      .some((component) => component && sameFoodIdentity(component, food));
-    if (!matchesPlan || !activePlan) {
-      handleSelectFoodForPet(pricedFood);
-      return;
-    }
-    const primaryFood = getEffectiveFoodItem(activePlan);
-    const isPrimary = Boolean(primaryFood && sameFoodIdentity(primaryFood, food));
-    const updateComponent = (component?: FoodItem) => component && sameFoodIdentity(component, food)
-      ? { ...component, bagSizeKg: pricedFood.bagSizeKg, priceBasis: basis,
-          barcode: component.bagSizeKg === basis.packageKg ? component.barcode : undefined } : component;
-    const updated = withPlanCosts({
-      ...activePlan,
-      dryFood: updateComponent(activePlan.dryFood),
-      wetFood: updateComponent(activePlan.wetFood),
-      ...(isPrimary ? { bagWeightKg: basis.packageKg,
-        bagDaysRemaining: activePlan.rationConfirmed && activePlan.gramsPerDay > 0
-          ? Math.floor(basis.packageKg * 1000 / (activePlan.foodType === 'mixed' ? activePlan.dryGramsPerDay || activePlan.gramsPerDay : activePlan.gramsPerDay))
-          : undefined } : {}),
-    }, StorageService.getFoodPurchases(activePet.id));
-    StorageService.savePlan(updated);
-    setPlans(StorageService.getPlans());
-    setPriceSelection(undefined);
-    setCurrentTab('today');
+    handleSelectFoodForPet({ ...food, priceBasis: basis, bagSizeKg: basis.packageKg,
+      barcode: food.bagSizeKg === basis.packageKg ? food.barcode : undefined }, basis);
   };
 
   // Reset all data
@@ -435,8 +384,12 @@ export default function App() {
 
         {currentTab === 'prices' && priceSelection && (
           <PriceComparisonView
-            key={priceSelection.food.id}
+            key={JSON.stringify([priceSelection.food.id, priceSelection.packageKg])}
             food={priceSelection.food}
+            pet={activePet}
+            plan={activePlan}
+            onPick={(food) => openPriceComparison(priceSelection.returnTo, food)}
+            onReviewFood={!activePlan?.isVetLocked ? handleSelectFoodForPet : undefined}
             packageKg={priceSelection.packageKg}
             backTo={priceSelection.returnTo === 'compare' ? 'foods' : priceSelection.returnTo === 'more' ? 'more' : 'plan'}
             language={userAccount.language}
@@ -528,6 +481,24 @@ export default function App() {
         onTabChange={(tab) => setCurrentTab(tab)}
         lang={userAccount.language}
       />
+
+      {planChoice && activePet?.id === planChoice.pet.id && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/60 p-3">
+          <section role="dialog" aria-modal="true" aria-label={isEs ? 'Revisar cambio de plan' : 'Review plan change'}
+            className="max-h-[88dvh] w-full max-w-md space-y-4 overflow-y-auto rounded-3xl bg-[var(--surface-card)] p-5">
+            <PlanChangePreview pet={planChoice.pet} current={activePlan} proposed={planChoice.plan} lang={userAccount.language} />
+            <div className="flex flex-wrap gap-2">
+              <button type="button" className="min-h-11 rounded-xl border px-4" onClick={() => setPlanChoice(undefined)}>{isEs ? 'Cancelar' : 'Cancel'}</button>
+              <button type="button" disabled={getPlanSafetyNotices(planChoice.pet, planChoice.plan).some(n => n.level === 'mismatch')}
+                className="min-h-11 rounded-xl bg-[#0B5D2E] px-4 font-bold text-white disabled:opacity-50" onClick={() => {
+                  if (planChoice.pet !== activePet) handleUpdatePetProfile(planChoice.pet);
+                  handleSavePlan(withPlanCosts(planChoice.plan, StorageService.getFoodPurchases(activePet.id)));
+                  setPlanChoice(undefined);
+                }}>{isEs ? 'Aplicar a' : 'Apply to'} {activePet.name}</button>
+            </div>
+          </section>
+        </div>
+      )}
 
       {/* Add / Edit Pet Modal */}
       <PetModal

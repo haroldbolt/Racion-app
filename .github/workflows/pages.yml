@@ -47,7 +47,15 @@ jobs:
           trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
           node .github/scripts/verify-pages.cjs "http://127.0.0.1:4196${PAGES_BASE_PATH%/}/" --price-fixtures
           node .github/scripts/verify-food-search.cjs "http://127.0.0.1:4196${PAGES_BASE_PATH%/}/" --fixtures
+          AGILITY_SCREENSHOT_DIR="$RUNNER_TEMP/racion-agility-proof" node .github/scripts/verify-agility.cjs "http://127.0.0.1:4196${PAGES_BASE_PATH%/}/"
           RECEIPT_SCREENSHOT_DIR="$RUNNER_TEMP/racion-receipt-proof" node .github/scripts/verify-receipt.cjs "http://127.0.0.1:4196${PAGES_BASE_PATH%/}/"
+      - name: Save Agility browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agility-mobile
+          path: ${{ runner.temp }}/racion-agility-proof
+          if-no-files-found: ignore
       - name: Save receipt browser evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -94,5 +102,6 @@ jobs:
       - run: |
           export PLAYWRIGHT_PATH="$RUNNER_TEMP/racion-browser/node_modules/playwright-core"
           node .github/scripts/verify-pages.cjs "$PAGES_URL"
+          node .github/scripts/verify-agility.cjs "https://racion-app.pages.dev/?release=$GITHUB_SHA"
         env:
           PAGES_URL: ${{ needs.deploy.outputs.page_url }}

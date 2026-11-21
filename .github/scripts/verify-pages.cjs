@@ -90,7 +90,7 @@ async function verifyAdjustmentAndPrices(page, button, text) {
 
   await button('Consultar precios').click();
   const result = page.getByRole('region', { name: 'Resultado de precios' });
-  const winner = result.getByRole('article').filter({ hasText: 'Más barato hoy' });
+  const winner = result.getByRole('article').filter({ hasText: 'Menor total confirmado' });
   await winner.getByRole('heading', { name: 'Tienda B' }).waitFor();
   assert.match(await winner.innerText(), /99[.\s]000/);
   assert.equal(await winner.getByRole('link').getAttribute('href'), 'https://tienda-b.example/producto');
@@ -179,6 +179,12 @@ async function verifyDiary() {
     for (const value of ['59 g', '30 g', '29 g']) await text(value).waitFor();
     await button('Guardar este plan').click();
 
+    const firstCard = page.locator('main section').first();
+    await firstCard.getByRole('heading', { name: 'Progreso diario de Luna' }).waitFor();
+    const ring = await firstCard.locator('svg').first().boundingBox();
+    const record = await firstCard.getByRole('button', { name: 'Registrar esta comida' }).boundingBox();
+    assert.ok(ring && record && ring.y >= 0 && record.y + record.height < page.viewportSize().height,
+      'The complete ring and next-meal action should fit without scrolling');
     await button('Ya comió').last().click();
     await button('Progreso').click();
     await button(/pesar hoy/i).click();
@@ -247,6 +253,23 @@ async function verifyDiary() {
       assert.match(await cells.nth(0).innerText(), planned, `${name}: planned`);
       assert.match(await cells.nth(1).innerText(), served, `${name}: served`);
     }
+    await button('Registrar esta comida').click();
+    const meal = page.getByRole('dialog', { name: 'Registrar comida de Nube' });
+    await meal.getByRole('spinbutton', { name: 'Gramos servidos', exact: true }).fill('300');
+    await meal.getByRole('alert').filter({ hasText: /superarías la meta diaria/ }).waitFor();
+    await meal.getByRole('spinbutton', { name: 'Gramos servidos', exact: true }).fill('30');
+    await meal.getByRole('button', {name: 'Dejó parte'}).click();
+    const remaining = meal.getByLabel(/Gramos que dejó/);
+    await remaining.fill('31');
+    assert.ok(await meal.getByRole('button', {name: 'Confirmar toma'}).isDisabled());
+    await remaining.fill('10');
+    await meal.getByRole('button', {name: 'Confirmar toma'}).click();
+    await page.reload({waitUntil: 'domcontentloaded'});
+    await text('Comió 20 g').waitFor();
+    await nutrients.getByRole('columnheader', {name: 'Consumido'}).waitFor();
+    const protein = nutrients.getByRole('row').filter({has: nutrients.getByRole('rowheader', {name: 'Proteína'})});
+    assert.match(await protein.getByRole('cell').last().innerText(), /14[.,]7\s*g/); // (20 + 29) g x 30%
+    await button('Deshacer').first().click();
     await button('Alimentos').click();
     await button('Mis alimentos').click();
     const savedFood = page.getByRole('article', { name: 'Marca de prueba Seco de prueba', exact: true });

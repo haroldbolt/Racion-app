@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Pet, Species, Sex, ActivityLevel, SpecialState, BreedSize, DietType } from '../types';
+import { VetFoodRestrictions } from './VetFoodRestrictions';
 import { BCSSelector } from './BCSSelector';
 import { X, Check, Camera, RefreshCw, Trash2, Upload, AlertCircle, Sparkles } from 'lucide-react';
 import {
@@ -54,6 +55,8 @@ export const PetModal: React.FC<PetModalProps> = ({
   );
   const [dietType, setDietType] = useState<DietType>(petToEdit?.dietType || 'commercial');
   const [restrictionNotes, setRestrictionNotes] = useState<string>(petToEdit?.restrictionNotes || '');
+  const [avoidedIngredients, setAvoidedIngredients] = useState((petToEdit?.avoidedIngredients ?? []).join(', '));
+  const [vetLimits, setVetLimits] = useState(petToEdit?.vetNutrientLimits ?? []);
   const [photoUrl, setPhotoUrl] = useState(petToEdit?.photoUrl || '');
 
   // Camera & Snapshot states
@@ -89,6 +92,8 @@ export const PetModal: React.FC<PetModalProps> = ({
     setSpecialState(petToEdit?.specialState || 'none');
     setDietType(petToEdit?.dietType || 'commercial');
     setRestrictionNotes(petToEdit?.restrictionNotes || '');
+    setAvoidedIngredients((petToEdit?.avoidedIngredients ?? []).join(', '));
+    setVetLimits(petToEdit?.vetNutrientLimits ?? []);
     setPhotoUrl(petToEdit?.photoUrl || '');
     setShowManualUrlInput(false);
   }, [isOpen, petToEdit]);
@@ -283,6 +288,8 @@ export const PetModal: React.FC<PetModalProps> = ({
       dietType,
       restrictions: petToEdit?.restrictions,
       restrictionNotes: restrictionNotes.trim() || undefined,
+      avoidedIngredients: [...new Set(avoidedIngredients.split(/[,;\n]/).map((item) => item.trim()).filter(Boolean))],
+      vetNutrientLimits: vetLimits,
       profileRefinementPending: {
         adultWeight: false,
         activity: false,
@@ -880,6 +887,8 @@ export const PetModal: React.FC<PetModalProps> = ({
               className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs text-[#1C2B21] min-h-[42px]"
             />
           </div>
+
+          <VetFoodRestrictions key={petToEdit?.id ?? 'new'} ingredients={avoidedIngredients} onIngredients={setAvoidedIngredients} limits={vetLimits} onLimits={setVetLimits} lang={lang} />
 
           {specialState !== 'none' && (
             <div className="bg-[#FFFBEB] p-3 rounded-xl border border-[#D97706]/30 text-xs text-[#92400E] space-y-1">

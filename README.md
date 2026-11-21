@@ -47,9 +47,15 @@ El servicio comparte resultados del mismo día para una fórmula, presentación 
 
 El buscador abre **Internet** y consulta los productos y presentaciones del catálogo público de Laia Pets. Un enlace permite ampliar la búsqueda en la web. **Mis alimentos** conserva las fichas que el usuario ha revisado. No se presenta un catálogo precargado como resultado de una consulta en internet.
 
+Hoy abre con los anillos de tomas y energía. Cada registro guarda los gramos servidos y consumidos, la composición disponible y el costo de ese momento. Una toma con energía desconocida cuenta en el diario y deja las calorías pendientes.
+
+La búsqueda consulta las presentaciones de Laia Pets y las contrasta con el fabricante cuando hay una ficha identificable. Indica fuente, fecha y mínimos o máximos. Para Agility Gold Grandes Adultos importa el análisis y la tabla de suministro de Italcol. En mantenimiento se pueden confirmar gramos dentro del intervalo publicado para el peso de la mascota. La foto del empaque permite revisar los campos pendientes en el dispositivo. El perfil admite ingredientes a evitar y límites nutricionales veterinarios con unidad.
+
+En Gastos se registra la apertura de la compra y las mascotas que comparten el alimento. El inventario descuenta cada toma registrada una vez y estima la fecha de reposición con las raciones actuales.
+
 Elegir un empaque conserva la fórmula, tamaño, imagen, fuente y precio observado de esa variante. La energía y los nutrientes ausentes permanecen pendientes de la etiqueta. Al usar la ficha en el plan, el diario, Ajustar y el comparador comparten esa selección. Cambiar de fórmula o presentación invalida cualquier precio que no corresponda al nuevo alimento.
 
-En el comparador, **Usar precio del producto** o **Usar total con envío** actualiza la referencia de costo del plan. Se conserva la tienda, fecha, URL y código postal de la cotización. En **Gastos** se puede registrar el precio pagado, la cantidad y el peso de los empaques, o elegir **Leer factura (foto o PDF)** para extraerlos automáticamente.
+En el comparador, **Usar precio del producto** o **Usar total con envío** abre una vista previa del nuevo costo por toma. Aplicar confirma el cambio para la mascota seleccionada. Se conserva la tienda, fecha, URL y código postal de la cotización. En **Gastos** se puede registrar el precio pagado, la cantidad y el peso de los empaques, o elegir **Leer factura (foto o PDF)** para extraerlos automáticamente.
 
 La lectura de fotos usa Tesseract.js en español e inglés. Los PDF digitales se leen con PDF.js y las páginas escaneadas pasan por OCR. Todo se procesa en el navegador; los archivos de soporte se sirven desde el mismo dominio y se descargan al usar el lector. La factura y su texto no se envían a servicios externos. Se admiten documentos de hasta 15 MB y PDF de hasta cinco páginas.
 

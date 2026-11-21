@@ -7,6 +7,7 @@ import { localDateKey } from '../utils/localDate';
 import { getPlanCostSummary, sameFoodIdentity, withPurchasedPackage } from '../utils/foodCosts';
 import { parsePurchasedPriceCop } from '../utils/purchaseInput';
 import { OnlineFoodSearch } from './OnlineFoodSearch';
+import { StockSummary, OpenPurchase } from './FoodInventory';
 import { ReceiptReview } from './ReceiptReview';
 import type { ReceiptReadResult } from '../services/receiptReader';
 import type { ReceiptExtraction, ReceiptItemCandidate } from '../utils/receiptExtraction';
@@ -217,6 +218,8 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
       receiptPhotoUrl: receiptPhotoUrl || undefined,
       receiptReadMethod: receiptReadMethod,
       receiptItemDescription: receiptItemDescription,
+      formulaAtPurchase: { name: selected.food.name, analysis: selected.food.fichaNutricional },
+      plannedMealCostsAtPurchase: draftSummary?.meals.map(({ time, grams, costCop, partial }) => ({ time, grams, costCop, partial })),
       notes: String(data.get('notes') ?? '').trim() || undefined,
       imageUrl: selected.food.imageUrl,
       createdAt: new Date().toISOString(),
@@ -441,6 +444,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
           <h3 className="font-heading text-lg font-extrabold text-[var(--text-primary)]">{isEs ? 'Compras registradas' : 'Saved purchases'}</h3>
           <span className="text-xs font-bold text-[var(--text-secondary)]">{cost(totalSpent)} {isEs ? 'en total' : 'total'}</span>
         </div>
+        <StockSummary petId={pet.id} language={userAccount.language} />
         {purchases.length === 0 && <p className="text-sm text-[var(--text-secondary)]">{isEs ? 'Aún no hay compras registradas para esta mascota.' : 'No purchases saved for this pet yet.'}</p>}
         {purchases.map((purchase) => (
           <article key={purchase.id} className="space-y-2 rounded-2xl border border-[var(--border-color)] p-3">
@@ -456,6 +460,12 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
               {' · '}{cost(purchase.pricePaidCop)}
               {purchase.bagSizeKg > 0 && ` · ${cost(purchase.pricePaidCop / purchase.bagSizeKg)} / kg`}
             </p>
+            <OpenPurchase purchase={purchase} pets={StorageService.getPets()} language={userAccount.language} onSaved={refreshPurchases} />
+            {Boolean(purchase.plannedMealCostsAtPurchase?.some(meal => meal.costCop !== undefined)) && <details className="text-xs">
+              <summary className="cursor-pointer font-bold">{isEs ? 'Ración al comprar' : 'Portions at purchase'}</summary>
+              {purchase.plannedMealCostsAtPurchase?.map((meal,index) => <p key={index}>{meal.time} · {meal.grams} g · {meal.costCop === undefined ? '—' : cost(meal.costCop)}{meal.partial && (isEs ? ' (parcial)' : ' (partial)')}</p>)}
+              {purchase.formulaAtPurchase?.analysis?.fuenteNombre && <p>{purchase.formulaAtPurchase.analysis.fuenteNombre} · {purchase.formulaAtPurchase.analysis.fechaConsulta?.slice(0, 10)}</p>}
+            </details>}
             {purchase.notes && <p className="text-xs text-[var(--text-secondary)]">{purchase.notes}</p>}
             {purchase.receiptPhotoUrl && <a href={purchase.receiptPhotoUrl} target="_blank" rel="noopener noreferrer" className="inline-block text-xs font-bold text-[#0B5D2E] dark:text-green-300"><img src={purchase.receiptPhotoUrl} alt={isEs ? 'Factura de esta compra' : 'Receipt for this purchase'} className="mb-1 max-h-32 rounded-xl border border-[var(--border-color)] object-contain" />{isEs ? 'Ver recibo' : 'View receipt'}</a>}
           </article>

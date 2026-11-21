@@ -115,3 +115,19 @@ test('confirming a purchased package changes only packaging and its linked cost,
   assert.equal(withPurchasedPackage({ ...plan, dryFood: linked }, linked, 4).dryFood?.buyUrl, linked.packagePrices[0].sourceUrl);
   assert.equal(withPurchasedPackage({ ...plan, dryFood: linked }, linked, 10).dryFood?.buyUrl, 'https://www.laiapets.com.co/productos/rc37/');
 });
+
+test('migrates commercial Laia titles within one source id without mixing Piel, 7+, or another merchant product', () => {
+  const sourceFoodId = 'online_laia_370514960';
+  const food = {...dry, id:sourceFoodId, sourceFoodId, brand:'Agility Gold', name:'Grandes Adultos', species:'dog' as const};
+  const legacy = {...food, id:'custom_old', brand:'Agility', name:'Gold Grandes Adultos – Concentrado Super Premium para Perros 1,5 kg, 3 kg y 15 kg'};
+  const olderPurchase = {...purchase, foodId:legacy.id, sourceFoodId, foodBrand:legacy.brand, foodName:legacy.name};
+  assert.equal(sameFoodIdentity(legacy,food),true);
+  assert.equal(resolveFoodPrice(food,2,[olderPurchase])?.source,'manual');
+  for (const different of [
+    {...food, name:'Piel Grandes Adultos'}, {...food, name:'Grandes Adultos 7+'},
+    {...food, sourceFoodId:'online_laia_55'}, {...food, sourceFoodId:undefined},
+  ]) {
+    assert.equal(sameFoodIdentity(legacy,different),false);
+    assert.equal(resolveFoodPrice(different,2,[olderPurchase])?.source,'online');
+  }
+});

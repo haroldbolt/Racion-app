@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ExternalLink, Search } from 'lucide-react';
 import { FoodItem, Species } from '../types';
 import { searchOnlineFoods, selectFoodPackage } from '../services/onlineFoodCatalog';
+import { FoodLabelComposition } from './FoodLabelComposition';
 import { formatCOP } from '../utils/i18n';
 
 interface OnlineFoodSearchProps {
@@ -66,7 +67,7 @@ export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 
   return (
     <div className="space-y-3">
       <p className="text-xs text-[#44544A]">
-        {isEs ? 'Consulta en vivo a Laia Pets. Revisa sus productos y presentaciones; confirma los nutrientes en la etiqueta antes de calcular la ración.' : 'Search Laia Pets live for products and package sizes; confirm label nutrition before calculating a ration.'}
+        {isEs ? 'Busca presentaciones y precios. Revisa la composición de la fórmula y la fuente de cada dato.' : 'Search package sizes and prices. Review the formula and the source of each value.'}
       </p>
       <div className="flex flex-wrap gap-2">
         <input
@@ -130,7 +131,7 @@ export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 
             ...(food.availableSizesKg || []),
             ...(food.bagSizeKg ? [food.bagSizeKg] : []),
           ])].filter((size) => Number.isFinite(size) && size > 0).sort((a, b) => a - b);
-          const sourceUrl = food.fichaNutricional?.fuenteUrl;
+          const sourceUrl = food.storeProductUrl || food.buyUrl;
           const safeSource = sourceUrl && /^https:\/\//i.test(sourceUrl) ? sourceUrl : undefined;
           return (
             <article key={food.id} aria-label={`${food.brand} ${food.name}`} className="space-y-2 rounded-2xl border border-[#0B5D2E20] bg-white p-3 text-xs">
@@ -138,7 +139,10 @@ export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 
                 {food.imageUrl && (
                   <img src={food.imageUrl} alt={food.name} loading="lazy" className="size-16 shrink-0 rounded-xl bg-white object-contain" />
                 )}
-                <h4 className="font-heading text-sm font-extrabold text-[#1C2B21]">{food.brand} {food.name}</h4>
+                <div>
+                  <h4 className="font-heading text-sm font-extrabold text-[#1C2B21]">{food.brand} {food.name}</h4>
+                  <p>{food.species === 'dog' ? (isEs ? 'Perro' : 'Dog') : (isEs ? 'Gato' : 'Cat')} · {food.lifeStageKnown === false ? (isEs ? 'Etapa por confirmar' : 'Stage unknown') : ({adult:isEs?'Adulto':'Adult', puppy:isEs?'Cachorro':'Puppy', kitten:isEs?'Gatito':'Kitten', senior:'Sénior', all:isEs?'Todas las etapas':'All stages'})[food.lifeStage]}</p>
+                </div>
               </div>
               <div className="flex flex-wrap items-center justify-between gap-2 text-[#44544A]">
                 <span>{isEs ? 'Fuente: Laia Pets' : 'Source: Laia Pets'}</span>
@@ -149,7 +153,12 @@ export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 
                   </a>
                 )}
               </div>
-              <p className="text-[#44544A]">{isEs ? 'Nutrientes pendientes de confirmar en la etiqueta.' : 'Nutrition pending label confirmation.'}</p>
+              {food.fichaNutricional?.coincidenciaEstado === 'verificado' ? <div className="space-y-2 rounded-xl bg-[#F5F8F5] p-2.5">
+                <FoodLabelComposition food={food} language={lang} />
+                {!food.fichaNutricional.kcalPerKg && <p className="text-[#44544A]">{food.feedingGuide
+                  ? (isEs ? 'Sin kcal/kg publicadas. Puedes usar la tabla de ración del fabricante según el peso.' : 'No published kcal/kg. A manufacturer feeding guide by weight is available.')
+                  : (isEs ? 'Faltan las kcal/kg para calcular la porción por energía.' : 'Energy-based portions need the kcal/kg from the package.')}</p>}
+              </div> : <p className="text-[#44544A]">{isEs ? 'Composición pendiente. Puedes leer la etiqueta con una foto.' : 'Nutrition pending. You can read the package with a photo.'}</p>}
               <div className="flex flex-wrap gap-2">
                 {sizes.map((size) => {
                   const price = food.packagePrices?.find((basis) => basis.packageKg === size);

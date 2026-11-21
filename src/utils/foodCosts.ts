@@ -14,16 +14,32 @@ function productUrl(value?: string): string | undefined {
   } catch { return undefined; }
 }
 
+type FormulaName = { brand?: string; name: string; sourceFoodId?: string };
+const isLaiaProduct = (id?: string) => /^online_laia_\d+$/.test(id || '');
+
+/** Older Laia records included the bag sizes and sales description in the formula title.
+ * Keep that equivalence strictly scoped to one merchant product id. */
+export function canonicalFormulaName({brand, name, sourceFoodId}: FormulaName): string {
+  const title = (brand ?? '') + ' ' + name;
+  return normalized(isLaiaProduct(sourceFoodId)
+    ? title.replace(/\s+[–—|-]\s+(?:alimento|concentrado|croquetas)\b.*$/i, '') : title);
+}
+
+export function sameFormulaName(left: FormulaName, right: FormulaName): boolean {
+  if (normalized(left.brand ?? '') === normalized(right.brand ?? '') && normalized(left.name) === normalized(right.name)) return true;
+  return Boolean(left.sourceFoodId && left.sourceFoodId === right.sourceFoodId && isLaiaProduct(left.sourceFoodId) &&
+    canonicalFormulaName(left) === canonicalFormulaName(right));
+}
+
 export function sameFoodIdentity(left: FoodItem, right: FoodItem): boolean {
-  if (left.species !== right.species || left.type !== right.type ||
-    normalized(left.brand) !== normalized(right.brand) || normalized(left.name) !== normalized(right.name)) return false;
+  if (left.species !== right.species || left.type !== right.type || !sameFormulaName(left, right)) return false;
   const leftUrl = productUrl(left.buyUrl ?? left.fichaNutricional?.fuenteUrl);
   const rightUrl = productUrl(right.buyUrl ?? right.fichaNutricional?.fuenteUrl);
   return left.id === right.id || Boolean(left.sourceFoodId && left.sourceFoodId === right.sourceFoodId) || Boolean(leftUrl && leftUrl === rightUrl);
 }
 
 export function foodPurchaseMatches(purchase: FoodCostEntry, food: FoodItem, packageKg?: number): boolean {
-  const formula = normalized(purchase.foodBrand) === normalized(food.brand) && normalized(purchase.foodName) === normalized(food.name);
+  const formula = sameFormulaName({brand:purchase.foodBrand, name:purchase.foodName, sourceFoodId:purchase.sourceFoodId}, food);
   const purchaseUrl = productUrl(purchase.foodSourceUrl);
   const foodUrl = productUrl(food.buyUrl ?? food.fichaNutricional?.fuenteUrl);
   const identity = formula && (!purchase.foodId || purchase.foodId === food.id ||

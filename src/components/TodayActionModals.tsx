@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import {
   ActivityLevel,
   FeedingPlan,
+  FoodItem,
   MealLog,
   MealMixedComponent,
   Pet,
@@ -10,9 +11,13 @@ import {
 } from '../types';
 import { localDateKey } from '../utils/localDate';
 import { defaultMealTimes } from '../utils/calculator';
-import { getPlannedMeals, getPlannedMealComponents } from '../utils/mealPortions';
+import { getFoodKcalPerKg, getLoggedMealEnergy, getPlannedMeals, getPlannedMealComponents, snapshotMealFood } from '../utils/mealPortions';
+import { UnifiedFoodSearchModal } from './UnifiedFoodSearchModal';
+import { calculateDailyMealNutritionSummary } from '../utils/mealNutrition';
+import { getPricePerGram, resolveFoodPrice, sameFoodIdentity } from '../utils/foodCosts';
+import { StorageService } from '../utils/storage';
 import { PET_TREATS_DATABASE } from '../data/foods';
-import { evaluateTreatsBudget, TreatsGuidance } from '../utils/feedingGuide';
+import { evaluateTreatsBudget, getNextMealStatus, TreatsGuidance } from '../utils/feedingGuide';
 import { X, Check, Clock, Cookie, Scale, Utensils, AlertCircle } from 'lucide-react';
 
 /* 1. CONFIGURAR HORARIOS */
@@ -287,6 +292,10 @@ export const RegisterTreatModal: React.FC<RegisterTreatModalProps> = ({
   const [piecesCount, setPiecesCount] = useState<number>(1);
   const [customName, setCustomName] = useState<string>('');
   const [manualKcal, setManualKcal] = useState<string>('');
+  const [findingTreat, setFindingTreat] = useState(false);
+  const [weighedFood, setWeighedFood] = useState<FoodItem>();
+  const [treatGrams, setTreatGrams] = useState('');
+  const [fromAllowance, setFromAllowance] = useState(false);
   const [trainingGramsInput, setTrainingGramsInput] = useState<string>(
     String(plan?.trainingRationGramsToday || 0)
   );
@@ -298,6 +307,10 @@ export const RegisterTreatModal: React.FC<RegisterTreatModalProps> = ({
     setPiecesCount(1);
     setCustomName('');
     setManualKcal('');
+    setFindingTreat(false);
+    setWeighedFood(undefined);
+    setTreatGrams('');
+    setFromAllowance(false);
     setTrainingGramsInput(String(plan?.trainingRationGramsToday || 0));
     setMode('treat');
     setErrorMsg(null);
@@ -305,6 +318,8 @@ export const RegisterTreatModal: React.FC<RegisterTreatModalProps> = ({
 
   const selectedTreat: TreatCatalogItem | null =
     speciesTreats.find((t) => t.id === selectedTreatId) || null;
+  const sameRation = Boolean(weighedFood && [plan?.dryFood, plan?.wetFood].some((food) => food && sameFoodIdentity(food, weighedFood)));
+  const reserved = (plan?.trainingRationGramsToday ?? 0) - treatsToday.reduce((sum, entry) => sum + (entry.gramsFromRation ?? 0), 0);
 
   const treatsGuidance: TreatsGuidance = useMemo(
     () => evaluateTreatsBudget(pet, plan, treatsToday, selectedTreat),
@@ -317,6 +332,32 @@ export const RegisterTreatModal: React.FC<RegisterTreatModalProps> = ({
     e.preventDefault();
     setErrorMsg(null);
 
+    if (weighedFood) {
+      const grams = Number(treatGrams);
+      const density = getFoodKcalPerKg(weighedFood);
+      const kcal = density ? density * grams / 1000 : Number(manualKcal);
+      if (!(Number.isFinite(grams) && grams > 0 && Number.isFinite(kcal) && kcal > 0)) {
+        setErrorMsg('Confirma los gramos consumidos y las kcal de esa porción.');
+        return;
+      }
+      const price = resolveFoodPrice(weighedFood, weighedFood.bagSizeKg, StorageService.getFoodPurchases(pet.id));
+      if (sameRation && fromAllowance && grams > reserved) {
+        setErrorMsg('Los gramos superan la cantidad disponible de la ración reservada.');
+        return;
+      }
+      onAddTreat({
+        id: 'tr_' + Date.now(), petId: pet.id, date: localDateKey(), name: weighedFood.name, brand: weighedFood.brand,
+        kcal, nutritionComponent: {
+          ...snapshotMealFood(weighedFood, 'main', grams, grams),
+          priceSnapshot: { copPerGram: getPricePerGram(price), packageKg: weighedFood.bagSizeKg, source: price?.source },
+        },
+        isTrainingFromRation: sameRation && fromAllowance,
+        gramsFromRation: sameRation && fromAllowance ? grams : undefined,
+        hasKcalPerUnitOnLabel: false, loggedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      });
+      onClose();
+      return;
+    }
     if (selectedTreat && selectedTreat.hasKcalPerUnitOnLabel && selectedTreat.kcalPerUnit) {
       const pcs = Math.max(1, Math.floor(piecesCount));
       const kcal = pcs * selectedTreat.kcalPerUnit;
@@ -409,7 +450,7 @@ export const RegisterTreatModal: React.FC<RegisterTreatModalProps> = ({
                   Apartar parte de su ración diaria para entrenamiento
                 </strong>
                 <p className="text-[#44544A]">
-                  En cachorros, puedes usar parte de sus {plan?.gramsPerDay} g diarios como premio de entrenamiento sin sumar calorías extra. Los gramos apartados se restan de su plato y se cuentan dentro del total diario.
+                  Los gramos reservados se descuentan de los {plan?.gramsPerDay} g planificados para el plato. Cuando los coma, registra la cantidad con «Buscar el alimento del premio».
                 </p>
               </div>
 
@@ -468,6 +509,26 @@ export const RegisterTreatModal: React.FC<RegisterTreatModalProps> = ({
                 </div>
               )}
 
+              <button type="button" className="min-h-11 w-full rounded-xl border border-[#0B5D2E30] px-3 text-xs font-bold text-[#0B5D2E]" onClick={() => setFindingTreat(true)}>
+                {weighedFood ? 'Cambiar alimento del premio' : 'Buscar el alimento del premio'}
+              </button>
+              {weighedFood ? <div className="space-y-2 rounded-xl bg-[#F3F7F3] p-3 text-xs">
+                <strong>{weighedFood.brand} {weighedFood.name}</strong>
+                <label className="block">Gramos consumidos como premio
+                  <input type="number" step="any" min="0.001" required value={treatGrams} onChange={(e) => setTreatGrams(e.target.value)}
+                    className="mt-1 w-full min-h-11 rounded-xl border border-gray-300 px-3" />
+                </label>
+                {getFoodKcalPerKg(weighedFood) ? <p>{Math.round((Number(treatGrams) || 0) * getFoodKcalPerKg(weighedFood)! / 1000)} kcal</p> :
+                  <label className="block">Kcal de la porción según la etiqueta
+                    <input type="number" step="any" min="0.001" required value={manualKcal} onChange={(e) => setManualKcal(e.target.value)}
+                      className="mt-1 w-full min-h-11 rounded-xl border border-gray-300 px-3" />
+                  </label>}
+                {sameRation && reserved > 0 && <label className="flex min-h-11 items-center gap-2">
+                  <input type="checkbox" checked={fromAllowance} onChange={(e) => setFromAllowance(e.target.checked)} />
+                  Viene de la ración reservada para entrenamiento ({reserved} g disponibles)
+                </label>}
+                <button type="button" onClick={() => setWeighedFood(undefined)} className="min-h-11 font-bold text-[#0B5D2E] underline">Volver al registro manual</button>
+              </div> : <>
               <div className="space-y-1">
                 <label className="text-xs font-bold text-[#1C2B21]">Seleccionar premio o ingresar otro</label>
                 <select
@@ -547,6 +608,7 @@ export const RegisterTreatModal: React.FC<RegisterTreatModalProps> = ({
                 </div>
               )}
 
+              </>}
               <button
                 type="submit"
                 className="w-full min-h-[48px] bg-[#0B5D2E] text-white rounded-2xl font-heading font-extrabold text-sm flex items-center justify-center gap-2 hover:bg-[#094723] transition"
@@ -556,6 +618,10 @@ export const RegisterTreatModal: React.FC<RegisterTreatModalProps> = ({
               </button>
             </form>
           )}
+          {findingTreat && <UnifiedFoodSearchModal isOpen onClose={() => setFindingTreat(false)} activePet={pet}
+            titleOverride="Elegir alimento del premio" onSelectFood={({ sourceFoodItem }) => {
+              setWeighedFood(sourceFoodItem); setManualKcal(''); setTreatGrams(''); setFromAllowance(false);
+            }} />}
         </div>
       </div>
     </div>
@@ -661,6 +727,8 @@ interface RegisterMealModalProps {
   pet: Pet;
   plan: FeedingPlan;
   mealLogs: MealLog[];
+  treats: TreatLog[];
+  manualIntake?: boolean;
   defaultFeeder: string;
   preferredMealIndex?: number;
   familyMembers: Array<{ id: string; name: string }>;
@@ -670,7 +738,8 @@ interface RegisterMealModalProps {
     grams: number,
     time: string,
     plannedGrams?: number,
-    mixedComponents?: MealMixedComponent[]
+    mixedComponents?: MealMixedComponent[],
+    gramsEaten?: number
   ) => void;
 }
 
@@ -680,6 +749,8 @@ export const RegisterMealModal: React.FC<RegisterMealModalProps> = ({
   pet,
   plan,
   mealLogs,
+  treats,
+  manualIntake = false,
   defaultFeeder,
   preferredMealIndex,
   familyMembers,
@@ -693,38 +764,79 @@ export const RegisterMealModal: React.FC<RegisterMealModalProps> = ({
   );
   const initialIndex = Math.max(0, startingMealIndex);
   const initialPortion = completedMeals.find((log) => log.mealIndex === initialIndex)?.gramsFed ??
-    (plan.rationConfirmed ? portions[initialIndex]?.grams : undefined);
+    (plan.rationConfirmed && !manualIntake ? portions[initialIndex]?.grams : undefined);
 
   const [mealIndex, setMealIndex] = useState(initialIndex);
   const [fedBy, setFedBy] = useState(defaultFeeder);
   const [grams, setGrams] = useState('');
+  const [hasLeftovers, setHasLeftovers] = useState(false);
+  const [leftovers, setLeftovers] = useState<string[]>([]);
+  const [componentInputs, setComponentInputs] = useState<string[]>([]);
+  const previousLeftovers = (entry?: MealLog) => {
+    if (!entry || entry.gramsEaten === undefined || entry.gramsEaten >= entry.gramsFed) return [];
+    return entry.mixedComponents?.length ? entry.mixedComponents.map((item) => String(item.gramsFed - (item.gramsEaten ?? item.gramsFed)))
+      : [String(entry.gramsFed - entry.gramsEaten)];
+  };
 
   useEffect(() => {
     if (!isOpen) return;
     setMealIndex(initialIndex);
     setFedBy(completedMeals.find((log) => log.mealIndex === initialIndex)?.fedBy || defaultFeeder);
     setGrams(initialPortion === undefined ? '' : String(initialPortion));
+    const remaining = previousLeftovers(completedMeals.find((log) => log.mealIndex === initialIndex));
+    setHasLeftovers(remaining.length > 0);
+    setLeftovers(remaining);
+    setComponentInputs([]);
   }, [isOpen, initialIndex, initialPortion, completedMeals, defaultFeeder]);
 
   if (!isOpen) return null;
 
-  const scheduledTime = plan.mealTimes?.[mealIndex] || times[mealIndex];
+  const existing = completedMeals.find((log) => log.mealIndex === mealIndex);
+  const scheduledTime = existing?.mealTime || plan.mealTimes?.[mealIndex] || times[mealIndex];
   const plannedPortion = portions[mealIndex];
-  const plannedGrams = plan.rationConfirmed ? plannedPortion?.grams : undefined;
-  const servedGrams = Number(grams);
-  const canSubmit = grams.trim() !== '' && Number.isFinite(servedGrams) && servedGrams >= 0;
+  const plannedGrams = existing?.plannedGrams ?? (plan.rationConfirmed && !manualIntake ? plannedPortion?.grams : undefined);
+  const original = existing?.mixedComponents;
+  const base = original?.length ? original : !plan.isVetLocked && plan.foodType === 'mixed' && plan.dryFood && plan.wetFood ? [
+    snapshotMealFood(plan.dryFood, 'dry', plannedPortion?.dryGrams ?? 0, plannedPortion?.dryGrams ?? 0),
+    snapshotMealFood(plan.wetFood, 'wet', plannedPortion?.wetGrams ?? 0, plannedPortion?.wetGrams ?? 0),
+  ] : getPlannedMealComponents(plan, plannedPortion);
+  const perComponent = Boolean(base && base.length > 1);
+  const fields = perComponent ? base!.map((item, i) => componentInputs[i] ?? (existing || (plan.rationConfirmed && !manualIntake) ? String(item.gramsFed) : '')) : [grams];
+  const validServed = fields.every((value) => value.trim() !== '' && Number.isFinite(Number(value)) && Number(value) >= 0);
+  const servedGrams = fields.reduce((sum, value) => sum + Number(value || 0), 0);
+  const serving = validServed ? servedGrams : 0;
+  const available = base?.map((item, i) => ({ ...item, gramsFed: Number(fields[i] || 0) }));
+  const weights = available?.map((item) => item.gramsFed) ?? [serving];
+  const validRemaining = !hasLeftovers || weights.every((qty, i) => (qty === 0 && !Number(leftovers[i])) ||
+    (leftovers[i]?.trim() && Number.isFinite(Number(leftovers[i])) && Number(leftovers[i]) >= 0 && Number(leftovers[i]) <= qty));
+  const canSubmit = validServed && validRemaining;
+  const eatenByItem = weights.map((qty, i) => qty - (hasLeftovers ? Number(leftovers[i] || 0) : 0));
+  const gramsEaten = eatenByItem.reduce((sum, qty) => sum + qty, 0);
+  const components = available?.map((item, i) => ({ ...item, gramsEaten: eatenByItem[i] }));
+  const pending = { mealIndex, plannedGrams, gramsFed: serving, gramsEaten, mixedComponents: components };
+  const energy = getLoggedMealEnergy(pending, plan);
+  const otherMeals = getNextMealStatus(plan, mealLogs.filter((entry) => entry.mealIndex !== mealIndex), treats);
+  const excess = otherMeals.consumedKcalUnrounded + energy.kcal - otherMeals.targetKcalTotal;
+  const includesPartialEnergy = otherMeals.energyIncomplete || energy.partial;
+  const portionNutrition = canSubmit ? calculateDailyMealNutritionSummary({ plan, mealLogs: [{
+    ...pending, id: 'preview', petId: pet.id, date: localDateKey(), mealTime: scheduledTime, fedBy, completed: true,
+  }] }) : undefined;
 
   const selectMeal = (index: number) => {
     const existing = completedMeals.find((log) => log.mealIndex === index);
-    const amount = existing?.gramsFed ?? (plan.rationConfirmed ? portions[index]?.grams : undefined);
+    const amount = existing?.gramsFed ?? (plan.rationConfirmed && !manualIntake ? portions[index]?.grams : undefined);
     setMealIndex(index);
     setFedBy(existing?.fedBy || defaultFeeder);
     setGrams(amount === undefined ? '' : String(amount));
+    const remaining = previousLeftovers(existing);
+    setHasLeftovers(remaining.length > 0);
+    setLeftovers(remaining);
+    setComponentInputs([]);
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4">
-      <div className="bg-white rounded-t-3xl sm:rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl border border-[#0B5D2E20]">
+      <div role="dialog" aria-modal="true" aria-label={`Registrar comida de ${pet.name}`} className="bg-white rounded-t-3xl sm:rounded-3xl max-w-sm max-h-[92dvh] overflow-y-auto w-full p-5 space-y-4 shadow-2xl border border-[#0B5D2E20]">
         <div className="flex items-center justify-between border-b border-gray-100 pb-3">
           <div className="flex items-center gap-2">
             <Utensils className="w-5 h-5 text-[#0B5D2E]" />
@@ -790,24 +902,54 @@ export const RegisterMealModal: React.FC<RegisterMealModalProps> = ({
                 </span>
               )}
             </label>
-            <input
+            {perComponent ? <strong className="block">{serving} g</strong> : <input
               type="number"
               min="0"
               step="any"
               placeholder={plannedGrams !== undefined ? String(plannedGrams) : 'Ej: 50'}
+              aria-label="Gramos servidos"
               value={grams}
               onChange={(e) => setGrams(e.target.value)}
               className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-extrabold text-[#0B5D2E] tabular-nums min-h-[44px]"
-            />
+            />}
           </div>
         </div>
 
+        {perComponent && base?.map((item, i) => <label key={item.role} className="block text-xs">
+          Gramos servidos · {item.foodName}
+          <input type="number" min="0" step="any" value={fields[i]} onChange={(e) => {
+            const next = [...fields]; next[i] = e.target.value; setComponentInputs(next);
+          }} className="mt-1 min-h-11 w-full rounded-xl border border-gray-300 px-3" />
+        </label>)}
+        <fieldset className="space-y-2 text-xs">
+          <legend className="font-bold">¿Cuánto comió?</legend>
+          <div className="grid grid-cols-2 gap-2">
+            {['Comió todo', 'Dejó parte'].map((label, i) => <button type="button" key={label} aria-pressed={hasLeftovers === Boolean(i)}
+              className={`min-h-11 rounded-xl border font-bold ${hasLeftovers === Boolean(i) ? 'border-[#0B5D2E] bg-[#EAF4EC] text-[#0B5D2E]' : 'border-gray-200'}`}
+              onClick={() => setHasLeftovers(Boolean(i))}>{label}</button>)}
+          </div>
+          {hasLeftovers && weights.map((qty, i) => <label key={i} className="block">
+            Gramos que dejó{available && available.length > 1 ? ' · ' + available[i].foodName : ''} (de {Number(qty.toFixed(2))} g)
+            <input type="number" min="0" step="any" max={qty} value={leftovers[i] ?? ''} onChange={(event) => {
+              const next = [...leftovers]; next[i] = event.target.value; setLeftovers(next);
+            }} className="mt-1 min-h-11 w-full rounded-xl border border-gray-300 px-3" />
+          </label>)}
+        </fieldset>
+        {canSubmit && <div className="space-y-1 rounded-xl bg-[#F4F8F4] p-3 text-xs">
+          <p className="font-bold">{Number(gramsEaten.toFixed(2))} g consumidos · {energy.partial ? (energy.kcal ? Math.round(energy.kcal) + ' kcal (parcial)' : 'kcal pendientes') : Math.round(energy.kcal) + ' kcal'}</p>
+          {portionNutrition?.consumedBreakdown.map((item, i) => <p key={i}>
+            {available && available.length > 1 && item.foodName + ' · '}
+            {[item.proteina, item.grasa, item.fibra, item.carbohidratos].filter((n) => n?.available).map((n) => n!.displayText).join(' · ')}
+          </p>)}
+        </div>}
+        {canSubmit && otherMeals.targetKcalTotal > 0 && excess > 0.000001 && <p role="alert" className="rounded-xl bg-amber-50 p-3 text-xs font-bold text-amber-950">
+          Con esta toma superarías la meta diaria{excess >= 1 ? ' en ' + (includesPartialEnergy ? 'al menos ' : '') + Math.floor(excess) + ' kcal' : ''}, incluidos los premios de hoy. Revisa los gramos antes de confirmar.
+        </p>}
         <button
           type="button"
           disabled={!canSubmit}
           onClick={() => {
-            const components = getPlannedMealComponents(plan, plannedPortion, servedGrams);
-            onConfirmMeal(mealIndex, fedBy, servedGrams, scheduledTime, plannedGrams, components);
+            onConfirmMeal(mealIndex, fedBy, servedGrams, scheduledTime, plannedGrams, components, gramsEaten);
             onClose();
           }}
           className="w-full min-h-[48px] bg-[#0B5D2E] text-white rounded-2xl font-heading font-extrabold text-sm flex items-center justify-center gap-2 disabled:opacity-50"

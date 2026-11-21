@@ -115,3 +115,30 @@ test('edits hours when the diary exists before a formula is chosen', () => {
   assert.equal(result.plan.dryFood, undefined);
   assert.deepEqual(getPlannedMeals(result.plan).map((meal) => meal.grams), [0, 0, 0]);
 });
+
+test('an edited copy of the same official formula retains its guide amount and new energy cites the package', () => {
+  const guide = {sourceName:'Fabricante',sourceUrl:'https://example.test/ficha',
+    ranges:[{minWeightKg:3,maxWeightKg:5,minGrams:40,maxGrams:65}]};
+  const formula: FoodItem = {...dry,sourceFoodId:'source-11',kcalPerKg:0,feedingGuide:guide,labelStatus:'verified_manufacturer',
+    fichaNutricional:{coincidenciaEstado:'verificado',fuenteNombre:'Fabricante',fuenteUrl:guide.sourceUrl}};
+  const values: CalculationInputs = {...inputs,dryFood:formula,manufacturerGramsPerDay:50};
+  const initial = buildFeedingPlan(values,calculateFeedingPlan(values));
+  assert.equal(initial.manufacturerGramsPerDay,50);
+  const personal = {...formula,id:'custom_new',bagSizeKg:3};
+  const changed = createFeedingPlanAdjustment(initial, personal);
+  assert.equal(changed.manufacturerGramsPerDay,50);
+  const adjusted = previewFeedingPlanAdjustment(pet,initial,changed,[]);
+  assert.ok('plan' in adjusted);
+  assert.equal(adjusted.plan.gramsPerDay,50);
+  assert.equal(adjusted.plan.kcalPerMeal,0);
+  assert.equal(adjusted.plan.bagWeightKg,3);
+  const renamed = createFeedingPlanAdjustment(initial,{...personal,name:'Otra fórmula'});
+  assert.equal(renamed.manufacturerGramsPerDay,undefined);
+  assert.deepEqual(previewFeedingPlanAdjustment(pet,initial,{...changed,manufacturerGramsPerDay:70},[]),{error:'guide'});
+  const energy = previewFeedingPlanAdjustment(pet,initial,{...changed,dryEnergy:'4000',manufacturerGramsPerDay:undefined},[]);
+  assert.ok('plan' in energy);
+  const entry = energy.plan.dryFood?.fichaNutricional?.kcalPerKg;
+  assert.equal(entry?.valor,4000);
+  assert.equal(entry?.source?.name,'Etiqueta confirmada por el usuario');
+  assert.equal(entry?.source?.url,undefined);
+});

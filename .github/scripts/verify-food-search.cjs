@@ -186,6 +186,7 @@ async function verifyFoodPriceCoherence(page, button) {
     const offer = page.getByRole('region', { name: 'Resultado de precios' }).getByRole('article')
       .filter({ has: page.getByRole('heading', { name: 'Tienda de prueba', exact: true }) });
     await offer.getByRole('button', { name: choice, exact: true }).click();
+    await button('Aplicar a Nube').click();
     await expectMealCosts(todayCost, dailyCost, mealCost);
     assert.equal(priceCalls, before + 1);
     await page.getByText('Ración diaria: 54 g', { exact: true }).waitFor();
@@ -236,7 +237,9 @@ async function verifyFoodPriceCoherence(page, button) {
   await button(/🐱\s*Bruma/).click();
   await button('Hoy').click();
   await page.reload({ waitUntil: 'domcontentloaded' });
-  await page.getByText('Etiqueta pendiente para calcular gramos', { exact: true }).waitFor();
+  await page.getByText(/^Faltan las kcal\/kg de /).waitFor();
+  await page.getByRole('button', { name: 'Buscar ficha', exact: true }).waitFor();
+  await page.getByRole('region', { name: 'Progreso diario de Bruma' }).getByText('Calorías pendientes').waitFor();
   assert.equal(await todayCost.count(), 0, 'Another pet must not inherit Nube’s ration or cost');
   await button('Revisar etiqueta').first().click();
   const brumaLabel = page.getByRole('dialog', { name: 'Revisar etiqueta', exact: true });

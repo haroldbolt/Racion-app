@@ -119,3 +119,28 @@ test('keeps the logged label and does not claim old placeholder macros or missin
   const legacy = calculateDailyMealNutritionSummary({ plan, mealLogs: [mealLog()] });
   assert.equal(legacy.usesCurrentPlanForLegacyLogs, true);
 });
+
+test('counts the amounts eaten from each food, preserves a true zero and keeps snacks without a label partial', async () => {
+  const { getLoggedMealEnergy } = await import('../src/utils/mealPortions');
+  const parts = getPlannedMealComponents(plan, getPlannedMeals(plan)[0])!;
+  const log = mealLog({ gramsEaten: 65, mixedComponents: parts.map((part) => ({
+    ...part, gramsEaten: part.role === 'wet' ? 50 : 15,
+  })) });
+  const eatenSnack = { id: 'snack', petId: 'luna', date: log.date, loggedAt: '12:00',
+    name: 'Premio', kcal: 2, hasKcalPerUnitOnLabel: false };
+  const totals = calculateDailyMealNutritionSummary({ plan, mealLogs: [log], treatLogs: [eatenSnack] });
+  assert.deepEqual([totals.totalServedGrams, totals.totalEatenGrams], [75, 65]);
+  assert.equal(totals.servedNutrients.proteina.grams, 9.3);
+  assert.equal(totals.consumedNutrients.proteina.grams, 8.5);
+  assert.equal(totals.consumedNutrients.proteina.coverage, 'partial');
+  assert.equal(totals.treatsWithoutLabel, true);
+  assert.deepEqual(getLoggedMealEnergy(log, plan), {kcal:110, partial:false});
+  const untouched = { ...log, gramsEaten: 0, mixedComponents: parts.map((part) => ({ ...part, gramsEaten: 0 })) };
+  assert.deepEqual(getLoggedMealEnergy(untouched, plan), {kcal:0, partial:false});
+
+  const { getNextMealStatus } = await import('../src/utils/feedingGuide');
+  assert.equal(getNextMealStatus({...plan, trainingRationGramsToday: 7}, [log], [eatenSnack]).consumedKcalTotal, 112);
+  const missing = { ...log, mixedComponents: log.mixedComponents!.map(part => ({...part, kcalPerKg: 0})) };
+  assert.equal(getNextMealStatus(plan, [missing], [eatenSnack]).energyIncomplete, true);
+  assert.equal(getNextMealStatus(plan, [missing], [eatenSnack]).consumedKcalTotal, 2);
+});

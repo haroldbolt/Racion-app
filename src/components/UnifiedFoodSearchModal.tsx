@@ -8,6 +8,7 @@ import { OnlineFoodSearch } from './OnlineFoodSearch';
 import { formatCOP } from '../utils/i18n';
 
 interface UnifiedFoodSearchModalProps {
+  initialQuery?: string;
   isOpen: boolean;
   onClose: () => void;
   activePet?: Pet;
@@ -88,6 +89,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
   category = 'all',
   includeArchived = true,
   titleOverride,
+  initialQuery,
   formulaType,
 }) => {
   const isEs = lang === 'es';
@@ -171,6 +173,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
         <div className="min-h-0 flex-1 space-y-3 overflow-y-auto">
           {source === 'internet' ? (
             <OnlineFoodSearch
+              initialQuery={initialQuery}
               species={activePet?.species || 'dog'}
               foodType={formulaType}
               lang={lang}

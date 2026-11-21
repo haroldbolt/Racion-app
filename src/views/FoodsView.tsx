@@ -9,6 +9,8 @@ import {
 import { TOXIC_FOODS } from '../data/toxicFoods';
 import { StorageService } from '../utils/storage';
 import { formatCOP, formatRation } from '../utils/i18n';
+import { FoodSafetyAlerts } from '../components/FoodSafetyAlerts';
+import { sameFoodIdentity } from '../utils/foodCosts';
 import { FoodCostTracker } from '../components/FoodCostTracker';
 import { FoodLabelComposition } from '../components/FoodLabelComposition';
 import { LabelReviewModal } from '../components/LabelReviewModal';
@@ -191,7 +193,9 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
       const moistField = asSoldAmount(reference.humedad);
       const ashField = asSoldAmount(reference.cenizas);
       const carbsField = asSoldAmount(reference.carbohidratos);
-      const gramsDay = kcalPerKg && merTargetKcal > 0 ? Math.round(merTargetKcal / (kcalPerKg / 1000)) : null;
+      const activeComponent = plan && (plan.foodType === 'wet' ? plan.wetFood : plan.dryFood);
+      const gramsDay = plan?.rationConfirmed && plan.foodType !== 'mixed' && activeComponent && sameFoodIdentity(activeComponent, food)
+        ? plan.gramsPerDay : kcalPerKg && merTargetKcal > 0 ? Math.round((plan?.foodMerKcal ?? merTargetKcal) / (kcalPerKg / 1000)) : null;
       const gramsPerMeal = gramsDay ? Math.round(gramsDay / mealsPerDay) : null;
       const portionNutrients = gramsPerMeal
         ? calculateFoodPortionNutrients(food, gramsPerMeal, { brand: food.brand, name: food.name })
@@ -212,7 +216,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
         portionNutrients,
       };
     });
-  }, [selectedCompareFoods, merTargetKcal, mealsPerDay]);
+  }, [selectedCompareFoods, merTargetKcal, mealsPerDay, plan]);
 
   return (
     <div className="p-4 space-y-4 pb-28 max-w-lg mx-auto">
@@ -313,11 +317,11 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
           </div>
 
           {/* Empty or single-selection guidance */}
-          {selectedCompareFoods.length < 2 ? (
+          {selectedCompareFoods.length === 0 ? (
             <div className="bg-white rounded-3xl p-8 text-center border border-[#0B5D2E20] shadow-sm space-y-3">
               <Layers className="w-12 h-12 text-[#0B5D2E40] mx-auto" />
               <h4 className="font-heading font-extrabold text-base text-[#1C2B21]">
-                Selecciona al menos 2 alimentos para comparar
+                Elige un alimento para revisar su ficha
               </h4>
               <p className="text-xs text-[#44544A] max-w-sm mx-auto">
                 Elige dos o tres fórmulas de internet o de tus fichas personales. La comparación se actualiza al agregar o quitar un alimento.
@@ -389,6 +393,8 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                       </button>
                     </div>
 
+                    <FoodSafetyAlerts pet={pet} food={food} lang={userAccount.language} />
+                    {onComparePrices && <button type="button" onClick={() => onComparePrices(food)} className="min-h-11 rounded-xl border px-3 text-xs font-bold">{isEs ? 'Comparar precios' : 'Compare prices'}</button>}
                     {/* Section 1: Base común 100 g de producto tal como se vende */}
                     <div className="bg-[#F8FAF8] p-3.5 rounded-2xl border border-gray-200 space-y-2">
                       <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#0B5D2E] block">

@@ -12,7 +12,8 @@ import {
   HydrationDailyState,
 } from '../types';
 import { localDateKey } from './localDate';
-import { withPlanCosts } from './foodCosts';
+import { getPlanCostSummary, sameFormulaName, withPlanCosts } from './foodCosts';
+import { getPlannedMealComponents, getPlannedMeals } from './mealPortions';
 
 const STORAGE_KEYS = {
   PETS: 'racion_pets_v1',
@@ -202,6 +203,19 @@ export const StorageService = {
     }
   },
 
+  getMealHistory(petId: string): MealLog[] {
+    try {
+      const logs: MealLog[] = JSON.parse(localStorage.getItem(STORAGE_KEYS.MEAL_LOGS) || '[]');
+      const latest = new Map<string, MealLog>();
+      for (const log of logs) {
+        if (log.petId === petId) latest.set(log.date + '/' + log.mealIndex, log);
+      }
+      return [...latest.values()].filter((entry) => entry.completed).sort(
+        (a, b) => b.date.localeCompare(a.date) || b.mealTime.localeCompare(a.mealTime)
+      );
+    } catch { return []; }
+  },
+
   toggleMealCompleted(
     petId: string,
     mealIndex: number,
@@ -210,7 +224,8 @@ export const StorageService = {
     scheduledTime: string,
     plannedGrams?: number,
     forceCompleteWithGrams?: boolean,
-    mixedComponents?: import('../types').MealMixedComponent[]
+    mixedComponents?: import('../types').MealMixedComponent[],
+    gramsEaten?: number
   ): MealLog {
     const now = new Date();
     const today = localDateKey(now);
@@ -222,39 +237,42 @@ export const StorageService = {
     );
     const completedAt = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    if (current) {
-      current.completed = forceCompleteWithGrams ? true : !current.completed;
-      current.completedAt = current.completed ? completedAt : undefined;
-      current.fedBy = fedBy;
-      if (forceCompleteWithGrams || grams > 0) {
-        current.gramsFed = grams;
-      }
-      if (plannedGrams !== undefined && plannedGrams >= 0) {
-        current.plannedGrams = plannedGrams;
-      }
-      if (mixedComponents) {
-        current.mixedComponents = mixedComponents;
-      }
+    if (current?.completed && !forceCompleteWithGrams) {
+      current.completed = false;
+      current.completedAt = undefined;
       localStorage.setItem(STORAGE_KEYS.MEAL_LOGS, JSON.stringify(all));
       return current;
-    } else {
-      const newLog: MealLog = {
-        id: 'ml_' + now.getTime() + '_' + Math.random(),
-        petId,
-        date: today,
-        mealIndex,
-        mealTime: scheduledTime,
-        plannedGrams: plannedGrams ?? grams,
-        gramsFed: grams,
-        mixedComponents,
-        fedBy,
-        completed: true,
-        completedAt,
-      };
-      all.push(newLog);
-      localStorage.setItem(STORAGE_KEYS.MEAL_LOGS, JSON.stringify(all));
-      return newLog;
     }
+    const plan = this.getPlan(petId);
+    const portion = plan && getPlannedMeals(plan)[mealIndex];
+    const components: import('../types').MealMixedComponent[] = mixedComponents ?? (plan && portion && getPlannedMealComponents(plan, portion, grams)) ??
+      [{ foodName: plan?.foodName || 'Alimento registrado', role: 'main' as const, gramsPlanned: plannedGrams ?? grams, gramsFed: grams, kcalPerKg: 0 }];
+    const cost = getPlanCostSummary(plan, this.getFoodPurchases(petId));
+    const eaten = Math.max(0, Math.min(grams, gramsEaten ?? grams));
+    const snapshots = components.map((item) => {
+      // An edited log keeps its original price, including historical entries with no price.
+      const price = current?.completed ? undefined : cost.components.find(({food, role}) =>
+        role === item.role && (food.id === item.foodId || Boolean(food.sourceFoodId && food.sourceFoodId === item.sourceFoodId)) &&
+        sameFormulaName(food, {brand:item.brand, name:item.foodName, sourceFoodId:item.sourceFoodId}));
+      return {
+        ...item,
+        gramsEaten: item.gramsEaten ?? (components.length === 1 ? eaten : item.gramsFed),
+        priceSnapshot: item.priceSnapshot ?? {
+          copPerGram: price?.costPerGramCop,
+          source: price?.basis?.source,
+          packageKg: price?.packageKg,
+        },
+      };
+    });
+    const log: MealLog = {
+      id: current?.id ?? 'ml_' + now.getTime() + '_' + Math.random(),
+      petId, date: today, mealIndex, mealTime: scheduledTime, plannedGrams: plannedGrams ?? grams,
+      gramsFed: grams, gramsEaten: eaten, mixedComponents: snapshots, fedBy, completed: true, completedAt,
+    };
+    if (current) Object.assign(current, log);
+    else all.push(log);
+    localStorage.setItem(STORAGE_KEYS.MEAL_LOGS, JSON.stringify(all));
+    return log;
   },
 
   getWeightRecords(petId: string): WeightRecord[] {
@@ -363,10 +381,14 @@ export const StorageService = {
 
   getTreatLogsToday(petId: string): TreatLog[] {
     const today = localDateKey();
+    return this.getTreatHistory(petId).filter((entry) => entry.date === today);
+  },
+
+  getTreatHistory(petId: string): TreatLog[] {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.TREAT_LOGS);
       const all: TreatLog[] = data ? JSON.parse(data) : [];
-      return all.filter((l) => l.petId === petId && l.date === today);
+      return all.filter((l) => l.petId === petId);
     } catch {
       return [];
     }
