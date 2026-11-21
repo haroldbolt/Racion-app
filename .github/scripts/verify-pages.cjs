@@ -267,7 +267,7 @@ async function verifyDiary() {
     await page.reload({waitUntil: 'domcontentloaded'});
     await text('Comió 20 g').waitFor();
     await nutrients.getByRole('columnheader', {name: 'Consumido'}).waitFor();
-    const protein = nutrients.getByRole('row').filter({has: nutrients.getByRole('rowheader', {name: 'Proteína'})});
+    const protein = nutrients.getByRole('row').filter({ has: page.getByRole('rowheader', { name: 'Proteína', exact: true }) });
     assert.match(await protein.getByRole('cell').last().innerText(), /14[.,]7\s*g/); // (20 + 29) g x 30%
     await button('Deshacer').first().click();
     await button('Alimentos').click();
