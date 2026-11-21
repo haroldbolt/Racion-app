@@ -60,6 +60,7 @@ jobs:
           curl --retry 12 --retry-all-errors --retry-delay 1 -fsS http://127.0.0.1:4197/ -o /dev/null
           node .github/scripts/verify-colombia-foods.cjs "http://127.0.0.1:4197/"
           node .github/scripts/verify-ica.cjs "http://127.0.0.1:4197/"
+          node .github/scripts/verify-manufacturer-store.cjs "http://127.0.0.1:4197/"
       - name: Save Agility browser evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -117,5 +118,6 @@ jobs:
           node .github/scripts/verify-agility.cjs "https://racion-app.pages.dev/?release=$GITHUB_SHA"
           node .github/scripts/verify-colombia-foods.cjs "https://racion-app.pages.dev/?release=$GITHUB_SHA"
           node .github/scripts/verify-ica.cjs "https://racion-app.pages.dev/?release=$GITHUB_SHA"
+          node .github/scripts/verify-manufacturer-store.cjs "https://racion-app.pages.dev/?release=$GITHUB_SHA"
         env:
           PAGES_URL: ${{ needs.deploy.outputs.page_url }}

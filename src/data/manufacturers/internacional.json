@@ -1,0 +1,4870 @@
+[
+  {
+    "brand": "ALPO",
+    "species": "dog",
+    "handles": [
+      "alpo-adultos-carne-pollo-cereales-y-vegetales"
+    ],
+    "url": "https://purina.com.co/alpo/adultos-todos-los-tamanos",
+    "verifiedOn": "2026-11-21",
+    "name": "Purina Alpo: Alimento para perros adultos todos los tamaños",
+    "proteinMin": 17.0,
+    "fatMin": 7.0,
+    "fiberMax": 5.5,
+    "moistureMax": 12.0,
+    "ashMax": 9.5,
+    "kcalKg": 3400.0,
+    "packagesKg": [
+      2.0,
+      8.0,
+      22.7
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Cat Chow",
+    "species": "cat",
+    "handles": [
+      "purina-cat-chow-comida-gatos-adultos-carne"
+    ],
+    "url": "https://purina.com.co/catchow/productos/adultos-carne",
+    "verifiedOn": "2026-11-21",
+    "name": "ADULTOS CARNE",
+    "proteinMin": 31.0,
+    "fatMin": 10.0,
+    "fiberMax": 3.5,
+    "moistureMax": 12.0,
+    "ashMax": 9.5,
+    "packagesKg": [
+      0.5,
+      1.5,
+      8.0,
+      15.0
+    ]
+  },
+  {
+    "brand": "Cat Chow",
+    "species": "cat",
+    "handles": [
+      "purina-cat-chow-comida-gatos-adulto-pescado"
+    ],
+    "url": "https://purina.com.co/catchow/productos/adultos-pescado",
+    "verifiedOn": "2026-11-21",
+    "name": "ADULTOS PESCADO",
+    "proteinMin": 31.0,
+    "fatMin": 10.0,
+    "fiberMax": 3.5,
+    "moistureMax": 12.0,
+    "ashMax": 9.5,
+    "packagesKg": [
+      0.5,
+      1.5,
+      8.0
+    ]
+  },
+  {
+    "brand": "Cat Chow",
+    "species": "cat",
+    "handles": [
+      "purina-cat-chow-comida-gatos-adultos-delimix-salmon-carne-pollo"
+    ],
+    "url": "https://purina.com.co/catchow/productos/delmix-salmon-carne-pollo",
+    "verifiedOn": "2026-11-21",
+    "name": "CAT CHOW® CAT CHOW Adultos Delimix para gato",
+    "proteinMin": 31.0,
+    "fatMin": 11.0,
+    "fiberMax": 3.5,
+    "moistureMax": 12.0,
+    "ashMax": 9.5,
+    "packagesKg": [
+      0.2,
+      10.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Cat Chow",
+    "species": "cat",
+    "handles": [
+      "purina-cat-chow-comida-gatitos-pescado-carne-leche"
+    ],
+    "url": "https://purina.com.co/catchow/productos/gatitos-hasta-12-meses",
+    "verifiedOn": "2026-11-21",
+    "name": "Cat Chow Gatitos hasta 12 meses sabor Pescado, Carne y Leche",
+    "proteinMin": 36.0,
+    "fatMin": 12.0,
+    "fiberMax": 3.0,
+    "moistureMax": 12.0,
+    "ashMax": 9.5,
+    "packagesKg": [
+      0.5,
+      1.5,
+      8.0
+    ]
+  },
+  {
+    "brand": "Cat Chow",
+    "species": "cat",
+    "handles": [
+      "alimento-gato-cat-chow-vida-sana"
+    ],
+    "url": "https://purina.com.co/catchow/productos/vida-sana",
+    "verifiedOn": "2026-11-21",
+    "name": "Cat Chow Vida Sana - Salmón, Pollo y Queso",
+    "proteinMin": 36.0,
+    "fiberMax": 5.0,
+    "moistureMax": 12.0,
+    "ashMax": 9.5,
+    "packagesKg": [
+      0.45,
+      1.3,
+      3.0
+    ]
+  },
+  {
+    "brand": "Cat Chow",
+    "species": "cat",
+    "handles": [
+      "purina-cat-chow-comida-gatos-adultos-hogarenos-carne"
+    ],
+    "url": "https://purina.com.co/catchow/productos/hogarenos-carne",
+    "verifiedOn": "2026-11-21",
+    "name": "HOGAREÑOS ADULTO CARNE",
+    "proteinMin": 31.0,
+    "fatMin": 7.0,
+    "fiberMax": 6.0,
+    "moistureMax": 12.0,
+    "ashMax": 9.5,
+    "kcalKg": 3500.0,
+    "packagesKg": [
+      1.5,
+      8.0
+    ]
+  },
+  {
+    "brand": "Diamond",
+    "species": "dog",
+    "handles": [
+      "diamond-high-energy-para-perros"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond/high-energy/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond HIGH ENERGY",
+    "proteinMin": 24.0,
+    "fatMin": 20.0,
+    "fiberMax": 4.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3900.0,
+    "packagesKg": [
+      22.679619
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond",
+    "species": "dog",
+    "handles": [
+      "diamond-maintenance-para-perros"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond/maintenance/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond MAINTENANCE",
+    "proteinMin": 22.0,
+    "fatMin": 12.0,
+    "fiberMax": 4.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3440.0,
+    "packagesKg": [
+      9.071847,
+      18.143695,
+      22.679619
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond",
+    "species": "cat",
+    "handles": [
+      "diamond-maintenance-cat-para-gatos"
+    ],
+    "url": "https://www.diamondpet.com/cat/diamond/maintenance/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond MAINTENANCE CAT",
+    "proteinMin": 30.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3630.0,
+    "packagesKg": [
+      2.721554,
+      9.071847,
+      18.143695
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond",
+    "species": "dog",
+    "handles": [
+      "diamond-original-para-perros"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond/original/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond ORIGINAL",
+    "proteinMin": 24.0,
+    "fatMin": 12.0,
+    "fiberMax": 4.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3388.0,
+    "packagesKg": [
+      22.679619
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond",
+    "species": "dog",
+    "handles": [
+      "diamond-performance-para-perros"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond/performance/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond PERFORMANCE",
+    "proteinMin": 30.0,
+    "fatMin": 20.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3870.0,
+    "packagesKg": [
+      18.143695
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond",
+    "species": "dog",
+    "handles": [
+      "diamond-premium-para-perros"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond/premium/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond PREMIUM",
+    "proteinMin": 26.0,
+    "fatMin": 18.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3840.0,
+    "packagesKg": [
+      2.721554,
+      9.071847,
+      18.143695,
+      22.679619
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond",
+    "species": "dog",
+    "handles": [
+      "diamond-puppy-para-cachorros"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond/puppy/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond PUPPY",
+    "proteinMin": 31.0,
+    "fatMin": 20.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3890.0,
+    "packagesKg": [
+      2.721554,
+      9.071847,
+      18.143695
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond CARE",
+    "species": "dog",
+    "handles": [
+      "diamond-care-rx-renal-para-perros-adultos"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-care/renal-care/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond CARE Rx RENAL FORMULA FOR ADULT DOGS",
+    "proteinMin": 13.0,
+    "fatMin": 18.0,
+    "fiberMax": 2.0,
+    "moistureMax": 10.0,
+    "kcalKg": 4300.0,
+    "packagesKg": [
+      3.628739,
+      11.339809
+    ]
+  },
+  {
+    "brand": "Diamond CARE",
+    "species": "dog",
+    "handles": [
+      "diamond-care-sensitive-skin-para-perros-adultos"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-care/sensitive-skin/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond CARE SENSITIVE SKIN FORMULA FOR ADULT DOGS",
+    "proteinMin": 22.0,
+    "fatMin": 12.0,
+    "fiberMax": 4.5,
+    "moistureMax": 10.0,
+    "kcalKg": 3510.0,
+    "packagesKg": [
+      3.628739,
+      11.339809
+    ]
+  },
+  {
+    "brand": "Diamond CARE",
+    "species": "dog",
+    "handles": [
+      "diamond-care-sensitive-stomach-para-perros-adultos"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-care/sensitive-stomach/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond CARE SENSITIVE STOMACH FORMULA FOR ADULT DOGS",
+    "proteinMin": 25.0,
+    "fatMin": 13.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3615.0,
+    "packagesKg": [
+      3.628739,
+      11.339809
+    ]
+  },
+  {
+    "brand": "Diamond CARE",
+    "species": "cat",
+    "handles": [
+      "diamond-care-urinary-support-para-gatos-adultos"
+    ],
+    "url": "https://www.diamondpet.com/cat/diamond-care/urinary-support-adult-cats/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond CARE URINARY SUPPORT FORMULA FOR ADULT CATS",
+    "proteinMin": 30.0,
+    "fatMin": 15.0,
+    "fiberMax": 2.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3728.0,
+    "packagesKg": [
+      2.721554,
+      6.803886
+    ]
+  },
+  {
+    "brand": "Diamond CARE",
+    "species": "cat",
+    "handles": [
+      "diamond-care-weight-management-para-gatos-adultos"
+    ],
+    "url": "https://www.diamondpet.com/cat/diamond-care/weight-management/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond CARE WEIGHT MANAGEMENT FORMULA FOR ADULT CATS",
+    "proteinMin": 32.0,
+    "fatMin": 9.0,
+    "fiberMax": 10.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3080.0,
+    "packagesKg": [
+      2.721554,
+      6.803886
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond CARE",
+    "species": "dog",
+    "handles": [
+      "diamond-care-weight-management-para-perros-adultos"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-care/weight-management/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond CARE WEIGHT MANAGEMENT FORMULA FOR ADULT DOGS",
+    "proteinMin": 22.0,
+    "fatMin": 6.0,
+    "fiberMax": 10.0,
+    "moistureMax": 10.0,
+    "kcalKg": 2979.0,
+    "packagesKg": [
+      3.628739,
+      11.339809
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Naturals",
+    "species": "cat",
+    "handles": [
+      "diamond-naturals-active-cat-pollo-y-arroz"
+    ],
+    "url": "https://www.diamondpet.com/cat/diamond-naturals/active-cat-chicken-meal-rice-formula/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Naturals ACTIVE CAT CHICKEN MEAL & RICE Formula",
+    "proteinMin": 40.0,
+    "fatMin": 18.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3900.0,
+    "packagesKg": [
+      2.721554,
+      8.164663
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Naturals",
+    "species": "dog",
+    "handles": [
+      "diamond-naturals-adult-beef-meal-rice-para-perros"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-naturals/adult-dog-beef-meal-rice-formula/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Naturals ADULT DOG BEEF MEAL & RICE FORMULA",
+    "proteinMin": 25.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.5,
+    "moistureMax": 10.0,
+    "kcalKg": 3518.0,
+    "packagesKg": [
+      18.143695
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Naturals",
+    "species": "dog",
+    "handles": [
+      "adult-dog-lamb-meal-rice-formula"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-naturals/adult-dog-lamb-meal-rice/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Naturals ADULT DOG LAMB MEAL & RICE FORMULA",
+    "proteinMin": 23.0,
+    "fatMin": 14.0,
+    "fiberMax": 4.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3550.0,
+    "packagesKg": [
+      2.721554,
+      9.071847,
+      18.143695
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Naturals",
+    "species": "dog",
+    "handles": [
+      "diamond-naturals-all-life-stages-pollo-y-arroz-para-perros"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-naturals/all-life-stages-dog-chicken-rice/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Naturals ALL LIFE STAGES DOG CHICKEN & RICE FORMULA",
+    "proteinMin": 26.0,
+    "fatMin": 16.0,
+    "fiberMax": 2.5,
+    "moistureMax": 10.0,
+    "kcalKg": 3708.0,
+    "packagesKg": [
+      18.143695
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Naturals",
+    "species": "dog",
+    "handles": [
+      "diamond-naturals-extreme-athlete-pollo-y-arroz-para-perros"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-naturals/extreme-athlete-adult-dog-chicken-rice-formula/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Naturals EXTREME ATHLETE ADULT DOG CHICKEN & RICE FORMULA",
+    "proteinMin": 32.0,
+    "fatMin": 25.0,
+    "fiberMax": 4.0,
+    "moistureMax": 10.0,
+    "kcalKg": 4107.0,
+    "packagesKg": [
+      18.143695
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Naturals",
+    "species": "dog",
+    "handles": [
+      "diamond-naturals-grain-free-chicken-sweet-potato-para-perros"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-naturals-grain-free/cage-free-chicken-sweet-potato-formula-for-dogs/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Naturals Grain-Free CAGE-FREE CHICKEN & SWEET POTATO Formula for Dogs",
+    "proteinMin": 24.0,
+    "fatMin": 14.0,
+    "fiberMax": 5.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3580.0,
+    "packagesKg": [
+      2.267962,
+      6.350293,
+      12.700586
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Naturals",
+    "species": "dog",
+    "handles": [
+      "diamond-naturals-grain-free-beef-sweet-potato-para-perros"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-naturals-grain-free/pasture-raised-beef-sweet-potato-formula-for-dogs/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Naturals Grain-Free PASTURE-RAISED BEEF & SWEET POTATO FORMULA FOR DOGS",
+    "proteinMin": 24.0,
+    "fatMin": 14.0,
+    "fiberMax": 5.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3580.0,
+    "packagesKg": [
+      2.267962,
+      6.350293,
+      12.700586
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Naturals",
+    "species": "dog",
+    "handles": [
+      "diamond-naturals-grain-free-whitefish-sweet-potato-para-perros"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-naturals-grain-free/wild-caught-whitefish-sweet-potato/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Naturals Grain-Free WILD-CAUGHT WHITEFISH & SWEET POTATO FORMULA FOR DOGS",
+    "proteinMin": 24.0,
+    "fatMin": 14.0,
+    "fiberMax": 5.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3580.0,
+    "packagesKg": [
+      2.267962,
+      6.350293,
+      12.700586
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Naturals",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-diamond-naturals-indoor-cat",
+      "alimento-para-gato-diamond-naturals-indoor-cat-18-lb"
+    ],
+    "url": "https://www.diamondpet.com/cat/diamond-naturals/indoor-cat-chicken-meal-rice-formula/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Naturals INDOOR CAT CHICKEN & RICE FORMULA",
+    "proteinMin": 32.0,
+    "fatMin": 14.0,
+    "fiberMax": 8.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3470.0,
+    "packagesKg": [
+      2.721554,
+      8.164663
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Naturals",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-diamond-naturals-kitten-6-lb"
+    ],
+    "url": "https://www.diamondpet.com/cat/diamond-naturals/kitten-chicken-rice-formula/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Naturals KITTEN CHICKEN & RICE Formula",
+    "proteinMin": 34.0,
+    "fatMin": 22.0,
+    "fiberMax": 2.0,
+    "moistureMax": 10.0,
+    "kcalKg": 4052.0,
+    "packagesKg": [
+      2.721554
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Naturals",
+    "species": "dog",
+    "handles": [
+      "diamond-naturals-large-breed-adult-pollo-y-arroz"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-naturals/large-breed-adult-dog-chicken-rice/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Naturals LARGE BREED ADULT DOG CHICKEN & RICE FORMULA",
+    "proteinMin": 23.0,
+    "fatMin": 13.0,
+    "fiberMax": 3.5,
+    "moistureMax": 10.0,
+    "kcalKg": 3499.0,
+    "packagesKg": [
+      18.143695
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Naturals",
+    "species": "dog",
+    "handles": [
+      "diamond-naturals-large-breed-adult-cordero-y-arroz"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-naturals/large-breed-adult-dog-lamb-meal-rice/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Naturals LARGE BREED ADULT DOG LAMB MEAL & RICE FORMULA",
+    "proteinMin": 22.0,
+    "fatMin": 12.0,
+    "fiberMax": 4.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3425.0,
+    "packagesKg": [
+      18.143695
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Naturals",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-diamond-naturals-large-breed-puppy-20-lb",
+      "large-breed-puppy-lamb-rice-formula"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-naturals/large-breed-puppy-lamb-rice/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Naturals LARGE BREED PUPPY LAMB & RICE FORMULA",
+    "proteinMin": 27.0,
+    "fatMin": 15.0,
+    "fiberMax": 4.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3650.0,
+    "packagesKg": [
+      2.721554,
+      9.071847,
+      18.143695
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Naturals",
+    "species": "dog",
+    "handles": [
+      "sin-nombre-15ago_17-12"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-naturals/light-adult-dog-lamb-meal-rice/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Naturals LIGHT ADULT DOG LAMB MEAL & RICE FORMULA",
+    "proteinMin": 18.0,
+    "fatMin": 6.0,
+    "fiberMax": 8.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3035.0,
+    "packagesKg": [
+      6.803886,
+      13.607771
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Naturals",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-diamond-naturals-senior",
+      "alimento-para-perro-diamond-naturals-senior-18-lb"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-naturals/senior-dog-chicken-egg-oatmeal/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Naturals SENIOR DOG CHICKEN, EGG & OATMEAL FORMULA",
+    "proteinMin": 25.0,
+    "fatMin": 11.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3400.0,
+    "packagesKg": [
+      2.721554,
+      8.164663,
+      15.875733
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Naturals",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-diamond-naturals-skin-and-coat-salmon",
+      "diamond-skin-coat-x-30-lbs"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-naturals/skin-coat-all-life-stages-dog-salmon-potato-formula/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Naturals SKIN & COAT ALL LIFE STAGES DOG SALMON & POTATO FORMULA",
+    "proteinMin": 25.0,
+    "fatMin": 14.0,
+    "fiberMax": 5.5,
+    "moistureMax": 10.0,
+    "kcalKg": 3600.0,
+    "packagesKg": [
+      6.803886,
+      13.607771
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Naturals",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-diamond-naturals-small-breed-puppy-1-kg"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-naturals/small-medium-breed-puppy-chicken-rice/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Naturals SMALL & MEDIUM BREED PUPPY CHICKEN & RICE FORMULA",
+    "proteinMin": 32.0,
+    "fatMin": 22.0,
+    "fiberMax": 3.5,
+    "moistureMax": 10.0,
+    "kcalKg": 3995.0,
+    "packagesKg": [
+      2.721554,
+      8.164663,
+      18.143695
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Naturals",
+    "species": "dog",
+    "handles": [
+      "diamond-naturals-small-breed-adult-pollo-y-arroz"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-naturals/small-breed-adult-dog-chicken-rice/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Naturals SMALL BREED ADULT DOG CHICKEN & RICE FORMULA",
+    "proteinMin": 27.0,
+    "fatMin": 16.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3683.0,
+    "packagesKg": [
+      2.721554,
+      8.164663
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Naturals",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-diamond-naturals-small-breed-adult-lamb-rice-1-kg"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-naturals/small-breed-adult-dog-lamb-rice/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Naturals SMALL BREED ADULT DOG LAMB & RICE FORMULA",
+    "proteinMin": 25.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3650.0,
+    "packagesKg": [
+      2.721554,
+      8.164663
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Diamond Pro89",
+    "species": "dog",
+    "handles": [
+      "diamond-pro89-beef-pork-ancient-grains-para-perros-adultos"
+    ],
+    "url": "https://www.diamondpet.com/dog/diamond-pro89/beef-pork-ancient-grains-formula-for-adult-dogs/",
+    "verifiedOn": "2026-11-21",
+    "name": "Diamond Pro89 BEEF, PORK & ANCIENT GRAINS FORMULA FOR ADULT DOGS",
+    "proteinMin": 30.0,
+    "fatMin": 20.0,
+    "fiberMax": 2.2,
+    "moistureMax": 10.0,
+    "kcalKg": 4114.0,
+    "packagesKg": [
+      18.143695
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Dog Chow",
+    "species": "dog",
+    "handles": [
+      "purina-dog-chow-seleccion-de-proteinas-para-perros"
+    ],
+    "url": "https://purina.com.co/dogchow/productos/seleccion-de-proteinas",
+    "verifiedOn": "2026-11-21",
+    "name": "Comida para Perros Purina® Dog Chow® Selección Proteína",
+    "proteinMin": 23.0,
+    "fatMin": 12.0,
+    "fiberMax": 4.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.0,
+      7.5,
+      20.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Dog Chow",
+    "species": "dog",
+    "handles": [
+      "dog-chow-control-de-peso-adultos-todos-los-tamanos"
+    ],
+    "url": "https://purina.com.co/dogchow/productos/adultos-control-peso-carne-pollo",
+    "verifiedOn": "2026-11-21",
+    "name": "Comida para perros Control de Peso de Dog Chow",
+    "ashMax": 9.0,
+    "fiberMax": 9.0,
+    "proteinMin": 24.0,
+    "fatMin": 4.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.0,
+      8.0,
+      17.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Dog Chow",
+    "species": "dog",
+    "handles": [
+      "dog-chow-longevidad-adultos-7"
+    ],
+    "url": "https://purina.com.co/dogchow/productos/longevidad-adultos-7-todos-tamanos",
+    "verifiedOn": "2026-11-21",
+    "name": "DOG CHOW LONGEVIDAD ADULTOS 7+ TODOS LOS TAMAÑOS",
+    "ashMax": 9.0,
+    "fiberMax": 6.0,
+    "proteinMin": 24.0,
+    "fatMin": 8.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.0,
+      8.0,
+      17.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Dog Chow",
+    "species": "dog",
+    "handles": [
+      "dog-chow-triple-proteina-adultos-todos-los-tamanos"
+    ],
+    "url": "https://purina.com.co/dogchow/productos/triple-proteina-todos-tamanios",
+    "verifiedOn": "2026-11-21",
+    "name": "DOG CHOW TODAS LAS RAZAS CON TRIPLE PROTEÍNA",
+    "proteinMin": 25.0,
+    "fatMin": 12.0,
+    "fiberMax": 4.0,
+    "moistureMax": 12.0,
+    "ashMax": 9.0,
+    "packagesKg": [
+      2.0,
+      8.0,
+      22.7
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Dog Chow",
+    "species": "dog",
+    "handles": [
+      "dog-chow-salud-visible-adultos-medianos-y-grandes"
+    ],
+    "url": "https://purina.com.co/dogchow/productos/medianos-y-grandes",
+    "verifiedOn": "2026-11-21",
+    "name": "DOG CHOW® para perro adulto medianos y grandes sabor carne y pollo",
+    "proteinMin": 21.0,
+    "fatMin": 10.0,
+    "fiberMax": 4.0,
+    "moistureMax": 12.0,
+    "ashMax": 9.0,
+    "kcalKg": 3600.0,
+    "packagesKg": [
+      0.35,
+      0.475,
+      2.0,
+      4.0,
+      8.0,
+      17.0,
+      22.7
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Dog Chow",
+    "species": "dog",
+    "handles": [
+      "dog-chow-alimento-para-perro-alta-proteina"
+    ],
+    "url": "https://purina.com.co/dogchow/productos/alta-proteina",
+    "verifiedOn": "2026-11-21",
+    "name": "Purina® Dog Chow® Alta Proteína",
+    "proteinMin": 25.0,
+    "fatMin": 12.0,
+    "moistureMax": 12.0,
+    "fiberMax": 4.0,
+    "ashMax": 9.0,
+    "packagesKg": [
+      1.0,
+      2.0,
+      7.5,
+      20.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Excellent",
+    "species": "dog",
+    "handles": [
+      "excellent-adulto-razas-medianas-y-grandes-pollo-y-arroz"
+    ],
+    "url": "https://purina.com.co/excellent/perros/adultos-pollo",
+    "verifiedOn": "2026-11-21",
+    "name": "Adulto Pollo y Arroz Razas Medianas y Grandes",
+    "proteinMin": 24.0,
+    "fatMin": 11.0,
+    "fiberMax": 4.0,
+    "moistureMax": 12.0,
+    "ashMax": 9.0,
+    "kcalKg": 3650.0,
+    "packagesKg": [
+      1.5,
+      3.0,
+      17.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Excellent",
+    "species": "dog",
+    "handles": [
+      "excellent-cachorros-razas-medianas-y-grandes-pollo-y-arroz"
+    ],
+    "url": "https://purina.com.co/excellent/perros/cachorros-pollo-arroz-medianos-grandes",
+    "verifiedOn": "2026-11-21",
+    "name": "Cachorro Pollo y Arroz Razas Medianas y Grandes",
+    "fatMin": 13.0,
+    "fiberMax": 3.5,
+    "moistureMax": 12.0,
+    "ashMax": 9.0,
+    "kcalKg": 3720.0,
+    "packagesKg": [
+      1.5,
+      3.0,
+      17.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Excellent",
+    "species": "dog",
+    "handles": [
+      "excellent-cachorro-razas-pequenas-pollo-y-arroz"
+    ],
+    "url": "https://purina.com.co/excellent/perros/cachorros-pollo-arroz-razas-pequenas",
+    "verifiedOn": "2026-11-21",
+    "name": "Cachorro Pollo y Arroz Razas Pequeñas",
+    "proteinMin": 31.0,
+    "fatMin": 14.0,
+    "fiberMax": 3.5,
+    "moistureMax": 12.0,
+    "ashMax": 9.0,
+    "kcalKg": 3900.0,
+    "packagesKg": [
+      3.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Excellent",
+    "species": "dog",
+    "handles": [
+      "excellent-adulto-maintenance-formula"
+    ],
+    "url": "https://purina.com.co/excellent/perros/adultos-mantenimiento",
+    "verifiedOn": "2026-11-21",
+    "name": "EXCELLENT® ADULT Mantenimiento para perro adulto todos los tamaños",
+    "moistureMax": 12.0,
+    "proteinMin": 24.0,
+    "fatMin": 11.0,
+    "fiberMax": 4.0,
+    "ashMax": 9.0,
+    "packagesKg": [
+      3.0,
+      22.7
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Excellent",
+    "species": "cat",
+    "handles": [
+      "excellent-gatos-sterilized"
+    ],
+    "url": "https://purina.com.co/excellent/gatos/sterilized",
+    "verifiedOn": "2026-11-21",
+    "name": "Excellent Gatos Sterilized",
+    "fiberMax": 6.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      1.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Excellent",
+    "species": "cat",
+    "handles": [
+      "excellent-urinary-cat"
+    ],
+    "url": "https://purina.com.co/excellent/gatos/adultos-urinario-pollo-arroz",
+    "verifiedOn": "2026-11-21",
+    "name": "Excellent Urinary Gatos Adultos",
+    "proteinMin": 33.0,
+    "fatMin": 12.0,
+    "fiberMax": 3.0,
+    "moistureMax": 12.0,
+    "ashMax": 8.5,
+    "kcalKg": 3900.0,
+    "packagesKg": [
+      1.0,
+      3.0
+    ]
+  },
+  {
+    "brand": "Excellent",
+    "species": "cat",
+    "handles": [
+      "excellent-gatitos-pollo-arroz"
+    ],
+    "url": "https://purina.com.co/excellent/gatos/gatitos-pollo-arroz",
+    "verifiedOn": "2026-11-21",
+    "name": "Excellent comida para gatitos con Pollo, Carne y Arroz",
+    "fiberMax": 3.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      1.0
+    ]
+  },
+  {
+    "brand": "Félix",
+    "species": "cat",
+    "handles": [
+      "alimento-seco-para-gato-felix-megamix"
+    ],
+    "url": "https://purina.com.co/felix/alimento-seco/megamix-adultos",
+    "verifiedOn": "2026-11-21",
+    "name": "Alimento Seco Megamix Adultos",
+    "ashMax": 9.5,
+    "fiberMax": 4.0,
+    "proteinMin": 30.0,
+    "fatMin": 10.0,
+    "moistureMax": 12.0,
+    "kcalKg": 3700.0,
+    "packagesKg": [
+      1.5,
+      10.0
+    ]
+  },
+  {
+    "brand": "N&D",
+    "species": "dog",
+    "handles": [
+      "alimento-n-d-tropical-can-suino-adt-md-mx"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/n&d-tropical-selection-canine/1049-cerdo-adult-medium-&-maxi.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Cerdo Adult Medium & Maxi",
+    "complete": true,
+    "packagesKg": [
+      2.0,
+      10.1
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 26.0,
+    "fatMin": 14.0,
+    "fiberMax": 3.5,
+    "ashMax": 7.5,
+    "kcalKg": 3730
+  },
+  {
+    "brand": "N&D",
+    "species": "dog",
+    "handles": [
+      "alimento-n-d-tropical-can-suino-adt-mini"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/n&d-tropical-selection-canine/1048-cerdo-adult-mini.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Cerdo Adult Mini",
+    "complete": true,
+    "packagesKg": [
+      2.5
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 26.0,
+    "fatMin": 14.0,
+    "fiberMax": 3.5,
+    "ashMax": 7.5,
+    "kcalKg": 3730
+  },
+  {
+    "brand": "N&D",
+    "species": "dog",
+    "handles": [
+      "alimento-n-d-tropical-can-suino-pup-md-mx"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/n&d-tropical-selection-canine/1044-cerdo-puppy-medium-&-maxi.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Cerdo Puppy Medium & Maxi",
+    "complete": true,
+    "packagesKg": [
+      2.0,
+      10.1
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 28.0,
+    "fatMin": 18.0,
+    "fiberMax": 3.5,
+    "ashMax": 7.5,
+    "kcalKg": 3920
+  },
+  {
+    "brand": "N&D",
+    "species": "dog",
+    "handles": [
+      "alimento-n-d-tropical-can-suino-pup-mini"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/n&d-tropical-selection-canine/1043-cerdo-puppy-mini.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Cerdo Puppy Mini",
+    "complete": true,
+    "packagesKg": [
+      2.0
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 28.0,
+    "fatMin": 18.0,
+    "fiberMax": 3.5,
+    "ashMax": 7.5,
+    "kcalKg": 3920
+  },
+  {
+    "brand": "N&D",
+    "species": "dog",
+    "handles": [
+      "alimento-n-d-spirulina-can-suino-adt-mini"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/n&d-spirulina-canine/1069-cerdo,-spirulina-e-gojiberry-adult-mini.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Cerdo, Spirulina e Gojiberry Adult Mini",
+    "complete": true,
+    "packagesKg": [
+      2.0,
+      7.0
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 28.0,
+    "fatMin": 18.0,
+    "fiberMax": 2.9,
+    "ashMax": 8.6,
+    "kcalKg": 3930
+  },
+  {
+    "brand": "N&D",
+    "species": "dog",
+    "handles": [
+      "alimento-n-d-spirulina-can-suino-pup-mini"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/n&d-spirulina-canine/1063-cerdo,-spirulina-e-gojiberry-puppy-mini.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Cerdo, Spirulina e Gojiberry Puppy Mini",
+    "complete": true,
+    "packagesKg": [
+      2.0,
+      7.0
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 30.0,
+    "fatMin": 20.0,
+    "fiberMax": 2.5,
+    "ashMax": 8.1,
+    "kcalKg": 4074
+  },
+  {
+    "brand": "N&D",
+    "species": "dog",
+    "handles": [
+      "alimento-n-d-white-can-merluza-adt-mini"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/n&d-white/1052-n&d-white-adult-mini.html",
+    "verifiedOn": "2026-11-21",
+    "name": "N&D White Adult Mini",
+    "complete": true,
+    "packagesKg": [
+      2.0
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 23.0,
+    "fatMin": 18.0,
+    "fiberMax": 2.9,
+    "ashMax": 7.9,
+    "kcalKg": 3934
+  },
+  {
+    "brand": "N&D",
+    "species": "dog",
+    "handles": [
+      "alimento-n-d-tropical-can-fgo-adt-md-mx"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/n&d-tropical-selection-canine/1046-pollo-adult-medium-&-maxi.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Pollo Adult Medium & Maxi",
+    "complete": true,
+    "packagesKg": [
+      2.0,
+      10.1
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 26.0,
+    "fatMin": 14.0,
+    "fiberMax": 3.5,
+    "ashMax": 7.5,
+    "kcalKg": 3730
+  },
+  {
+    "brand": "N&D",
+    "species": "dog",
+    "handles": [
+      "alimento-n-d-tropical-can-fgo-adt-mini"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/n&d-tropical-selection-canine/1045-pollo-adult-mini.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Pollo Adult Mini",
+    "complete": true,
+    "packagesKg": [
+      2.5
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 26.0,
+    "fatMin": 14.0,
+    "fiberMax": 3.5,
+    "ashMax": 7.5,
+    "kcalKg": 3730
+  },
+  {
+    "brand": "N&D",
+    "species": "cat",
+    "handles": [
+      "alimento-seco-n-d-prime-feline-frango-adt"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-gato/n&d-prime-feline/274-pollo-y-granada-adult.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Pollo y Granada Adult",
+    "complete": true,
+    "packagesKg": [
+      1.5,
+      7.5
+    ],
+    "moistureMax": 8.0,
+    "proteinMin": 44.0,
+    "fatMin": 20.0,
+    "fiberMax": 1.8,
+    "ashMax": 8.5,
+    "kcalKg": 4132
+  },
+  {
+    "brand": "N&D",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-n-d-ancestral-castrados-pollo"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-gato/n&d-ancestral-grain-feline/420-pollo-y-granada-castrados.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Pollo y Granada Castrados",
+    "complete": true,
+    "packagesKg": [
+      1.5,
+      7.5
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 38.0,
+    "fatMin": 10.0,
+    "fiberMax": 5.5,
+    "ashMax": 8.3,
+    "kcalKg": 3557
+  },
+  {
+    "brand": "N&D",
+    "species": "dog",
+    "handles": [
+      "alimento-n-d-tropical-can-salm-adt-md-mx"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/n&d-tropical-selection-canine/1051-salmón-adult-medium-&-maxi.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Salmón Adult Medium & Maxi",
+    "complete": true,
+    "packagesKg": [
+      2.0,
+      2.5,
+      10.1
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 26.0,
+    "fatMin": 14.0,
+    "fiberMax": 3.5,
+    "ashMax": 7.5,
+    "kcalKg": 3730
+  },
+  {
+    "brand": "N&D",
+    "species": "dog",
+    "handles": [
+      "alimento-n-d-tropical-can-salm-adt-mini"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/n&d-tropical-selection-canine/1050-salmón-adult-mini.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Salmón Adult Mini",
+    "complete": true,
+    "packagesKg": [
+      2.5
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 26.0,
+    "fatMin": 14.0,
+    "fiberMax": 3.5,
+    "ashMax": 7.5,
+    "kcalKg": 3730
+  },
+  {
+    "brand": "N&D",
+    "species": "cat",
+    "handles": [
+      "alimento-seco-n-d-ocean-feline-adult-castrado-salmon"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-gato/n&d-ocean-feline/953-salmón-y-melón-adult-castrados.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Salmón y Melón Adult Castrados",
+    "complete": true,
+    "packagesKg": [
+      0.4,
+      1.5,
+      7.5
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 44.0,
+    "fatMin": 11.0,
+    "fiberMax": 5.1,
+    "ashMax": 8.5,
+    "kcalKg": 3645
+  },
+  {
+    "brand": "N&D",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-n-d-ocean-canine-adult-mini-salmon"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/n&d-ocean-canine/956-salmón-y-melón-adult-mini.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Salmón y Melón Adult Mini",
+    "complete": true,
+    "packagesKg": [
+      0.8,
+      2.5
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 30.0,
+    "fatMin": 18.0,
+    "ashMax": 7.8,
+    "kcalKg": 3999
+  },
+  {
+    "brand": "N&D",
+    "species": "dog",
+    "handles": [
+      "alimento-n-d-spirulina-can-tilapia-adt-mini"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/n&d-spirulina-canine/1067-tilapia,-spirulina-e-gojiberry-adult-mini.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Tilapia, Spirulina e Gojiberry Adult Mini",
+    "complete": true,
+    "packagesKg": [
+      2.0,
+      7.0
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 28.0,
+    "fatMin": 18.0,
+    "fiberMax": 2.9,
+    "ashMax": 8.6,
+    "kcalKg": 3930
+  },
+  {
+    "brand": "Nutra-Nuggets",
+    "species": "dog",
+    "handles": [
+      "nutra-nuggets-adulto-cordero-y-arroz"
+    ],
+    "url": "https://nutranuggets.com/product-information/nutra-nuggets/lamb-meal-rice/",
+    "verifiedOn": "2026-11-21",
+    "name": "Nutra-Nuggets Lamb Meal & Rice Formula for Dogs Nutra-Nuggets Lamb Meal & Rice Formula for Dogs Nutra-Nuggets Lamb Meal & Rice Formula for Dogs",
+    "moisture": 10.0,
+    "kcalKg": 3631.0,
+    "complete": true,
+    "protein": 25.0,
+    "fat": 15.0,
+    "fiber": 3.0
+  },
+  {
+    "brand": "Nutra-Nuggets",
+    "species": "dog",
+    "handles": [
+      "nutra-nuggets-adulto-lite-senior"
+    ],
+    "url": "https://nutranuggets.com/product-information/nutra-nuggets/litesenior-for-dogs/",
+    "verifiedOn": "2026-11-21",
+    "name": "Nutra-Nuggets Lite/Senior Formula for Dogs Nutra-Nuggets Lite/Senior Formula for Dogs Nutra-Nuggets Lite/Senior Formula for Dogs",
+    "moisture": 10.0,
+    "kcalKg": 3450.0,
+    "complete": true,
+    "protein": 18.0,
+    "fat": 8.0,
+    "fiber": 3.0
+  },
+  {
+    "brand": "Nutra-Nuggets",
+    "species": "cat",
+    "handles": [
+      "nutra-nuggets-gato-adulto"
+    ],
+    "url": "https://nutranuggets.com/product-information/nutra-nuggets/maintenance-for-cats/",
+    "verifiedOn": "2026-11-21",
+    "name": "Nutra-Nuggets Maintenance Formula for Cats Nutra-Nuggets Maintenance Formula for Cats Nutra-Nuggets Maintenance Formula for Cats",
+    "moisture": 10.0,
+    "kcalKg": 3742.0,
+    "complete": true,
+    "protein": 30.0,
+    "fat": 15.0,
+    "fiber": 3.0
+  },
+  {
+    "brand": "Nutra-Nuggets",
+    "species": "dog",
+    "handles": [
+      "nutra-nuggets-adulto-mantenimiento"
+    ],
+    "url": "https://nutranuggets.com/product-information/nutra-nuggets/maintenance-for-dogs/",
+    "verifiedOn": "2026-11-21",
+    "name": "Nutra-Nuggets Maintenance Formula for Dogs Nutra-Nuggets Maintenance Formula for Dogs Nutra-Nuggets Maintenance Formula for Dogs",
+    "moisture": 10.0,
+    "kcalKg": 3530.0,
+    "complete": true,
+    "protein": 21.0,
+    "fat": 12.0,
+    "fiber": 3.5
+  },
+  {
+    "brand": "Nutra-Nuggets",
+    "species": "dog",
+    "handles": [
+      "nutra-nuggets-performance-dogs"
+    ],
+    "url": "https://nutranuggets.com/product-information/nutra-nuggets/performance-for-dogs/",
+    "verifiedOn": "2026-11-21",
+    "name": "Nutra-Nuggets Performance Formula for Dogs Nutra-Nuggets Performance Formula for Dogs Nutra-Nuggets Performance Formula for Dogs",
+    "moisture": 10.0,
+    "kcalKg": 3886.0,
+    "complete": true,
+    "protein": 28.0,
+    "fat": 18.0,
+    "fiber": 3.0
+  },
+  {
+    "brand": "Nutra-Nuggets",
+    "species": "dog",
+    "handles": [
+      "nutra-nuggets-cachorro"
+    ],
+    "url": "https://nutranuggets.com/product-information/nutra-nuggets/puppy/",
+    "verifiedOn": "2026-11-21",
+    "name": "Nutra-Nuggets Puppy Formula Nutra-Nuggets Puppy Formula Nutra-Nuggets Puppy Formula",
+    "moisture": 10.0,
+    "kcalKg": 3973.0,
+    "complete": true,
+    "protein": 31.0,
+    "fat": 20.0,
+    "fiber": 3.0
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
+      "pro-plan-active-mind-razas-medianas-y-grandes"
+    ],
+    "url": "https://purina.com.co/proplan/perros/mente-activa/razas-medianas-grandes",
+    "verifiedOn": "2026-11-21",
+    "name": "Active Mind Razas Medianas y Grandes",
+    "proteinMin": 28.0,
+    "fatMin": 12.0,
+    "fiberMax": 3.5,
+    "moistureMax": 12.0,
+    "ashMax": 8.5,
+    "kcalKg": 3740.0,
+    "packagesKg": [
+      3.0,
+      13.0
+    ]
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perros-adultos-7-anos-razas-pequenas-purina-pro-plan"
+    ],
+    "url": "https://purina.com.co/proplan/perros/mente-activa/razas-pequenas",
+    "verifiedOn": "2026-11-21",
+    "name": "Active Mind Razas Pequeñas",
+    "proteinMin": 29.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.0,
+    "moistureMax": 12.0,
+    "ashMax": 8.5,
+    "kcalKg": 3900.0,
+    "packagesKg": [
+      1.0,
+      3.0,
+      7.5
+    ]
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
+      "pro-plan-perros-adultos-razas-mediana"
+    ],
+    "url": "https://purina.com.co/proplan/perros/adulto/razas-medianas",
+    "verifiedOn": "2026-11-21",
+    "name": "Adulto Razas Medianas",
+    "proteinMin": 26.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.0,
+    "moistureMax": 12.0,
+    "ashMax": 8.5,
+    "kcalKg": 3900.0,
+    "packagesKg": [
+      3.0,
+      7.5,
+      13.0,
+      17.5
+    ]
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perros-adultos-razas-pequenas-purina-pro-plan"
+    ],
+    "url": "https://purina.com.co/proplan/perros/adulto/razas-pequenas",
+    "verifiedOn": "2026-11-21",
+    "name": "Adulto Razas Pequeñas",
+    "proteinMin": 29.0,
+    "fiberMax": 3.0,
+    "moistureMax": 12.0,
+    "ashMax": 9.0,
+    "kcalKg": 4050.0,
+    "packagesKg": [
+      1.0,
+      3.0,
+      7.5
+    ]
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
+      "pro-plan-perros-adultos-paladares-exigentes-razas-pequenas"
+    ],
+    "url": "https://purina.com.co/proplan/perros/exigentes/razas-pequenas",
+    "verifiedOn": "2026-11-21",
+    "name": "Exigent Razas Pequeñas",
+    "fiberMax": 3.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      1.0,
+      3.0,
+      7.5
+    ]
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "cat",
+    "handles": [
+      "pro-plan-gatos-adultos"
+    ],
+    "url": "https://purina.com.co/proplan/gatos/adultos-producto",
+    "verifiedOn": "2026-11-21",
+    "name": "Gato Adulto",
+    "proteinMin": 36.0,
+    "fatMin": 16.0,
+    "fiberMax": 2.5,
+    "moistureMax": 12.0,
+    "ashMax": 8.5,
+    "kcalKg": 4200.0,
+    "packagesKg": [
+      1.5,
+      3.0,
+      7.5
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "cat",
+    "handles": [
+      "pro-plan-gatos-adultos-mayores-de-7-anos-purina"
+    ],
+    "url": "https://purina.com.co/proplan/gatos/adultos-7-mas-producto",
+    "verifiedOn": "2026-11-21",
+    "name": "Gato Adulto 7+",
+    "proteinMin": 37.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.0,
+    "moistureMax": 12.0,
+    "ashMax": 8.5,
+    "kcalKg": 4100.0,
+    "packagesKg": [
+      3.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-pro-plan-reductor-de-alergenos-live-clear"
+    ],
+    "url": "https://purina.com.co/proplan/gatos/liveclear",
+    "verifiedOn": "2026-11-21",
+    "name": "LiveClear",
+    "proteinMin": 36.0,
+    "fatMin": 16.0,
+    "fiberMax": 2.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      1.0,
+      3.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
+      "pro-plan-perros-adultos-piel-sensible-razas-medianas-y-grandes"
+    ],
+    "url": "https://purina.com.co/proplan/perros/piel-sensible/adultos-medianas-grandes",
+    "verifiedOn": "2026-11-21",
+    "name": "PRO PLAN® Pro Plan Sensitive Skin para perros adultos razas medianas y grandes",
+    "proteinMin": 26.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.5,
+    "moistureMax": 12.0,
+    "ashMax": 8.5,
+    "kcalKg": 3980.0,
+    "packagesKg": [
+      3.0,
+      13.0
+    ]
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perros-adultos-piel-sensible-razas-pequenas-purina-pro-plan"
+    ],
+    "url": "https://purina.com.co/proplan/perros/piel-sensible/adultos-razas-pequenas",
+    "verifiedOn": "2026-11-21",
+    "name": "PRO PLAN® Sensitive Skin Adult Razas Pequeñas",
+    "proteinMin": 29.0,
+    "fatMin": 17.0,
+    "fiberMax": 3.5,
+    "moistureMax": 12.0,
+    "ashMax": 9.0,
+    "kcalKg": 4100.0,
+    "packagesKg": [
+      1.0,
+      3.0,
+      7.5
+    ]
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "cat",
+    "handles": [
+      "pro-plan-gatitos-kitten"
+    ],
+    "url": "https://purina.com.co/proplan/gatos/gatitos-producto",
+    "verifiedOn": "2026-11-21",
+    "name": "Pro Plan Gatitos",
+    "proteinMin": 40.0,
+    "fatMin": 19.0,
+    "fiberMax": 2.5,
+    "moistureMax": 12.0,
+    "ashMax": 8.0,
+    "kcalKg": 4300.0,
+    "packagesKg": [
+      1.5,
+      3.0,
+      7.5
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "cat",
+    "handles": [
+      "alimento-gato-pro-plan-veterinary-diets-ha"
+    ],
+    "url": "https://purina.com.co/proplan/dietas-veterinarias/gatos/hydrolizado",
+    "verifiedOn": "2026-11-21",
+    "name": "Pro Plan HA Alimento hidrolizado para gatos",
+    "proteinMin": 29.5,
+    "fatMin": 9.0,
+    "fiberMax": 4.0,
+    "moistureMax": 10.0,
+    "packagesKg": [
+      1.8
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-medicado-ppvd-jm-movilidad-articular"
+    ],
+    "url": "https://purina.com.co/proplan/veterinary-diets/perros/articulaciones",
+    "verifiedOn": "2026-11-21",
+    "name": "Pro Plan JM: Alimento terapéutico para perros",
+    "moistureMax": 11.0,
+    "proteinMin": 30.0,
+    "fatMin": 12.0,
+    "fiberMax": 4.0,
+    "ashMax": 8.0,
+    "packagesKg": [
+      2.0,
+      7.5
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
+      "pro-plan-perro-veterinary-diet-nf"
+    ],
+    "url": "https://purina.com.co/proplan/veterinary-diets/perros/renal",
+    "verifiedOn": "2026-11-21",
+    "name": "Pro Plan NF Alimento renal para perros adultos",
+    "proteinMin": 12.5,
+    "fatMin": 13.0,
+    "fiberMax": 2.5,
+    "moistureMax": 12.0,
+    "ashMax": 5.0,
+    "packagesKg": [
+      2.0
+    ]
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
+      "pro-plan-perro-veterinary-diets-nc-neurocare"
+    ],
+    "url": "https://purina.com.co/proplan/veterinary-diets/perros/neurologico",
+    "verifiedOn": "2026-11-21",
+    "name": "Pro Plan Neurocare NC Fórmula Canina",
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.0
+    ]
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
+      "pro-plan-perro-veterinary-diets-om-obesidad"
+    ],
+    "url": "https://purina.com.co/proplan/veterinary-diets/perros/obesidad",
+    "verifiedOn": "2026-11-21",
+    "name": "Pro Plan OM Obesity Management Fórmula Canina",
+    "proteinMin": 26.0,
+    "fiberMax": 16.0,
+    "moistureMax": 12.0,
+    "ashMax": 7.0,
+    "packagesKg": [
+      2.0,
+      7.5
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "cat",
+    "handles": [
+      "pro-plan-gatos-adultos-cuidado-urinario"
+    ],
+    "url": "https://purina.com.co/proplan/gatos/urinario-producto",
+    "verifiedOn": "2026-11-21",
+    "name": "Pro Plan Urinary Gatos",
+    "proteinMin": 36.0,
+    "fatMin": 14.0,
+    "fiberMax": 3.0,
+    "moistureMax": 12.0,
+    "ashMax": 8.5,
+    "kcalKg": 3950.0,
+    "packagesKg": [
+      1.5,
+      3.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "cat",
+    "handles": [
+      "alimento-gato-pro-plan-veterinary-diets-kidney-function-etapa-inicial"
+    ],
+    "url": "https://purina.com.co/proplan/veterinary-diets/gatos/renal-temprano",
+    "verifiedOn": "2026-11-21",
+    "name": "Pro Plan Veterinary Diets Comida renal para gatos etapa inicial",
+    "proteinMin": 33.0,
+    "fatMin": 13.0,
+    "moistureMax": 12.0,
+    "fiberMax": 5.0,
+    "packagesKg": [
+      1.4
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "cat",
+    "handles": [
+      "proplan-veterinary-nf-renal-gato-advance"
+    ],
+    "url": "https://purina.com.co/proplan/veterinary-diets/gatos/funcion-renal-avanzada",
+    "verifiedOn": "2026-11-21",
+    "name": "Pro Plan Veterinary Diets NF Renal Function fórmula felina",
+    "proteinMin": 26.5,
+    "fatMin": 16.0,
+    "moistureMax": 12.0,
+    "ashMax": 7.0,
+    "fiberMax": 5.0,
+    "packagesKg": [
+      1.5
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "cat",
+    "handles": [
+      "proplan-veterinary-om-gato"
+    ],
+    "url": "https://purina.com.co/proplan/veterinary-diets/gatos/obesidad",
+    "verifiedOn": "2026-11-21",
+    "name": "Pro Plan Veterinary Diets OM Obesidad Fórmula Felina",
+    "proteinMin": 50.0,
+    "fatMin": 8.0,
+    "fiberMax": 9.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      1.5
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
+      "pro-plan-perros-cachorros-razas-pequenas"
+    ],
+    "url": "https://purina.com.co/proplan/perros/cachorros/razas-pequenas",
+    "verifiedOn": "2026-11-21",
+    "name": "Pro Plan cachorros de raza pequeña: alimento para perros",
+    "proteinMin": 32.0,
+    "fatMin": 20.0,
+    "fiberMax": 3.0,
+    "moistureMax": 12.0,
+    "ashMax": 9.0,
+    "kcalKg": 4240.0,
+    "packagesKg": [
+      1.0,
+      3.0,
+      7.5
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
+      "pro-plan-perros-cachorros-razas-medianas"
+    ],
+    "url": "https://purina.com.co/proplan/perros/cachorros/razas-medianas",
+    "verifiedOn": "2026-11-21",
+    "name": "Puppy Razas Medianas",
+    "proteinMin": 29.0,
+    "fatMin": 18.0,
+    "fiberMax": 3.0,
+    "moistureMax": 12.0,
+    "ashMax": 8.5,
+    "kcalKg": 4080.0,
+    "packagesKg": [
+      1.0,
+      3.0,
+      7.5,
+      13.0,
+      17.5
+    ]
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
+      "pro-plan-perros-adultos-calorias-reducidas-razas-medianas-y-grandes"
+    ],
+    "url": "https://purina.com.co/proplan/perros/calorias-reducidas/razas-medianas-grandes",
+    "verifiedOn": "2026-11-21",
+    "name": "Reduced Calorie Razas Medianas y Grandes",
+    "proteinMin": 26.0,
+    "fatMin": 4.0,
+    "fiberMax": 4.0,
+    "moistureMax": 12.0,
+    "ashMax": 8.5,
+    "kcalKg": 3150.0,
+    "packagesKg": [
+      3.0,
+      13.0
+    ]
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
+      "proplan-reduced-calorie-razas-pequenas"
+    ],
+    "url": "https://purina.com.co/proplan/perros/calorias-reducidas/razas-pequenas",
+    "verifiedOn": "2026-11-21",
+    "name": "Reduced Calorie Razas Pequeñas",
+    "proteinMin": 27.0,
+    "fatMin": 5.0,
+    "fiberMax": 14.0,
+    "moistureMax": 12.0,
+    "ashMax": 8.5,
+    "kcalKg": 3200.0,
+    "packagesKg": [
+      1.0,
+      3.0,
+      7.5
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gatos-adultos-con-piel-y-estomago-sensible-purina-pro-plan"
+    ],
+    "url": "https://purina.com.co/proplan/gatos/piel-estomago-sensible-producto",
+    "verifiedOn": "2026-11-21",
+    "name": "Sensitive Skin and Stomach Gato Adulto",
+    "moistureMax": 12.0,
+    "kcalKg": 4200.0,
+    "packagesKg": [
+      3.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "cat",
+    "handles": [
+      "pro-plan-gatos-adultos-esterilizados"
+    ],
+    "url": "https://purina.com.co/proplan/gatos/esterilizados-producto",
+    "verifiedOn": "2026-11-21",
+    "name": "Sterilized",
+    "proteinMin": 40.0,
+    "fatMin": 12.0,
+    "moistureMax": 12.0,
+    "ashMax": 8.5,
+    "kcalKg": 3750.0,
+    "packagesKg": [
+      1.0,
+      3.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
+      "purina-pro-plan-veterinary-diets-cardiocare-para-perros"
+    ],
+    "url": "https://purina.com.co/proplan/dietas-veterinarias/perros/cardiaco",
+    "verifiedOn": "2026-11-21",
+    "name": "Veterinary Diets Cardiocare",
+    "ashMax": 9.5,
+    "fiberMax": 5.5,
+    "proteinMin": 25.0,
+    "fatMin": 14.0,
+    "moistureMax": 12.5,
+    "packagesKg": [
+      2.72
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "cat",
+    "handles": [
+      "proplan-veterinary-dm-diabetes-gato"
+    ],
+    "url": "https://purina.com.co/proplan/dietas-veterinarias/gatos/diabetes",
+    "verifiedOn": "2026-11-21",
+    "name": "Veterinary Diets DM Diabetes Feline",
+    "moistureMax": 12.0,
+    "proteinMin": 51.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.0,
+    "ashMax": 7.7,
+    "packagesKg": [
+      2.72
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "cat",
+    "handles": [
+      "alimento-gato-pro-plan-veterinary-diets-ur-urinary-st-ox-feline"
+    ],
+    "url": "https://purina.com.co/proplan/veterinary-diets/gatos/urinario",
+    "verifiedOn": "2026-11-21",
+    "name": "Veterinary Diets UR Urinario ST/OX Feline",
+    "fiberMax": 8.5,
+    "ashMax": 9.5,
+    "proteinMin": 40.0,
+    "fatMin": 8.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      1.5
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
+      "pro-plan-perro-veterinary-diets-ur-cuidado-urinario"
+    ],
+    "url": "https://purina.com.co/proplan/veterinary-diets/perros/urinario",
+    "verifiedOn": "2026-11-21",
+    "name": "Veterinary Diets Urinario ST/OX Canine",
+    "moistureMax": 12.0,
+    "proteinMin": 21.0,
+    "fatMin": 9.0,
+    "fiberMax": 6.5,
+    "ashMax": 8.5,
+    "packagesKg": [
+      2.0
+    ]
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-ageing-11-para-gatos"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/ageing-11%2b-2561",
+    "verifiedOn": "2026-11-21",
+    "name": "Ageing 11+",
+    "packagesKg": [
+      2.0
+    ],
+    "protein": 30.0,
+    "fat": 17.0,
+    "fiber": 2.9,
+    "ash": 6.1,
+    "kcalKg": 4033.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-anallergenic-gato"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/vet-products/anallergenic-1950",
+    "verifiedOn": "2026-11-21",
+    "name": "Anallergenic Gato",
+    "packagesKg": [
+      2.0
+    ],
+    "proteinMin": 22.6,
+    "fatMin": 15.0,
+    "fiberMax": 4.2,
+    "moistureMax": 6.5,
+    "ashMax": 8.3,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-para-perro-royal-canin-veterinary-health-nutrition-anallergenic"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/anallergenic-4014",
+    "verifiedOn": "2026-11-21",
+    "name": "Anallergenic Perro",
+    "packagesKg": [
+      3.0
+    ],
+    "protein": 18.0,
+    "fat": 16.5,
+    "fiber": 2.0,
+    "ash": 6.2
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-para-perro-royal-canin-veterinary-health-nutrition-anallergenic-small-dog"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/anallergenic-small-dog-3317",
+    "verifiedOn": "2026-11-21",
+    "name": "Anallergenic Perro Pequeño",
+    "packagesKg": [
+      1.5
+    ],
+    "protein": 20.0,
+    "fat": 15.0,
+    "fiber": 1.9,
+    "ash": 7.2,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-british-shorthair-gato-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/british-shorthair--adult-2557",
+    "verifiedOn": "2026-11-21",
+    "name": "British Shorthair Adulto",
+    "packagesKg": [
+      2.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-bulldog-frances-perro-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/french-bulldog-adult-3991",
+    "verifiedOn": "2026-11-21",
+    "name": "Bulldog Francés Adulto",
+    "packagesKg": [
+      3.0,
+      9.0
+    ],
+    "protein": 26.0,
+    "fat": 18.0,
+    "fiber": 1.5,
+    "ash": 5.7,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-bulldog-frances-cachorro"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/french-bulldog-puppy-3990",
+    "verifiedOn": "2026-11-21",
+    "name": "Bulldog Francés Cachorro",
+    "packagesKg": [
+      3.0,
+      10.0
+    ],
+    "protein": 30.0,
+    "fat": 20.0,
+    "fiber": 1.2,
+    "ash": 8.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-royal-canin-breed-health-nutrition-bulldog-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/bulldog-adult-2590",
+    "verifiedOn": "2026-11-21",
+    "name": "Bulldog Inglés Adulto",
+    "packagesKg": [
+      3.0
+    ],
+    "protein": 24.0,
+    "fat": 14.0,
+    "fiber": 2.8,
+    "ash": 6.5
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-royal-canin-veterinary-health-nutrition-calm"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/vet-products/calm-3955",
+    "verifiedOn": "2026-11-21",
+    "name": "Calm Gato",
+    "packagesKg": [
+      1.995806
+    ],
+    "proteinMin": 34.0,
+    "fatMin": 9.0,
+    "fiberMax": 5.6,
+    "moistureMax": 8.0,
+    "kcalKg": 3448.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-calm-perro-pequeno"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/calm-dog-dry-3956",
+    "verifiedOn": "2026-11-21",
+    "name": "Calm Perro Pequeño",
+    "packagesKg": [
+      1.995806
+    ],
+    "proteinMin": 23.0,
+    "fatMin": 14.0,
+    "fiberMax": 3.4,
+    "moistureMax": 10.0,
+    "kcalKg": 3698.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-cardiac-perro"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/cardiac-3930",
+    "verifiedOn": "2026-11-21",
+    "name": "Cardiac Perro",
+    "packagesKg": [
+      2.0
+    ],
+    "protein": 26.0,
+    "fat": 20.0,
+    "fiber": 1.7,
+    "ash": 5.0,
+    "kcalKg": 4158.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-chihuahua-perro-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/chihuahua-adult-2210",
+    "verifiedOn": "2026-11-21",
+    "name": "Chihuahua Adulto",
+    "packagesKg": [
+      1.133981
+    ],
+    "proteinMin": 26.0,
+    "fatMin": 14.0,
+    "fiberMax": 3.6,
+    "moistureMax": 10.0,
+    "kcalKg": 3758.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-chihuahua-perro-adulto-8"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/chihuahua-adult-8%2b-2107",
+    "verifiedOn": "2026-11-21",
+    "name": "Chihuahua Adulto 8+",
+    "packagesKg": [
+      1.133981
+    ],
+    "proteinMin": 24.0,
+    "fatMin": 14.0,
+    "fiberMax": 3.3,
+    "moistureMax": 10.0,
+    "kcalKg": 3758.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-chihuahua-cachorro"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/chihuahua-puppy-2438",
+    "verifiedOn": "2026-11-21",
+    "name": "Chihuahua Cachorro",
+    "packagesKg": [
+      1.133981
+    ],
+    "proteinMin": 28.0,
+    "fatMin": 18.0,
+    "fiberMax": 4.0,
+    "moistureMax": 10.0,
+    "ashMax": 10.2,
+    "kcalKg": 3846.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-cocker-perro-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/cocker-adult-3969",
+    "verifiedOn": "2026-11-21",
+    "name": "Cocker Adulto",
+    "packagesKg": [
+      3.0
+    ],
+    "protein": 25.0,
+    "fat": 14.0,
+    "fiber": 1.4,
+    "ash": 5.1,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-cocker-cachorro"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/cocker-puppy-4133",
+    "verifiedOn": "2026-11-21",
+    "name": "Cocker Puppy",
+    "packagesKg": [
+      3.0
+    ],
+    "protein": 32.0,
+    "fat": 18.0,
+    "fiber": 1.8,
+    "ash": 7.7,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-dachshund-perro-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/dachshund-adult-3059",
+    "verifiedOn": "2026-11-21",
+    "name": "Dachshund Adult",
+    "packagesKg": [
+      1.5
+    ],
+    "protein": 28.0,
+    "fiber": 6.0,
+    "moisture": 4.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-dachshund-cachorro"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/dachshund-puppy-2437",
+    "verifiedOn": "2026-11-21",
+    "name": "Dachshund Perro Cachorro",
+    "packagesKg": [
+      1.133981
+    ],
+    "proteinMin": 28.0,
+    "fatMin": 14.0,
+    "fiberMax": 3.9,
+    "moistureMax": 10.0,
+    "kcalKg": 3649.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-digestive-care-mediano-perro-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/medium-digestive-care-3016",
+    "verifiedOn": "2026-11-21",
+    "name": "Digestive Care Perro Mediano",
+    "packagesKg": [
+      3.0
+    ],
+    "protein": 25.0,
+    "fat": 18.0,
+    "fiber": 1.8,
+    "ash": 6.2
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-digestive-care-mini-perro-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/mini-digestive-care-2447",
+    "verifiedOn": "2026-11-21",
+    "name": "Digestive Care Perro Miniatura",
+    "packagesKg": [
+      1.0
+    ],
+    "proteinMin": 28.0,
+    "fatMin": 20.0,
+    "fiberMax": 2.8,
+    "moistureMax": 9.0,
+    "ashMax": 6.7
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-early-renal-gato"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/vet-products/early-renal-1242",
+    "verifiedOn": "2026-11-21",
+    "name": "Early Renal Gato",
+    "packagesKg": [
+      1.5
+    ],
+    "protein": 28.0,
+    "fat": 14.0,
+    "fiber": 5.1,
+    "ash": 5.5,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-regular-fit-gato"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/fit-32-2520",
+    "verifiedOn": "2026-11-21",
+    "name": "Fit 32",
+    "packagesKg": [
+      0.4,
+      2.0,
+      4.0,
+      10.0
+    ],
+    "protein": 32.0,
+    "fat": 15.0,
+    "fiber": 4.6,
+    "ash": 7.2,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "alimento-seco-para-gato-royal-canin-veterinary-health-nutrition-gastro-intestinal"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/vet-products/gastrointestinal-3905",
+    "verifiedOn": "2026-11-21",
+    "name": "Gastroinstestinal Gato",
+    "packagesKg": [
+      0.4,
+      2.0
+    ],
+    "proteinMin": 30.0,
+    "fatMin": 20.0,
+    "fiberMax": 5.8,
+    "moistureMax": 6.5,
+    "ashMax": 9.3,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-medicado-para-perro-royal-canin-vhn-gastrointestinal-bajo-en-grasa",
+      "alimento-para-perro-royal-canin-veterinary-health-nutrition-gastro-intestinal-low-fat-dry"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/gastrointestinal-low-fat-3932",
+    "verifiedOn": "2026-11-21",
+    "name": "Gastrointestinal Bajo en Grasas Perro",
+    "packagesKg": [
+      2.99371,
+      7.983226
+    ],
+    "proteinMin": 20.0,
+    "fatMin": 4.5,
+    "fiberMax": 3.6,
+    "moistureMax": 10.0,
+    "kcalKg": 3237.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-royal-canin-veterinary-health-nutrition-gastro-intestinal-junior"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/gastrointestinal-puppy-3957",
+    "verifiedOn": "2026-11-21",
+    "name": "Gastrointestinal Cachorro",
+    "packagesKg": [
+      2.5
+    ],
+    "protein": 29.0,
+    "fiber": 1.3,
+    "ash": 7.9,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "alimento-seco-para-gato-royal-canin-veterinary-health-nutrition-gastrointestinal-moderate-calorie"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/vet-products/gastrointestinal-moderate-calorie-4008",
+    "verifiedOn": "2026-11-21",
+    "name": "Gastrointestinal Calorías Moderadas",
+    "packagesKg": [
+      2.0
+    ],
+    "protein": 35.0,
+    "fiber": 5.2,
+    "ash": 7.8,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "alimento-seco-para-gato-royal-canin-veterinary-health-nutrition-gastrointestinal-fibre-response"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/vet-products/gastrointestinal-fibre-response-4007",
+    "verifiedOn": "2026-11-21",
+    "name": "Gastrointestinal Fibre Response",
+    "packagesKg": [
+      2.0
+    ],
+    "protein": 31.0,
+    "fiber": 2.9,
+    "ash": 7.3,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-gastrointestinal-high-fibre-perro"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/gastrointestinal-high-fibre-3959",
+    "verifiedOn": "2026-11-21",
+    "name": "Gastrointestinal High Fibre Perro",
+    "packagesKg": [
+      2.0
+    ],
+    "protein": 23.2,
+    "fat": 16.1,
+    "fiber": 11.1,
+    "ash": 7.4,
+    "kcalKg": 3171.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-gastrointestinal-hydrolyzed-protein-para-gatos"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/vet-products/gastrointestinal-hydrolyzed--protein-2735",
+    "verifiedOn": "2026-11-21",
+    "name": "Gastrointestinal Hydrolyzed Protein",
+    "packagesKg": [
+      2.99371
+    ],
+    "proteinMin": 29.0,
+    "fatMin": 18.0,
+    "fiberMax": 6.7,
+    "moistureMax": 7.5,
+    "kcalKg": 3870.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "alimento-seco-para-gato-royal-canin-veterinary-health-nutrition-gastrointestinal-kitten"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/vet-products/gastrointestinal-kitten-1228",
+    "verifiedOn": "2026-11-21",
+    "name": "Gastrointestinal Kitten",
+    "packagesKg": [
+      0.4,
+      2.0
+    ],
+    "protein": 35.0,
+    "fiber": 2.0,
+    "ash": 8.7,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-gastrointestinal-low-fat-hydrolyzed-protein-perro"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/gastrointestinal-low-fat-%2b-hydrolyzed-protein-2734",
+    "verifiedOn": "2026-11-21",
+    "name": "Gastrointestinal Low Fat + Hydrolyzed Protein Perro",
+    "packagesKg": [
+      1.496855
+    ],
+    "proteinMin": 23.0,
+    "fatMin": 5.0,
+    "fiberMax": 3.2,
+    "moistureMax": 10.5,
+    "kcalKg": 3280.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-royal-canin-veterinary-health-nutrition-gastro-intestinal"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/gastrointestinal-3911",
+    "verifiedOn": "2026-11-21",
+    "name": "Gastrointestinal Perro",
+    "packagesKg": [
+      2.0,
+      7.5
+    ],
+    "protein": 25.0,
+    "fiber": 1.9,
+    "ash": 6.6,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-royal-canin-feline-breed-nutrition-bengal"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/bengal-adult-4370",
+    "verifiedOn": "2026-11-21",
+    "name": "Gato Bengala Adulto",
+    "packagesKg": [
+      2.0
+    ],
+    "protein": 40.0,
+    "fat": 18.0,
+    "fiber": 3.8,
+    "ash": 7.7
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-glycobalance-para-gatos"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/vet-products/glycobalance-3906",
+    "verifiedOn": "2026-11-21",
+    "name": "Glycobalance",
+    "packagesKg": [
+      1.995806
+    ],
+    "proteinMin": 44.0,
+    "fatMin": 10.0,
+    "fiberMax": 6.7,
+    "moistureMax": 8.0,
+    "kcalKg": 3519.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-golden-retriever-perro-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/golden-retriever-adult-3970",
+    "verifiedOn": "2026-11-21",
+    "name": "Golden Retriever Adulto",
+    "packagesKg": [
+      13.607771
+    ],
+    "proteinMin": 23.0,
+    "fatMin": 11.0,
+    "fiberMax": 5.7,
+    "moistureMax": 10.0,
+    "ashMax": 8.7
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-golden-retriever-cachorro"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/golden-retriever-puppy-3979",
+    "verifiedOn": "2026-11-21",
+    "name": "Golden Retriever Cachorros",
+    "packagesKg": [
+      12.0
+    ],
+    "protein": 29.0,
+    "fat": 16.0,
+    "fiber": 3.7,
+    "ash": 7.4,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-hair-skin-care-gatos"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/hair-and-skin-care-2526",
+    "verifiedOn": "2026-11-21",
+    "name": "Hair And Skin Care",
+    "packagesKg": [
+      0.4,
+      2.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-hairball-bola-de-pelos"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/hairball-care-2534",
+    "verifiedOn": "2026-11-21",
+    "name": "Hairball Care Gato",
+    "packagesKg": [
+      2.721554
+    ],
+    "proteinMin": 32.0,
+    "fatMin": 13.0,
+    "fiberMax": 8.5,
+    "moistureMax": 7.5,
+    "kcalKg": 3564.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-royal-canin-veterinary-health-nutrition-hepatic"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/vet-products/hepatic-4012",
+    "verifiedOn": "2026-11-21",
+    "name": "Hepatic",
+    "packagesKg": [
+      2.0,
+      4.0
+    ],
+    "protein": 26.0,
+    "fiber": 5.1,
+    "ash": 6.2,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-royal-canin-veterinary-health-nutrition-hepatic-dry"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/hepatic-3927",
+    "verifiedOn": "2026-11-21",
+    "name": "Hepatic Perro",
+    "packagesKg": [
+      3.492661,
+      11.974839
+    ],
+    "proteinMin": 14.0,
+    "fatMin": 14.0,
+    "fiberMax": 3.6,
+    "moistureMax": 10.0,
+    "kcalKg": 3768.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-royal-canin-veterinary-health-nutrition-hydrolyzed-protein"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/vet-products/hydrolyzed-protein-hp-3902",
+    "verifiedOn": "2026-11-21",
+    "name": "Hydrolyzed Protein HP Adulto Gato",
+    "packagesKg": [
+      3.492661
+    ],
+    "proteinMin": 24.0,
+    "fatMin": 18.0,
+    "fiberMax": 5.7,
+    "moistureMax": 8.0,
+    "kcalKg": 3930.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-hypoallergenic-satiety-para-perros"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/hypoallergenic-%2b-satiety-1083",
+    "verifiedOn": "2026-11-21",
+    "name": "Hypoallergenic + Satiety",
+    "packagesKg": [
+      3.5
+    ],
+    "protein": 30.0,
+    "fat": 9.5,
+    "fiber": 16.6,
+    "ash": 5.7,
+    "kcalKg": 2586.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-medicado-royal-canin-vhn-hipoalergenico-para-perro-cachorro"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/hypoallergenic-puppy-3318",
+    "verifiedOn": "2026-11-21",
+    "name": "Hypoallergenic Cachorro",
+    "packagesKg": [
+      1.5
+    ],
+    "protein": 23.0,
+    "fat": 19.0,
+    "fiber": 1.0,
+    "ash": 8.1,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-hypoallergenic-moderate-calorie-para-perros"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/hypoallergenic-moderate-calorie-3964",
+    "verifiedOn": "2026-11-21",
+    "name": "Hypoallergenic Moderate Calorie",
+    "packagesKg": [
+      1.5
+    ],
+    "protein": 23.0,
+    "fat": 12.0,
+    "fiber": 1.1,
+    "ash": 7.0,
+    "kcalKg": 3722.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "alimento-seco-para-gato-royal-canin-feline-health-nutrition-indoor27-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/indoor-27-2529",
+    "verifiedOn": "2026-11-21",
+    "name": "Indoor 27",
+    "packagesKg": [
+      0.4,
+      2.0
+    ],
+    "protein": 27.0,
+    "fiber": 4.0,
+    "ash": 7.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "alimento-seco-para-gato-royal-canin-feline-health-nutrition-indoor-7"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/indoor-7%2b-2548",
+    "verifiedOn": "2026-11-21",
+    "name": "Indoor 7+ Gato",
+    "packagesKg": [
+      1.133981
+    ],
+    "kcalKg": 3587.0,
+    "proteinMin": 27.0,
+    "fatMin": 11.0,
+    "fiberMax": 5.5,
+    "moistureMax": 8.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-mini-indoor-cachorro"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/puppy-indoor---mini-2433",
+    "verifiedOn": "2026-11-21",
+    "name": "Indoor Cachorro pequeño",
+    "packagesKg": [
+      1.5
+    ],
+    "protein": 27.0,
+    "fat": 18.0,
+    "fiber": 1.5,
+    "ash": 7.9,
+    "kcalKg": 3959.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-kitten-gatitos"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/kitten-2522",
+    "verifiedOn": "2026-11-21",
+    "name": "KITTEN",
+    "packagesKg": [
+      0.4,
+      2.0,
+      4.0,
+      10.0
+    ],
+    "protein": 36.0,
+    "fat": 18.0,
+    "fiber": 2.3,
+    "ash": 7.8,
+    "kcalKg": 4083.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-royal-canin-feline-health-nutrition-kitten-sterilised",
+      "royal-canin-alimento-gatitos-esterilizados"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/kitten-sterilised-2562",
+    "verifiedOn": "2026-11-21",
+    "name": "KITTEN STERILISED",
+    "packagesKg": [
+      0.4,
+      2.0
+    ],
+    "protein": 34.0,
+    "fat": 12.0,
+    "fiber": 9.8,
+    "ash": 7.4,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-maine-coon-gato-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/maine-coon-adult-2550",
+    "verifiedOn": "2026-11-21",
+    "name": "Maine Coon Gato Adulto",
+    "packagesKg": [
+      2.0,
+      4.0
+    ],
+    "protein": 31.0,
+    "fat": 20.0,
+    "fiber": 5.0,
+    "ash": 7.4,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-maine-coon-kitten-gatitos"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/maine-coon-kitten-2558",
+    "verifiedOn": "2026-11-21",
+    "name": "Maine Coon Kitten",
+    "packagesKg": [
+      2.0,
+      4.0,
+      10.0
+    ],
+    "protein": 36.0,
+    "fat": 23.0,
+    "fiber": 2.9,
+    "ash": 8.3,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-perro-maxi-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/maxi-adult-3007",
+    "verifiedOn": "2026-11-21",
+    "name": "Maxi Perro Adulto",
+    "packagesKg": [
+      4.0,
+      15.0
+    ],
+    "protein": 26.0,
+    "fat": 17.0,
+    "fiber": 1.3,
+    "ash": 7.6,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-royal-canin-shn-mini-ageing-12"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/mini-ageing-12%2b-1007",
+    "verifiedOn": "2026-11-21",
+    "name": "Mini Ageing 12+",
+    "packagesKg": [
+      1.5
+    ],
+    "fiber": 1.5,
+    "ash": 5.5,
+    "kcalKg": 3854.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-dermacomfort-mini-perro-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/mini-dermacomfort-2441",
+    "verifiedOn": "2026-11-21",
+    "name": "Mini Dermacomfort",
+    "packagesKg": [
+      3.0
+    ],
+    "protein": 25.5,
+    "fat": 17.0,
+    "fiber": 1.4,
+    "ash": 5.3,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-mini-exigente-perro-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/mini-exigent-1006",
+    "verifiedOn": "2026-11-21",
+    "name": "Mini Exigente",
+    "packagesKg": [
+      1.0,
+      3.0
+    ],
+    "protein": 30.0,
+    "fat": 22.0,
+    "fiber": 2.6,
+    "ash": 4.8,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-perro-mini-indoor-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/mini-indoor-adult-2434",
+    "verifiedOn": "2026-11-21",
+    "name": "Mini Indoor Adulto",
+    "packagesKg": [
+      1.5
+    ],
+    "protein": 21.0,
+    "fat": 14.0,
+    "fiber": 1.7,
+    "ash": 6.9,
+    "kcalKg": 3770.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-royal-canin-canine-care-nutrition-mini-light-weight-care"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/mini-light-weight-care-3018",
+    "verifiedOn": "2026-11-21",
+    "name": "Mini Light Weight Care",
+    "packagesKg": [
+      1.0
+    ],
+    "protein": 30.0,
+    "fat": 11.0,
+    "fiber": 8.6,
+    "ash": 5.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-perro-mini-adulto-8"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/mini-adult-8%2b-3002",
+    "verifiedOn": "2026-11-21",
+    "name": "Mini Perro Adulto 8+",
+    "packagesKg": [
+      2.0
+    ],
+    "protein": 27.0,
+    "fat": 16.0,
+    "fiber": 1.5,
+    "ash": 6.3,
+    "kcalKg": 3923.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-esterilizado-mini-perro-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/mini-sterilised-3185",
+    "verifiedOn": "2026-11-21",
+    "name": "Mini Sterilised",
+    "packagesKg": [
+      1.0,
+      3.0
+    ],
+    "protein": 30.0,
+    "fat": 13.0,
+    "fiber": 6.6,
+    "ash": 5.4,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-royal-canin-feline-health-nutrition-mother-babycat"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/mother-%26-babycat-2544",
+    "verifiedOn": "2026-11-21",
+    "name": "Mother & Babycat",
+    "packagesKg": [
+      0.4,
+      2.0
+    ],
+    "protein": 34.0,
+    "fat": 25.0,
+    "fiber": 1.7,
+    "ash": 7.3,
+    "kcalKg": 4437.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-pastor-aleman-5-perro-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/german-shepherd-5%2b-1340",
+    "verifiedOn": "2026-11-21",
+    "name": "Pastor Alemán 5+",
+    "packagesKg": [
+      12.0
+    ],
+    "protein": 25.0,
+    "fat": 19.0,
+    "fiber": 3.6,
+    "ash": 6.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-royal-canin-breed-health-nutrition-german-shepherd-adulto",
+      "royal-canin-pastor-aleman-perro-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/german-shepherd-adult-2518",
+    "verifiedOn": "2026-11-21",
+    "name": "Pastor Alemán Adulto",
+    "packagesKg": [
+      13.607771
+    ],
+    "proteinMin": 22.0,
+    "fatMin": 17.0,
+    "fiberMax": 5.5,
+    "moistureMax": 10.0,
+    "ashMax": 9.4,
+    "kcalKg": 3771.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-pastor-aleman-cachorro"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/german-shepherd-puppy-2519",
+    "verifiedOn": "2026-11-21",
+    "name": "Pastor Alemán Cachorro",
+    "packagesKg": [
+      13.607771
+    ],
+    "proteinMin": 28.0,
+    "fatMin": 14.0,
+    "fiberMax": 3.8,
+    "moistureMax": 10.0,
+    "ashMax": 10.6,
+    "kcalKg": 3639.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-royal-canin-size-health-nutrition-mini-puppy",
+      "royal-canin-mini-cachorro"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/puppy---mini-3000",
+    "verifiedOn": "2026-11-21",
+    "name": "Perro Cachorro Miniatura",
+    "packagesKg": [
+      0.8,
+      2.0,
+      8.0
+    ],
+    "protein": 31.0,
+    "fat": 20.0,
+    "fiber": 1.4,
+    "ash": 8.0,
+    "kcalKg": 4072.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-royal-canin-size-health-nutrition-giant-puppy",
+      "royal-canin-giant-cachorro"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/puppy---giant-3030",
+    "verifiedOn": "2026-11-21",
+    "name": "Perro Gigante Cachorro",
+    "packagesKg": [
+      15.0
+    ],
+    "protein": 34.0,
+    "fat": 14.0,
+    "fiber": 1.3,
+    "ash": 7.9,
+    "kcalKg": 3812.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-perro-maxi-adulto-5"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/maxi-adult-5%2b-3008",
+    "verifiedOn": "2026-11-21",
+    "name": "Perro Maxi Adulto 5+",
+    "packagesKg": [
+      15.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-maxi-cachorro"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/puppy---maxi-3006",
+    "verifiedOn": "2026-11-21",
+    "name": "Perro Maxi Cachorro",
+    "packagesKg": [
+      1.0,
+      4.0,
+      15.0
+    ],
+    "protein": 30.0,
+    "fat": 16.0,
+    "fiber": 2.5,
+    "ash": 7.6,
+    "kcalKg": 3812.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-perro-mediano-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/medium-adult-3004",
+    "verifiedOn": "2026-11-21",
+    "name": "Perro Mediano Adulto",
+    "packagesKg": [
+      4.0,
+      15.0
+    ],
+    "fiber": 1.4,
+    "ash": 6.2,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-perro-mediano-adulto-7"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/medium-adult-7%2b-3005",
+    "verifiedOn": "2026-11-21",
+    "name": "Perro Mediano Adulto 7+",
+    "packagesKg": [
+      4.0
+    ],
+    "protein": 25.0,
+    "fat": 14.0,
+    "fiber": 1.6,
+    "ash": 5.2,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-mediano-cachorro"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/puppy---medium-3003",
+    "verifiedOn": "2026-11-21",
+    "name": "Perro Mediano Cachorro",
+    "packagesKg": [
+      1.0,
+      4.0,
+      10.0
+    ],
+    "protein": 32.0,
+    "fat": 20.4,
+    "fiber": 1.6,
+    "ash": 8.3,
+    "kcalKg": 4125.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-perro-mini-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/mini-adult-3001",
+    "verifiedOn": "2026-11-21",
+    "name": "Perro Miniatura Adulto",
+    "packagesKg": [
+      0.8,
+      2.0,
+      4.0,
+      8.0
+    ],
+    "fiber": 1.3,
+    "ash": 6.8,
+    "kcalKg": 3920.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-perro-x-small-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/x-small-adult-1003",
+    "verifiedOn": "2026-11-21",
+    "name": "Perro X-Small Adulto",
+    "packagesKg": [
+      0.5,
+      1.5,
+      3.0
+    ],
+    "fiber": 1.7,
+    "ash": 5.6,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-persian-gato-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/persian-adult-2552",
+    "verifiedOn": "2026-11-21",
+    "name": "Persian Adulto",
+    "packagesKg": [
+      0.4,
+      2.0,
+      4.0,
+      10.0
+    ],
+    "protein": 30.0,
+    "fat": 22.0,
+    "fiber": 4.7,
+    "ash": 7.4
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-persian-kitten-gatitos"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/persian-kitten-2554",
+    "verifiedOn": "2026-11-21",
+    "name": "Persian Kitten",
+    "packagesKg": [
+      0.4,
+      2.0
+    ],
+    "protein": 32.0,
+    "fat": 22.0,
+    "fiber": 2.7,
+    "ash": 7.9,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-pomeranian-perro-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/pomeranian-adult-1255",
+    "verifiedOn": "2026-11-21",
+    "name": "Pomeranian Adulto",
+    "packagesKg": [
+      0.5,
+      1.5,
+      3.0
+    ]
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-poodle-perro-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/poodle-adult-3057",
+    "verifiedOn": "2026-11-21",
+    "name": "Poodle Adulto",
+    "packagesKg": [
+      1.5
+    ],
+    "protein": 30.0,
+    "fat": 19.0,
+    "fiber": 2.1,
+    "ash": 5.5,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-royal-canin-veterinary-health-nutrition-hydrolyzed-protein"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/hydrolyzed-protein-hp-3910",
+    "verifiedOn": "2026-11-21",
+    "name": "Proteína Hidrolizada HP Perro Adulto",
+    "packagesKg": [
+      3.492661,
+      7.983226,
+      11.475887
+    ],
+    "proteinMin": 19.0,
+    "fatMin": 17.5,
+    "fiberMax": 3.4,
+    "moistureMax": 10.0,
+    "kcalKg": 3845.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-royal-canin-veterinary-health-nutrition-hydrolyzed-protein-small-dog"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/hydrolyzed-protein-small-dog-3952",
+    "verifiedOn": "2026-11-21",
+    "name": "Proteína Hidrolizada Perro Pequeño",
+    "packagesKg": [
+      3.991613
+    ],
+    "proteinMin": 22.0,
+    "fatMin": 14.0,
+    "fiberMax": 2.6,
+    "moistureMax": 10.0,
+    "kcalKg": 3653.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-pug-perro-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/pug-adult-3985",
+    "verifiedOn": "2026-11-21",
+    "name": "Pug Adulto",
+    "packagesKg": [
+      3.0
+    ],
+    "protein": 25.0,
+    "fat": 16.0,
+    "fiber": 2.0,
+    "ash": 5.8,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-ragdoll-gato-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/ragdoll-adult-2515",
+    "verifiedOn": "2026-11-21",
+    "name": "Ragdoll Adulto",
+    "packagesKg": [
+      2.0
+    ],
+    "protein": 32.0,
+    "fat": 18.0,
+    "fiber": 4.1,
+    "ash": 7.6
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-renal-hypoallergenic-para-perros"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/renal-%2b-hypoallergenic-6501",
+    "verifiedOn": "2026-11-21",
+    "name": "Renal + Hypoallergenic",
+    "packagesKg": [
+      4.0
+    ],
+    "protein": 14.0,
+    "fat": 19.0,
+    "fiber": 2.3,
+    "ash": 4.2,
+    "kcalKg": 4031.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-renal-hypoallergenic-gato"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/vet-products/renal-%2b-hyppoallergenic-6531",
+    "verifiedOn": "2026-11-21",
+    "name": "Renal + Hypoallergenic Gato",
+    "packagesKg": [
+      2.0
+    ],
+    "ash": 5.7,
+    "kcalKg": 4102.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-renal-mobility-para-gatos"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/vet-products/renal-%2b-mobility-8083",
+    "verifiedOn": "2026-11-21",
+    "name": "Renal + Mobility",
+    "packagesKg": [
+      2.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-renal-mobility-para-perros"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/renal-%2b-mobility-1247",
+    "verifiedOn": "2026-11-21",
+    "name": "Renal + Mobility",
+    "packagesKg": [
+      3.5
+    ],
+    "protein": 13.5,
+    "fat": 17.5,
+    "fiber": 2.3,
+    "ash": 4.0,
+    "kcalKg": 3966.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-royal-canin-veterinary-health-nutrition-renal"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/vet-products/renal-3900",
+    "verifiedOn": "2026-11-21",
+    "name": "Renal Gato",
+    "packagesKg": [
+      0.4,
+      2.0
+    ],
+    "protein": 23.0,
+    "fat": 17.0,
+    "fiber": 4.6,
+    "ash": 5.9,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-renal-perro-pequeno"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/renal-small-dog-1249",
+    "verifiedOn": "2026-11-21",
+    "name": "Renal Perro Pequeño",
+    "packagesKg": [
+      1.5
+    ],
+    "ash": 4.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "alimento-seco-para-gato-royal-canin-veterinary-health-nutrition-renal-special"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/vet-products/renal-special-3949",
+    "verifiedOn": "2026-11-21",
+    "name": "Renal Special",
+    "packagesKg": [
+      0.4,
+      2.0
+    ],
+    "protein": 26.0,
+    "fat": 17.0,
+    "fiber": 4.8,
+    "ash": 6.2,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-royal-canin-veterinary-health-nutrition-satiety-weight-management"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/royal-canin-veterinary-diet-satiety-support-weight-management-canine-dry-diet-3948",
+    "verifiedOn": "2026-11-21",
+    "name": "Satiety Perro",
+    "packagesKg": [
+      3.492661,
+      7.983226,
+      11.974839
+    ],
+    "proteinMin": 28.0,
+    "fatMin": 7.5,
+    "fiberMax": 18.8,
+    "moistureMax": 10.0,
+    "kcalKg": 2880.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-royal-canin-veterinary-health-nutrition-satiety"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/vet-products/satiety-weight-management-3943",
+    "verifiedOn": "2026-11-21",
+    "name": "Satiety Weight Management",
+    "packagesKg": [
+      1.5
+    ],
+    "protein": 34.0,
+    "fiber": 14.6,
+    "ash": 8.6,
+    "kcalKg": 3040.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-royal-canin-veterinary-health-nutrition-satiety-small-weight-management"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/satiety-weight-management-small-dog-4252",
+    "verifiedOn": "2026-11-21",
+    "name": "Satiety Weight Management Perro Pequeño",
+    "packagesKg": [
+      1.5
+    ],
+    "protein": 30.0,
+    "fat": 9.5,
+    "fiber": 15.6,
+    "ash": 6.8,
+    "kcalKg": 2696.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-royal-canin-breed-health-nutrition-miniature-schnauzer"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/miniature-schnauzer-adult-2220",
+    "verifiedOn": "2026-11-21",
+    "name": "Schnauzer Miniatura Adulto",
+    "packagesKg": [
+      4.535924
+    ],
+    "proteinMin": 23.0,
+    "fatMin": 10.0,
+    "fiberMax": 3.7,
+    "moistureMax": 10.0,
+    "ashMax": 9.7,
+    "kcalKg": 3474.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-royal-canin-feline-health-nutrition-sensible"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/sensible-33-2521",
+    "verifiedOn": "2026-11-21",
+    "name": "Sensible 33",
+    "packagesKg": [
+      0.4,
+      2.0
+    ],
+    "protein": 33.0,
+    "fat": 22.0,
+    "fiber": 1.5,
+    "ash": 7.3,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-shih-tzu-perro-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/shih-tzu-adult-2200",
+    "verifiedOn": "2026-11-21",
+    "name": "Shih Tzu Adulto",
+    "packagesKg": [
+      0.5,
+      1.5,
+      3.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-shih-tzu-cachorro"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/shih-tzu-puppy-2439",
+    "verifiedOn": "2026-11-21",
+    "name": "Shih Tzu Puppy",
+    "packagesKg": [
+      0.5
+    ],
+    "ash": 7.6,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-siamese-gato-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/siamese-adult-2551",
+    "verifiedOn": "2026-11-21",
+    "name": "Siamés Adulto",
+    "packagesKg": [
+      2.0
+    ],
+    "protein": 38.0,
+    "fat": 16.0,
+    "fiber": 1.4,
+    "ash": 7.7,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-skin-care-perro"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/skin-care-4013",
+    "verifiedOn": "2026-11-21",
+    "name": "Skin Care Perro",
+    "packagesKg": [
+      2.0
+    ],
+    "protein": 23.0,
+    "fat": 16.0,
+    "fiber": 2.0,
+    "ash": 5.6,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-medicado-para-perro-royal-canin-vhn-skintopic-razas-pequenas"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/skintopic-small-dog-3315",
+    "verifiedOn": "2026-11-21",
+    "name": "Skintopic Perro Miniatura",
+    "packagesKg": [
+      1.5
+    ],
+    "protein": 25.0,
+    "fat": 14.0,
+    "fiber": 1.4,
+    "ash": 7.9,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-soporte-renal-f-perro"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/renal-support-f-4161",
+    "verifiedOn": "2026-11-21",
+    "name": "Soporte Renal F Perro",
+    "packagesKg": [
+      2.721554
+    ],
+    "proteinMin": 11.5,
+    "fatMin": 14.0,
+    "fiberMax": 3.9,
+    "moistureMax": 10.0,
+    "kcalKg": 3779.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-royal-canin-veterinary-health-nutrition-renal-support-s"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/renal-support-s-4162",
+    "verifiedOn": "2026-11-21",
+    "name": "Soporte Renal S Perro",
+    "packagesKg": [
+      2.721554,
+      7.983226
+    ],
+    "proteinMin": 10.5,
+    "fatMin": 16.0,
+    "fiberMax": 3.7,
+    "kcalKg": 3879.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-sphynx-gato-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/sphynx-adult-2556",
+    "verifiedOn": "2026-11-21",
+    "name": "Sphynx Adult",
+    "packagesKg": [
+      2.0
+    ],
+    "protein": 33.0,
+    "fat": 23.0,
+    "fiber": 5.0,
+    "ash": 7.3,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-perro-royal-canin-size-health-nutrition-mini-starter-mother-and-baby"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/starter-mother-%26-babydog---mini-2990",
+    "verifiedOn": "2026-11-21",
+    "name": "Starter Mother & Babydog Perro Miniatura",
+    "packagesKg": [
+      1.0
+    ],
+    "protein": 30.0,
+    "fat": 22.0,
+    "fiber": 1.3,
+    "ash": 8.5,
+    "kcalKg": 4209.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-royal-canin-feline-health-nutrition-sterilised"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/sterilised-37-2537",
+    "verifiedOn": "2026-11-21",
+    "name": "Sterilised 37",
+    "packagesKg": [
+      0.4,
+      2.0,
+      4.0,
+      10.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-royal-canin-feline-health-nutrition-sterilised-7"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/sterilised-7%2b-2560",
+    "verifiedOn": "2026-11-21",
+    "name": "Sterilised 7+",
+    "packagesKg": [
+      1.5
+    ],
+    "protein": 36.0,
+    "fat": 12.0,
+    "fiber": 5.3,
+    "ash": 7.6,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "royal-canin-urinary-care-gatos"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/retail-products/urinary-care-1800",
+    "verifiedOn": "2026-11-21",
+    "name": "Urinary Care",
+    "packagesKg": [
+      0.4,
+      2.0
+    ],
+    "protein": 33.0,
+    "fat": 13.0,
+    "fiber": 5.0,
+    "ash": 6.6,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-royal-canin-veterinary-health-nutrition-urinary-so-dry"
+    ],
+    "url": "https://www.royalcanin.com/co/cats/products/vet-products/urinary-so-3901",
+    "verifiedOn": "2026-11-21",
+    "name": "Urinary S/O",
+    "packagesKg": [
+      0.4,
+      1.5,
+      3.5
+    ],
+    "protein": 34.5,
+    "fat": 15.0,
+    "fiber": 2.9,
+    "ash": 8.9,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-urinary-s-o-hypoallergenic-para-perros"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/urinary-so-%2b-hypoallergenic-6500",
+    "verifiedOn": "2026-11-21",
+    "name": "Urinary S/O + Hypoallergenic",
+    "packagesKg": [
+      3.5
+    ],
+    "protein": 20.0,
+    "fat": 15.0,
+    "fiber": 2.4,
+    "ash": 8.3,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-urinary-s-o-satiety-para-perros"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/urinary-so-%2b-satiety-6502",
+    "verifiedOn": "2026-11-21",
+    "name": "Urinary S/O + Satiety",
+    "packagesKg": [
+      3.5
+    ],
+    "protein": 30.0,
+    "fat": 9.0,
+    "fiber": 16.3,
+    "ash": 7.3,
+    "kcalKg": 2661.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-urinary-s-o-satiety-small-dogs-para-perros"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/urinary-so-%2b-satiety-small-dogs-8064",
+    "verifiedOn": "2026-11-21",
+    "name": "Urinary S/O + Satiety Small Dogs",
+    "packagesKg": [
+      3.0
+    ],
+    "proteinMin": 28.0,
+    "fatMin": 7.5,
+    "fiberMax": 17.3,
+    "moistureMax": 10.5,
+    "ashMax": 8.0,
+    "kcalKg": 2564.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-royal-canin-veterinary-health-nutrition-urinary-small-dog"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/urinary-so-small-dog-3801",
+    "verifiedOn": "2026-11-21",
+    "name": "Urinary S/O Perro Pequeño",
+    "packagesKg": [
+      4.0
+    ],
+    "protein": 20.0,
+    "fat": 17.0,
+    "fiber": 2.3,
+    "ash": 7.3,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-royal-canin-veterinary-health-nutrition-urinary-so"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/urinary-so-3913",
+    "verifiedOn": "2026-11-21",
+    "name": "Urinary SO Perro",
+    "packagesKg": [
+      2.99371,
+      7.983226
+    ],
+    "proteinMin": 17.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.7,
+    "moistureMax": 10.0,
+    "kcalKg": 3741.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-yorkshire-terrier-8-perro-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/yorkshire-terrier-8%2b-1260",
+    "verifiedOn": "2026-11-21",
+    "name": "Yorkshire Terrier 8+",
+    "packagesKg": [
+      1.5
+    ],
+    "protein": 29.0,
+    "fat": 18.0,
+    "fiber": 2.9,
+    "ash": 5.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-yorkshire-terrier-perro-adulto"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/yorkshire-terrier-adult-3051",
+    "verifiedOn": "2026-11-21",
+    "name": "Yorkshire Terrier Adult",
+    "packagesKg": [
+      1.133981,
+      4.535924
+    ],
+    "proteinMin": 26.0,
+    "fatMin": 16.0,
+    "fiberMax": 5.3,
+    "moistureMax": 10.0,
+    "ashMax": 7.4,
+    "kcalKg": 3798.0
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
+      "royal-canin-yorkshire-terrier-cachorro"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/yorkshire-terrier-puppy-3972",
+    "verifiedOn": "2026-11-21",
+    "name": "Yorkshire Terrier Cachorro",
+    "packagesKg": [
+      1.133981
+    ],
+    "proteinMin": 27.0,
+    "fatMin": 18.0,
+    "fiberMax": 3.5,
+    "moistureMax": 10.0,
+    "ashMax": 10.0,
+    "kcalKg": 3870.0
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "dog",
+    "handles": [
+      "taste-of-the-wild-ancient-mountain"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/dog/ancient-grains/ancient-mountain-with-roasted-lamb",
+    "verifiedOn": "2026-11-21",
+    "name": "Ancient Mountain Canine Recipe with Roasted Lamb",
+    "proteinMin": 25.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3625.0,
+    "complete": true,
+    "packagesKg": [
+      2.267962,
+      6.350293,
+      12.700586
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "dog",
+    "handles": [
+      "taste-of-the-wild-ancient-praire"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/dog/ancient-grains/ancient-prairie-with-roasted-bison-roasted-venison",
+    "verifiedOn": "2026-11-21",
+    "name": "Ancient Prairie Canine Recipe with Roasted Bison & Roasted Venison",
+    "proteinMin": 32.0,
+    "fatMin": 18.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3920.0,
+    "complete": true,
+    "packagesKg": [
+      2.267962,
+      6.350293,
+      12.700586
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "dog",
+    "handles": [
+      "taste-of-the-wild-ancient-stream"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/dog/ancient-grains/ancient-stream-with-smoke-flavored-salmon",
+    "verifiedOn": "2026-11-21",
+    "name": "Ancient Stream Canine Recipe with Smoke-Flavored Salmon",
+    "proteinMin": 30.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3640.0,
+    "complete": true,
+    "packagesKg": [
+      2.267962,
+      6.350293,
+      12.700586
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "dog",
+    "handles": [
+      "taste-of-the-wild-ancient-wetlands-perro"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/dog/ancient-grains/ancient-wetlands-with-roasted-fowl",
+    "verifiedOn": "2026-11-21",
+    "name": "Ancient Wetlands Canine Recipe with Roasted Fowl",
+    "proteinMin": 32.0,
+    "fatMin": 18.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3750.0,
+    "complete": true,
+    "packagesKg": [
+      2.267962,
+      6.350293,
+      12.700586
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-tow-prey-angus-beef"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/cat/prey/angus-beef-limited-ingredient-for-cats",
+    "verifiedOn": "2026-11-21",
+    "name": "Angus Beef Limited Ingredient Recipe for Cats",
+    "proteinMin": 30.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3650.0,
+    "complete": true,
+    "packagesKg": [
+      2.721554,
+      6.803886
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-tow-prey-angus-beef"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/dog/prey/angus-beef-limited-ingredient-for-dogs",
+    "verifiedOn": "2026-11-21",
+    "name": "Angus Beef Limited Ingredient Recipe for Dogs",
+    "proteinMin": 27.0,
+    "fatMin": 15.0,
+    "fiberMax": 5.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3630.0,
+    "complete": true,
+    "packagesKg": [
+      3.628739,
+      11.339809
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "dog",
+    "handles": [
+      "taste-of-the-wild-apalachan-valley-small-breed-venado-y-garbanzos"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/dog/grain-free/appalachian-valley-small-breed-with-venison-garbanzo-beans",
+    "verifiedOn": "2026-11-21",
+    "name": "Appalachian Valley Small Breed Canine Recipe with Venison & Garbanzo Beans",
+    "proteinMin": 32.0,
+    "fatMin": 18.0,
+    "fiberMax": 4.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3719.0,
+    "complete": true,
+    "packagesKg": [
+      2.267962,
+      6.350293,
+      12.700586
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "cat",
+    "handles": [
+      "taste-of-the-wild-canyon-river-trsal"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/cat/grain-free/canyon-river-with-trout-smoke-flavored-salmon",
+    "verifiedOn": "2026-11-21",
+    "name": "Canyon River Feline Recipe with Trout & Smoke-Flavored Salmon",
+    "proteinMin": 32.0,
+    "fatMin": 16.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3741.0,
+    "complete": true,
+    "packagesKg": [
+      2.267962,
+      6.350293
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "dog",
+    "handles": [
+      "taste-of-the-wild-high-praire-canine-roasted-bison-venison"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/dog/grain-free/high-prairie-with-roasted-bison-roasted-venison",
+    "verifiedOn": "2026-11-21",
+    "name": "High Prairie Canine Recipe with Roasted Bison & Roasted Venison",
+    "proteinMin": 32.0,
+    "fatMin": 18.0,
+    "fiberMax": 4.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3719.0,
+    "complete": true,
+    "packagesKg": [
+      2.267962,
+      6.350293,
+      12.700586
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "dog",
+    "handles": [
+      "taste-of-the-wild-highpr-for-bison-puppy"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/dog/grain-free/high-prairie-puppy-with-roasted-bison-roasted-venison",
+    "verifiedOn": "2026-11-21",
+    "name": "High Prairie Puppy Recipe with Roasted Bison & Roasted Venison",
+    "proteinMin": 28.0,
+    "fatMin": 17.0,
+    "fiberMax": 5.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3656.0,
+    "complete": true,
+    "packagesKg": [
+      2.267962,
+      6.350293,
+      12.700586
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "cat",
+    "handles": [
+      "taste-of-the-wild-lowland-creek-codorniz-y-pato"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/cat/grain-free/lowland-creek-with-roasted-quail-roasted-duck",
+    "verifiedOn": "2026-11-21",
+    "name": "Lowland Creek Feline Recipe with Roasted Quail & Roasted Duck",
+    "proteinMin": 36.0,
+    "fatMin": 16.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3558.0,
+    "complete": true,
+    "packagesKg": [
+      2.267962,
+      6.350293
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "dog",
+    "handles": [
+      "taste-of-the-wild-pacific-salmon"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/dog/grain-free/pacific-stream-with-smoke-flavored-salmon",
+    "verifiedOn": "2026-11-21",
+    "name": "Pacific Stream Canine Recipe with Smoke-Flavored Salmon",
+    "proteinMin": 25.0,
+    "fatMin": 15.0,
+    "fiberMax": 5.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3600.0,
+    "complete": true,
+    "packagesKg": [
+      2.267962,
+      6.350293,
+      12.700586
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "dog",
+    "handles": [
+      "taste-of-the-wild-puppy-pacific-for-salmon"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/dog/grain-free/pacific-stream-puppy-with-smoke-flavored-salmon",
+    "verifiedOn": "2026-11-21",
+    "name": "Pacific Stream Puppy Recipe with Smoke-Flavored Salmon",
+    "proteinMin": 27.0,
+    "fatMin": 15.0,
+    "fiberMax": 5.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3600.0,
+    "complete": true,
+    "packagesKg": [
+      2.267962,
+      6.350293,
+      12.700586
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "dog",
+    "handles": [
+      "taste-of-the-wild-pine-forest-venado"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/dog/grain-free/pine-forest-with-venison-legumes",
+    "verifiedOn": "2026-11-21",
+    "name": "Pine Forest Canine Recipe with Venison & Legumes",
+    "proteinMin": 28.0,
+    "fatMin": 15.0,
+    "fiberMax": 4.5,
+    "moistureMax": 10.0,
+    "kcalKg": 3600.0,
+    "complete": true,
+    "packagesKg": [
+      2.267962,
+      6.350293,
+      12.700586
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "cat",
+    "handles": [
+      "taste-of-the-wild-rocky-mountain"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/cat/grain-free/rocky-mountain-with-roasted-venison-smoke-flavored-salmon",
+    "verifiedOn": "2026-11-21",
+    "name": "Rocky Mountain Feline Recipe with Roasted Venison & Smoke-Flavored Salmon",
+    "proteinMin": 42.0,
+    "fatMin": 18.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3745.0,
+    "complete": true,
+    "packagesKg": [
+      2.267962,
+      6.350293
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "dog",
+    "handles": [
+      "taste-of-the-wild-sierra-mountain"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/dog/grain-free/sierra-mountain-with-roasted-lamb",
+    "verifiedOn": "2026-11-21",
+    "name": "Sierra Mountain Canine Recipe with Roasted Lamb",
+    "proteinMin": 25.0,
+    "fatMin": 15.0,
+    "fiberMax": 5.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3611.0,
+    "complete": true,
+    "packagesKg": [
+      2.267962,
+      6.350293,
+      12.700586
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "dog",
+    "handles": [
+      "taste-of-the-wild-southwest-canyon"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/dog/grain-free/southwest-canyon-with-wild-boar",
+    "verifiedOn": "2026-11-21",
+    "name": "Southwest Canyon Canine Recipe with Wild Boar",
+    "proteinMin": 29.0,
+    "fatMin": 15.0,
+    "fiberMax": 5.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3600.0,
+    "complete": true,
+    "packagesKg": [
+      2.267962,
+      6.350293,
+      12.700586
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-taste-of-the-wild-tow-prey-trout"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/dog/prey/trout-limited-ingredient-for-dogs",
+    "verifiedOn": "2026-11-21",
+    "name": "Trout Limited Ingredient Recipe for Dogs",
+    "proteinMin": 27.0,
+    "fatMin": 15.0,
+    "fiberMax": 5.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3592.0,
+    "complete": true,
+    "packagesKg": [
+      3.628739,
+      11.339809
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-taste-of-the-wild-tow-prey-turkey"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/cat/prey/turkey-limited-ingredient-for-cats",
+    "verifiedOn": "2026-11-21",
+    "name": "Turkey Limited Ingredient Recipe for Cats",
+    "proteinMin": 33.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3689.0,
+    "complete": true,
+    "packagesKg": [
+      2.721554,
+      6.803886
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-taste-of-the-wild-tow-prey-turkey"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/dog/prey/turkey-limited-ingredient-for-dogs",
+    "verifiedOn": "2026-11-21",
+    "name": "Turkey Limited Ingredient Recipe for Dogs",
+    "proteinMin": 30.0,
+    "fatMin": 15.0,
+    "fiberMax": 5.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3670.0,
+    "complete": true,
+    "packagesKg": [
+      3.628739,
+      11.339809
+    ]
+  },
+  {
+    "brand": "Taste of the Wild",
+    "species": "dog",
+    "handles": [
+      "taste-of-the-wild-wetlands"
+    ],
+    "url": "https://www.tasteofthewildpetfood.com/dog/grain-free/wetlands-with-roasted-fowl",
+    "verifiedOn": "2026-11-21",
+    "name": "Wetlands Canine Recipe with Roasted Fowl",
+    "proteinMin": 32.0,
+    "fatMin": 18.0,
+    "fiberMax": 4.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3750.0,
+    "complete": true,
+    "packagesKg": [
+      2.267962,
+      6.350293,
+      12.700586
+    ]
+  },
+  {
+    "brand": "Vet Life",
+    "species": "cat",
+    "handles": [
+      "vet-life-gatos-diabeticos"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-gato/vet-life-natural-feline/259-diabetic-feline.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Diabetic Feline",
+    "packagesKg": [
+      0.4,
+      2.0
+    ],
+    "moistureMax": 8.0,
+    "proteinMin": 46.0,
+    "fatMin": 13.0,
+    "fiberMax": 4.6,
+    "ashMax": 7.9,
+    "kcalKg": 3710
+  },
+  {
+    "brand": "Vet Life",
+    "species": "dog",
+    "handles": [
+      "vet-life-perros-gastro-intestinal"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/vet-life-natural-canine/289-gastro-intestinal-canine.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Gastro-Intestinal Canine",
+    "packagesKg": [
+      2.0,
+      10.1
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 23.0,
+    "fatMin": 10.5,
+    "fiberMax": 2.0,
+    "ashMax": 7.5,
+    "kcalKg": 3590
+  },
+  {
+    "brand": "Vet Life",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-vet-life-gastrointestinal"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-gato/vet-life-natural-feline/303-gastro-intestinal-feline.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Gastro-Intestinal Feline",
+    "packagesKg": [
+      0.4,
+      2.0
+    ],
+    "moistureMax": 8.0,
+    "proteinMin": 33.0,
+    "fatMin": 21.5,
+    "fiberMax": 1.7,
+    "ashMax": 7.5,
+    "kcalKg": 4170
+  },
+  {
+    "brand": "Vet Life",
+    "species": "dog",
+    "handles": [
+      "vet-life-perros-hepaticos"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/vet-life-natural-canine/466-hepatic-canine.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Hepatic Canine",
+    "packagesKg": [
+      2.0,
+      10.1
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 16.0,
+    "fatMin": 18.0,
+    "fiberMax": 3.0,
+    "ashMax": 5.8,
+    "kcalKg": 3900
+  },
+  {
+    "brand": "Vet Life",
+    "species": "dog",
+    "handles": [
+      "vet-life-perros-hipoalergenicos"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/vet-life-natural-canine/292-hypoallergenic-canine.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Hypoallergenic Canine",
+    "packagesKg": [
+      2.0,
+      10.1
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 15.5,
+    "fatMin": 13.0,
+    "fiberMax": 1.3,
+    "ashMax": 6.5,
+    "kcalKg": 3760
+  },
+  {
+    "brand": "Vet Life",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-vet-life-hypoallergenic-mini-breeds"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/vet-life-natural-canine/416-hypoallergenic-mini-canine.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Hypoallergenic Mini Canine",
+    "packagesKg": [
+      2.0
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 15.5,
+    "fatMin": 13.0,
+    "fiberMax": 1.3,
+    "ashMax": 6.5,
+    "kcalKg": 3760
+  },
+  {
+    "brand": "Vet Life",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-vet-life-obesidad-y-diabetes"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/vet-life-natural-canine/294-obesity-&-diabetic-canine.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Obesity & Diabetic Canine",
+    "packagesKg": [
+      2.0,
+      10.1
+    ],
+    "moistureMax": 10.0,
+    "proteinMin": 22.0,
+    "fatMin": 7.0,
+    "fiberMax": 7.8,
+    "ashMax": 7.5,
+    "kcalKg": 2950
+  },
+  {
+    "brand": "Vet Life",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-vet-life-obesidad-y-diabetes-mini-breeds"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/vet-life-natural-canine/417-obesity-&-diabetic-mini-canine.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Obesity & Diabetic Mini Canine",
+    "packagesKg": [
+      2.0
+    ],
+    "moistureMax": 10.0,
+    "proteinMin": 22.0,
+    "fatMin": 7.0,
+    "fiberMax": 7.8,
+    "ashMax": 7.5,
+    "kcalKg": 2950
+  },
+  {
+    "brand": "Vet Life",
+    "species": "cat",
+    "handles": [
+      "vet-life-gatos-obesos"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-gato/vet-life-natural-feline/304-obesity-feline.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Obesity Feline",
+    "packagesKg": [
+      0.4,
+      2.0
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 43.0,
+    "fatMin": 9.0,
+    "fiberMax": 10.0,
+    "ashMax": 8.0,
+    "kcalKg": 3240
+  },
+  {
+    "brand": "Vet Life",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-vet-life-renal"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/vet-life-natural-canine/295-renal-canine.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Renal Canine",
+    "packagesKg": [
+      2.0,
+      10.1
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 13.3,
+    "fatMin": 17.0,
+    "fiberMax": 1.6,
+    "ashMax": 4.6,
+    "kcalKg": 3990
+  },
+  {
+    "brand": "Vet Life",
+    "species": "cat",
+    "handles": [
+      "vet-life-gatos-renal"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-gato/vet-life-natural-feline/305-renal-feline.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Renal Feline",
+    "packagesKg": [
+      0.4,
+      2.0
+    ],
+    "moistureMax": 8.0,
+    "proteinMin": 24.5,
+    "fatMin": 20.0,
+    "fiberMax": 1.2,
+    "ashMax": 5.8,
+    "kcalKg": 4140
+  },
+  {
+    "brand": "Vet Life",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-vet-life-renal-mini-breeds"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/vet-life-natural-canine/418-renal-mini-canine.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Renal Mini Canine",
+    "packagesKg": [
+      2.0,
+      10.1
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 13.3,
+    "fatMin": 17.0,
+    "fiberMax": 1.6,
+    "ashMax": 4.6,
+    "kcalKg": 3990
+  },
+  {
+    "brand": "Vet Life",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-vet-life-ultrahypo-mini-breeds"
+    ],
+    "url": "https://www.farmina.com/co/eshop/alimento-para-su-perro/vet-life-natural-canine/564-ultrahypo-mini-canine.html",
+    "verifiedOn": "2026-11-21",
+    "name": "UltraHypo Mini Canine",
+    "packagesKg": [
+      2.0
+    ],
+    "moistureMax": 9.0,
+    "proteinMin": 18.0,
+    "fatMin": 15.0,
+    "fiberMax": 2.0,
+    "ashMax": 6.0,
+    "kcalKg": 3840
+  }
+]

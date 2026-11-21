@@ -1,0 +1,1449 @@
+[
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC 1st Care",
+    "species": "dog",
+    "handles": [
+      "nupec-1st-care-cachorro"
+    ],
+    "url": "https://nupec.com/es/nutricion-canina/nutricion-especializada/1st-care",
+    "verifiedOn": "2026-11-21",
+    "fatMin": 21.0,
+    "fiberMax": 4.0,
+    "ashMax": 7.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      2.0,
+      8.0
+    ],
+    "kcalKg": 4000,
+    "kcalSourceUrl": "https://cdn.sanity.io/files/qyunqto3/production/59204c96ba6595ae74b35b4a84efabc04c244c51.pdf"
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC FELINO Indoor",
+    "species": "cat",
+    "handles": [
+      "nupec-adulto-indoor-gato"
+    ],
+    "url": "https://nupec.com/es/nutricion-felina/nutricion-diaria/felino-indoor",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 32.0,
+    "fatMin": 14.0,
+    "fiberMax": 3.0,
+    "ashMax": 7.5,
+    "basis": "materia_seca",
+    "packagesKg": [
+      1.5,
+      3.0,
+      5.0
+    ]
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Adulto",
+    "species": "dog",
+    "handles": [
+      "nupec-adulto-perro-raza-mediana-y-grande"
+    ],
+    "url": "https://nupec.com/es/nutricion-canina/nutricion-diaria/adulto",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 24.0,
+    "fatMin": 12.0,
+    "fiberMax": 4.0,
+    "ashMax": 8.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      2.0,
+      5.0,
+      8.0,
+      15.0,
+      20.0
+    ],
+    "kcalKg": 3500,
+    "kcalSourceUrl": "https://cdn.sanity.io/files/qyunqto3/production/840d53418ed657ab18381cb53a504e32023b713a.pdf"
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Adulto Razas Mini",
+    "species": "dog",
+    "handles": [
+      "nupec-adulto-perro-razas-mini-3-kg"
+    ],
+    "url": "https://nupec.com/es/nutricion-canina/nutricion-diaria/adulto-razas-mini",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 25.0,
+    "fatMin": 14.0,
+    "fiberMax": 4.0,
+    "ashMax": 8.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      1.0,
+      3.0
+    ]
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Adulto Razas Pequeñas",
+    "species": "dog",
+    "handles": [
+      "nupec-adulto-raza-pequena"
+    ],
+    "url": "https://nupec.com/es/nutricion-canina/nutricion-diaria/adulto-razas-pequenas",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 24.0,
+    "fatMin": 12.0,
+    "fiberMax": 4.0,
+    "ashMax": 8.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      2.0,
+      8.0
+    ]
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Cachorro",
+    "species": "dog",
+    "handles": [
+      "nupec-cachorro-raza-mediana-y-grande"
+    ],
+    "url": "https://nupec.com/es/nutricion-canina/nutricion-diaria/cachorro",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 28.0,
+    "fatMin": 14.0,
+    "fiberMax": 4.0,
+    "ashMax": 8.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      2.0,
+      5.0,
+      8.0,
+      15.0,
+      20.0
+    ],
+    "kcalKg": 3600,
+    "kcalSourceUrl": "https://cdn.sanity.io/files/qyunqto3/production/51c9463efa3ca549e1800bf6b79f5f4f9b14fcc6.pdf"
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Cachorro Razas Pequeñas",
+    "species": "dog",
+    "handles": [
+      "nupec-cachorro-raza-pequena"
+    ],
+    "url": "https://nupec.com/es/nutricion-canina/nutricion-diaria/cachorro-razas-pequenas",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 28.0,
+    "fatMin": 14.0,
+    "fiberMax": 4.0,
+    "ashMax": 8.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      2.0,
+      8.0
+    ],
+    "kcalKg": 3600,
+    "kcalSourceUrl": "https://cdn.sanity.io/files/qyunqto3/production/f09a607bd239ff84ec5feb5221dede4c13ffe937.pdf"
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Cachorro Razas Mini",
+    "species": "dog",
+    "handles": [
+      "nupec-cachorro-razas-mini-3-kg"
+    ],
+    "url": "https://nupec.com/es/nutricion-canina/nutricion-diaria/cachorro-razas-mini",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 29.0,
+    "fatMin": 17.0,
+    "fiberMax": 4.0,
+    "ashMax": 8.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      1.0,
+      3.0
+    ]
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Digestive Health",
+    "species": "dog",
+    "handles": [
+      "nupec-digestive-health-adulto"
+    ],
+    "url": "https://nupec.com/es/nutricion-canina/nutricion-especializada/digestive-health",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 26.0,
+    "fatMin": 15.0,
+    "fiberMax": 4.5,
+    "ashMax": 11.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      2.0,
+      5.0
+    ],
+    "kcalKg": 3650,
+    "kcalSourceUrl": "https://cdn.sanity.io/files/qyunqto3/production/a1550e8ecc6c757f76c8a0f8857883378da30fe7.pdf"
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Digestive Health",
+    "species": "cat",
+    "handles": [
+      "nupec-felino-digestive-health"
+    ],
+    "url": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-digestive-health",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 31.0,
+    "fatMin": 17.5,
+    "fiberMax": 6.5,
+    "ashMax": 7.5,
+    "basis": "materia_seca",
+    "packagesKg": [
+      1.5,
+      3.0
+    ]
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Felino Hairball",
+    "species": "cat",
+    "handles": [
+      "nupec-felino-hairball-control"
+    ],
+    "url": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-hairball",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 32.0,
+    "fatMin": 13.0,
+    "fiberMax": 7.0,
+    "ashMax": 7.5,
+    "basis": "materia_seca",
+    "packagesKg": [
+      1.5,
+      3.0
+    ]
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC FELINO Kitten",
+    "species": "cat",
+    "handles": [
+      "nupec-felino-kitten"
+    ],
+    "url": "https://nupec.com/es/nutricion-felina/nutricion-diaria/felino-kitten",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 35.0,
+    "fatMin": 18.0,
+    "fiberMax": 3.0,
+    "ashMax": 7.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      1.5,
+      3.0
+    ]
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Renal Care",
+    "species": "cat",
+    "handles": [
+      "nupec-felino-renal-care-1-5-kg"
+    ],
+    "url": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-renal-care",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 26.0,
+    "fatMin": 17.0,
+    "fiberMax": 4.0,
+    "ashMax": 5.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      1.5
+    ]
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC FELINO Senior",
+    "species": "cat",
+    "handles": [
+      "nupec-felino-senior"
+    ],
+    "url": "https://nupec.com/es/nutricion-felina/nutricion-diaria/felino-senior",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 34.0,
+    "fatMin": 14.0,
+    "fiberMax": 5.0,
+    "ashMax": 8.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      1.5,
+      3.0
+    ]
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Felino Weight Care",
+    "species": "cat",
+    "handles": [
+      "nupec-felino-weight-care-adulto"
+    ],
+    "url": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-weight-care",
+    "verifiedOn": "2026-11-21",
+    "fiberMax": 4.5,
+    "ashMax": 8.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      1.5,
+      3.0
+    ]
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC High Performance",
+    "species": "dog",
+    "handles": [
+      "nupec-high-performance-perro-adulto"
+    ],
+    "url": "https://nupec.com/es/nutricion-canina/nutricion-especializada/high-performance",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 30.0,
+    "fatMin": 22.0,
+    "fiberMax": 4.0,
+    "ashMax": 7.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      8.0,
+      20.0
+    ],
+    "kcalKg": 3950,
+    "kcalSourceUrl": "https://cdn.sanity.io/files/qyunqto3/production/e433d6cf6b7dfd520e0a64437bedf199e6d61fe5.pdf"
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Senior Razas Mini",
+    "species": "dog",
+    "handles": [
+      "nupec-perro-senior-razas-mini-3-kg"
+    ],
+    "url": "https://nupec.com/es/nutricion-canina/nutricion-diaria/senior-razas-mini",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 27.0,
+    "fatMin": 14.0,
+    "fiberMax": 4.5,
+    "ashMax": 8.5,
+    "basis": "materia_seca",
+    "packagesKg": [
+      1.0,
+      3.0
+    ],
+    "kcalKg": 3500,
+    "kcalSourceUrl": "https://cdn.sanity.io/files/qyunqto3/production/a3389f98796350c33f51720a14c19a69ce8a8cfc.pdf"
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Senior",
+    "species": "dog",
+    "handles": [
+      "nupec-senior-perro-adulto-mayor"
+    ],
+    "url": "https://nupec.com/es/nutricion-canina/nutricion-diaria/senior",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 29.0,
+    "fatMin": 12.0,
+    "fiberMax": 4.5,
+    "ashMax": 7.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      2.0,
+      8.0,
+      15.0
+    ]
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Senior Razas Pequeñas",
+    "species": "dog",
+    "handles": [
+      "nupec-senior-razas-pequenas"
+    ],
+    "url": "https://nupec.com/es/nutricion-canina/nutricion-diaria/senior-razas-pequenas",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 29.0,
+    "fatMin": 12.0,
+    "fiberMax": 4.5,
+    "ashMax": 7.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      2.0,
+      8.0
+    ],
+    "kcalKg": 3500,
+    "kcalSourceUrl": "https://cdn.sanity.io/files/qyunqto3/production/24ca51d0105ad1ba591206fbf1591abc4a3b6172.pdf"
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Sensitive",
+    "species": "dog",
+    "handles": [
+      "nupec-sensitive-perro-adulto"
+    ],
+    "url": "https://nupec.com/es/nutricion-canina/nutricion-especializada/sensitive",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 20.0,
+    "fatMin": 18.0,
+    "fiberMax": 5.0,
+    "ashMax": 7.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      2.0,
+      8.0,
+      15.0
+    ],
+    "kcalKg": 3800,
+    "kcalSourceUrl": "https://cdn.sanity.io/files/qyunqto3/production/0f138f63fa9b61279705c334b78f375bd01e7939.pdf"
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Sensitive Razas Pequeñas",
+    "species": "dog",
+    "handles": [
+      "nupec-sensitive-raza-pequena"
+    ],
+    "url": "https://nupec.com/es/nutricion-canina/nutricion-especializada/sensitive-razas-pequenas",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 20.0,
+    "fatMin": 18.0,
+    "fiberMax": 5.0,
+    "ashMax": 7.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      2.0,
+      8.0
+    ],
+    "kcalKg": 3000,
+    "kcalSourceUrl": "https://cdn.sanity.io/files/qyunqto3/production/4e90b717914163b3977a916ca1feb7814da96e1c.pdf"
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Urinary Management",
+    "species": "cat",
+    "handles": [
+      "nupec-urinary-management-gato"
+    ],
+    "url": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-urinary-management",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 32.5,
+    "fatMin": 12.5,
+    "fiberMax": 4.0,
+    "ashMax": 6.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      1.5,
+      3.0
+    ]
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Urinary Management",
+    "species": "dog",
+    "handles": [
+      "nupec-urinary-management-perro"
+    ],
+    "url": "https://nupec.com/es/nutricion-canina/nutricion-especializada/urinary-management",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 19.0,
+    "fatMin": 16.0,
+    "fiberMax": 4.5,
+    "ashMax": 6.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      2.0,
+      5.0
+    ],
+    "kcalKg": 3700,
+    "kcalSourceUrl": "https://cdn.sanity.io/files/qyunqto3/production/b81c9d79a0adfe7c83bfaad9f40e5e4f797e0046.pdf"
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Weight Control",
+    "species": "dog",
+    "handles": [
+      "nupec-weight-control"
+    ],
+    "url": "https://nupec.com/es/nutricion-canina/nutricion-especializada/weight-control",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 26.0,
+    "fatMin": 8.0,
+    "fiberMax": 12.0,
+    "ashMax": 9.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      2.0,
+      8.0,
+      15.0
+    ],
+    "kcalKg": 3000,
+    "kcalSourceUrl": "https://cdn.sanity.io/files/qyunqto3/production/082bf2ff81a533ba67519f6a948b972096299990.pdf"
+  },
+  {
+    "brand": "NUPEC",
+    "name": "NUPEC Weight Control Razas Pequeñas",
+    "species": "dog",
+    "handles": [
+      "nupec-weight-control-raza-pequena"
+    ],
+    "url": "https://nupec.com/es/nutricion-canina/nutricion-especializada/weight-control-razas-pequenas",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 26.0,
+    "fatMin": 8.0,
+    "fiberMax": 12.0,
+    "ashMax": 9.0,
+    "basis": "materia_seca",
+    "packagesKg": [
+      2.0,
+      8.0
+    ],
+    "kcalKg": 3000,
+    "kcalSourceUrl": "https://cdn.sanity.io/files/qyunqto3/production/d42ea5694872d0fd7e1af1fa311bb6af368de4fb.pdf"
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY CHICKEN ADULT CAT",
+    "species": "cat",
+    "handles": [
+      "bravery-chicken-adult-cat"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-chicken-adult-cat/",
+    "verifiedOn": "2026-11-21",
+    "protein": 32.0,
+    "fat": 16.0,
+    "fiber": 3.7,
+    "moisture": 8.0,
+    "ash": 8.2,
+    "packagesKg": [
+      2.0,
+      7.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY CHICKEN ADULT CAT STERILIZED",
+    "species": "cat",
+    "handles": [
+      "bravery-chicken-adult-cat-sterilized"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-chicken-adult-cat-sterilized/",
+    "verifiedOn": "2026-11-21",
+    "protein": 33.0,
+    "fat": 12.0,
+    "fiber": 5.0,
+    "moisture": 8.0,
+    "ash": 7.9,
+    "packagesKg": [
+      2.0,
+      7.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY DOG CHICKEN ADULT LARGE/MEDIUM BREEDS",
+    "species": "dog",
+    "handles": [
+      "bravery-chicken-adult-large-medium-breeds",
+      "bravery-chicken-adult-large-medium-breeds-catalogo"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-dog-chicken-adult-large-medium-breeds/",
+    "verifiedOn": "2026-11-21",
+    "protein": 26.0,
+    "fat": 15.0,
+    "fiber": 2.5,
+    "moisture": 9.0,
+    "ash": 7.9,
+    "packagesKg": [
+      4.0,
+      12.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY CHICKEN KITTEN",
+    "species": "cat",
+    "handles": [
+      "bravery-chicken-kitten"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-chicken-kitten/",
+    "verifiedOn": "2026-11-21",
+    "protein": 38.0,
+    "fat": 18.0,
+    "fiber": 1.9,
+    "moisture": 8.0,
+    "ash": 7.8,
+    "packagesKg": [
+      2.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY DOG CHICKEN MINI ADULT SMALL BREEDS",
+    "species": "dog",
+    "handles": [
+      "bravery-chicken-mini-adult-small-breeds"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-dog-chicken-mini-adult-small-breeds/",
+    "verifiedOn": "2026-11-21",
+    "protein": 28.0,
+    "fat": 17.0,
+    "fiber": 2.4,
+    "moisture": 9.0,
+    "ash": 7.9,
+    "packagesKg": [
+      2.0,
+      7.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY DOG CHICKEN MINI PUPPY SMALL BREEDS",
+    "species": "dog",
+    "handles": [
+      "bravery-chicken-mini-puppy-small-breeds"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-chicken-mini-puppy-small-breeds/",
+    "verifiedOn": "2026-11-21",
+    "protein": 31.0,
+    "fat": 20.0,
+    "fiber": 2.4,
+    "moisture": 9.0,
+    "ash": 7.8,
+    "packagesKg": [
+      2.0,
+      7.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY DOG CHICKEN PUPPY RAZAS MEDIAS/GRANDES BREEDS",
+    "species": "dog",
+    "handles": [
+      "bravery-chicken-puppy-large-medium-breeds"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-dog-chicken-puppy-razas-medias-grandes-breeds/",
+    "verifiedOn": "2026-11-21",
+    "protein": 30.0,
+    "fat": 18.0,
+    "fiber": 2.4,
+    "moisture": 9.0,
+    "ash": 7.8,
+    "packagesKg": [
+      4.0,
+      12.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY HERRING ADULT CAT",
+    "species": "cat",
+    "handles": [
+      "bravery-herring-adult-cat"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-herring-adult-cat/",
+    "verifiedOn": "2026-11-21",
+    "protein": 32.0,
+    "fat": 16.0,
+    "fiber": 3.7,
+    "moisture": 8.0,
+    "ash": 8.2,
+    "packagesKg": [
+      2.0,
+      7.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY HERRING ADULT CAT STERILIZED",
+    "species": "cat",
+    "handles": [
+      "bravery-herring-adult-cat-sterilized"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-herring-adult-cat-sterilized/",
+    "verifiedOn": "2026-11-21",
+    "protein": 33.0,
+    "fat": 12.0,
+    "fiber": 5.0,
+    "moisture": 8.0,
+    "ash": 7.9,
+    "packagesKg": [
+      2.0,
+      7.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY DOG HERRING ADULT MED-LARGE BREEDS",
+    "species": "dog",
+    "handles": [
+      "bravery-herring-adult-large-medium-breeds"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-herring-adult-med-large/",
+    "verifiedOn": "2026-11-21",
+    "protein": 26.0,
+    "fat": 15.0,
+    "fiber": 2.5,
+    "moisture": 9.0,
+    "ash": 7.9,
+    "packagesKg": [
+      4.0,
+      12.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY DOG HERRING MINI ADULT SMALL BREEDS",
+    "species": "dog",
+    "handles": [
+      "bravery-herring-mini-adult-small-breeds"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-herring-mini-adult/",
+    "verifiedOn": "2026-11-21",
+    "protein": 28.0,
+    "fat": 17.0,
+    "fiber": 2.4,
+    "moisture": 9.0,
+    "ash": 7.9,
+    "kcalKg": 3900,
+    "packagesKg": [
+      2.0,
+      7.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY DOG HERRING MINI SENIOR SMALL BREEDS",
+    "species": "dog",
+    "handles": [
+      "bravery-herring-mini-senior-small-breeds"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-dog-herring-mini-senior-small-breeds/",
+    "verifiedOn": "2026-11-21",
+    "protein": 29.0,
+    "fat": 15.0,
+    "fiber": 6.0,
+    "moisture": 9.0,
+    "ash": 6.2,
+    "packagesKg": [
+      2.0,
+      7.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY HERRING SENIOR CAT",
+    "species": "cat",
+    "handles": [
+      "bravery-herring-senior-cat"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-herring-senior-cat/",
+    "verifiedOn": "2026-11-21",
+    "protein": 35.0,
+    "fat": 12.0,
+    "fiber": 6.0,
+    "moisture": 8.0,
+    "ash": 6.7,
+    "packagesKg": [
+      2.0,
+      7.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY DOG HERRING SENIOR MED-LARGE BREEDS",
+    "species": "dog",
+    "handles": [
+      "bravery-herring-senior-med-large-breeds"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-dog-herring-senior-med-large-breeds/",
+    "verifiedOn": "2026-11-21",
+    "protein": 27.0,
+    "fat": 13.0,
+    "fiber": 6.0,
+    "moisture": 9.0,
+    "ash": 6.2,
+    "packagesKg": [
+      4.0,
+      12.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY DOG IBERIAN PORK ADULT LARGE/MEDIUM BREEDS",
+    "species": "dog",
+    "handles": [
+      "bravery-iberian-pork-adult-large-medium-breeds"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-dog-iberian-pork-adult-large-medium-breeds/",
+    "verifiedOn": "2026-11-21",
+    "protein": 26.0,
+    "fat": 15.0,
+    "fiber": 2.5,
+    "moisture": 9.0,
+    "ash": 7.9,
+    "packagesKg": [
+      4.0,
+      12.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY DOG IBERIAN PORK MINI ADULT SMALL BREEDS",
+    "species": "dog",
+    "handles": [
+      "bravery-iberian-pork-mini-adult-small-breeds"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-dog-iberian-pork-mini-adult-small-breeds/",
+    "verifiedOn": "2026-11-21",
+    "protein": 28.0,
+    "fat": 17.0,
+    "fiber": 2.4,
+    "moisture": 9.0,
+    "ash": 7.9,
+    "packagesKg": [
+      2.0,
+      7.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY DOG LAMB ADULT LARGE/MEDIUM BREEDS",
+    "species": "dog",
+    "handles": [
+      "bravery-lamb-adult-large-medium-breed"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-dog-lamb-adult-large-medium-breeds/",
+    "verifiedOn": "2026-11-21",
+    "protein": 26.0,
+    "fat": 15.0,
+    "fiber": 2.5,
+    "moisture": 9.0,
+    "ash": 7.9,
+    "packagesKg": [
+      4.0,
+      12.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY DOG LAMB MINI ADULT SMALL BREEDS",
+    "species": "dog",
+    "handles": [
+      "bravery-lamb-mini-adult-small-breeds"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-dog-lamb-mini-adult-small-breeds/",
+    "verifiedOn": "2026-11-21",
+    "protein": 28.0,
+    "fat": 17.0,
+    "fiber": 2.4,
+    "moisture": 9.0,
+    "ash": 7.9,
+    "packagesKg": [
+      2.0,
+      7.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY DOG IBERIAN PORK LIGHT ADULT LARGE/MEDIUM BREEDS",
+    "species": "dog",
+    "handles": [
+      "bravery-light-iberian-pork-adult-large-medium-breeds"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-dog-iberianpork-light-adult-large-medium-breeds/",
+    "verifiedOn": "2026-11-21",
+    "protein": 28.0,
+    "packagesKg": [
+      4.0,
+      12.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY DOG IBERIAN PORK LIGHT MINI ADULT SMALL BREEDS",
+    "species": "dog",
+    "handles": [
+      "bravery-light-iberian-pork-mini-adult-small-breeds"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-dog-iberianpork-light-mini-adult-small-breeds/",
+    "verifiedOn": "2026-11-21",
+    "protein": 30.0,
+    "packagesKg": [
+      2.0,
+      7.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY SALMON ADULT CAT",
+    "species": "cat",
+    "handles": [
+      "bravery-salmon-adult-cat"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-salmon-adult-cat/",
+    "verifiedOn": "2026-11-21",
+    "protein": 32.0,
+    "fat": 16.0,
+    "fiber": 3.7,
+    "moisture": 8.0,
+    "ash": 8.2,
+    "packagesKg": [
+      2.0,
+      7.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY SALMON ADULT CAT STERILIZED",
+    "species": "cat",
+    "handles": [
+      "bravery-salmon-adult-cat-sterilized"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-salmon-adult-cat-sterilized/",
+    "verifiedOn": "2026-11-21",
+    "protein": 33.0,
+    "fat": 12.0,
+    "fiber": 5.0,
+    "moisture": 8.0,
+    "ash": 7.9,
+    "packagesKg": [
+      2.0,
+      7.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY SALMON KITTEN",
+    "species": "cat",
+    "handles": [
+      "bravery-salmon-kitten"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-salmon-kitten/",
+    "verifiedOn": "2026-11-21",
+    "protein": 38.0,
+    "fat": 18.0,
+    "fiber": 1.9,
+    "moisture": 8.0,
+    "ash": 7.8,
+    "packagesKg": [
+      2.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY DOG SALMON MINI ADULT SMALL BREEDS",
+    "species": "dog",
+    "handles": [
+      "bravery-salmon-mini-adult-small-breeds"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-dog-salmon-mini-adult-small-breeds/",
+    "verifiedOn": "2026-11-21",
+    "protein": 28.0,
+    "fat": 17.0,
+    "fiber": 2.4,
+    "moisture": 9.0,
+    "ash": 7.9,
+    "packagesKg": [
+      2.0,
+      7.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Bravery",
+    "name": "BRAVERY DOG SALMON PUPPY RAZAS MEDIAS/GRANDES BREEDS",
+    "species": "dog",
+    "handles": [
+      "bravery-salmon-puppy-large-medium-breeds"
+    ],
+    "url": "https://www.braverypetfood.com/producto/bravery-salmon-puppy-large-medium-breeds/",
+    "verifiedOn": "2026-11-21",
+    "protein": 30.0,
+    "fat": 18.0,
+    "fiber": 2.4,
+    "moisture": 9.0,
+    "ash": 7.8,
+    "packagesKg": [
+      4.0,
+      12.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Monello",
+    "name": "Monello Especial Cães Sênior",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-para-perro-monello-senior"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/monello-premium-especial-caes-senior",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 25.0,
+    "fatMin": 10.0,
+    "fiberMax": 5.0,
+    "ashMax": 9.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3550,
+    "packagesKg": [
+      1.0,
+      10.1,
+      15.0
+    ]
+  },
+  {
+    "brand": "Monello",
+    "name": "Monello Especial Cães Filhotes",
+    "species": "dog",
+    "handles": [
+      "monello-cachorro"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/monello-premium-especial-caes-filhotes",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 30.0,
+    "fatMin": 12.0,
+    "fiberMax": 2.8,
+    "ashMax": 9.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3950,
+    "packagesKg": [
+      1.0,
+      7.0,
+      15.0,
+      25.0
+    ]
+  },
+  {
+    "brand": "Monello",
+    "name": "Monello Especial Gatos Adultos",
+    "species": "cat",
+    "handles": [
+      "monello-cat-adultos",
+      "monello-cat-adultos-copia"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/monello-premium-especial-gatos-adultos",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 31.0,
+    "fatMin": 12.0,
+    "fiberMax": 3.0,
+    "ashMax": 7.5,
+    "moistureMax": 10.0,
+    "kcalKg": 3950,
+    "packagesKg": [
+      1.0,
+      7.0,
+      10.1,
+      15.0
+    ]
+  },
+  {
+    "brand": "Monello",
+    "name": "Monello Especial Gatos Adultos Bolas de Pelos",
+    "species": "cat",
+    "handles": [
+      "monello-cat-adultos-bolas-de-pelos"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/monello-premium-especial-gatos-adultos-bolas-de-pelos",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 31.0,
+    "fatMin": 12.0,
+    "fiberMax": 5.5,
+    "ashMax": 7.5,
+    "moistureMax": 10.0,
+    "kcalKg": 3950,
+    "packagesKg": [
+      1.0,
+      7.0,
+      10.1,
+      15.0
+    ]
+  },
+  {
+    "brand": "Monello",
+    "name": "Monello Especial Gatos Castrados",
+    "species": "cat",
+    "handles": [
+      "monello-cat-castrados-y-esterilizados"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/monello-premium-especial-gatos-castrados",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 36.0,
+    "fatMin": 9.0,
+    "fiberMax": 4.5,
+    "ashMax": 7.5,
+    "moistureMax": 10.0,
+    "kcalKg": 4150,
+    "packagesKg": [
+      1.0,
+      10.1
+    ]
+  },
+  {
+    "brand": "Monello",
+    "name": "Monello Especial Gatos Filhotes",
+    "species": "cat",
+    "handles": [
+      "monello-gatitos"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/monello-premium-especial-gatos-filhotes",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 33.0,
+    "fatMin": 12.0,
+    "fiberMax": 3.5,
+    "ashMax": 7.5,
+    "moistureMax": 10.0,
+    "kcalKg": 4000,
+    "packagesKg": [
+      1.0,
+      10.1,
+      15.0
+    ]
+  },
+  {
+    "brand": "Monello",
+    "name": "Monello Castrados – Gatos Adultos",
+    "species": "cat",
+    "handles": [
+      "monello-select-castrados-gatos-adultos"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/select-by-monello-castrados-gatos-adultos",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 36.0,
+    "fatMin": 8.5,
+    "fiberMax": 4.5,
+    "ashMax": 8.5,
+    "moistureMax": 10.0,
+    "kcalKg": 3650,
+    "packagesKg": [
+      1.5,
+      7.0,
+      10.1,
+      15.0
+    ]
+  },
+  {
+    "brand": "Monello",
+    "name": "Monello Controle de Peso – Cães Adultos de Raças Mini e Pequenas",
+    "species": "dog",
+    "handles": [
+      "monello-select-control-de-peso-perros-adultos-mini-y-pequenos"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/select-by-monello-controle-de-peso-ces-adultos-de-raas-mini-e-pequenas",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 27.0,
+    "fatMin": 10.0,
+    "fiberMax": 4.0,
+    "ashMax": 8.5,
+    "moistureMax": 10.0,
+    "kcalKg": 3500,
+    "packagesKg": [
+      2.0,
+      7.0,
+      10.1,
+      15.0
+    ]
+  },
+  {
+    "brand": "Monello",
+    "name": "Monello Digestão Equilibrada – Cães Adultos de Raças Médias e Grandes",
+    "species": "dog",
+    "handles": [
+      "monello-select-digestion-equilibrada-perros-adultos-medianos-y-grandes"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/select-by-monello-digesto-equilibrada-ces-adultos-de-raas-mdias-e-grandes",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 26.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.0,
+    "ashMax": 8.5,
+    "moistureMax": 10.0,
+    "kcalKg": 4000,
+    "packagesKg": [
+      2.0,
+      7.0,
+      10.1,
+      15.0
+    ]
+  },
+  {
+    "brand": "Monello",
+    "name": "Monello Digestão Equilibrada – Cães Adultos de Raças Mini e Pequenas",
+    "species": "dog",
+    "handles": [
+      "monello-select-digestion-equilibrada-perros-adultos-mini-y-pequenos"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/select-by-monello-digesto-equilibrada-ces-adultos-de-raas-mini-e-pequenas",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 26.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.0,
+    "ashMax": 8.5,
+    "moistureMax": 10.0,
+    "kcalKg": 4000,
+    "packagesKg": [
+      2.0,
+      7.0,
+      10.1,
+      15.0
+    ]
+  },
+  {
+    "brand": "Monello",
+    "name": "Monello Longevidade – Cães Sênior de Raças Mini e Pequenas 7+",
+    "species": "dog",
+    "handles": [
+      "monello-select-longevidad-perros-senior-mini-y-pequenos-7"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/select-by-monello-longevidade-ces-snior-de-raas-mini-e-pequenas-7",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 26.0,
+    "fatMin": 13.0,
+    "fiberMax": 3.5,
+    "ashMax": 8.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3750,
+    "packagesKg": [
+      2.0,
+      7.0,
+      10.1
+    ]
+  },
+  {
+    "brand": "Monello",
+    "name": "Monello Mães e Filhotes – Gatos",
+    "species": "cat",
+    "handles": [
+      "monello-select-madres-y-gatitos"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/select-by-monello-mes-e-filhotes-gatos",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 35.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.0,
+    "ashMax": 8.5,
+    "moistureMax": 10.0,
+    "kcalKg": 4200,
+    "packagesKg": [
+      1.5,
+      7.0
+    ]
+  },
+  {
+    "brand": "Monello",
+    "name": "Monello Primeira Nutrição – Cães Filhotes de Raças Médias e Grandes",
+    "species": "dog",
+    "handles": [
+      "monello-select-primera-nutricion-cachorros-medianos-y-grandes"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/select-by-monello-primeira-nutrio-ces-filhotes-de-raas-mdias-e-grandes",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 31.0,
+    "fatMin": 15.0,
+    "fiberMax": 2.8,
+    "ashMax": 8.0,
+    "moistureMax": 10.0,
+    "kcalKg": 4150,
+    "packagesKg": [
+      2.0,
+      7.0,
+      15.0
+    ]
+  },
+  {
+    "brand": "Monello",
+    "name": "Monello Primeira Nutrição – Cães Filhotes de Raças Mini e Pequenas",
+    "species": "dog",
+    "handles": [
+      "monello-select-primera-nutricion-cachorros-mini-y-pequenos"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/select-by-monello-primeira-nutrio-ces-filhotes-de-raas-mini-e-pequenas",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 31.0,
+    "fatMin": 15.0,
+    "fiberMax": 2.8,
+    "ashMax": 8.0,
+    "moistureMax": 10.0,
+    "kcalKg": 4150,
+    "packagesKg": [
+      2.0,
+      7.0
+    ]
+  },
+  {
+    "brand": "Monello",
+    "name": "Monello Skin and Coat – Gatos Adultos",
+    "species": "cat",
+    "handles": [
+      "monello-select-skin-and-coat"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/select-by-monello-skin-and-coat-gatos-adultos",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 33.0,
+    "fatMin": 14.0,
+    "fiberMax": 3.0,
+    "ashMax": 8.5,
+    "moistureMax": 10.0,
+    "kcalKg": 3950,
+    "packagesKg": [
+      1.5,
+      7.0,
+      10.1,
+      15.0
+    ]
+  },
+  {
+    "brand": "Monello",
+    "name": "Monello Especial Cães Adultos Tradicional",
+    "species": "dog",
+    "handles": [
+      "monello-tradicional"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/monello-premium-especial-caes-adultos-tradicional",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 23.0,
+    "fatMin": 11.0,
+    "fiberMax": 3.5,
+    "moistureMax": 10.0,
+    "kcalKg": 3700,
+    "packagesKg": [
+      1.0,
+      7.0,
+      10.1,
+      15.0,
+      25.0
+    ]
+  },
+  {
+    "brand": "Birbo",
+    "name": "Birbo Filhotes",
+    "species": "dog",
+    "handles": [
+      "birbo-premium-cachorros"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/birbo-premium-filhotes",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 27.0,
+    "fiberMax": 3.0,
+    "ashMax": 9.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3600,
+    "packagesKg": [
+      1.0,
+      7.0,
+      15.0
+    ]
+  },
+  {
+    "brand": "Birbo",
+    "name": "Birbo Carne",
+    "species": "dog",
+    "handles": [
+      "birbo-premium-carne-para-perros-adultos"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/birbo-premium-carne",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 21.0,
+    "fiberMax": 4.0,
+    "ashMax": 10.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3400,
+    "packagesKg": [
+      1.0,
+      7.0,
+      10.1,
+      15.0,
+      25.0
+    ]
+  },
+  {
+    "brand": "Birbo",
+    "name": "Birbo Gatos Blend",
+    "species": "cat",
+    "handles": [
+      "birbo-premium-gatos-mix"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/birbo-premium-gatos-blend",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 30.0,
+    "fatMin": 10.0,
+    "fiberMax": 3.5,
+    "moistureMax": 10.0,
+    "kcalKg": 3750,
+    "packagesKg": [
+      1.0,
+      7.0,
+      10.1,
+      25.0
+    ]
+  },
+  {
+    "brand": "Birbo",
+    "name": "Birbo Raças Pequenas",
+    "species": "dog",
+    "handles": [
+      "birbo-premium-razas-pequenas"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/birbo-premium-racas-pequenas",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 22.0,
+    "fatMin": 12.0,
+    "fiberMax": 4.0,
+    "ashMax": 10.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3550,
+    "packagesKg": [
+      1.0,
+      7.0,
+      15.0
+    ]
+  },
+  {
+    "brand": "Birbo",
+    "name": "Birbo Cordeiro & Vegetais",
+    "species": "dog",
+    "handles": [
+      "birbo-premium-tradicional-cordero-y-vegetales-para-perros-adultos"
+    ],
+    "url": "https://www.nutrire.ind.br/produto/birbo-premium-tradicional",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 21.0,
+    "fatMin": 10.0,
+    "fiberMax": 4.0,
+    "ashMax": 10.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3400,
+    "packagesKg": [
+      1.0,
+      7.0,
+      15.0
+    ]
+  }
+]

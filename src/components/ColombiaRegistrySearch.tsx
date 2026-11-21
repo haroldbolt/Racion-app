@@ -5,6 +5,7 @@ import type { FoodCatalogResult } from '../services/onlineFoodCatalog';
 import { registryFormulaKey, searchRegistryMarket } from '../services/registryMarket';
 import { findRegistrations, type RegistryFood } from '../utils/colombiaRegistryRows';
 import { OnlineFoodCards } from './OnlineFoodCards';
+import { enrichMarketFoods } from './onlineFoodResults';
 
 type Registry = Awaited<ReturnType<typeof loadColombiaRegistry>>;
 interface Props {
@@ -49,7 +50,8 @@ export function ColombiaRegistrySearch({query, species, foodType, category, lang
       const found = await searchRegistryMarket(item, species, foodType, index.source, signal, ambiguous);
       if (signal.aborted) return;
       const foods = found.foods.filter(food => category === 'all' || (category === 'snacks' ? food.nutritionalUse === 'treat' : food.nutritionalUse !== 'treat'));
-      setMarket({...found, foods});
+      const enriched = await enrichMarketFoods(foods);
+      if (!signal.aborted) setMarket({...found, foods:enriched});
     } catch {
       if (!signal.aborted) setMarketError(true);
     }

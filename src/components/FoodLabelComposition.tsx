@@ -32,7 +32,8 @@ export function FoodLabelComposition({ food, language, previewPending = false }:
               <span className="block font-normal">
                 {url && /^https:\/\//i.test(url) ? <a className="text-green-800 underline" href={url} target="_blank" rel="noopener noreferrer">{sourceName}</a> : sourceName}
                 {nutrient?.declaracionOriginal && <span className="block">{nutrient.declaracionOriginal}</span>}
-                {date && !Number.isNaN(Date.parse(date)) && <> · {new Date(date).toLocaleDateString(isEs ? 'es-CO' : 'en')}</>}
+                {date && !Number.isNaN(Date.parse(date)) && <> · {new Date(date).toLocaleDateString(isEs ? 'es-CO' : 'en',
+                  /^\d{4}-\d{2}-\d{2}$/.test(date) ? {timeZone:'UTC'} : undefined)}</>}
               </span>
             </details> : display || (isEs ? 'Sin dato' : 'No data')}
             {conflicts.map(item => <span key={item.sourceUrl} className="block font-normal text-amber-900">

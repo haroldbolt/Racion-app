@@ -6,6 +6,8 @@ import { searchFoodCatalog } from '../services/onlineFoodCatalog';
 import { ColombiaRegistrySearch } from './ColombiaRegistrySearch';
 import { LabelReviewModal } from './LabelReviewModal';
 import { OnlineFoodCards } from './OnlineFoodCards';
+import { StoreManufacturerResults } from './StoreManufacturerResults';
+import { enrichMarketFoods } from './onlineFoodResults';
 
 interface OnlineFoodSearchProps {
   species: Species;
@@ -13,7 +15,7 @@ interface OnlineFoodSearchProps {
   initialQuery?: string;
   lang?: 'es' | 'en';
   category?: 'all' | 'main' | 'snacks';
-  onSelect: (food: FoodItem, provenance?: 'label') => void;
+  onSelect: (food: FoodItem, provenance?: 'label' | 'manufacturer') => void;
 }
 
 
@@ -25,6 +27,7 @@ export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 
   const [unavailable, setUnavailable] = useState<string[]>([]);
   const [labelDraft, setLabelDraft] = useState<{food?: FoodItem; formula?:string; registry?:FoodItem['icaRegistry']} | null>(null);
   const [registryOpen, setRegistryOpen] = useState(false);
+  const [submission, setSubmission] = useState<AbortSignal>();
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [error, setError] = useState('');
@@ -32,6 +35,7 @@ export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 
 
   useEffect(() => {
     request.current?.abort();
+    setSubmission(undefined);
     setFoods([]);
     setUnavailable([]);
     setSearched(false);
@@ -58,10 +62,16 @@ export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 
     else onSelect(food);
   }
 
+  function chooseStoreFood(food: FoodItem) {
+    if (food.labelStatus === 'verified_manufacturer') onSelect(food, 'manufacturer');
+    else choose(food);
+  }
+
   async function submit() {
     const text = query.trim();
     request.current?.abort();
     if (text.length < 2 || text.length > 100) {
+      setSubmission(undefined);
       setError(isEs ? 'Escribe entre 2 y 100 caracteres.' : 'Enter between 2 and 100 characters.');
       setFoods([]);
       setLoading(false);
@@ -69,6 +79,7 @@ export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 
     }
     const controller = new AbortController();
     request.current = controller;
+    setSubmission(controller.signal);
     setLoading(true);
     setUnavailable([]);
     setFoods([]);
@@ -78,9 +89,12 @@ export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 
     try {
       const results = await searchFoodCatalog(text, species, foodType, controller.signal);
       if (controller.signal.aborted) return;
+      const matches = results.foods.filter(food => category === 'all' ||
+        (category === 'snacks' ? food.nutritionalUse === 'treat' : food.nutritionalUse !== 'treat'));
+      const enriched = await enrichMarketFoods(matches);
+      if (controller.signal.aborted) return;
       setUnavailable(results.unavailableSources);
-      setFoods(results.foods.filter(food => category === 'all' ||
-        (category === 'snacks' ? food.nutritionalUse === 'treat' : food.nutritionalUse !== 'treat')));
+      setFoods(enriched);
       setSearched(true);
     } catch (failure) {
       if (controller.signal.aborted) return;
@@ -93,7 +107,7 @@ export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 
   return (
     <div className="space-y-3">
       <p className="text-xs text-[#44544A]">
-        {isEs ? 'Busca por marca y fórmula en tiendas de Colombia. Cada presentación muestra su precio y los nutrientes publicados.' : 'Search Colombian stores by brand and formula. Each listing shows its package prices and published nutrients.'}
+        {isEs ? 'Busca por marca y fórmula. Al elegir un empaque se cargan los nutrientes publicados de ese alimento.' : 'Search by brand and formula. Choosing a package loads the published nutrients for that food.'}
       </p>
       <div className="flex flex-wrap gap-2">
         <input
@@ -101,6 +115,7 @@ export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 
           value={query}
           onChange={(event) => {
             request.current?.abort();
+            setSubmission(undefined);
             setQuery(event.target.value);
             setFoods([]);
             setError('');
@@ -140,6 +155,9 @@ export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 
           {isEs ? 'Buscar en toda la web' : 'Search the whole web'}
         </a>
       )}
+      {submission && !registryOpen && category !== 'snacks' && (!foodType || foodType === 'dry') && (
+        <StoreManufacturerResults query={query.trim()} species={species} lang={lang} signal={submission} choose={chooseStoreFood} />
+      )}
       {(searched || error && query.trim().length >= 2) && <ColombiaRegistrySearch
         key={query + ':' + species + ':' + foodType + ':' + category} query={query.trim()} species={species} foodType={foodType} category={category} lang={lang}
         onOpenChange={setRegistryOpen} onSelect={choose}
@@ -158,7 +176,7 @@ export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 
         </p>}
         {!registryOpen && searched && foods.length === 0 && (
           <p role="status" className="text-xs text-[#44544A]">
-            {isEs ? 'No encontramos esa fórmula para esta especie y tipo en las fuentes consultadas.' : 'The available sources did not return this formula for the selected species and type.'}
+            {isEs ? 'Las otras tiendas consultadas no devolvieron ofertas para esta fórmula.' : 'The other stores returned no listings for this formula.'}
           </p>
         )}
         {(searched || error) && <button type="button" onClick={() => setLabelDraft({})}

@@ -598,13 +598,17 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
             ) : (
               <>
                 <p className="text-xs text-[#44544A]">
-                  {isEs ? 'Elige el empaque, revisa su etiqueta y después toca “Usar en plan” en Mis alimentos.' : 'Choose a package, review its label, then select “Use in plan” in My foods.'}
+                  {isEs ? 'Elige un empaque para guardarlo en Mis alimentos. Desde allí puedes usarlo en el plan.' : 'Choose a package to save it to My foods and use it in the plan.'}
                 </p>
                 <OnlineFoodSearch
                   species={pet.species}
                   foodType={filterType === 'all' ? undefined : filterType}
                   lang={userAccount.language}
-                  onSelect={(food, source) => source === 'label' ? saveLibraryFood(food) : setLabelDraft({ food })}
+                  onSelect={(food, source) => {
+                    if (source === 'manufacturer') StorageService.addCustomFood(food);
+                    if (source) saveLibraryFood(food);
+                    else setLabelDraft({ food });
+                  }}
                 />
               </>
             )}

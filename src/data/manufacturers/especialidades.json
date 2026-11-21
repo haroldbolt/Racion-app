@@ -1,0 +1,1749 @@
+[
+  {
+    "brand": "Guabi Natural",
+    "name": "Alimento Para Gatito Guabi Natural Sabor Pollo y Arroz Integral",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gatito-guabi-natural-sabor-pollo-y-arroz-integral"
+    ],
+    "url": "https://guabinatural.com.br/pt/gatos/gato-filhote-frango-e-arroz-integral",
+    "proteinMin": 38,
+    "fatMin": 18,
+    "fiberMax": 2.5,
+    "ashMax": 8,
+    "moistureMax": 9,
+    "kcalKg": 4300,
+    "packagesKg": [
+      1.5
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Guabi Natural",
+    "name": "Alimento Para Gato Adulto Castrado Guabi Natural Sabor Salmon y Cebada",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-adulto-castrado-guabi-natural-sabor-salmon-y-cebada"
+    ],
+    "url": "https://guabinatural.com.br/pt/gatos/gato-adulto-castrado-salmao-e-cevada",
+    "proteinMin": 36,
+    "fatMin": 12,
+    "fiberMax": 5,
+    "ashMax": 8,
+    "moistureMax": 9,
+    "kcalKg": 3800,
+    "packagesKg": [
+      1.5,
+      7.5
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Guabi Natural",
+    "name": "Alimento Para Gato Adulto Guabi Natural Sabor Pollo y Arroz Integral",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-adulto-guabi-natural-sabor-pollo-y-arroz-integral"
+    ],
+    "url": "https://guabinatural.com.br/pt/gatos/gato-adulto-sabor-frango-e-arroz-integral",
+    "proteinMin": 36,
+    "fatMin": 17,
+    "fiberMax": 3.5,
+    "ashMax": 8,
+    "moistureMax": 9,
+    "kcalKg": 4150,
+    "packagesKg": [
+      1.5,
+      7.5
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Guabi Natural",
+    "name": "Alimento Para Gato Senior Castrado Guabi Natural Sabor Pollo y Arroz Integral",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-senior-castrado-guabi-natural-sabor-pollo-y-arroz-integral"
+    ],
+    "url": "https://guabinatural.com.br/pt/gatos/gato-senior-castrado-frango-e-arroz-integral",
+    "proteinMin": 38,
+    "fatMin": 15,
+    "fiberMax": 4,
+    "ashMax": 7.5,
+    "moistureMax": 9,
+    "kcalKg": 4100,
+    "packagesKg": [
+      1.5,
+      7.5
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Alimento Para Gato Virbac HPM Cat Dermatology Support",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-virbac-hpm-cat-dermatology-support"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/dermato---soporte-de-la-piel-y-e-1",
+    "protein": 44.0,
+    "fat": 17.5,
+    "moisture": 5.5,
+    "ash": 8.5,
+    "fiber": 5.0,
+    "kcalKg": 4370.0,
+    "packagesKg": [
+      3.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Alimento Para Gato Virbac HPM Cat Digestive Suport",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-virbac-hpm-cat-digestive-suport"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/gastro---para-trastornos-digestivos-1",
+    "protein": 44.0,
+    "fat": 21.0,
+    "moisture": 5.5,
+    "ash": 8.5,
+    "fiber": 3.5,
+    "kcalKg": 4190.0,
+    "packagesKg": [
+      1.5,
+      3.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Alimento Para Gato Virbac HPM Cat Urology Dissolution Y Prevention-U2",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-virbac-hpm-cat-urology-dissolution-y-prevention-u2"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/urology-2-salud-urinaria-1",
+    "protein": 44.0,
+    "fat": 13.5,
+    "moisture": 5.5,
+    "ash": 7.5,
+    "fiber": 6.5,
+    "kcalKg": 3640.0,
+    "packagesKg": [
+      1.5,
+      3.0,
+      7.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Alimento Para Gato Virbac HPM Cat Urology Strutive Dissolution U1",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-virbac-hpm-cat-urology-strutive-dissolution-u1"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/urology-1---salud-urinaria-1",
+    "protein": 44.0,
+    "fat": 16.0,
+    "moisture": 5.5,
+    "ash": 7.5,
+    "fiber": 4.0,
+    "kcalKg": 3850.0,
+    "packagesKg": [
+      1.5,
+      3.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Alimento Para Gato Virbac HPM Cat Urology Urinary Wib",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-virbac-hpm-cat-urology-urinary-wib"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/urology-3---salud-urinaria-1",
+    "protein": 44.0,
+    "fat": 13.5,
+    "moisture": 5.5,
+    "ash": 7.5,
+    "fiber": 6.5,
+    "kcalKg": 3640.0,
+    "packagesKg": [
+      1.5,
+      3.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Alimento Para Gato Virbac HPM Cat Weight Loss And Control",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-virbac-hpm-cat-weight-loss-and-control"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/weight-2---control-del-peso-corp-1",
+    "protein": 44.0,
+    "fat": 13.0,
+    "moisture": 5.5,
+    "ash": 8.5,
+    "fiber": 9.0,
+    "kcalKg": 3390.0,
+    "packagesKg": [
+      1.5,
+      3.0,
+      7.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Alimento Para Gato Virbac HPM Cat Weight Loss And Diabetes",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-virbac-hpm-cat-weight-loss-and-diabetes"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/weight-1---control-del-peso-corp-1",
+    "protein": 44.0,
+    "fat": 11.0,
+    "moisture": 5.5,
+    "ash": 8.5,
+    "fiber": 12.0,
+    "kcalKg": 3020.0,
+    "packagesKg": [
+      1.5,
+      3.0,
+      7.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Guabi Natural",
+    "name": "Alimento Para Perro Adulto Raza Mediana Guabi Natural Sabor Pollo y Arroz Integral",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-adulto-raza-mediana-guabi-natural-sabor-pollo-y-arroz-integral"
+    ],
+    "url": "https://guabinatural.com.br/pt/caes/cao-adulto-medio-frango-e-arroz-integral",
+    "proteinMin": 28,
+    "fatMin": 17,
+    "fiberMax": 3,
+    "ashMax": 8.3,
+    "moistureMax": 9,
+    "kcalKg": 4150,
+    "packagesKg": [
+      2.5,
+      12,
+      20
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Guabi Natural",
+    "name": "Alimento Para Perro Adulto Raza Mini y Pequeña Guabi Natural Sabor Pollo y Arroz Integral",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-adulto-raza-mini-y-pequena-guabi-natural-sabor-pollo-y-arroz-integral"
+    ],
+    "url": "https://guabinatural.com.br/pt/caes/cao-adulto-mini-e-pequeno-frango-e-arroz-integral",
+    "proteinMin": 30,
+    "fatMin": 18,
+    "fiberMax": 3,
+    "ashMax": 8.3,
+    "moistureMax": 9,
+    "kcalKg": 4250,
+    "packagesKg": [
+      1,
+      2.5,
+      10.1,
+      20
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Guabi Natural",
+    "name": "Alimento Para Perro Adulto Sensitive Raza mini Pequeña Y Mediana Guabi Natural Sabor Salmon y Avena",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-adulto-sensitive-raza-mini-pequena-y-mediana-guabi-natural-sabor-salmon-y-avena"
+    ],
+    "url": "https://guabinatural.com.br/pt/caes/cao-adulto-sensitive-mini-pequeno-e-medio-salmao-e-aveia",
+    "proteinMin": 24,
+    "fatMin": 15,
+    "fiberMax": 3,
+    "ashMax": 8,
+    "moistureMax": 9,
+    "kcalKg": 4050,
+    "packagesKg": [
+      2.5,
+      10.1
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Guabi Natural",
+    "name": "Alimento Para Perro Senior Raza Mini y Pequeña Guabi Natural Sabor Pollo y Arroz Integral",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-senior-raza-mini-y-pequena-guabi-natural-sabor-pollo-y-arroz-integral"
+    ],
+    "url": "https://guabinatural.com.br/pt/caes/cao-senior-mini-e-pequeno-frango-e-arroz-integral",
+    "proteinMin": 27,
+    "fatMin": 13,
+    "fiberMax": 4,
+    "ashMax": 8.1,
+    "moistureMax": 9,
+    "kcalKg": 3950,
+    "packagesKg": [
+      2.5,
+      10.1
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Sieger",
+    "name": "Alimento para Perro Sieger Adulto Mini",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-sieger-adulto-mini"
+    ],
+    "url": "https://links.sieger.com.ar/ficha-tecninca-continuo.pdf#page=8",
+    "proteinMin": 29.0,
+    "fatMin": 17.0,
+    "fiberMax": 3.0,
+    "ashMax": 7.0,
+    "moistureMax": 10.0,
+    "kcalKg": 4000.0,
+    "packagesKg": [
+      1,
+      3,
+      12
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Sieger",
+    "name": "Alimento para Perro Sieger Adulto Razas Medianas y Grandes",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-sieger-adulto-razas-medianas-y-grandes"
+    ],
+    "url": "https://links.sieger.com.ar/ficha-tecninca-continuo.pdf#page=11",
+    "proteinMin": 26.0,
+    "fatMin": 16.0,
+    "fiberMax": 3.0,
+    "ashMax": 7.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3950.0,
+    "packagesKg": [
+      3,
+      15
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Sieger",
+    "name": "Alimento para Perro Sieger Cachorro Mini",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-sieger-cachorro-mini"
+    ],
+    "url": "https://links.sieger.com.ar/ficha-tecninca-continuo.pdf#page=8",
+    "proteinMin": 32.0,
+    "fatMin": 20.0,
+    "fiberMax": 3.0,
+    "ashMax": 7.0,
+    "moistureMax": 10.0,
+    "kcalKg": 4150.0,
+    "packagesKg": [
+      1,
+      3,
+      12
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Sieger",
+    "name": "Alimento para Perro Sieger Cachorro Razas Medianas y Grandes",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-sieger-cachorro-razas-medianas-y-grandes"
+    ],
+    "url": "https://links.sieger.com.ar/ficha-tecninca-continuo.pdf#page=11",
+    "proteinMin": 30.0,
+    "fatMin": 18.0,
+    "fiberMax": 3.0,
+    "ashMax": 7.0,
+    "moistureMax": 10.0,
+    "kcalKg": 4050.0,
+    "packagesKg": [
+      1,
+      3,
+      15
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Sieger",
+    "name": "Alimento para Perro Sieger Control de Calorías",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-sieger-control-de-calorias"
+    ],
+    "url": "https://links.sieger.com.ar/ficha-tecninca-continuo.pdf#page=13",
+    "proteinMin": 27.0,
+    "fatMin": 5.0,
+    "fiberMax": 6.2,
+    "ashMax": 8.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3245.0,
+    "packagesKg": [
+      3,
+      12
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Sieger",
+    "name": "Alimento para Perro Sieger Senior +7 Razas Medianas y Grandes",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-sieger-senior-7-razas-medianas-y-grandes"
+    ],
+    "url": "https://links.sieger.com.ar/ficha-tecninca-continuo.pdf#page=11",
+    "proteinMin": 27.0,
+    "fatMin": 12.0,
+    "fiberMax": 3.0,
+    "ashMax": 7.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3750.0,
+    "packagesKg": [
+      3,
+      15
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Alimento Para Perro Virbac HPM Dog Dermatology Suport",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-virbac-hpm-dog-dermatology-suport"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/dermato---soporte-de-la-piel-y-1-1",
+    "protein": 34.0,
+    "fat": 18.0,
+    "moisture": 9.0,
+    "ash": 7.5,
+    "fiber": 5.0,
+    "kcalKg": 3860.0,
+    "packagesKg": [
+      3.0,
+      7.0,
+      12.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Alimento Para Perro Virbac HPM Dog Digestive Support",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-virbac-hpm-dog-digestive-support"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/gastro---para-trastornos-diges-3",
+    "protein": 34.0,
+    "fat": 22.0,
+    "moisture": 9.0,
+    "ash": 7.5,
+    "fiber": 6.0,
+    "kcalKg": 4110.0,
+    "packagesKg": [
+      3.0,
+      7.0,
+      12.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Alimento Para Perro Virbac HPM Dog Kidney Support (Renal)",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-virbac-hpm-dog-kidney-support-renal"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/kidney---mantiene-la-funcion-r-2-1",
+    "protein": 20.5,
+    "fat": 22.0,
+    "moisture": 9.0,
+    "ash": 5.5,
+    "fiber": 5.5,
+    "kcalKg": 3950.0,
+    "packagesKg": [
+      3.0,
+      12.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Alimento Para Perro Virbac HPM Dog Urology Dissolution And Prevention",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-virbac-hpm-dog-urology-dissolution-and-prevention"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/urology---salud-urinaria-1",
+    "protein": 34.0,
+    "fat": 17.5,
+    "moisture": 9.0,
+    "ash": 7.0,
+    "fiber": 5.0,
+    "kcalKg": 3770.0,
+    "packagesKg": [
+      3.0,
+      12.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Alimento Para Perro Virbac HPM Dog  Weight Loss And Control",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-virbac-hpm-dog-weight-loss-and-control"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/weight-2---control-del-peso-co-2-1",
+    "protein": 34.0,
+    "moisture": 9.0,
+    "ash": 7.5,
+    "fiber": 9.0,
+    "kcalKg": 3020.0,
+    "packagesKg": [
+      3.0,
+      7.0,
+      12.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Alimento Para Perro Virbac HPM Dog  Weight Loss And Diabetes",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-virbac-hpm-dog-weight-loss-and-diabetes"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/weight-1-control-del-peso-1",
+    "protein": 34.0,
+    "fat": 11.5,
+    "moisture": 9.0,
+    "ash": 7.5,
+    "fiber": 15.0,
+    "kcalKg": 2850.0,
+    "packagesKg": [
+      3.0,
+      7.0,
+      12.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Prestige",
+    "name": "Alimento Prestige para Gato Adulto",
+    "species": "cat",
+    "handles": [
+      "alimento-prestige-para-gato-adulto"
+    ],
+    "url": "https://esvbalimentos.com/produtos/leitura/prestige-gatos-adultos",
+    "proteinMin": 26,
+    "fatMin": 9,
+    "fiberMax": 3,
+    "ashMax": 10,
+    "moistureMax": 9,
+    "packagesKg": [
+      1,
+      3,
+      10.1,
+      20
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Prestige",
+    "name": "Alimento Prestige para Perro Adulto",
+    "species": "dog",
+    "handles": [
+      "alimento-prestige-para-perro-adulto"
+    ],
+    "url": "https://esvbalimentos.com/produtos/leitura/prestige-perros-adultos",
+    "proteinMin": 21,
+    "fatMin": 7,
+    "fiberMax": 4,
+    "ashMax": 10,
+    "moistureMax": 10,
+    "packagesKg": [
+      1,
+      3,
+      10.1,
+      15,
+      20
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Prestige",
+    "name": "Alimento Prestige para Perro Cachorro",
+    "species": "dog",
+    "handles": [
+      "alimento-prestige-para-perro-cachorro"
+    ],
+    "url": "https://esvbalimentos.com/produtos/leitura/prestige-perros-cachorros",
+    "proteinMin": 26,
+    "fatMin": 9,
+    "fiberMax": 3,
+    "ashMax": 10,
+    "moistureMax": 10,
+    "packagesKg": [
+      1,
+      3,
+      10.1,
+      20
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Prestige",
+    "name": "Alimento Prestige para Perro Raza Pequeña y mediana",
+    "species": "dog",
+    "handles": [
+      "alimento-prestige-para-perro-raza-pequena-y-mediana"
+    ],
+    "url": "https://esvbalimentos.com/produtos/leitura/prestige-perros-adultos-de-razas-pequenas-y-medianas",
+    "proteinMin": 21,
+    "fatMin": 7,
+    "fiberMax": 4,
+    "ashMax": 10,
+    "moistureMax": 10,
+    "packagesKg": [
+      1,
+      3,
+      10.1,
+      15,
+      20
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Evolve",
+    "name": "Alimento Seco Para Gato Evolve Classic Salmon",
+    "species": "cat",
+    "handles": [
+      "alimento-seco-para-gato-evolve-classic-salmon"
+    ],
+    "url": "https://evolvepetfood.com/dry-cat-food/evolve-classic-salmon-rice-sweet-potato-recipe-cat-food",
+    "proteinMin": 32.0,
+    "fatMin": 15.0,
+    "fiberMax": 4.5,
+    "moistureMax": 10.0,
+    "kcalKg": 3601,
+    "packagesKg": [
+      1.247,
+      6.35
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Evolve",
+    "name": "Alimento Seco Para Gato Evolve Grain-Free Kitten Pollo",
+    "species": "cat",
+    "handles": [
+      "alimento-seco-para-gato-evolve-grain-free-kitten-pollo"
+    ],
+    "url": "https://evolvepetfood.com/dry-cat-food/evolve-grain-free-kitten-food",
+    "proteinMin": 36.0,
+    "fatMin": 18.0,
+    "fiberMax": 4.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3700,
+    "packagesKg": [
+      1.247
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Evolve",
+    "name": "Alimento Seco Para Gato Evolve Grain-Free Pescado",
+    "species": "cat",
+    "handles": [
+      "alimento-seco-para-gato-evolve-grain-free-pescado"
+    ],
+    "url": "https://evolvepetfood.com/dry-cat-food/evolve-grain-free-ocean-whitefish-egg-recipe-cat-food",
+    "proteinMin": 35.0,
+    "fatMin": 14.0,
+    "fiberMax": 4.0,
+    "moistureMax": 12.0,
+    "kcalKg": 3689,
+    "packagesKg": [
+      1.247
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Nulo",
+    "name": "Alimento Seco Para Gato Nulo GF Senior Alaska Pollock, Duck And Sweet Potato",
+    "species": "cat",
+    "handles": [
+      "alimento-seco-para-gato-nulo-gf-senior-alaska-pollock-duck-and-sweet-potato"
+    ],
+    "url": "https://nulo.com/products/freestyle-senior-alaska-pollock-sweet-potato-recipe-for-cats",
+    "proteinMin": 38.0,
+    "fatMin": 14.0,
+    "fiberMax": 6.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3454,
+    "packagesKg": [
+      1.814,
+      2.268,
+      5.443,
+      6.35
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Nulo",
+    "name": "Alimento Seco Para Gato Nulo Grain Free Hairball Management Turkey And Cod",
+    "species": "cat",
+    "handles": [
+      "alimento-seco-para-gato-nulo-grain-free-hairball-management-turkey-and-cod"
+    ],
+    "url": "https://nulo.com/products/freestyle-hairball-management-turkey-cod-recipe-for-cats",
+    "proteinMin": 40.0,
+    "fatMin": 16.0,
+    "fiberMax": 7.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3474,
+    "packagesKg": [
+      1.814,
+      2.268,
+      5.443,
+      6.35
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Nulo",
+    "name": "Alimento Seco Para Gato Nulo Grain Free Kitten And Cat Chicken And Cod",
+    "species": "cat",
+    "handles": [
+      "alimento-seco-para-gato-nulo-grain-free-kitten-and-cat-chicken-and-cod"
+    ],
+    "url": "https://nulo.com/products/freestyle-chicken-cod-recipe-for-cats",
+    "proteinMin": 40.0,
+    "fatMin": 20.0,
+    "fiberMax": 4.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3672,
+    "packagesKg": [
+      0.907,
+      1.814,
+      2.268,
+      5.443,
+      6.35
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Nulo",
+    "name": "Alimento Seco Para Gato Nulo Grain Free Trim Peso Saludable Salmon And Lentils",
+    "species": "cat",
+    "handles": [
+      "alimento-seco-para-gato-nulo-grain-free-trim-peso-saludable-salmon-and-lentils"
+    ],
+    "url": "https://nulo.com/products/freestyle-adult-trim-salmon-lentils-recipe-for-cats",
+    "proteinMin": 42.0,
+    "fatMin": 12.0,
+    "fiberMax": 5.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3342,
+    "packagesKg": [
+      0.907,
+      1.814,
+      2.268,
+      5.443,
+      6.35
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Evolve",
+    "name": "Alimento Seco Para Perro Evolve Classic Carne",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-para-perro-evolve-classic-carne"
+    ],
+    "url": "https://evolvepetfood.com/dry-dog-food/evolve-classic-beef-barley-bison-recipe-dog-food",
+    "proteinMin": 22.0,
+    "fatMin": 12.0,
+    "fiberMax": 4.0,
+    "moistureMax": 12.0,
+    "kcalKg": 3403,
+    "packagesKg": [
+      1.588,
+      6.804
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Evolve",
+    "name": "Alimento Seco Para Perro Evolve Grain-Free Pavo",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-para-perro-evolve-grain-free-pavo"
+    ],
+    "url": "https://evolvepetfood.com/dry-dog-food/evolve-grain-free-turkey-sweet-potato-recipe-dog-food",
+    "proteinMin": 25.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3755,
+    "packagesKg": [
+      1.814,
+      5.897
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Evolve",
+    "name": "Alimento Seco Para Perro Evolve Grain-Free Senior Pollo",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-para-perro-evolve-grain-free-senior-pollo"
+    ],
+    "url": "https://evolvepetfood.com/dry-dog-food/evolve-grain-free-senior-formula-chicken-sweet-potato-berry-recipe-dog-food",
+    "proteinMin": 20.0,
+    "fatMin": 10.0,
+    "fiberMax": 7.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3272,
+    "packagesKg": [
+      1.814,
+      6.35
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Evolve",
+    "name": "Evolve - Cat Adult Chicken & Rice Pollo",
+    "species": "cat",
+    "handles": [
+      "evolve-cat-adult-chicken-rice-pollo"
+    ],
+    "url": "https://evolvepetfood.com/dry-cat-food/evolve-classic-chicken-brown-rice-recipe-cat-food",
+    "proteinMin": 32.0,
+    "fatMin": 13.0,
+    "fiberMax": 3.0,
+    "moistureMax": 11.0,
+    "kcalKg": 3588,
+    "packagesKg": [
+      1.361,
+      6.804
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Evolve",
+    "name": "Evolve - Cat Grain Free Chicken Pollo",
+    "species": "cat",
+    "handles": [
+      "evolve-cat-grain-free-chicken-pollo"
+    ],
+    "url": "https://evolvepetfood.com/dry-cat-food/evolve-grain-free-chicken-chickpea-recipe-cat-food",
+    "proteinMin": 36.0,
+    "fatMin": 15.0,
+    "fiberMax": 4.5,
+    "moistureMax": 12.0,
+    "kcalKg": 3497,
+    "packagesKg": [
+      1.361,
+      4.99
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Evolve",
+    "name": "Evolve - Deboned Lamb & Brown Rice Recipe Dog Adult",
+    "species": "dog",
+    "handles": [
+      "evolve-deboned-lamb-brown-rice-recipe-dog-adult"
+    ],
+    "url": "https://evolvepetfood.com/dry-dog-food/evolve-classic-lamb-brown-rice-recipe-dog-food",
+    "proteinMin": 24.0,
+    "fatMin": 14.0,
+    "fiberMax": 5.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3528,
+    "packagesKg": [
+      1.701,
+      6.35
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Evolve",
+    "name": "Evolve - Dog Classic Chicken & Rice Adulto",
+    "species": "dog",
+    "handles": [
+      "evolve-dog-classic-chicken-rice-adulto"
+    ],
+    "url": "https://evolvepetfood.com/dry-dog-food/evolve-classic-chicken-brown-rice-recipe-dog-food",
+    "proteinMin": 25.0,
+    "fatMin": 15.0,
+    "fiberMax": 4.0,
+    "moistureMax": 12.0,
+    "kcalKg": 3540,
+    "packagesKg": [
+      1.814,
+      6.804,
+      13.608
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Evolve",
+    "name": "Evolve - Salmon & Sweet Potato Recipe Dog",
+    "species": "dog",
+    "handles": [
+      "evolve-salmon-sweet-potato-recipe-dog"
+    ],
+    "url": "https://evolvepetfood.com/dry-dog-food/evolve-grain-free-salmon-sweet-potato-recipe-dog-food",
+    "proteinMin": 25.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3696,
+    "packagesKg": [
+      1.588,
+      5.443
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Fawna",
+    "name": "Fawna Salmón Gatos Adultos",
+    "species": "cat",
+    "handles": [
+      "fawna-salmon-gatos-adultos"
+    ],
+    "url": "https://fawna.com.ar/gato-adulto/",
+    "packagesKg": [
+      3.0,
+      7.5
+    ],
+    "kcalKg": 3365,
+    "protein": 35.0,
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Fawna",
+    "name": "Fawna Salmón Gatos Esterilizados",
+    "species": "cat",
+    "handles": [
+      "fawna-salmon-gatos-esterilizados"
+    ],
+    "url": "https://fawna.com.ar/gato-esterilizado/",
+    "packagesKg": [
+      3.0,
+      7.5
+    ],
+    "kcalKg": 3145,
+    "protein": 38.0,
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Fawna",
+    "name": "Fawna Salmón Gatos Kitten",
+    "species": "cat",
+    "handles": [
+      "fawna-salmon-gatos-kitten"
+    ],
+    "url": "https://fawna.com.ar/gatitos/",
+    "packagesKg": [
+      1.0,
+      3.0
+    ],
+    "kcalKg": 3665,
+    "protein": 39.0,
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Fawna",
+    "name": "Fawna Salmón Gatos Urinario",
+    "species": "cat",
+    "handles": [
+      "fawna-salmon-gatos-urinario"
+    ],
+    "url": "https://fawna.com.ar/gato-urinario/",
+    "packagesKg": [
+      3.0,
+      7.5
+    ],
+    "kcalKg": 3330,
+    "protein": 35.0,
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Fawna",
+    "name": "Fawna Salmón Perros Adultos Light",
+    "species": "dog",
+    "handles": [
+      "fawna-salmon-perros-adultos-light"
+    ],
+    "url": "https://fawna.com.ar/perro-adulto-light/",
+    "packagesKg": [
+      3.0,
+      15.0
+    ],
+    "kcalKg": 2990,
+    "protein": 33.0,
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Fawna",
+    "name": "Fawna Salmón Perros Adultos Raza Medium Y Large",
+    "species": "dog",
+    "handles": [
+      "fawna-salmon-perros-adultos-raza-medium-y-large"
+    ],
+    "url": "https://fawna.com.ar/perro-adulto/",
+    "packagesKg": [
+      3.0,
+      15.0
+    ],
+    "kcalKg": 3460,
+    "protein": 31.0,
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Fawna",
+    "name": "Fawna Salmón Perros Adultos Raza Pequeña",
+    "species": "dog",
+    "handles": [
+      "fawna-salmon-perros-adultos-raza-pequena"
+    ],
+    "url": "https://fawna.com.ar/__trashed/",
+    "protein": 33,
+    "kcalKg": 3460,
+    "packagesKg": [
+      3,
+      7.5
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Fawna",
+    "name": "Fawna Salmón Perros Cachorros Raza Medium Y Large",
+    "species": "dog",
+    "handles": [
+      "fawna-salmon-perros-cachorros-raza-medium-y-large"
+    ],
+    "url": "https://fawna.com.ar/perro-cachorro-grande/",
+    "packagesKg": [
+      3.0,
+      7.5
+    ],
+    "kcalKg": 3560,
+    "protein": 33.0,
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Fawna",
+    "name": "Fawna Salmón Perros Cachorros Raza Pequeña",
+    "species": "dog",
+    "handles": [
+      "fawna-salmon-perros-cachorros-raza-pequena"
+    ],
+    "url": "https://fawna.com.ar/perro-cachorro-pequeno/",
+    "packagesKg": [
+      3.0,
+      7.5
+    ],
+    "kcalKg": 3660,
+    "protein": 34.0,
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Fawna",
+    "name": "Fawna Salmón Perros Senior",
+    "species": "dog",
+    "handles": [
+      "fawna-salmon-perros-senior"
+    ],
+    "url": "https://fawna.com.ar/perro-adulto-senior/",
+    "packagesKg": [
+      3.0,
+      15.0
+    ],
+    "kcalKg": 3090,
+    "protein": 31.0,
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Guabi Natural",
+    "name": "Guabi Natural Grain Free Gato Adulto Castrado Salmón y Lenteja",
+    "species": "cat",
+    "handles": [
+      "guabi-natural-grain-free-gato-adulto-castrado-salmon-y-lenteja"
+    ],
+    "url": "https://guabinatural.com.br/pt/gatos/gato-adulto-castrado-salmao-e-lentilha",
+    "proteinMin": 37,
+    "fatMin": 12,
+    "fiberMax": 5,
+    "ashMax": 8.2,
+    "moistureMax": 9,
+    "kcalKg": 4100,
+    "packagesKg": [
+      1.5,
+      7.5
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Holliday MV",
+    "name": "Holliday MV Gatos Gastrointestinal",
+    "species": "cat",
+    "handles": [
+      "holliday-mv-gatos-gastrointestinal"
+    ],
+    "url": "https://holliday-scott.com/file/im/20240711035159vademecum_mv_digital.pdf#page=11",
+    "proteinMin": 32,
+    "fatMin": 20,
+    "fiberMax": 2.5,
+    "ashMax": 7,
+    "moistureMax": 10,
+    "kcalKg": 3925,
+    "packagesKg": [
+      2
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Holliday MV",
+    "name": "Holliday MV Gatos Obesidad",
+    "species": "cat",
+    "handles": [
+      "holliday-mv-gatos-obesidad"
+    ],
+    "url": "https://holliday-scott.com/file/im/20240711035159vademecum_mv_digital.pdf#page=12",
+    "proteinMin": 38,
+    "fatMin": 9,
+    "fiberMax": 5,
+    "ashMax": 7,
+    "moistureMax": 10,
+    "kcalKg": 3170,
+    "packagesKg": [
+      2
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Holliday MV",
+    "name": "Holliday MV Gatos Renal",
+    "species": "cat",
+    "handles": [
+      "holliday-mv-gatos-renal"
+    ],
+    "url": "https://holliday-scott.com/file/im/20240711035159vademecum_mv_digital.pdf#page=13",
+    "proteinMin": 24,
+    "fatMin": 22,
+    "fiberMax": 4,
+    "ashMax": 6,
+    "moistureMax": 10,
+    "kcalKg": 3900,
+    "packagesKg": [
+      2
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Holliday MV",
+    "name": "Holliday MV Gatos Urinario",
+    "species": "cat",
+    "handles": [
+      "holliday-mv-gatos-urinario"
+    ],
+    "url": "https://holliday-scott.com/file/im/20240711035159vademecum_mv_digital.pdf#page=14",
+    "proteinMin": 35,
+    "fatMin": 17,
+    "fiberMax": 4,
+    "ashMax": 6,
+    "moistureMax": 10,
+    "kcalKg": 3900,
+    "packagesKg": [
+      2,
+      7.5
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Holliday MV",
+    "name": "Holliday MV Perros Articular",
+    "species": "dog",
+    "handles": [
+      "holliday-mv-perros-articular"
+    ],
+    "url": "https://holliday-scott.com/file/im/20240711035159vademecum_mv_digital.pdf#page=4",
+    "proteinMin": 25,
+    "fatMin": 12,
+    "fiberMax": 4,
+    "ashMax": 8,
+    "moistureMax": 10,
+    "kcalKg": 3300,
+    "packagesKg": [
+      2,
+      10
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Holliday MV",
+    "name": "Holliday MV Perros Gastrointestinal",
+    "species": "dog",
+    "handles": [
+      "holliday-mv-perros-gastrointestinal"
+    ],
+    "url": "https://holliday-scott.com/file/im/20240711035159vademecum_mv_digital.pdf#page=6",
+    "proteinMin": 28,
+    "fatMin": 13,
+    "fiberMax": 3,
+    "ashMax": 8,
+    "moistureMax": 10,
+    "kcalKg": 3700,
+    "packagesKg": [
+      2,
+      10
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Holliday MV",
+    "name": "Holliday MV Perros Obesidad",
+    "species": "dog",
+    "handles": [
+      "holliday-mv-perros-obesidad"
+    ],
+    "url": "https://holliday-scott.com/file/im/20240711035159vademecum_mv_digital.pdf#page=7",
+    "proteinMin": 28,
+    "fatMin": 7,
+    "fiberMax": 4.5,
+    "ashMax": 8,
+    "moistureMax": 10,
+    "kcalKg": 3000,
+    "packagesKg": [
+      2,
+      10
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Holliday MV",
+    "name": "Holliday MV Perros Renal",
+    "species": "dog",
+    "handles": [
+      "holliday-mv-perros-renal"
+    ],
+    "url": "https://holliday-scott.com/file/im/20240711035159vademecum_mv_digital.pdf#page=8",
+    "proteinMin": 16,
+    "fatMin": 14,
+    "fiberMax": 3,
+    "ashMax": 7,
+    "moistureMax": 10,
+    "kcalKg": 3600,
+    "packagesKg": [
+      2,
+      10
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Holliday MV",
+    "name": "Holliday MV Perros Sensibilidad Dietaria",
+    "species": "dog",
+    "handles": [
+      "holliday-mv-perros-sensibilidad-dietaria"
+    ],
+    "url": "https://holliday-scott.com/file/im/20240711035159vademecum_mv_digital.pdf#page=9",
+    "proteinMin": 23,
+    "fatMin": 12,
+    "fiberMax": 4,
+    "ashMax": 8,
+    "moistureMax": 10,
+    "kcalKg": 3200,
+    "packagesKg": [
+      2,
+      10
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Nulo",
+    "name": "Nulo Dog FreeStyle Grain Free Cordero",
+    "species": "dog",
+    "handles": [
+      "nulo-dog-freestyle-grain-free-cordero"
+    ],
+    "url": "https://nulo.com/products/freestyle-lamb-chickpeas-recipe-for-dogs",
+    "proteinMin": 31.0,
+    "fatMin": 17.0,
+    "fiberMax": 4.5,
+    "moistureMax": 10.0,
+    "kcalKg": 3519,
+    "packagesKg": [
+      2.041,
+      2.722,
+      4.99,
+      10.886,
+      11.793
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Nulo",
+    "name": "Nulo Dog FreeStyle Grain Free Pavo",
+    "species": "dog",
+    "handles": [
+      "nulo-dog-freestyle-grain-free-pavo"
+    ],
+    "url": "https://nulo.com/products/freestyle-turkey-sweet-potato-recipe-for-dogs",
+    "proteinMin": 33.0,
+    "fatMin": 18.0,
+    "fiberMax": 4.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3614,
+    "packagesKg": [
+      2.041,
+      2.722,
+      4.99,
+      10.886,
+      11.793
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Nulo",
+    "name": "Nulo Dog FreeStyle Grain Free Puppy Salmon",
+    "species": "dog",
+    "handles": [
+      "nulo-dog-freestyle-grain-free-puppy-salmon"
+    ],
+    "url": "https://nulo.com/products/freestyle-puppy-salmon-peas-recipe-for-dogs",
+    "proteinMin": 30.0,
+    "fatMin": 17.0,
+    "fiberMax": 4.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3501,
+    "packagesKg": [
+      2.041,
+      2.722,
+      4.99,
+      10.886,
+      11.793
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Nulo",
+    "name": "Nulo Dog FreeStyle Grain Free Senior Trucha",
+    "species": "dog",
+    "handles": [
+      "nulo-dog-freestyle-grain-free-senior-trucha"
+    ],
+    "url": "https://nulo.com/products/freestyle-senior-trout-sweet-potato-recipe-for-dogs",
+    "proteinMin": 30.0,
+    "fatMin": 12.0,
+    "fiberMax": 5.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3257,
+    "packagesKg": [
+      2.041,
+      2.722,
+      4.99,
+      10.886,
+      11.793
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Nulo",
+    "name": "Nulo Dog FreeStyle Grain Free Small Breed Salmon",
+    "species": "dog",
+    "handles": [
+      "nulo-dog-freestyle-grain-free-small-breed-salmon"
+    ],
+    "url": "https://nulo.com/products/freestyle-small-breed-salmon-lentils-recipe-for-dogs",
+    "proteinMin": 31.0,
+    "fatMin": 17.0,
+    "fiberMax": 5.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3490,
+    "packagesKg": [
+      2.041,
+      2.722,
+      4.99,
+      6.35
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Nulo",
+    "name": "Nulo Dog FreeStyle Grain Free Trim Peso Saludable Bacalao",
+    "species": "dog",
+    "handles": [
+      "nulo-dog-freestyle-grain-free-trim-peso-saludable-bacalao"
+    ],
+    "url": "https://nulo.com/products/freestyle-adult-trim-cod-lentils-recipe-for-dogs",
+    "proteinMin": 30.0,
+    "fiberMax": 6.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3030,
+    "fatMin": 7,
+    "packagesKg": [
+      2.041,
+      2.722,
+      4.99,
+      10.886,
+      11.793
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Virbac HPM Adult Cat Neutered",
+    "species": "cat",
+    "handles": [
+      "virbac-hpm-adult-cat-neutered"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/adult-neutered-cat-1",
+    "protein": 44.0,
+    "fat": 13.5,
+    "moisture": 5.5,
+    "ash": 8.5,
+    "fiber": 8.0,
+    "kcalKg": 3420.0,
+    "packagesKg": [
+      1.5,
+      3.0,
+      7.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Virbac HPM Adult Cat Salmon N&E",
+    "species": "cat",
+    "handles": [
+      "virbac-hpm-adult-cat-salmon-n-e"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/adult-salmon-neutered--entire--1-1",
+    "protein": 44.0,
+    "fat": 16.0,
+    "moisture": 5.5,
+    "ash": 8.5,
+    "fiber": 6.0,
+    "kcalKg": 3770.0,
+    "packagesKg": [
+      1.5,
+      3.0,
+      7.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Virbac HPM Adult Dog Large & Medium",
+    "species": "dog",
+    "handles": [
+      "virbac-hpm-adult-dog-large-medium"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/adult-dog-large--medium-1",
+    "protein": 34.0,
+    "fat": 17.0,
+    "moisture": 9.0,
+    "ash": 7.5,
+    "fiber": 5.0,
+    "kcalKg": 3860.0,
+    "packagesKg": [
+      3.0,
+      7.0,
+      12.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Virbac HPM Adult Dog Neutered Large & Medium",
+    "species": "dog",
+    "handles": [
+      "virbac-hpm-adult-dog-neutered-large-medium"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/adult-neutered-dog-large--medium-1",
+    "protein": 34.0,
+    "fat": 14.0,
+    "moisture": 9.0,
+    "ash": 7.5,
+    "fiber": 9.5,
+    "kcalKg": 3170.0,
+    "packagesKg": [
+      3.0,
+      7.0,
+      12.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Virbac HPM Adult Dog Neutered Small & Toy",
+    "species": "dog",
+    "handles": [
+      "virbac-hpm-adult-dog-neutered-small-toy"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/adult-neutered-dog-small--toy-1",
+    "protein": 34.0,
+    "fat": 14.0,
+    "moisture": 9.0,
+    "ash": 7.5,
+    "fiber": 9.5,
+    "kcalKg": 3170.0,
+    "packagesKg": [
+      1.5,
+      3.0,
+      7.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Virbac HPM Adult Dog Small & Toy",
+    "species": "dog",
+    "handles": [
+      "virbac-hpm-adult-dog-small-toy"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/adult-dog-small-toy-1",
+    "protein": 34.0,
+    "fat": 17.0,
+    "moisture": 9.0,
+    "ash": 7.5,
+    "fiber": 5.0,
+    "kcalKg": 3860.0,
+    "packagesKg": [
+      1.5,
+      3.0,
+      7.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Virbac HPM Cat Advanced Kidney & Joint K3",
+    "species": "cat",
+    "handles": [
+      "virbac-hpm-cat-advanced-kidney-joint-k3"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/advanced-kidney-joint-1",
+    "protein": 30.0,
+    "fat": 21.0,
+    "moisture": 5.5,
+    "ash": 7.0,
+    "fiber": 3.5,
+    "packagesKg": [
+      1.5,
+      3.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Virbac HPM Cat Hypoallergy Hydrolysed",
+    "species": "cat",
+    "handles": [
+      "virbac-hpm-cat-hypoallergy-hydrolysed"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/allergy-a2-proteina-pescado-intolerancia-cat-1",
+    "protein": 31.0,
+    "fat": 16.0,
+    "moisture": 5.5,
+    "ash": 7.5,
+    "fiber": 4.0,
+    "kcalKg": 3830.0,
+    "packagesKg": [
+      3.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Virbac HPM Dog Hypoallergy Hydrolysed",
+    "species": "dog",
+    "handles": [
+      "virbac-hpm-dog-hypoallergy-hydrolysed"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/allergy-a2-proteina-pescado-intolerancia-dog-1",
+    "protein": 24.0,
+    "fat": 18.0,
+    "moisture": 9.0,
+    "ash": 7.0,
+    "fiber": 4.5,
+    "kcalKg": 3840.0,
+    "packagesKg": [
+      3.0,
+      7.0,
+      12.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Virbac HPM Dog Joint & Mobility",
+    "species": "dog",
+    "handles": [
+      "virbac-hpm-dog-joint-mobility"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/joint---soporte-articular-y-musc-1",
+    "protein": 34.0,
+    "fat": 15.0,
+    "moisture": 9.0,
+    "ash": 6.5,
+    "fiber": 9.0,
+    "kcalKg": 3350.0,
+    "packagesKg": [
+      3.0,
+      12.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Virbac HPM Kitten Pre Neutered Cat",
+    "species": "cat",
+    "handles": [
+      "virbac-hpm-kitten-pre-neutered-cat"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/baby-cat-1-1",
+    "protein": 45.0,
+    "fat": 20.0,
+    "moisture": 5.5,
+    "ash": 8.5,
+    "fiber": 4.0,
+    "kcalKg": 4300.0,
+    "packagesKg": [
+      1.5,
+      3.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Virbac HPM Puppy Dog Large & Medium",
+    "species": "dog",
+    "handles": [
+      "virbac-hpm-puppy-dog-large-medium"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/puppy-large--medium",
+    "protein": 35.0,
+    "fat": 21.0,
+    "moisture": 9.0,
+    "ash": 7.5,
+    "fiber": 4.0,
+    "kcalKg": 3960.0,
+    "packagesKg": [
+      3.0,
+      7.0,
+      12.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Virbac HPM Puppy Dog Small & Toy",
+    "species": "dog",
+    "handles": [
+      "virbac-hpm-puppy-dog-small-toy"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/Puppy%20Dog%20Small%20%26%20Toy",
+    "protein": 35,
+    "fat": 21,
+    "fiber": 4,
+    "ash": 7.5,
+    "moisture": 9,
+    "kcalKg": 3960,
+    "packagesKg": [
+      1.5,
+      3
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Virbac HPM Senior Dog Neutered Large & Medium",
+    "species": "dog",
+    "handles": [
+      "virbac-hpm-senior-dog-neutered-large-medium"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/senior-neutered-dog-large--med-2-1",
+    "protein": 32.0,
+    "fat": 12.0,
+    "moisture": 9.0,
+    "ash": 6.5,
+    "fiber": 10.5,
+    "kcalKg": 3200.0,
+    "packagesKg": [
+      3.0,
+      7.0,
+      12.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Virbac HPM Senior Dog Neutered Small & Toy",
+    "species": "dog",
+    "handles": [
+      "virbac-hpm-senior-dog-neutered-small-toy"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/senior-dog-neutered-small--toy-1",
+    "protein": 32.0,
+    "fat": 12.0,
+    "moisture": 9.0,
+    "ash": 6.5,
+    "fiber": 10.5,
+    "kcalKg": 3200.0,
+    "packagesKg": [
+      1.5,
+      3.0,
+      7.0
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Virbac Veterinary HPM",
+    "name": "Virbac HPM Senior Dog Small & Toy",
+    "species": "dog",
+    "handles": [
+      "virbac-hpm-senior-dog-small-toy"
+    ],
+    "url": "https://co.virbac.com/products/nutricion/senior-dog-small--toy-1-1",
+    "protein": 32.0,
+    "fat": 14.0,
+    "moisture": 9.0,
+    "ash": 6.5,
+    "fiber": 9.5,
+    "kcalKg": 3320.0,
+    "packagesKg": [
+      1.5,
+      3.0,
+      7.0
+    ],
+    "verifiedOn": "2026-11-21"
+  }
+]

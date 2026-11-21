@@ -360,8 +360,9 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
           {source === 'internet' && (
             <OnlineFoodSearch species={pet.species} lang={userAccount.language} onSelect={(food) => {
               const component = summary.components.find((item) => sameFoodIdentity(item.food, food));
+              const keepPlanLabel = component && (component.food.labelStatus === 'user_confirmed_label' || food.labelStatus !== 'verified_manufacturer');
               chooseFood({
-                food: component ? { ...component.food, bagSizeKg: food.bagSizeKg, availableSizesKg: food.availableSizesKg } : food,
+                food: keepPlanLabel ? { ...component.food, bagSizeKg: food.bagSizeKg, availableSizesKg: food.availableSizesKg } : food,
                 role: component?.role ?? (food.type === 'wet' ? 'wet' : 'dry'),
               });
               setError('');
