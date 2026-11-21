@@ -389,14 +389,14 @@ const LabelForm: React.FC<LabelFormProps> = ({
             {manualIdentity && <>
               <label className="space-y-1 text-xs font-bold">
                 <span>{isEs ? 'Especie indicada en el empaque' : 'Species on the package'}</span>
-                <select name="species" className={inputClass} defaultValue={currentFood?.species ?? pet.species}>
+                <select aria-label={isEs ? 'Especie indicada en el empaque' : 'Species on the package'} name="species" className={inputClass} defaultValue={currentFood?.species ?? pet.species}>
                   <option value="dog">{isEs ? 'Perro' : 'Dog'}</option>
                   <option value="cat">{isEs ? 'Gato' : 'Cat'}</option>
                 </select>
               </label>
               <label className="space-y-1 text-xs font-bold">
                 <span>{isEs ? 'Etapa indicada en el empaque' : 'Life stage on the package'}</span>
-                <select name="stage" className={inputClass} defaultValue={
+                <select aria-label={isEs ? 'Etapa indicada en el empaque' : 'Life stage on the package'} name="stage" className={inputClass} defaultValue={
                   !currentFood || currentFood.lifeStageKnown === false ? '' :
                     ['kitten','puppy'].includes(currentFood.lifeStage) ? 'growth' : currentFood.lifeStage
                 }>
