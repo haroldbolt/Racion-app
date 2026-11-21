@@ -1,3 +1,5 @@
+import { registryPath, registryResponse } from './colombiaRegistry';
+import { catalogPath, colombiaFoodResponse } from './colombiaFoodRoute';
 import { DurableObject } from 'cloudflare:workers';
 import { LivePriceService, hashValue, parseLivePriceRequest, unavailablePriceResult, type PriceStorageTransactions } from './service';
 
@@ -63,19 +65,38 @@ export class PriceSearchBudget extends DurableObject<LivePriceWorkerEnv> {
 
 export default {
   async fetch(request: Request, env: LivePriceWorkerEnv): Promise<Response> {
-    if (new URL(request.url).pathname !== ROUTE) return new Response(null, { status: 404 });
+    const url = new URL(request.url);
+    const isRegistry = url.pathname === registryPath;
+    const isCatalog = url.pathname === catalogPath || isRegistry;
+    if (!isCatalog && url.pathname !== ROUTE) return new Response(null, { status: 404 });
     const origin = request.headers.get('Origin');
     const allowedOrigins = (env.ALLOWED_ORIGINS ?? '').split(',').map((item) => item.trim());
     if (!origin || !allowedOrigins.includes(origin)) return new Response(null, { status: 403 });
     const headers = {
       'Access-Control-Allow-Origin': origin,
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Methods': isCatalog ? 'GET, OPTIONS' : 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
       'Access-Control-Max-Age': '600',
       'Cache-Control': 'no-store',
       Vary: 'Origin',
     };
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers });
+    if (isCatalog) {
+      if (request.method !== 'GET') return Response.json({ error: 'method_not_allowed' }, { status: 405, headers });
+      const cache = (globalThis.caches as CacheStorage & { default?: Cache }).default;
+      if (isRegistry) {
+        const result = await registryResponse(url, request.signal, cache);
+        const responseHeaders = new Headers(result.headers);
+        responseHeaders.set('Access-Control-Allow-Origin', origin);
+        responseHeaders.set('Access-Control-Expose-Headers', 'X-ICA-Source');
+        responseHeaders.set('Vary', 'Origin');
+        return new Response(result.body, {status:result.status, headers:responseHeaders});
+      }
+      const result = await colombiaFoodResponse(url, request.signal, cache);
+      return new Response(result.body, {status:result.status, headers:{
+        ...headers, 'Content-Type':'application/json; charset=utf-8',
+      }});
+    }
     if (request.method !== 'POST') return Response.json({ error: 'method_not_allowed' }, { status: 405, headers });
     if (!/^application\/json(?:;|$)/i.test(request.headers.get('Content-Type') ?? '')) {
       return Response.json({ error: 'invalid_content_type' }, { status: 415, headers });

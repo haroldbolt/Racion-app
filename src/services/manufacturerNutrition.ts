@@ -71,9 +71,16 @@ async function manufacturerPage(title: string, description: string, signal: Abor
 /** Marketing prose is never substituted for a declared analysis. Incomplete
  * and conflicting fields remain separately reviewable on the same formula. */
 export async function enrichOnlineNutrition(food: FoodItem, title: string, description: string, signal: AbortSignal): Promise<FoodItem> {
-  const storeUrl = food.storeProductUrl!;
-  const time = food.fichaNutricional!.fechaConsulta!;
-  const storeSource = {name:'Laia Pets', url:storeUrl, observedAt:time};
+  const storeUrl = food.storeProductUrl || food.fichaNutricional?.fuenteUrl;
+  if (!storeUrl || !/^https:\/\//i.test(storeUrl)) return food;
+  let storeHost: URL;
+  try {storeHost = new URL(storeUrl);} catch {return food;}
+  if (storeHost.username || storeHost.password) return food;
+  const time = food.fichaNutricional?.fechaConsulta || new Date().toISOString();
+  const storeSource = {
+    name: food.fichaNutricional?.fuenteNombre || food.priceBasis?.storeName || storeHost.hostname.replace(/^www\./, ''),
+    url:storeUrl, observedAt:time,
+  };
   const store = labelValueSources(parseLabelValues(description,true),storeSource);
   let page: OfficialPage | undefined;
   try {page = await manufacturerPage(title, description, AbortSignal.any([signal, AbortSignal.timeout(5500)]));}
@@ -84,28 +91,29 @@ export async function enrichOnlineNutrition(food: FoodItem, title: string, descr
     {name:page.sourceName, url:page.url, observedAt:time} : storeSource;
   const official = page ? labelValueSources(parseLabelValues(page.html,true),source) : {};
   const hasOfficial = Object.keys(official).length > 0;
-  const fields = hasOfficial ? official : store;
-  const verified = Object.keys(fields).length > 0;
+  const fields = {...store, ...official};
+  const hasSupplementaryStoreFields = Object.keys(store).some(key => !(key in official));
+  const manufacturerVerified = hasOfficial && !hasSupplementaryStoreFields;
+  const hasFields = Object.keys(fields).length > 0;
   const productSource = hasOfficial ? source : storeSource;
   const ficha: NutritionDatasheet = {
-    ...food.fichaNutricional,
-    ...fields,
-    coincidenciaEstado:verified ? 'verificado' : 'pendiente',
+    ...food.fichaNutricional, ...fields, fechaConsulta:time,
+    coincidenciaEstado:manufacturerVerified ? 'verificado' : hasFields ? 'revision_requerida' : 'pendiente',
     fuenteNombre:productSource.name, fuenteUrl:productSource.url,
-    notasRevision:hasOfficial ? 'Datos publicados por el fabricante para esta fórmula.'
-      : verified ? 'Análisis publicado por la tienda. Contrasta los datos con tu empaque.' : 'Análisis pendiente de la etiqueta.',
+    notasRevision:manufacturerVerified ? 'Datos publicados por el fabricante para esta fórmula.'
+      : hasFields ? 'Contrasta con tu empaque los valores publicados por la tienda antes de aplicar la ficha.' : 'Análisis pendiente de la etiqueta.',
     discrepancies:page ? labelDiscrepancies(official, store, storeUrl) : undefined,
   };
-  const use = declaredUse(page?.html || description) ?? food.nutritionalUse;
+  const use = (page && declaredUse(page.html)) || declaredUse(description) || food.nutritionalUse;
   return {
     ...food, fichaNutricional:ficha,
-    labelStatus:hasOfficial ? 'verified_manufacturer' : 'unconfirmed',
+    labelStatus:manufacturerVerified ? 'verified_manufacturer' : 'unconfirmed',
     dataSource:productSource.name,
-    ingredientsSummary:declaredIngredients(page?.html || description),
-    feedingGuide:page ? readFeedingGuide(page.html,page.url,page.sourceName) : undefined,
+    ingredientsSummary:(page && declaredIngredients(page.html)) || declaredIngredients(description),
+    feedingGuide:(page && readFeedingGuide(page.html,page.url,page.sourceName)) || readFeedingGuide(description,storeUrl,storeSource.name),
     nutritionalUse:use,
     isCompleteAndBalanced:use === 'complete' ? true : undefined,
-    kcalPerKg:hasOfficial ? (fields.kcalPerKg?.valor ?? 0) : 0,
+    kcalPerKg:manufacturerVerified ? (official.kcalPerKg?.valor ?? 0) : 0,
     proteinPct:fields.proteina?.baseMedicion === 'tal_como_se_vende' ? fields.proteina.valor : 0,
     fatPct:fields.grasa?.baseMedicion === 'tal_como_se_vende' ? fields.grasa.valor : 0,
     fiberPct:fields.fibra?.baseMedicion === 'tal_como_se_vende' ? fields.fibra.valor : 0,

@@ -81,6 +81,14 @@ async function verifyWorkerRuntime() {
       assert.equal(preflight.headers.get('access-control-allow-origin'), origin);
       assert.match(preflight.headers.get('access-control-allow-methods'), /POST/);
     }
+    const catalog = 'http://localhost/api/colombia-foods';
+    assert.equal((await worker.dispatchFetch(catalog + '?q=a&species=dog', {headers:{origin:brandedOrigin}})).status, 400);
+    assert.equal((await worker.dispatchFetch(catalog + '?q=pollo&species=bird', {headers:{origin:brandedOrigin}})).status, 400);
+    assert.equal((await worker.dispatchFetch(catalog, {method:'POST',headers:{origin:brandedOrigin}})).status, 405);
+    assert.equal((await worker.dispatchFetch(catalog, {headers:{origin:'https://other.example'}})).status, 403);
+    const options = await worker.dispatchFetch(catalog, {method:'OPTIONS',headers:{origin:brandedOrigin}});
+    assert.equal(options.status,204);
+    assert.match(options.headers.get('access-control-allow-methods'), /GET/);
     const unconfigured = await post(worker);
     assert.equal(unconfigured.status, 200);
     assert.equal(unconfigured.headers.get('cache-control'), 'no-store');

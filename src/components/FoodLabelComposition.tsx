@@ -9,14 +9,14 @@ const fields = [
   { key:'kcalPerKg', es:'Energía', en:'Energy' },
 ] as const;
 
-export function FoodLabelComposition({ food, language }: {food: FoodItem; language: 'es' | 'en'}) {
+export function FoodLabelComposition({ food, language, previewPending = false }: {food: FoodItem; language: 'es' | 'en'; previewPending?: boolean}) {
   const isEs = language === 'es';
   const format = new Intl.NumberFormat(isEs ? 'es-CO' : 'en', {maximumFractionDigits:3});
   const qualifiers = isEs ? {minimo:'Mín.', maximo:'Máx.', tipico:'Típico'} : {minimo:'Min.', maximo:'Max.', tipico:'Typical'};
   return (
     <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs sm:grid-cols-4">
       {fields.map(({ key, es, en }) => {
-        const nutrient = getEffectiveNutrientField(food, key);
+        const nutrient = getEffectiveNutrientField(food, key) ?? (previewPending && food.fichaNutricional?.coincidenciaEstado === 'revision_requerida' ? food.fichaNutricional[key] : undefined);
         const source = nutrient?.source;
         const url = source ? source.url : food.fichaNutricional?.fuenteUrl;
         const sourceName = source?.name ?? food.fichaNutricional?.fuenteNombre;
@@ -31,6 +31,7 @@ export function FoodLabelComposition({ food, language }: {food: FoodItem; langua
               <summary className="cursor-pointer">{display}</summary>
               <span className="block font-normal">
                 {url && /^https:\/\//i.test(url) ? <a className="text-green-800 underline" href={url} target="_blank" rel="noopener noreferrer">{sourceName}</a> : sourceName}
+                {nutrient?.declaracionOriginal && <span className="block">{nutrient.declaracionOriginal}</span>}
                 {date && !Number.isNaN(Date.parse(date)) && <> · {new Date(date).toLocaleDateString(isEs ? 'es-CO' : 'en')}</>}
               </span>
             </details> : display || (isEs ? 'Sin dato' : 'No data')}

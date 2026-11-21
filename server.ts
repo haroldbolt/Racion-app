@@ -1,3 +1,5 @@
+import { registryPath, registryResponse } from './workers/live-prices/colombiaRegistry';
+import { catalogPath, colombiaFoodResponse } from './workers/live-prices/colombiaFoodRoute';
 import express from 'express';
 import path from 'node:path';
 import { createServer as createViteServer } from 'vite';
@@ -5,6 +7,21 @@ import { createServer as createViteServer } from 'vite';
 const app = express();
 const port = Number(process.env.PORT ?? 3000);
 app.disable('x-powered-by');
+
+app.get(registryPath, async (_req, res, next) => {
+  try {
+    const result = await registryResponse(new URL(registryPath, 'http://localhost'), AbortSignal.timeout(15000));
+    result.headers.forEach((value, key) => res.set(key, value));
+    res.status(result.status).send(Buffer.from(await result.arrayBuffer()));
+  } catch (error) { next(error); }
+});
+
+app.get(catalogPath, async (req, res, next) => {
+  try {
+    const result = await colombiaFoodResponse(new URL(req.originalUrl, 'http://localhost'), AbortSignal.timeout(15000));
+    res.status(result.status).type('json').send(await result.text());
+  } catch (error) { next(error); }
+});
 
 // This beta stores all user data locally. API requests must never fall through to the SPA.
 app.use('/api', (_req, res) => {

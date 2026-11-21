@@ -604,7 +604,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                   species={pet.species}
                   foodType={filterType === 'all' ? undefined : filterType}
                   lang={userAccount.language}
-                  onSelect={(food) => setLabelDraft({ food })}
+                  onSelect={(food, source) => source === 'label' ? saveLibraryFood(food) : setLabelDraft({ food })}
                 />
               </>
             )}

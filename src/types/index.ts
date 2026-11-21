@@ -71,6 +71,7 @@ export type MeasurementBasis = 'tal_como_se_vende' | 'materia_seca';
 export type EmpaqueTipo = 'fabrica' | 'fraccionado' | 'por_confirmar';
 
 export interface NutrientValue {
+  declaracionOriginal?: string; // Source quantity when converted to the app’s display unit.
   source?: { name: string; url?: string; observedAt: string };
   valor: number;
   unidadOriginal: string;
@@ -110,6 +111,7 @@ export interface FoodPriceBasis {
 }
 
 export interface FoodItem {
+  storeName?: string;
   storeProductUrl?: string;
   feedingGuide?: {
     sourceUrl: string;

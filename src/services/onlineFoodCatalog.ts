@@ -8,7 +8,31 @@ const merchantOrigin = 'https://www.laiapets.com.co';
 const detailFields = 'id,name,handle,description,images,variants,categories,tags,brand';
 const maximumProducts = 8;
 const cacheLifetimeMs = 5 * 60 * 1000;
-const cache = new Map<string, { expiresAt: number; foods: FoodItem[] }>();
+export interface FoodCatalogResult {
+  foods: FoodItem[];
+  unavailableSources: string[];
+}
+const cache = new Map<string, { expiresAt: number; result: FoodCatalogResult }>();
+
+interface Presentation {
+  packageKg: number;
+  priceCop?: number;
+  sourceUrl: string;
+}
+
+interface CatalogListing {
+  id: string;
+  title: string;
+  brand: string;
+  retailer: string;
+  productUrl: string;
+  species: Species;
+  type: FoodItem['type'];
+  observedAt: string;
+  presentations: Presentation[];
+  imageUrl?: string;
+  nutritionalUse?: FoodItem['nutritionalUse'];
+}
 
 type JsonRecord = Record<string, unknown>;
 
@@ -120,65 +144,51 @@ function foodFromDetail(
     const sourceUrl = numericId(variant.id) ? `${productUrl}?variant=${variant.id}` : productUrl;
     return [{ packageKg: parsed[0].kg!, priceCop, sourceUrl }];
   });
+  const brand = /^agility gold\b/i.test(title) ? 'Agility Gold' : plainText(detail.brand);
+  const images = Array.isArray(detail.images) ? detail.images.map(record) : [];
+  const imageUrl = images.map((image) => httpsUrl(image.src)).find(Boolean);
+  return fromListing({
+    id: `online_laia_${detail.id}`, retailer: 'Laia Pets', brand, title, productUrl, species, type,
+    observedAt, presentations, imageUrl,
+  }, identity);
+}
+
+function httpsUrl(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && !url.username && !url.password ? url.href : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function fromListing(listing: CatalogListing, identity: string): FoodItem {
+  const {id, retailer, brand, title, productUrl, species, type, observedAt, presentations, imageUrl} = listing;
   const availableSizesKg = [...new Set(presentations.map(({ packageKg }) => packageKg))].sort((a, b) => a - b);
   const packagePrices: FoodPriceBasis[] = availableSizesKg.flatMap((packageKg) => {
     const matching = presentations.filter((pack) => pack.packageKg === packageKg);
     const prices = matching.map((pack) => pack.priceCop);
-    // Conflicting or missing prices for the same weight need confirmation, not a guessed offer.
     if (prices.some((price) => price === undefined) || new Set(prices).size !== 1) return [];
-    return [{ packageKg, priceCop: prices[0]!, source: 'online', observedAt, storeName: 'Laia Pets', sourceUrl: matching[0].sourceUrl, shippingCop: null }];
+    return [{ packageKg, priceCop: prices[0]!, source: 'online', observedAt, storeName: retailer, sourceUrl: matching[0].sourceUrl, shippingCop: null }];
   });
-  const brand = /^agility gold\b/i.test(title) ? 'Agility Gold' : plainText(detail.brand);
   const formula = title.replace(/\s+[–—|-]\s+(?:alimento|concentrado|croquetas)\b.*$/i, '').trim();
-  const name = brand && normalized(formula).startsWith(normalized(brand) + ' ')
-    ? formula.slice(brand.length).trim()
-    : formula;
-  const images = Array.isArray(detail.images) ? detail.images.map(record) : [];
-  const imageUrl = images.map((image) => text(image.src)).find((source) => {
-    try {
-      const url = new URL(source);
-      return url.protocol === 'https:' && !url.username && !url.password;
-    } catch {
-      return false;
-    }
-  });
+  const name = brand && normalized(formula).startsWith(normalized(brand) + ' ') ? formula.slice(brand.length).trim() : formula;
   const lifeStage = /\b(?:gatitos?|kittens?)\b/.test(identity) ? 'kitten'
     : /\b(?:cachorros?|pupp(?:y|ies))\b/.test(identity) ? (species === 'cat' ? 'kitten' : 'puppy')
     : /\b(?:senior|mature)\b/.test(identity) ? 'senior'
     : /\b(?:adult[oa]s?|adults?)\b/.test(normalized(title)) ? 'adult' : 'all';
-
+  const priceBasis = packagePrices.find((price) => price.packageKg === availableSizesKg[0]);
   return {
-    id: `online_laia_${detail.id}`,
-    sourceFoodId: `online_laia_${detail.id}`,
-    brand,
-    name,
-    species,
-    lifeStage,
+    id, sourceFoodId: id, storeName: retailer, storeProductUrl: productUrl, brand, name, species, type, lifeStage,
     lifeStageKnown: lifeStage !== 'all' || /todas las etapas|all life stages/.test(normalized(title)),
-    nutritionalUse: /\b(?:snacks?|premios?|golosinas?|galletas?)\b/.test(normalized(title)) ? 'treat' : undefined,
-    storeProductUrl: productUrl,
-    type,
-    kcalPerKg: 0,
-    proteinPct: 0,
-    fatPct: 0,
-    fiberPct: 0,
-    moisturePct: 0,
-    country: 'Colombia',
-    bagSizeKg: availableSizesKg[0],
-    availableSizesKg,
-    packagePrices,
-    priceBasis: packagePrices.find((price) => price.packageKg === availableSizesKg[0]),
-    imageUrl,
-    buyUrl: packagePrices.find((price) => price.packageKg === availableSizesKg[0])?.sourceUrl || productUrl,
-    labelStatus: 'unconfirmed',
-    dataSource: 'Laia Pets · catálogo público consultado en internet',
-    fichaNutricional: {
-      coincidenciaEstado: 'pendiente',
-      fuenteNombre: 'Laia Pets',
-      fuenteUrl: productUrl,
-      fechaConsulta: observedAt,
-      mercado: 'Colombia',
-      notasRevision: 'Presentaciones publicadas por la tienda. Confirma la etiqueta para guardar la composición nutricional.',
+    nutritionalUse: listing.nutritionalUse ?? (/\b(?:snacks?|premios?|golosinas?|galletas?)\b/.test(normalized(title)) ? 'treat' : undefined),
+    kcalPerKg: 0, proteinPct: 0, fatPct: 0, fiberPct: 0, moisturePct: 0, country: 'Colombia',
+    bagSizeKg: availableSizesKg[0], availableSizesKg, packagePrices, priceBasis, imageUrl,
+    buyUrl: priceBasis?.sourceUrl || productUrl,
+    labelStatus: 'unconfirmed', dataSource: retailer, fichaNutricional: {
+      coincidenciaEstado: 'pendiente', fuenteNombre: retailer, fuenteUrl: productUrl,
+      fechaConsulta: observedAt, mercado: 'Colombia', notasRevision: 'Presentaciones publicadas por la tienda.',
     },
   };
 }
@@ -194,32 +204,7 @@ async function storefrontJson(url: URL | string, signal: AbortSignal): Promise<J
   return record(await response.json());
 }
 
-/** Looks up explicit food and presentation metadata in the public merchant catalog. */
-export async function searchOnlineFoods(
-  query: string,
-  species: Species,
-  foodType?: FoodItem['type'],
-  signal?: AbortSignal,
-): Promise<FoodItem[]> {
-  const entered = query.trim().replace(/\s+/g, ' ');
-  if (!entered || entered.length > 100) throw new Error('Escribe el nombre del alimento, hasta 100 caracteres.');
-  if (species !== 'cat' && species !== 'dog') return [];
-  if (signal?.aborted) throw signal.reason ?? new DOMException('Búsqueda cancelada', 'AbortError');
-
-  const searchable = entered
-    .replace(/^rc\b/i, 'Royal Canin')
-    .replace(/^ppp\b/i, 'Purina Pro Plan')
-    .replace(/\b\d+(?:[.,]\d+)?\s*(?:kg|kilos?|g|gr|gramos?|lb|lbs|oz)\b/gi, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-  if (searchable.length < 2) return [];
-  const key = JSON.stringify([normalized(searchable), species, foodType]);
-  const existing = cache.get(key);
-  if (existing && existing.expiresAt > Date.now()) return structuredClone(existing.foods);
-  cache.delete(key);
-
-  const timeout = AbortSignal.timeout(19000);
-  const combined = signal ? AbortSignal.any([signal, timeout]) : timeout;
+async function searchLaia(searchable: string, species: Species, foodType: FoodItem['type'] | undefined, combined: AbortSignal): Promise<FoodCatalogResult> {
   const searchUrl = new URL(`${storefront}/search/products`);
   searchUrl.search = new URLSearchParams({ q: searchable, fields: 'id', per_page: String(maximumProducts) }).toString();
   const [metadata, result] = await Promise.all([
@@ -233,19 +218,123 @@ export async function searchOnlineFoods(
   const ids = [...new Set(result.data.map((item) => record(item).id).filter(numericId))].slice(0, maximumProducts);
   const queryNumbers = normalized(searchable).match(/\d+(?:[.,]\d+)?/g) ?? [];
   const foods: FoodItem[] = [];
+  let incomplete = false;
   for (let offset = 0; offset < ids.length; offset += 3) {
-    const products = await Promise.all(ids.slice(offset, offset + 3).map(async (id) => {
+    const products = await Promise.allSettled(ids.slice(offset, offset + 3).map(async (id) => {
       const detailUrl = new URL(`${storefront}/products/${id}`);
       detailUrl.searchParams.set('fields', detailFields);
       const detail = await storefrontJson(detailUrl, combined);
       const food = detail.id === id ? foodFromDetail(detail, species, queryNumbers, foodType) : null;
       return food ? enrichOnlineNutrition(food, plainText(detail.name), text(detail.description), combined) : null;
     }));
-    foods.push(...products.filter((food): food is FoodItem => food !== null));
+    for (const result of products) {
+      if (result.status === 'rejected') incomplete = true;
+      else if (result.value) foods.push(result.value);
+    }
+    if (combined.aborted) break;
   }
 
+  return {foods, unavailableSources: incomplete ? ['Laia Pets'] : []};
+}
+
+export function getColombiaCatalogUrl(): string | undefined {
+  const env = import.meta.env;
+  if (!env) return undefined;
+  if (env.VITE_PRICE_API_URL?.trim()) return new URL('/api/colombia-foods', new URL(env.VITE_PRICE_API_URL.trim(), window.location.origin)).href;
+  return env.DEV ? new URL('/api/colombia-foods', window.location.origin).href
+    : 'https://racion-live-prices.jumer4.workers.dev/api/colombia-foods';
+}
+
+async function searchColombianStores(endpoint: string, searchable: string, species: Species, foodType: FoodItem['type'] | undefined, signal: AbortSignal): Promise<FoodCatalogResult> {
+  const url = new URL(endpoint);
+  url.search = new URLSearchParams({q: searchable, species, ...(foodType ? {type:foodType} : {})}).toString();
+  const body = await storefrontJson(url, signal);
+  if (!Array.isArray(body.foods) || !Array.isArray(body.unavailableSources)) throw new Error('Respuesta de tiendas incompleta.');
+  const unavailableSources = body.unavailableSources.map(text).filter(Boolean);
+  const queryNumbers = normalized(searchable).match(/\d+(?:[.,]\d+)?/g) ?? [];
+  const listings = new Map<string, {food: FoodItem; title: string; description: string}>();
+  for (const raw of body.foods.slice(0, 32)) {
+    const row = record(raw);
+    const productUrl = httpsUrl(row.productUrl);
+    const title = plainText(row.name);
+    const brand = plainText(row.brand);
+    const retailer = plainText(row.retailer);
+    const type = row.type;
+    if (row.species !== species || (type !== 'dry' && type !== 'wet' && type !== 'barf') || (foodType && type !== foodType) ||
+        !/^[\w.:-]{1,180}$/.test(text(row.id)) || !retailer || !title || !productUrl || !Array.isArray(row.presentations) ||
+        !Number.isFinite(Date.parse(text(row.observedAt)))) continue;
+    const titleNumbers = new Set(normalized(title + ' ' + brand).match(/\d+(?:[.,]\d+)?/g) ?? []);
+    if (queryNumbers.some(n => !titleNumbers.has(n))) continue;
+    const presentations: Presentation[] = [];
+    for (const value of row.presentations) {
+      const variant = record(value);
+      const sourceUrl = httpsUrl(variant.sourceUrl);
+      if (typeof variant.packageKg !== 'number' || !Number.isFinite(variant.packageKg) || variant.packageKg <= 0 || variant.packageKg > 100 ||
+          !sourceUrl || new URL(sourceUrl).origin !== new URL(productUrl).origin) continue;
+      presentations.push({packageKg:variant.packageKg, priceCop:positivePrice(variant.priceCop), sourceUrl});
+    }
+    const id = 'online_co_' + row.id;
+    if (listings.has(id)) continue;
+    const food = fromListing({
+      id, species, type, title, brand, retailer, productUrl, presentations,
+      nutritionalUse: row.nutritionalUse === 'treat' || row.nutritionalUse === 'complementary' ? row.nutritionalUse : undefined,
+      observedAt: text(row.observedAt), imageUrl: httpsUrl(row.imageUrl),
+    }, normalized(title));
+    const fullTitle = normalized(title).includes(normalized(brand)) ? title : `${brand} ${title}`.trim();
+    listings.set(id, {food, title:fullTitle, description:text(row.description)});
+  }
+  const foods: FoodItem[] = [];
+  const entries = [...listings.values()];
+  for (let i = 0; i < entries.length; i += 4) {
+    foods.push(...await Promise.all(entries.slice(i, i + 4).map(({food, title, description}) =>
+      enrichOnlineNutrition(food, title, description, signal))));
+  }
+  return {foods, unavailableSources};
+}
+
+/** Independent offers keep their own product IDs, labels, weights and shopping links. */
+export async function searchFoodCatalog(
+  query: string, species: Species, foodType?: FoodItem['type'], signal?: AbortSignal,
+  endpoint = getColombiaCatalogUrl(),
+): Promise<FoodCatalogResult> {
+  const entered = query.trim().replace(/\s+/g, ' ');
+  if (!entered || entered.length > 100) throw new Error('Escribe el nombre del alimento, hasta 100 caracteres.');
   if (signal?.aborted) throw signal.reason ?? new DOMException('Búsqueda cancelada', 'AbortError');
-  if (cache.size >= 20) cache.delete(cache.keys().next().value!);
-  cache.set(key, { expiresAt: Date.now() + cacheLifetimeMs, foods });
-  return structuredClone(foods);
+  const searchable = entered.replace(/^rc\b/i, 'Royal Canin').replace(/^ppp\b/i, 'Purina Pro Plan')
+    .replace(/\b\d+(?:[.,]\d+)?\s*(?:kg|kilos?|g|gr|gramos?|lb|lbs|oz)\b/gi, ' ').replace(/\s+/g, ' ').trim();
+  if ((species !== 'dog' && species !== 'cat') || searchable.length < 2) return {foods:[], unavailableSources:[]};
+  const key = JSON.stringify([normalized(searchable), species, foodType, endpoint]);
+  const cached = cache.get(key);
+  if (cached && cached.expiresAt > Date.now()) return structuredClone(cached.result);
+  cache.delete(key);
+
+  const timeout = AbortSignal.timeout(19000);
+  const combined = signal ? AbortSignal.any([signal, timeout]) : timeout;
+  const lookups = [searchLaia(searchable, species, foodType, combined)];
+  if (endpoint) lookups.push(searchColombianStores(endpoint, searchable, species, foodType, combined));
+  const responses = await Promise.allSettled(lookups);
+  if (signal?.aborted) throw signal.reason ?? new DOMException('Búsqueda cancelada', 'AbortError');
+  if (responses.every(response => response.status === 'rejected')) {
+    if (!endpoint && responses[0].status === 'rejected') throw responses[0].reason;
+    throw new Error('No se pudieron consultar las tiendas. Vuelve a intentarlo o usa la etiqueta de tu alimento.');
+  }
+  const result: FoodCatalogResult = {foods:[], unavailableSources:[]};
+  responses.forEach((response, index) => {
+    if (response.status === 'fulfilled') {
+      result.foods.push(...response.value.foods);
+      result.unavailableSources.push(...response.value.unavailableSources);
+    } else {
+      result.unavailableSources.push(index === 0 ? 'Laia Pets' : 'tiendas colombianas');
+    }
+  });
+  if (!result.unavailableSources.length) {
+    if (cache.size >= 20) cache.delete(cache.keys().next().value!);
+    cache.set(key, {expiresAt: Date.now() + cacheLifetimeMs, result});
+    return structuredClone(result);
+  }
+  return result;
+}
+
+export async function searchOnlineFoods(query: string, species: Species, foodType?: FoodItem['type'], signal?: AbortSignal): Promise<FoodItem[]> {
+  return (await searchFoodCatalog(query, species, foodType, signal)).foods;
 }

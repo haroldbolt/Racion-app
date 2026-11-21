@@ -10,7 +10,7 @@ export function ManufacturerRationInput({food, pet, value, onChange, lang}: {
   if (!range || !food || !guide || assessFoodForPet(pet, food).some((notice) => notice.level === 'mismatch')) return null;
   const es = lang === 'es';
   return <section className="space-y-2 rounded-xl border border-[#cadfce] bg-[#f5faf6] p-3 text-xs text-[#37483c]">
-    <strong className="block text-sm text-[#1C2B21]">{es ? 'Ración según la guía del fabricante' : 'Manufacturer feeding guide'}</strong>
+    <strong className="block text-sm text-[#1C2B21]">{es ? 'Guía de alimentación de ' + guide.sourceName : 'Feeding guide from ' + guide.sourceName}</strong>
     <p>{es
       ? `Para ${pet.name} (${pet.currentWeightKg} kg), la tabla indica ${range.minGrams}–${range.maxGrams} g al día. Elige una cantidad del rango para calcular las tomas y su costo. Las calorías quedan pendientes de las kcal/kg.`
       : `For ${pet.name} (${pet.currentWeightKg} kg), the guide lists ${range.minGrams}–${range.maxGrams} g per day. Choose an amount in the range to calculate servings and costs. Calories require kcal/kg.`}</p>

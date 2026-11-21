@@ -8,7 +8,7 @@ import type {
   NutrientQualifier,
   Pet,
 } from '../types';
-import { labelFields, parseLabelValues, type LabelValues } from '../utils/nutritionLabel';
+import { declaredIngredients, labelFields, parseLabelValues, type LabelField, type LabelValues } from '../utils/nutritionLabel';
 import { getEffectiveNutrientField } from '../utils/mealNutrition';
 import { StorageService } from '../utils/storage';
 import { getConfirmedPresentations } from '../data/foodPresentations';
@@ -17,7 +17,8 @@ import { selectFoodPackage } from '../services/onlineFoodCatalog';
 interface LabelReviewModalProps {
   isOpen: boolean;
   onClose: () => void;
-  pet: Pet;
+  pet: Pick<Pet, 'species'>;
+  initialFormulaName?: string;
   plan?: FeedingPlan;
   initialFood?: FoodItem;
   defaultFoodType?: FoodItem['type'];
@@ -61,6 +62,7 @@ const LabelForm: React.FC<LabelFormProps> = ({
   plan,
   currentFood,
   defaultFoodType = 'dry',
+  initialFormulaName,
   mode = 'review',
   mixed,
   component,
@@ -74,7 +76,12 @@ const LabelForm: React.FC<LabelFormProps> = ({
   const [error, setError] = useState<string>();
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const labelEnergy = getEffectiveNutrientField(currentFood, 'kcalPerKg');
+  function reviewValue(key: LabelField) {
+    return getEffectiveNutrientField(currentFood, key) ??
+      (currentFood?.fichaNutricional?.coincidenciaEstado === 'revision_requerida' ? currentFood.fichaNutricional[key] : undefined);
+  }
+
+  const labelEnergy = reviewValue('kcalPerKg');
   const startingEnergy = labelEnergy?.baseMedicion === 'tal_como_se_vende' ? labelEnergy.valor : undefined;
 
   const form = useRef<HTMLFormElement>(null);
@@ -82,6 +89,9 @@ const LabelForm: React.FC<LabelFormProps> = ({
   const [reading, setReading] = useState(false);
   const [photoMessage, setPhotoMessage] = useState('');
   const [suggestions, setSuggestions] = useState<LabelValues>({});
+  const [labelText, setLabelText] = useState('');
+  const [suggestedIngredients, setSuggestedIngredients] = useState('');
+  const [suggestionSource, setSuggestionSource] = useState<'package' | 'datasheet'>('package');
   const [otherUse, setOtherUse] = useState(currentFood?.nutritionalUse === 'treat' || currentFood?.nutritionalUse === 'complementary' ? currentFood.nutritionalUse : '');
   const [complete, setComplete] = useState(Boolean(currentFood?.isCompleteAndBalanced || currentFood?.nutritionalUse === 'complete'));
   useEffect(() => () => reader.current?.abort(), []);
@@ -90,6 +100,7 @@ const LabelForm: React.FC<LabelFormProps> = ({
     reader.current?.abort();
     setReading(false);
     setLabelPhotoUrl('');
+    setSuggestedIngredients('');
     setPhotoMessage('');
     setSuggestions({});
   }
@@ -110,8 +121,11 @@ const LabelForm: React.FC<LabelFormProps> = ({
       });
       if (controller.signal.aborted) return;
       const found = parseLabelValues(result.text, false);
+      setSuggestionSource('package');
+      const ingredients = declaredIngredients(result.text) ?? '';
+      setSuggestedIngredients(ingredients);
       setSuggestions(found);
-      setPhotoMessage(Object.keys(found).length
+      setPhotoMessage((Object.keys(found).length || ingredients)
         ? (isEs ? 'Comprueba estos valores con tu foto antes de usarlos.' : 'Check these values against your photo before using them.')
         : (isEs ? 'No se reconocieron valores con sus unidades. Puedes escribirlos en los campos de abajo.' : 'No values with units were recognized. You can enter them below.'));
     } catch {
@@ -121,7 +135,18 @@ const LabelForm: React.FC<LabelFormProps> = ({
     }
   }
 
-  function applyPhotoValues() {
+  function readPastedLabel() {
+    const found = parseLabelValues(labelText, false);
+    const ingredients = declaredIngredients(labelText) ?? '';
+    setSuggestionSource('datasheet');
+    setSuggestions(found);
+    setSuggestedIngredients(ingredients);
+    setPhotoMessage(Object.keys(found).length || ingredients
+      ? (isEs ? 'Comprueba los datos de esta fórmula antes de copiarlos.' : 'Check these formula details before copying them.')
+      : (isEs ? 'Faltan valores con unidades. Puedes completarlos a mano.' : 'No values with units found. Enter them below.'));
+  }
+
+  function applySuggestedValues() {
     if (!form.current) return;
     const input = (name: string) => form.current?.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | null;
     for (const field of labelFields) {
@@ -134,7 +159,9 @@ const LabelForm: React.FC<LabelFormProps> = ({
         input(field + '-basis')!.value = value.baseMedicion;
       }
     }
-    input('source')!.value = 'package';
+    if (suggestedIngredients) input('ingredients')!.value = suggestedIngredients;
+    input('source')!.value = suggestionSource;
+    setSuggestedIngredients('');
     setSuggestions({});
     setPhotoMessage(isEs ? 'Revisa los campos y guarda la ficha cuando estén correctos.' : 'Review the fields and save when correct.');
   }
@@ -166,11 +193,24 @@ const LabelForm: React.FC<LabelFormProps> = ({
       return;
     }
 
-    const source = readText(data, 'source') === 'manufacturer' ? manufacturerSource : packageSource;
+    const kind = readText(data, 'source');
+    const source = kind === 'manufacturer' ? manufacturerSource : kind === 'datasheet' ? 'Ficha del producto' : packageSource;
+    const sourceLink = readText(data, 'sourceUrl');
+    let sourceUrl: string | undefined;
+    if (sourceLink) {
+      try {
+        const url = new URL(sourceLink);
+        if (url.protocol !== 'https:' || url.username || url.password) throw new Error();
+        sourceUrl = url.href;
+      } catch {
+        setError(isEs ? 'Revisa que el enlace a la ficha empiece por https://.' : 'Use an HTTPS link to the product sheet.');
+        return;
+      }
+    }
     const ficha: NutritionDatasheet = {
       coincidenciaEstado: 'pendiente',
       fuenteNombre: isEs ? `${source} · ingresada por ti` : 'Label values entered by you',
-      fuenteUrl: identityUnchanged ? currentFood?.fichaNutricional?.fuenteUrl : undefined,
+      fuenteUrl: sourceUrl || (identityUnchanged ? currentFood?.fichaNutricional?.fuenteUrl : undefined),
       fechaConsulta: identityUnchanged ? currentFood?.fichaNutricional?.fechaConsulta : undefined,
     };
     if (kcal !== undefined) {
@@ -201,12 +241,13 @@ const LabelForm: React.FC<LabelFormProps> = ({
       const previous = identityUnchanged ? currentFood?.fichaNutricional?.[key] : undefined;
       const unchanged = previous && value.valor === previous.valor && value.calificador === previous.calificador && value.baseMedicion === previous.baseMedicion;
       const checkedAgainstPackage = data.has(key + '-reconciled');
+      if (unchanged && !checkedAgainstPackage && previous.declaracionOriginal) value.declaracionOriginal = previous.declaracionOriginal;
       if (unchanged && !checkedAgainstPackage) retainedConflicts.push(...(currentFood?.fichaNutricional?.discrepancies?.filter(item => item.field === key) ?? []));
       value.source = unchanged && !checkedAgainstPackage ? previous.source || {
         name: currentFood!.fichaNutricional!.fuenteNombre || source,
         url: currentFood!.fichaNutricional!.fuenteUrl,
         observedAt: currentFood!.fichaNutricional!.fechaConsulta || new Date().toISOString(),
-      } : {name: checkedAgainstPackage ? packageSource : source, observedAt: new Date().toISOString()};
+      } : {name: checkedAgainstPackage ? packageSource : source, url: checkedAgainstPackage ? undefined : sourceUrl, observedAt: new Date().toISOString()};
     }
     if (retainedConflicts.length) ficha.discrepancies = retainedConflicts;
 
@@ -230,8 +271,9 @@ const LabelForm: React.FC<LabelFormProps> = ({
       lifeStage: declaresGrowth ? (pet.species === 'cat' ? 'kitten' : 'puppy') : (identityUnchanged ? currentFood?.lifeStage : undefined) ?? 'all',
       lifeStageKnown: declaresGrowth || (identityUnchanged && currentFood?.lifeStageKnown),
       nutritionalUse: complete ? 'complete' : otherUse === 'treat' || otherUse === 'complementary' ? otherUse : undefined,
-      ingredientsSummary: identityUnchanged ? currentFood?.ingredientsSummary : undefined,
+      ingredientsSummary: readText(data, 'ingredients') || undefined,
       feedingGuide: identityUnchanged ? currentFood?.feedingGuide : undefined,
+      storeName: identityUnchanged ? currentFood?.storeName : undefined,
       storeProductUrl: identityUnchanged ? currentFood?.storeProductUrl : undefined,
       type: foodType,
       kcalPerKg: kcal ?? 0,
@@ -302,20 +344,28 @@ const LabelForm: React.FC<LabelFormProps> = ({
             <button type="button" onClick={() => fileInput.current?.click()} className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#EAF4EC] px-3 font-bold text-[#0B5D2E]">
               <Camera className="size-4" /> {isEs ? 'Leer la etiqueta con una foto' : 'Read label from a photo'}
             </button>
+            <details>
+              <summary className="cursor-pointer py-2 font-bold text-[#0B5D2E]">{isEs ? 'Pegar una ficha o etiqueta' : 'Paste a product sheet or label'}</summary>
+              <label className="block py-1">{isEs ? 'Texto de la etiqueta de esta fórmula' : 'Label text for this formula'}
+                <textarea value={labelText} maxLength={24000} onChange={event => { setLabelText(event.target.value); setSuggestedIngredients(''); setSuggestions({}); setPhotoMessage(''); }} rows={4} className={inputClass} />
+              </label>
+              <button type="button" disabled={!labelText.trim() || reading} onClick={readPastedLabel} className="min-h-11 font-bold text-[#0B5D2E] disabled:opacity-50">{isEs ? 'Extraer datos de la ficha' : 'Extract label details'}</button>
+            </details>
             {labelPhotoUrl && <div className="relative">
               <img src={labelPhotoUrl} alt={isEs ? 'Etiqueta del alimento' : 'Food label'} className="max-h-44 w-full object-contain" />
               <button type="button" onClick={clearPhoto} aria-label={isEs ? 'Quitar foto' : 'Remove photo'} className="absolute right-1 top-1 rounded-lg bg-white p-2 text-red-700"><Trash2 className="size-4" /></button>
             </div>}
             {reading && <p role="status">{isEs ? 'Leyendo la etiqueta en este dispositivo…' : 'Reading the label on this device…'} <button type="button" className="underline" onClick={clearPhoto}>{isEs ? 'Cancelar' : 'Cancel'}</button></p>}
             {photoMessage && <p role="status">{photoMessage}</p>}
-            {Object.keys(suggestions).length > 0 && <div className="space-y-2">
+            {(Object.keys(suggestions).length > 0 || suggestedIngredients) && <div className="space-y-2">
               <ul>{labelFields.map(field => {
                 const value = suggestions[field];
                 if (!value) return null;
                 const label = NUTRIENT_FIELDS.find(({key}) => key === field);
                 return <li key={field}>{label ? (isEs ? label.es : label.en) : (isEs ? 'Energía' : 'Energy')} · {value.calificador === 'minimo' ? '≥' : value.calificador === 'maximo' ? '≤' : '≈'} {value.valor} {value.unidadOriginal}</li>;
               })}</ul>
-              <button type="button" onClick={applyPhotoValues} className="rounded-lg border border-green-700 p-2 font-bold text-green-800">{isEs ? 'Copiar estos valores a la ficha' : 'Copy these values into the form'}</button>
+              {suggestedIngredients && <p>{isEs ? 'Ingredientes' : 'Ingredients'} · {suggestedIngredients}</p>}
+              <button type="button" onClick={applySuggestedValues} className="rounded-lg border border-green-700 p-2 font-bold text-green-800">{isEs ? 'Copiar estos valores a la ficha' : 'Copy these values into the form'}</button>
             </div>}
           </div>
 
@@ -326,7 +376,7 @@ const LabelForm: React.FC<LabelFormProps> = ({
             </label>
             <label className="space-y-1 text-xs font-bold text-[#1C2B21]">
               <span>{isEs ? 'Nombre de la fórmula' : 'Formula name'}</span>
-              <input className={inputClass} name="formula" required defaultValue={currentFood?.name ?? (mixed ? '' : plan?.foodName)} />
+              <input className={inputClass} name="formula" required defaultValue={currentFood?.name ?? initialFormulaName ?? (mixed ? '' : plan?.foodName)} />
             </label>
             {!currentFood && !mixed && (
               <label className="space-y-1 text-xs font-bold text-[#1C2B21]">
@@ -350,18 +400,27 @@ const LabelForm: React.FC<LabelFormProps> = ({
               <span>{isEs ? 'Fuente de los datos' : 'Data source'}</span>
               <select className={inputClass} name="source" defaultValue={currentFood?.labelStatus === 'verified_manufacturer' || currentFood?.fichaNutricional?.fuenteNombre?.includes(manufacturerSource) ? 'manufacturer' : 'package'}>
                 <option value="package">{isEs ? packageSource : 'Package label'}</option>
+                <option value="datasheet">{isEs ? 'Ficha del producto' : 'Product sheet'}</option>
                 <option value="manufacturer">{isEs ? manufacturerSource : 'Manufacturer datasheet'}</option>
               </select>
             </label>
           </div>
 
+          <label className="block space-y-1 text-xs font-bold">
+            <span>{isEs ? 'Enlace a la ficha (opcional)' : 'Product sheet link (optional)'}</span>
+            <input className={inputClass} type="url" name="sourceUrl" placeholder="https://" />
+          </label>
+          <label className="block space-y-1 text-xs font-bold">
+            <span>{isEs ? 'Ingredientes declarados en la etiqueta' : 'Ingredients listed on the label'}</span>
+            <textarea name="ingredients" maxLength={4000} rows={2} className={inputClass} defaultValue={currentFood?.ingredientsSummary ?? ''} />
+          </label>
           <fieldset className="space-y-2 rounded-2xl border border-[#0B5D2E20] p-3">
             <legend className="px-1 text-sm font-extrabold text-[#0B5D2E]">{isEs ? 'Composición de la etiqueta' : 'Label composition'}</legend>
             <p className="text-xs text-[#44544A]">
               {isEs ? 'Deja en blanco lo que la etiqueta no indica. Ingresa la energía del alimento tal como se vende.' : 'Leave values off the label blank. Enter the energy for the food as sold.'}
             </p>
             {NUTRIENT_FIELDS.map(({ key, es, en }) => {
-              const nutrient = getEffectiveNutrientField(currentFood, key);
+              const nutrient = reviewValue(key);
               const name = isEs ? es : en;
               const qualifier: NutrientQualifier | '' = nutrient?.calificador ?? '';
               return (

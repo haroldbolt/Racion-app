@@ -872,7 +872,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                 foodType={foodType === 'mixed' ? undefined : foodType}
                 initialQuery={foodSearchQuery}
                 lang={userAccount.language}
-                onSelect={selectFood}
+                onSelect={(food, source) => source === 'label' ? handleSaveCustomFood(food) : selectFood(food)}
               />
             ) : <>
             {/* Search bar */}
@@ -1128,7 +1128,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                   </p>
                 </div>
                 {resultPlan.manufacturerGramsPerDay && (
-                  <p className="mt-2 text-center text-xs">{isEs ? 'Gramos elegidos en la tabla del fabricante. Energía por toma pendiente de kcal/kg.' : 'Daily grams chosen from the manufacturer guide. Energy per meal needs kcal/kg.'}</p>
+                  <p className="mt-2 text-center text-xs">{isEs ? 'Gramos elegidos en la tabla publicada. Energía por toma pendiente de kcal/kg.' : 'Daily grams chosen from the published guide. Energy per meal needs kcal/kg.'}</p>
                 )}
                 <ul className="mt-4 space-y-2">
                   {resultMeals.map((portion, idx) => (
@@ -1291,7 +1291,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
           {safetyMismatch && <button type="button" className="min-h-11 rounded-lg border px-3 text-sm font-bold text-[#0b5d2e]" onClick={() => setStep(4)}>
             {isEs ? 'Revisar el alimento seleccionado' : 'Review selected food'}
           </button>}
-          {invalidGuide && <p role="alert">{isEs ? 'Revisa los gramos elegidos en la tabla del fabricante.' : 'Review the daily grams selected from the guide.'}</p>}
+          {invalidGuide && <p role="alert">{isEs ? 'Revisa los gramos elegidos en la tabla publicada.' : 'Review the daily grams selected from the guide.'}</p>}
           <button
             disabled={safetyMismatch || Boolean(invalidGuide)}
             onClick={handleSaveAndApply}

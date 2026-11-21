@@ -54,7 +54,7 @@ async function verify() {
 
     await page.getByRole('textbox',{name:'Buscar alimentos en internet',exact:true}).fill(formula);
     await button('Buscar en internet').click();
-    const result = page.getByRole('region',{name:'Resultados de internet'}).getByRole('article',{name:formula,exact:true});
+    const result = page.getByRole('region',{name:'Resultados de internet'}).getByRole('article',{name:formula,exact:true}).filter({hasText:'Fuente: Laia Pets'});
     await result.waitFor({timeout:45000});
     for (const size of ['1.5 kg','3 kg','15 kg']) await result.getByRole('button',{name:'Elegir ' + size,exact:true}).waitFor();
     const chosen = result.getByRole('button',{name:'Elegir 3 kg',exact:true});

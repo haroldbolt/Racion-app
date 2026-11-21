@@ -97,3 +97,72 @@ test('unavailable manufacturer retains declared store values for review and pres
   assert.equal(result.feedingGuide,undefined);
   assert.equal(result.fichaNutricional?.kcalPerKg,undefined);
 });
+
+test('a different Colombian merchant and brand prefills SKU-specific nutrition pending label confirmation', async context => {
+  context.mock.method(globalThis, 'fetch', () => { throw Error('Unknown brands have no inferred manufacturer URL'); });
+  const productUrl = 'https://www.puppis.com.co/alimento-para-gato-monello-castrados/p';
+  const merchant = {...food, brand:'Monello', name:'Castrados', species:'cat' as const, storeProductUrl:productUrl,
+    fichaNutricional:{...food.fichaNutricional!, fuenteNombre:'Puppis Colombia', fuenteUrl:productUrl}};
+  const retail = '<h3>Ingredientes del concentrado</h3><p>Pollo, arroz, aceite de pescado.</p>' +
+    '<h3>Composición nutricional</h3><table><tr><th>Composición</th><th>Cantidad</th></tr>' +
+    '<tr><td>Proteína Cruda (Mín)</td><td>36%</td></tr><tr><td>Lípidos (Mín)</td><td>9%</td></tr>' +
+    '<tr><td>Materia Mineral (Máx)</td><td>4,5%</td></tr><tr><td>Humedad(Máx)</td><td>10%</td></tr></table>';
+  const lookup = await enrichOnlineNutrition(merchant, 'Monello Castrados', retail, new AbortController().signal);
+  assert.equal(lookup.labelStatus,'unconfirmed');
+  assert.equal(lookup.fichaNutricional?.coincidenciaEstado,'revision_requerida');
+  assert.equal(lookup.proteinPct,36);
+  assert.equal(lookup.fatPct,9);
+  assert.equal(lookup.ashPct,4.5);
+  assert.equal(lookup.fichaNutricional?.humedad?.calificador,'maximo');
+  assert.equal(lookup.fichaNutricional?.fibra,undefined);
+  assert.equal(lookup.fichaNutricional?.carbohidratos,undefined);
+  assert.deepEqual(lookup.fichaNutricional?.proteina?.source,{name:'Puppis Colombia',url:productUrl,observedAt:time});
+  assert.equal(lookup.ingredientsSummary,'Pollo, arroz, aceite de pescado.');
+});
+
+test('retailer analyses support declared mass units and reject inconsistent paired quantities', () => {
+  const data = parseLabelValues('Información nutricional: Lípidos (Mín) 120 g/kg (12%); Fibras (Máx) 30g/kg(12%); Materia Mineral (Máx) 90/kg(3%); Energía metabolizable (kcal/100 g): 89,2',true);
+  assert.equal(data.grasa?.valor,12);
+  assert.equal(data.grasa?.declaracionOriginal,'120 g/kg');
+  assert.equal(data.fibra,undefined);
+  assert.equal(data.cenizas,undefined);
+  assert.equal(data.kcalPerKg?.valor,892);
+  assert.equal(data.kcalPerKg?.declaracionOriginal,'89,2 kcal/100 g');
+  assert.equal(parseLabelValues('Energía metabolizable: 89,2 kcal/lata',true).kcalPerKg,undefined);
+  assert.equal(parseLabelValues('Información nutricional: Grasa mín. 5% (en materia seca y tal como se ofrece)', true).grasa,undefined);
+  assert.equal(parseLabelValues('Información nutricional: Grasa mín. 4%. Información nutricional: Grasa mín. 10%.',true).grasa,undefined);
+});
+
+test('well-labelled individual rows identify an analysis on products lacking a section title', () => {
+  const table = '<table><tr><td>Proteína cruda mín.</td><td>20%</td></tr><tr><td>Grasa cruda máx.</td><td>2%</td></tr></table>';
+  const data = parseLabelValues('Ahorra un 30 % ' + table,true);
+  assert.equal(data.proteina?.valor,20);
+  assert.equal(data.grasa?.calificador,'maximo');
+  assert.deepEqual(parseLabelValues(table + table.replace('20%','42%'),true),{});
+});
+
+test('published retail weight tables retain their provenance and require explicit grams per day', async () => {
+  const productUrl = 'https://www.puppis.com.co/ficticio-prueba/p';
+  const merchant = {...food, brand:'Marca de prueba', storeProductUrl:productUrl,
+    fichaNutricional:{...food.fichaNutricional!, fuenteNombre:'Puppis', fuenteUrl:productUrl}};
+  const table = '<table><tr><th>Peso de la mascota (kg)</th><th>Gramos diarios</th></tr><tr><td>10 a 15</td><td>120 a 155</td></tr><tr><td>20 kg</td><td>180</td></tr></table>';
+  const result = await enrichOnlineNutrition(merchant,'Marca de prueba',table,new AbortController().signal);
+  assert.deepEqual(result.feedingGuide,{sourceUrl:productUrl,sourceName:'Puppis',ranges:[
+    {minWeightKg:10,maxWeightKg:15,minGrams:120,maxGrams:155},{minWeightKg:20,maxWeightKg:20,minGrams:180,maxGrams:180},
+  ]});
+  assert.equal(readFeedingGuide(table.replace('Gramos diarios','Gramos por porción'),productUrl,'Puppis'),undefined);
+  assert.equal(readFeedingGuide(table + table.replace('180','250'),productUrl,'Puppis'),undefined);
+});
+
+test('merchant-only fields supplement a matched manufacturer without becoming manufacturer-verified', async context => {
+  context.mock.method(globalThis, 'fetch', async (url:URL) => url.pathname.endsWith('/search')
+    ? Response.json([{id:416,title:formula,url:officialUrl,subtype:'post'}])
+    : Response.json({id:416,link:officialUrl,title:{rendered:formula},content:{rendered:officialPage}}));
+  const result = await enrichOnlineNutrition(food,storeTitle,commercial + '. Energía metabolizable: 3500 kcal/kg.',new AbortController().signal);
+  assert.equal(result.fichaNutricional?.proteina?.source?.url,officialUrl);
+  assert.equal(result.fichaNutricional?.kcalPerKg?.source?.url,merchantUrl);
+  assert.equal(result.fichaNutricional?.kcalPerKg?.valor,3500);
+  assert.equal(result.fichaNutricional?.discrepancies?.[0]?.other.valor,24);
+  assert.equal(result.labelStatus,'unconfirmed');
+  assert.equal(result.kcalPerKg,0);
+});

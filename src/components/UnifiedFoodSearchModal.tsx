@@ -121,8 +121,8 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
       if (activePet && food.species !== activePet.species) return false;
       if (formulaType && (food.type !== formulaType || food.kcalPerPiece)) return false;
       if (!includeArchived && food.estadoCatalogo === 'archivado') return false;
-      if (category === 'main' && food.kcalPerPiece) return false;
-      if (category === 'snacks' && !food.kcalPerPiece) return false;
+      if (category === 'main' && (food.kcalPerPiece || food.nutritionalUse === 'treat')) return false;
+      if (category === 'snacks' && !(food.kcalPerPiece || food.nutritionalUse === 'treat')) return false;
       const haystack = normalizeText(`${food.brand} ${food.name} ${food.barcode || ''}`);
       return tokens.every((token) => haystack.includes(token));
     });
@@ -174,6 +174,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
           {source === 'internet' ? (
             <OnlineFoodSearch
               initialQuery={initialQuery}
+              category={category}
               species={activePet?.species || 'dog'}
               foodType={formulaType}
               lang={lang}
