@@ -16,6 +16,7 @@ export interface OfficialFormula {
   url: string;
   verifiedOn: string;
   complete?: boolean;
+  feedingGuide?: FoodItem['feedingGuide'];
   registration?: string;
   sourceName?: string;
   packageSources?: Record<string,string>;
@@ -33,6 +34,8 @@ export interface OfficialFormula {
   carbs?: number;
   kcalKg?: number;
   kcalSourceUrl?: string;
+  kcalSourceName?: string;
+  discrepancies?: NutritionDatasheet['discrepancies'];
   kcalQualifier?: NutrientQualifier;
   packagesKg?: number[];
 }
@@ -117,6 +120,11 @@ function withFormula(food: FoodItem, row:StoreManufacturerFood): FoodItem {
   const source = {name:formula.sourceName ?? row.house, url:formula.url, observedAt:formula.verifiedOn};
   const data: NutritionDatasheet = { ...food.fichaNutricional, fuenteNombre:source.name, fuenteUrl:formula.url,
     fechaConsulta:formula.verifiedOn, coincidenciaEstado:'verificado' };
+  if (formula.discrepancies?.length) {
+    const conflicts = new Map((data.discrepancies ?? []).map(entry => [entry.field + ' ' + entry.sourceUrl,entry]));
+    for (const entry of formula.discrepancies) conflicts.set(entry.field + ' ' + entry.sourceUrl,entry);
+    data.discrepancies = [...conflicts.values()];
+  }
   const result = {...food};
   const basis = formula.basis ?? 'tal_como_se_vende';
   for (const [key,bound,typical,qualifier,flat] of fields) {
@@ -133,7 +141,7 @@ function withFormula(food: FoodItem, row:StoreManufacturerFood): FoodItem {
   }
   if (formula.kcalKg !== undefined) {
     data.kcalPerKg = {valor:formula.kcalKg, unidadOriginal:'kcal/kg', baseMedicion:'tal_como_se_vende',
-      calificador:formula.kcalQualifier ?? 'tipico', source:formula.kcalSourceUrl ? {...source,url:formula.kcalSourceUrl} : source};
+      calificador:formula.kcalQualifier ?? 'tipico', source:formula.kcalSourceUrl ? {...source,name:formula.kcalSourceName ?? source.name,url:formula.kcalSourceUrl} : source};
     result.kcalPerKg = formula.kcalKg;
   }
   const nutritionalFields = ['proteina','grasa','fibra','humedad','cenizas','carbohidratos','kcalPerKg'] as const;
@@ -144,6 +152,7 @@ function withFormula(food: FoodItem, row:StoreManufacturerFood): FoodItem {
   data.notasRevision = onlyOfficial ? 'Ficha oficial de la fórmula seleccionada.' : 'Revisa la procedencia de cada valor y completa los campos pendientes con el empaque.';
   return {...result, fichaNutricional:data, dataSource:source.name,
     declaredIcaRegistration:formula.registration || food.declaredIcaRegistration,
+    feedingGuide:food.feedingGuide ?? formula.feedingGuide,
     labelStatus:onlyOfficial ? 'verified_manufacturer' : 'unconfirmed',
     nutritionalUse:formula.complete ? 'complete' : food.nutritionalUse,
     isCompleteAndBalanced:formula.complete || food.isCompleteAndBalanced };
@@ -182,8 +191,8 @@ export async function enrichFoodFromStoreManufacturer(food:FoodItem): Promise<Fo
   const key = equivalents(food.name);
   const matches = catalog.filter(row => row.species === food.species && identity(row.brand) === brand &&
     (equivalents(row.name) === key || (row.formula && equivalents(row.formula.name) === key)));
-  const pages = new Set(matches.map(row => row.officialUrl));
-  if (!matches.length || pages.size !== 1 || !matches[0].formula) return food;
+  const formulas = new Set(matches.map(row => row.formula));
+  if (!matches.length || formulas.size !== 1 || !matches[0].formula) return food;
   const formula = matches[0].formula;
   if (food.declaredIcaRegistration && formula.registration && food.declaredIcaRegistration !== formula.registration) return food;
   const hasRetailOffer = !!(food.storeProductUrl || food.buyUrl || food.priceBasis || food.packagePrices?.length);

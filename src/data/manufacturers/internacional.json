@@ -155,16 +155,16 @@
     "handles": [
       "acana-first-feast-kitten-gatos"
     ],
-    "url": "https://www.acana.com/en-US/cats/cat-food/first-feast-kitten/ds-aca-first-feast-cat.html",
+    "url": "https://latam.acana.com/en/cats/cat-food/la-ds-aca-first-feast-cat.html",
     "verifiedOn": "2026-11-21",
-    "name": "First Feast Kitten Dry Cat Food",
+    "name": "First Feast Kitten Dry Cat Food The ACANA difference",
     "kcalKg": 3850.0,
     "proteinMin": 36.0,
     "fatMin": 18.0,
     "fiberMax": 4.0,
     "moistureMax": 10.0,
     "packagesKg": [
-      1.814369,
+      1.8,
       3.17
     ],
     "complete": true
@@ -198,18 +198,18 @@
       "acana-free-run-poultry-perros",
       "acana-free-run-poultry-perros-presentaciones-por-confirmar"
     ],
-    "url": "https://www.acana.com/en-US/dogs/dog-food/free-run-poultry-recipe/ds-aca-free-run-poultry.html",
+    "url": "https://latam.acana.com/en/dogs/dog-food/la-ds-aca-free-run-poultry.html",
     "verifiedOn": "2026-11-21",
-    "name": "Free-Run Poultry Recipe Dry Dog Food",
+    "name": "Free-Run Poultry Recipe Dry Dog Food The ACANA difference",
     "kcalKg": 3475.0,
     "proteinMin": 29.0,
     "fatMin": 17.0,
     "fiberMax": 6.0,
     "moistureMax": 12.0,
     "packagesKg": [
-      2.041166,
-      5.896701,
-      11.339809
+      2.0,
+      6.0,
+      11.4
     ],
     "complete": true
   },
@@ -220,18 +220,17 @@
       "acana-fresh-water-fish-perros",
       "acana-fresh-water-fish-perros-presentaciones-por-confirmar"
     ],
-    "url": "https://www.acana.com/en-US/dogs/dog-food/freshwater-fish-blend/ds-aca-freshwater-fish.html",
+    "url": "https://latam.acana.com/en/dogs/dog-food/la-ds-aca-freshwater-fish.html",
     "verifiedOn": "2026-11-21",
-    "name": "Freshwater Fish Blend Dry Dog Food",
+    "name": "Freshwater Fish Blend Dry Dog Food The ACANA difference",
     "kcalKg": 3475.0,
     "proteinMin": 29.0,
     "fatMin": 17.0,
     "fiberMax": 6.0,
     "moistureMax": 12.0,
     "packagesKg": [
-      2.041166,
-      5.896701,
-      11.339809
+      6.0,
+      11.4
     ],
     "complete": true
   },
@@ -304,22 +303,98 @@
   },
   {
     "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-highest-protein-appalachian-ranch-recipe-perros"
+    ],
+    "url": "https://latam.acana.com/en/dogs/dog-food/la-ds-aca-appalachian-ranch-dog.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Highest Protein, Appalachian Ranch Recipe Dry Dog Food The ACANA difference",
+    "kcalKg": 3405.0,
+    "proteinMin": 33.0,
+    "fatMin": 17.0,
+    "fiberMax": 6.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.0,
+      11.4
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "name": "Highest Protein, Indoor Cat Recipe",
+    "species": "cat",
+    "handles": [
+      "acana-highest-protein-indoor-cat-recipe-gatos"
+    ],
+    "url": "https://emea.acana.com/en/cats/cat-food/eu-aca-highest-protein-indoor-cat.html",
+    "verifiedOn": "2026-11-21",
+    "kcalKg": 3630.0,
+    "protein": 38.0,
+    "fat": 14.0,
+    "fiber": 6.0,
+    "ash": 9.0,
+    "moisture": 10.0
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-highest-protein-meadowland-recipe-perros"
+    ],
+    "url": "https://latam.acana.com/en/dogs/dog-food/la-ds-aca-meadowlands-dog.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Highest Protein, Meadowland Recipe Dry Dog Food The ACANA difference",
+    "kcalKg": 3440.0,
+    "proteinMin": 33.0,
+    "fatMin": 17.0,
+    "fiberMax": 6.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.0,
+      11.4
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
     "species": "cat",
     "handles": [
       "acana-highest-protein-meadowlands-gatos",
       "acana-highest-protein-meadowlands-gatos-presentaciones-por-confirmar"
     ],
-    "url": "https://www.acana.com/en-US/cats/cat-food/highest-protein%2C-meadowlands/ds-aca-meadowlands-new-cat.html",
+    "url": "https://latam.acana.com/en/cats/cat-food/la-ds-aca-meadowlands-new-cat.html",
     "verifiedOn": "2026-11-21",
-    "name": "Highest Protein, Meadowlands Dry Cat Food",
+    "name": "Highest Protein, Meadowlands Dry Cat Food The ACANA difference",
     "kcalKg": 3850.0,
     "proteinMin": 36.0,
     "fatMin": 18.0,
     "fiberMax": 4.0,
     "moistureMax": 10.0,
     "packagesKg": [
-      1.814369,
-      4.535924
+      1.8,
+      4.5
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-highest-protein-wild-atlantic-recipe-perros"
+    ],
+    "url": "https://latam.acana.com/en/dogs/dog-food/la-ds-aca-wild-atlantic-dog.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Highest Protein, Wild Atlantic Recipe Dry Dog Food The ACANA difference",
+    "kcalKg": 3440.0,
+    "proteinMin": 33.0,
+    "fatMin": 17.0,
+    "fiberMax": 6.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.0,
+      11.4
     ],
     "complete": true
   },
@@ -373,17 +448,17 @@
     "handles": [
       "acana-indoor-entree-recipe-with-fish-gatos"
     ],
-    "url": "https://www.acana.com/en-US/cats/cat-food/indoor-entr%C3%A9e-recipe-with-fish/ds-aca-indoor-entree-fish.html",
+    "url": "https://latam.acana.com/en/cats/cat-food/la-ds-aca-indoor-entree-fish.html",
     "verifiedOn": "2026-11-21",
-    "name": "Indoor Entrée Recipe with Fish Dry Cat Food",
+    "name": "Indoor Entrée Recipe with Fish Dry Cat Food The ACANA difference",
     "kcalKg": 3670.0,
     "proteinMin": 36.0,
     "fatMin": 14.0,
     "fiberMax": 5.0,
     "moistureMax": 10.0,
     "packagesKg": [
-      1.814369,
-      4.535924
+      1.8,
+      4.5
     ],
     "complete": true
   },
@@ -393,18 +468,17 @@
     "handles": [
       "acana-light-fit-recipe-perros"
     ],
-    "url": "https://www.acana.com/en-US/dogs/dog-food/light-and-fit-recipe/ds-aca-light-fit.html",
+    "url": "https://latam.acana.com/en/dogs/dog-food/la-ds-aca-light-fit.html",
     "verifiedOn": "2026-11-21",
-    "name": "Light & Fit Recipe Dry Dog Food",
+    "name": "Light & Fit Recipe Dry Dog Food The ACANA difference",
     "kcalKg": 3020.0,
     "proteinMin": 33.0,
     "fatMin": 10.0,
     "fiberMax": 8.0,
     "moistureMax": 12.0,
     "packagesKg": [
-      2.041166,
-      5.896701,
-      11.339809
+      2.0,
+      11.4
     ],
     "complete": true
   },
@@ -563,17 +637,17 @@
     "handles": [
       "acana-senior-entree-gatos"
     ],
-    "url": "https://www.acana.com/en-US/cats/cat-food/senior-entr%C3%A9e/ds-aca-senior-entree.html",
+    "url": "https://latam.acana.com/en/cats/cat-food/la-ds-aca-senior-entree.html",
     "verifiedOn": "2026-11-21",
-    "name": "Senior Entrée Dry Cat Food",
+    "name": "Senior Entrée Dry Cat Food The ACANA difference",
     "kcalKg": 3670.0,
     "proteinMin": 33.0,
     "fatMin": 14.0,
     "fiberMax": 4.0,
     "moistureMax": 10.0,
     "packagesKg": [
-      1.814369,
-      4.535924
+      1.8,
+      4.5
     ],
     "complete": true
   },
@@ -622,18 +696,18 @@
     "handles": [
       "acana-singles-duck-pear-recipe-perros"
     ],
-    "url": "https://www.acana.com/en-US/dogs/dog-food/singles%2C-duck-and-pear-recipe/ds-aca-singles-duck-pear-2020.html",
+    "url": "https://latam.acana.com/en/dogs/dog-food/la-ds-aca-singles-duck-pear-2020.html",
     "verifiedOn": "2026-11-21",
-    "name": "Singles, Duck & Pear Recipe Dry Dog Food",
+    "name": "Singles, Duck & Pear Recipe Dry Dog Food The ACANA difference",
     "kcalKg": 3405.0,
     "proteinMin": 31.0,
     "fatMin": 17.0,
     "fiberMax": 5.0,
     "moistureMax": 12.0,
     "packagesKg": [
-      2.041166,
-      5.896701,
-      10.205828
+      2.0,
+      6.0,
+      10.2
     ],
     "complete": true
   },
@@ -644,17 +718,17 @@
       "acana-pork-and-squash-perros",
       "acana-pork-and-squash-perros-presentaciones-por-confirmar"
     ],
-    "url": "https://www.acana.com/en-US/dogs/dog-food/singles%2C-pork-and-squash-recipe/ds-aca-singles-pork-squash-2020.html",
+    "url": "https://latam.acana.com/en/dogs/dog-food/la-ds-aca-singles-pork-squash-2020.html",
     "verifiedOn": "2026-11-21",
-    "name": "Singles, Pork & Squash Recipe Dry Dog Food",
+    "name": "Singles, Pork & Squash Recipe Dry Dog Food The ACANA difference",
     "kcalKg": 3405.0,
     "proteinMin": 31.0,
     "fatMin": 17.0,
     "fiberMax": 5.0,
     "moistureMax": 12.0,
     "packagesKg": [
-      2.041166,
-      10.205828
+      2.0,
+      10.2
     ],
     "complete": true
   },
@@ -742,6 +816,26 @@
       2.0,
       6.0,
       11.4
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ALPO",
+    "name": "PURINA® ALPO® Cachorros Todos los Tamaños",
+    "species": "dog",
+    "handles": [
+      "alpo-cachorros"
+    ],
+    "url": "https://purinalatam.com/purina/es/cachorros-todos-los-tamanos",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 23.0,
+    "fatMin": 9.0,
+    "fiberMax": 4.5,
+    "moistureMax": 12.0,
+    "ashMax": 9.5,
+    "packagesKg": [
+      2.0,
+      22.7
     ],
     "complete": true
   },
@@ -886,6 +980,46 @@
       1.5,
       8.0
     ]
+  },
+  {
+    "brand": "Country Value",
+    "name": "Country Value Adult Dog Formula",
+    "species": "dog",
+    "handles": [
+      "country-value-premium-adult-dog"
+    ],
+    "url": "https://lars.ndda.nd.gov/public/openfile?getDocId=91563",
+    "sourceName": "Etiqueta de Country Value · Departamento de Agricultura de Dakota del Norte",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 21.0,
+    "fatMin": 10.0,
+    "fiberMax": 5.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3250,
+    "packagesKg": [
+      22.6
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Country Value",
+    "name": "Country Value Cat Formula",
+    "species": "cat",
+    "handles": [
+      "country-value-premium-cat"
+    ],
+    "url": "https://lars.ndda.nd.gov/public/openfile?getDocId=265359",
+    "sourceName": "Etiqueta de Country Value · Departamento de Agricultura de Dakota del Norte",
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 30.0,
+    "fatMin": 9.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "kcalKg": 3430,
+    "packagesKg": [
+      9.07
+    ],
+    "complete": true
   },
   {
     "brand": "Diamond",
@@ -1566,8 +1700,7 @@
       2.0,
       7.5,
       20.0
-    ],
-    "complete": true
+    ]
   },
   {
     "brand": "Dog Chow",
@@ -1629,8 +1762,55 @@
       2.0,
       8.0,
       22.7
+    ]
+  },
+  {
+    "brand": "Dog Chow",
+    "species": "dog",
+    "handles": [
+      "alimento-perro-dog-chow-cachorros-gran-comienzo-medianos-grandes"
     ],
-    "complete": true
+    "url": "https://purina.com.co/dogchow/gran-comienzo-cachorros-medianos",
+    "verifiedOn": "2026-11-21",
+    "name": "DOG CHOW® para cachorro medianos y grandes",
+    "proteinMin": 26.0,
+    "fatMin": 10.0,
+    "fiberMax": 3.5,
+    "moistureMax": 12.0,
+    "ashMax": 8.5,
+    "packagesKg": [
+      0.35,
+      0.475,
+      1.0,
+      2.0,
+      4.0,
+      8.0,
+      17.0,
+      22.7
+    ]
+  },
+  {
+    "brand": "Dog Chow",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-dog-chow-cachorros-gran-comienzo-minis-y-pequenos"
+    ],
+    "url": "https://purina.com.co/dogchow/gran-comienzo-cachorros-minis",
+    "verifiedOn": "2026-11-21",
+    "name": "DOG CHOW® para cachorro minis y pequeños",
+    "fatMin": 14.0,
+    "fiberMax": 3.5,
+    "moistureMax": 12.0,
+    "ashMax": 9.0,
+    "packagesKg": [
+      0.35,
+      0.475,
+      1.0,
+      2.0,
+      8.0,
+      17.0,
+      22.7
+    ]
   },
   {
     "brand": "Dog Chow",
@@ -1684,6 +1864,26 @@
     "brand": "Excellent",
     "species": "dog",
     "handles": [
+      "excellent-adult-skin-care"
+    ],
+    "url": "https://purina.com.co/excellent/perros-skin-care-salmon",
+    "verifiedOn": "2026-11-21",
+    "name": "Adult Skin Care",
+    "ashMax": 9.0,
+    "fiberMax": 4.0,
+    "proteinMin": 24.0,
+    "moistureMax": 12.0,
+    "kcalKg": 3650.0,
+    "packagesKg": [
+      3.0,
+      8.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Excellent",
+    "species": "dog",
+    "handles": [
       "excellent-adulto-razas-medianas-y-grandes-pollo-y-arroz"
     ],
     "url": "https://purina.com.co/excellent/perros/adultos-pollo",
@@ -1699,8 +1899,7 @@
       1.5,
       3.0,
       17.0
-    ],
-    "complete": true
+    ]
   },
   {
     "brand": "Excellent",
@@ -1720,8 +1919,7 @@
       1.5,
       3.0,
       17.0
-    ],
-    "complete": true
+    ]
   },
   {
     "brand": "Excellent",
@@ -1740,8 +1938,7 @@
     "kcalKg": 3900.0,
     "packagesKg": [
       3.0
-    ],
-    "complete": true
+    ]
   },
   {
     "brand": "Excellent",
@@ -1772,8 +1969,11 @@
     "url": "https://purina.com.co/excellent/gatos/sterilized",
     "verifiedOn": "2026-11-21",
     "name": "Excellent Gatos Sterilized",
+    "proteinMin": 36.0,
+    "fatMin": 9.0,
     "fiberMax": 6.0,
     "moistureMax": 12.0,
+    "ashMax": 9.5,
     "packagesKg": [
       1.0
     ],
@@ -1808,10 +2008,34 @@
     "url": "https://purina.com.co/excellent/gatos/gatitos-pollo-arroz",
     "verifiedOn": "2026-11-21",
     "name": "Excellent comida para gatitos con Pollo, Carne y Arroz",
+    "proteinMin": 37.0,
+    "fatMin": 14.0,
     "fiberMax": 3.0,
     "moistureMax": 12.0,
+    "ashMax": 9.5,
     "packagesKg": [
       1.0
+    ]
+  },
+  {
+    "brand": "Excellent",
+    "species": "cat",
+    "handles": [
+      "excellent-adult-cat"
+    ],
+    "url": "https://purina.com.co/excellent/pollo-y-arroz-medianas-y-grandes",
+    "verifiedOn": "2026-11-21",
+    "name": "Gato Adulto Pollo y Arroz",
+    "proteinMin": 33.0,
+    "fatMin": 13.0,
+    "fiberMax": 3.0,
+    "moistureMax": 12.0,
+    "ashMax": 9.5,
+    "kcalKg": 3920.0,
+    "packagesKg": [
+      1.0,
+      3.0,
+      7.5
     ]
   },
   {
@@ -1851,6 +2075,24 @@
     "fat": 18.5,
     "fiber": 1.3,
     "kcalKg": 3926.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Adult 7+ concentrado para perro",
+    "url": "https://www.hillspet.co/dog-food/science-diet-mature-adult-small-paws-breed-dry",
+    "handles": [
+      "hills-science-diet-adult-7-small-bites-chicken-meal-dog"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      2.04
+    ],
+    "protein": 21.5,
+    "basis": "materia_seca",
+    "fat": 15.0,
+    "fiber": 3.7,
+    "kcalKg": 3619.0
   },
   {
     "brand": "Hill’s",
@@ -1927,6 +2169,24 @@
     "fat": 17.0,
     "fiber": 3.3,
     "kcalKg": 3807.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Gastrointestinal Biome comida para perro Cuidado Digestivo 3.6 kg",
+    "url": "https://www.hillspet.co/dog-food/prescription-diet-gastrointestinal-biome-digestive-care-dry",
+    "handles": [
+      "hills-prescription-diet-gastrobiome"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      3.63
+    ],
+    "protein": 21.0,
+    "basis": "materia_seca",
+    "fat": 12.6,
+    "fiber": 7.4,
+    "kcalKg": 3327.0
   },
   {
     "brand": "Hill’s",
@@ -2241,6 +2501,24 @@
   },
   {
     "brand": "Hill’s",
+    "name": "Hill's Science Diet Senior Vitality comida para perro senior sabor pollo 5.7Kg",
+    "url": "https://www.hillspet.co/dog-food/science-plan-adult-7-senior-vitality-chicken-rice-dry",
+    "handles": [
+      "alimento-para-perro-hills-adulto-youthful-v-7-12-5-lb"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      5.67
+    ],
+    "protein": 22.1,
+    "basis": "materia_seca",
+    "fat": 14.2,
+    "fiber": 1.6,
+    "kcalKg": 3619.0
+  },
+  {
+    "brand": "Hill’s",
     "name": "Hill's Science Diet Small&Mini comida para perro adulto raza pequeña y mini 7Kg",
     "url": "https://www.hillspet.co/dog-food/science-plan-adult-small-paws-lamb-rice-dry",
     "handles": [
@@ -2296,6 +2574,24 @@
   },
   {
     "brand": "Hill’s",
+    "name": "Hill's Science Diet comida para control de peso perro adulto raza pequeña 1.8Kg",
+    "url": "https://www.hillspet.co/dog-food/science-plan-adult-perfect-weight-small-paws-dry",
+    "handles": [
+      "alimento-seco-para-perro-hills-science-diet-adult-perfect-weight-control-de-peso-small-and-mini"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.81
+    ],
+    "protein": 28.8,
+    "basis": "materia_seca",
+    "fat": 11.2,
+    "fiber": 10.3,
+    "kcalKg": 3189.0
+  },
+  {
+    "brand": "Hill’s",
     "name": "Hill's Science Diet comida para gatos adultos, salmón y arroz 1.5 Kg",
     "url": "https://www.hillspet.co/cat-food/science-plan-adult-salmon-brown-rice-dry",
     "handles": [
@@ -2311,6 +2607,24 @@
     "fat": 19.8,
     "fiber": 1.5,
     "kcalKg": 3942.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Science Diet comida para perro adulto para control de peso 1.8Kg",
+    "url": "https://www.hillspet.co/dog-food/science-plan-adult-perfect-weight-dry",
+    "handles": [
+      "hills-science-diet-adult-perfect-weight-dog"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.81
+    ],
+    "protein": 28.8,
+    "basis": "materia_seca",
+    "fat": 11.2,
+    "fiber": 10.3,
+    "kcalKg": 3189.0
   },
   {
     "brand": "Hill’s",
@@ -2691,6 +3005,24 @@
     "fat": 22.0,
     "fiber": 0.9,
     "kcalKg": 4104.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "concentrado para gato",
+    "url": "https://www.hillspet.co/cat-food/science-plan-adult-original-dry",
+    "handles": [
+      "hills-science-diet-feline-adul-1-6-cat"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      0.49
+    ],
+    "protein": 34.6,
+    "basis": "materia_seca",
+    "fat": 18.0,
+    "fiber": 1.6,
+    "kcalKg": 3873.0
   },
   {
     "brand": "Hill’s",
@@ -3240,7 +3572,7 @@
       "orijen-fit-trim-gatos",
       "orijen-fit-trim-gatos-presentaciones-por-confirmar"
     ],
-    "url": "https://www.orijenpetfoods.com/en-US/cats/cat-food/fit-and-trim/ds-ori-fit-trim-cat.html",
+    "url": "https://latam.orijenpetfoods.com/en/cats/cat-food/la-ds-ori-fit-trim-cat.html",
     "verifiedOn": "2026-11-21",
     "name": "Fit & Trim™ Dry Cat Food",
     "kcalKg": 3700.0,
@@ -3249,9 +3581,30 @@
     "fiberMax": 6.0,
     "moistureMax": 10.0,
     "packagesKg": [
-      1.814369,
-      3.175147,
-      5.443108
+      1.8,
+      3.17,
+      5.4
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ORIJEN",
+    "species": "dog",
+    "handles": [
+      "orijen-fit-trim-perros"
+    ],
+    "url": "https://latam.orijenpetfoods.com/en/dogs/dog-food/la-ds-ori-fit-trim-dog.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Fit & Trim™ Dry Dog Food",
+    "kcalKg": 3490.0,
+    "proteinMin": 42.0,
+    "fatMin": 13.0,
+    "fiberMax": 8.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.0,
+      6.0,
+      10.6
     ],
     "complete": true
   },
@@ -3304,7 +3657,7 @@
     "handles": [
       "orijen-large-breed-adult-recipe-perros"
     ],
-    "url": "https://www.orijenpetfoods.com/en-US/dogs/dog-food/large-breed-adult-recipe/ds-ori-large-breed-adult.html",
+    "url": "https://latam.orijenpetfoods.com/en/dogs/dog-food/la-ds-ori-large-breed-adult.html",
     "verifiedOn": "2026-11-21",
     "name": "Large Breed Adult Recipe Dry Dog Food",
     "kcalKg": 3610.0,
@@ -3313,7 +3666,7 @@
     "fiberMax": 6.0,
     "moistureMax": 12.0,
     "packagesKg": [
-      10.659421
+      10.6
     ],
     "complete": true
   },
@@ -3324,7 +3677,7 @@
       "orijen-original-cat-gatos",
       "orijen-original-cat-gatos-presentaciones-por-confirmar"
     ],
-    "url": "https://www.orijenpetfoods.com/en-US/cats/cat-food/original-cat/ds-ori-cat-kitten.html",
+    "url": "https://latam.orijenpetfoods.com/en/cats/cat-food/la-ds-ori-cat-kitten.html",
     "verifiedOn": "2026-11-21",
     "name": "Original Cat Dry Cat Food",
     "kcalKg": 4120.0,
@@ -3333,9 +3686,9 @@
     "fiberMax": 3.0,
     "moistureMax": 10.0,
     "packagesKg": [
-      1.814369,
-      3.175147,
-      5.443108
+      1.8,
+      3.17,
+      5.4
     ],
     "complete": true
   },
@@ -3346,7 +3699,7 @@
       "orijen-original-perros",
       "orijen-original-perros-presentaciones-por-confirmar"
     ],
-    "url": "https://www.orijenpetfoods.com/en-US/dogs/dog-food/original/ds-ori-original-dog.html",
+    "url": "https://latam.orijenpetfoods.com/en/dogs/dog-food/la-ds-ori-original-dog.html",
     "verifiedOn": "2026-11-21",
     "name": "Original Dry Dog Food",
     "kcalKg": 3940.0,
@@ -3355,10 +3708,10 @@
     "fiberMax": 4.0,
     "moistureMax": 12.0,
     "packagesKg": [
-      2.041166,
-      5.896701,
-      10.659421,
-      14.061363
+      2.0,
+      6.0,
+      10.6,
+      14.0
     ],
     "complete": true
   },
@@ -3369,7 +3722,7 @@
       "orijen-puppy-perros",
       "orijen-puppy-perros-presentaciones-por-confirmar"
     ],
-    "url": "https://www.orijenpetfoods.com/en-US/dogs/dog-food/puppy/ds-ori-puppy.html",
+    "url": "https://latam.orijenpetfoods.com/en/dogs/dog-food/la-ds-ori-puppy.html",
     "verifiedOn": "2026-11-21",
     "name": "Puppy Dry Dog Food",
     "kcalKg": 3960.0,
@@ -3378,9 +3731,9 @@
     "fiberMax": 6.0,
     "moistureMax": 12.0,
     "packagesKg": [
-      2.041166,
-      5.896701,
-      10.659421
+      2.0,
+      6.0,
+      10.6
     ],
     "complete": true
   },
@@ -3390,7 +3743,7 @@
     "handles": [
       "orijen-puppy-large-perros"
     ],
-    "url": "https://www.orijenpetfoods.com/en-US/dogs/dog-food/puppy-large/ds-ori-puppylrg.html",
+    "url": "https://latam.orijenpetfoods.com/en/dogs/dog-food/la-ds-ori-puppylrg.html",
     "verifiedOn": "2026-11-21",
     "name": "Puppy Large Dry Dog Food",
     "kcalKg": 3760.0,
@@ -3399,8 +3752,8 @@
     "fiberMax": 6.0,
     "moistureMax": 12.0,
     "packagesKg": [
-      5.896701,
-      10.659421
+      6.0,
+      10.6
     ],
     "complete": true
   },
@@ -3410,7 +3763,7 @@
     "handles": [
       "orijen-senior-perros"
     ],
-    "url": "https://www.orijenpetfoods.com/en-US/dogs/dog-food/senior/ds-ori-senior.html",
+    "url": "https://latam.orijenpetfoods.com/en/dogs/dog-food/la-ds-ori-senior.html",
     "verifiedOn": "2026-11-21",
     "name": "Senior Dry Dog Food",
     "kcalKg": 3710.0,
@@ -3419,9 +3772,9 @@
     "fiberMax": 8.0,
     "moistureMax": 12.0,
     "packagesKg": [
-      2.041166,
-      5.896701,
-      10.659421
+      2.0,
+      6.0,
+      10.6
     ],
     "complete": true
   },
@@ -3432,7 +3785,7 @@
       "orijen-six-fish-gatos",
       "orijen-six-fish-gatos-presentaciones-por-confirmar"
     ],
-    "url": "https://www.orijenpetfoods.com/en-US/cats/cat-food/six-fish/ds-ori-six-fish-cat.html",
+    "url": "https://latam.orijenpetfoods.com/en/cats/cat-food/la-ds-ori-six-fish-cat.html",
     "verifiedOn": "2026-11-21",
     "name": "Six Fish™ Dry Cat Food",
     "kcalKg": 4120.0,
@@ -3441,9 +3794,9 @@
     "fiberMax": 3.0,
     "moistureMax": 10.0,
     "packagesKg": [
-      1.814369,
-      3.175147,
-      5.443108
+      1.8,
+      3.17,
+      5.4
     ],
     "complete": true
   },
@@ -3453,7 +3806,7 @@
     "handles": [
       "orijen-six-fish-recipe-perros"
     ],
-    "url": "https://www.orijenpetfoods.com/en-US/dogs/dog-food/six-fish-recipe/ds-ori-six-fish-dog.html",
+    "url": "https://latam.orijenpetfoods.com/en/dogs/dog-food/la-ds-ori-six-fish-dog.html",
     "verifiedOn": "2026-11-21",
     "name": "Six Fish™ Recipe Dry Dog Food",
     "kcalKg": 3760.0,
@@ -3462,9 +3815,9 @@
     "fiberMax": 4.0,
     "moistureMax": 12.0,
     "packagesKg": [
-      2.041166,
-      5.896701,
-      10.659421
+      2.0,
+      6.0,
+      10.6
     ],
     "complete": true
   },
@@ -3474,7 +3827,7 @@
     "handles": [
       "orijen-small-breed-perros"
     ],
-    "url": "https://www.orijenpetfoods.com/en-US/dogs/dog-food/small-breed/ds-ori-small-breed.html",
+    "url": "https://latam.orijenpetfoods.com/en/dogs/dog-food/la-ds-ori-small-breed.html",
     "verifiedOn": "2026-11-21",
     "name": "Small Breed Dry Dog Food",
     "kcalKg": 3940.0,
@@ -3483,8 +3836,8 @@
     "fiberMax": 4.0,
     "moistureMax": 12.0,
     "packagesKg": [
-      1.814369,
-      4.535924
+      1.8,
+      4.5
     ],
     "complete": true
   },
@@ -3580,8 +3933,10 @@
     "url": "https://purina.com.co/proplan/perros/exigentes/razas-pequenas",
     "verifiedOn": "2026-11-21",
     "name": "Exigent Razas Pequeñas",
+    "proteinMin": 31.0,
     "fiberMax": 3.0,
     "moistureMax": 12.0,
+    "ashMax": 9.0,
     "packagesKg": [
       1.0,
       3.0,
@@ -3692,6 +4047,25 @@
   },
   {
     "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
+      "pro-plan-veterinary-diets-en-dietas-gastroenterico"
+    ],
+    "url": "https://purina.com.co/proplan/veterinary-diets/perros/gastroenterico",
+    "verifiedOn": "2026-11-21",
+    "name": "Pro Plan Gastroentérico para perros con problemas gastrointestinales",
+    "proteinMin": 24.0,
+    "fiberMax": 2.0,
+    "fatMin": 10.0,
+    "moistureMax": 12.0,
+    "ashMax": 8.5,
+    "packagesKg": [
+      2.0,
+      7.5
+    ]
+  },
+  {
+    "brand": "Pro Plan",
     "species": "cat",
     "handles": [
       "pro-plan-gatitos-kitten"
@@ -3709,8 +4083,7 @@
       1.5,
       3.0,
       7.5
-    ],
-    "complete": true
+    ]
   },
   {
     "brand": "Pro Plan",
@@ -3734,6 +4107,25 @@
     "brand": "Pro Plan",
     "species": "dog",
     "handles": [
+      "pro-plan-veterinary-diet-canine-ha-chicken"
+    ],
+    "url": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado",
+    "verifiedOn": "2026-11-21",
+    "name": "Pro Plan HA Hydrolized Fórmula Canina",
+    "moistureMax": 11.0,
+    "fatMin": 9.5,
+    "fiberMax": 4.0,
+    "ashMax": 7.0,
+    "packagesKg": [
+      2.7,
+      7.5
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
       "alimento-para-perro-medicado-ppvd-jm-movilidad-articular"
     ],
     "url": "https://purina.com.co/proplan/veterinary-diets/perros/articulaciones",
@@ -3747,8 +4139,7 @@
     "packagesKg": [
       2.0,
       7.5
-    ],
-    "complete": true
+    ]
   },
   {
     "brand": "Pro Plan",
@@ -3778,6 +4169,10 @@
     "verifiedOn": "2026-11-21",
     "name": "Pro Plan Neurocare NC Fórmula Canina",
     "moistureMax": 12.0,
+    "proteinMin": 29.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.0,
+    "ashMax": 8.5,
     "packagesKg": [
       2.0
     ]
@@ -3792,14 +4187,14 @@
     "verifiedOn": "2026-11-21",
     "name": "Pro Plan OM Obesity Management Fórmula Canina",
     "proteinMin": 26.0,
+    "fatMin": 5.0,
     "fiberMax": 16.0,
     "moistureMax": 12.0,
     "ashMax": 7.0,
     "packagesKg": [
       2.0,
       7.5
-    ],
-    "complete": true
+    ]
   },
   {
     "brand": "Pro Plan",
@@ -3837,6 +4232,24 @@
     "fiberMax": 5.0,
     "packagesKg": [
       1.4
+    ]
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "cat",
+    "handles": [
+      "proplan-veterinary-gastrointestinal-en"
+    ],
+    "url": "https://purina.com.co/proplan/dietas-veterinarias/gatos/gastroenterico",
+    "verifiedOn": "2026-11-21",
+    "name": "Pro Plan Veterinary Diets EN Gastrointestinal Formula Felina",
+    "proteinMin": 50.0,
+    "fatMin": 16.0,
+    "moistureMax": 12.0,
+    "ashMax": 7.5,
+    "fiberMax": 3.0,
+    "packagesKg": [
+      1.5
     ],
     "complete": true
   },
@@ -3856,8 +4269,7 @@
     "fiberMax": 5.0,
     "packagesKg": [
       1.5
-    ],
-    "complete": true
+    ]
   },
   {
     "brand": "Pro Plan",
@@ -3896,8 +4308,7 @@
       1.0,
       3.0,
       7.5
-    ],
-    "complete": true
+    ]
   },
   {
     "brand": "Pro Plan",
@@ -3961,8 +4372,7 @@
       1.0,
       3.0,
       7.5
-    ],
-    "complete": true
+    ]
   },
   {
     "brand": "Pro Plan",
@@ -3973,12 +4383,36 @@
     "url": "https://purina.com.co/proplan/gatos/piel-estomago-sensible-producto",
     "verifiedOn": "2026-11-21",
     "name": "Sensitive Skin and Stomach Gato Adulto",
+    "proteinMin": 36.0,
+    "fatMin": 16.0,
+    "fiberMax": 2.5,
     "moistureMax": 12.0,
+    "ashMax": 8.5,
     "kcalKg": 4200.0,
     "packagesKg": [
       3.0
+    ]
+  },
+  {
+    "brand": "Pro Plan",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-pro-plan-adultos-sensitive-skin-and-stomach",
+      "alimento-para-perros-adultos-con-piel-y-estomago-sensible-purina-pro-plan"
     ],
-    "complete": true
+    "url": "https://purina.com.co/proplan/perros/piel-estomago-sensible/medianas-grandes",
+    "verifiedOn": "2026-11-21",
+    "name": "Sensitive Skin and Stomach Todas las Razas",
+    "proteinMin": 25.0,
+    "fatMin": 15.0,
+    "fiberMax": 3.5,
+    "moistureMax": 12.0,
+    "ashMax": 8.5,
+    "kcalKg": 3950.0,
+    "packagesKg": [
+      3.0,
+      10.0
+    ]
   },
   {
     "brand": "Pro Plan",
@@ -3991,6 +4425,7 @@
     "name": "Sterilized",
     "proteinMin": 40.0,
     "fatMin": 12.0,
+    "fiberMax": 5.5,
     "moistureMax": 12.0,
     "ashMax": 8.5,
     "kcalKg": 3750.0,
@@ -4016,8 +4451,7 @@
     "moistureMax": 12.5,
     "packagesKg": [
       2.72
-    ],
-    "complete": true
+    ]
   },
   {
     "brand": "Pro Plan",
@@ -4054,8 +4488,7 @@
     "moistureMax": 12.0,
     "packagesKg": [
       1.5
-    ],
-    "complete": true
+    ]
   },
   {
     "brand": "Pro Plan",
@@ -4431,7 +4864,8 @@
     "fatMin": 20.0,
     "fiberMax": 2.8,
     "moistureMax": 9.0,
-    "ashMax": 6.7
+    "ashMax": 6.7,
+    "kcalKg": 4260
   },
   {
     "brand": "Royal Canin",
@@ -5836,6 +6270,26 @@
     "brand": "Royal Canin",
     "species": "dog",
     "handles": [
+      "alimento-medicado-para-perro-royal-canin-vhn-skintopic"
+    ],
+    "url": "https://www.royalcanin.com/co/dogs/products/vet-products/skintopic-3314",
+    "verifiedOn": "2026-11-21",
+    "name": "Skintopic Perro",
+    "packagesKg": [
+      3.492661,
+      7.983226
+    ],
+    "proteinMin": 21.0,
+    "fatMin": 14.0,
+    "fiberMax": 4.1,
+    "moistureMax": 10.5,
+    "kcalKg": 3656.0,
+    "complete": true
+  },
+  {
+    "brand": "Royal Canin",
+    "species": "dog",
+    "handles": [
       "alimento-medicado-para-perro-royal-canin-vhn-skintopic-razas-pequenas"
     ],
     "url": "https://www.royalcanin.com/co/dogs/products/vet-products/skintopic-small-dog-3315",
@@ -5939,7 +6393,9 @@
       4.0,
       10.0
     ],
-    "complete": true
+    "complete": true,
+    "protein": 37,
+    "fat": 12
   },
   {
     "brand": "Royal Canin",

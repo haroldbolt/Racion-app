@@ -22,6 +22,8 @@ test('every official sheet belongs to identifiable, published products of the st
       assert.equal(row.species, formula.species, handle);
       assert.equal(row.brand.toLowerCase(), formula.brand.toLowerCase(), handle);
       assert.equal(row.officialUrl, formula.url);
+      for (const link of Object.values(row.formula.packageSources ?? {})) assert.ok(new URL(link).protocol === 'https:');
+      for (const discrepancy of row.formula.discrepancies ?? []) assert.ok(new URL(discrepancy.sourceUrl).protocol === 'https:');
       assert.deepEqual(row.packagesKg, [...new Set(row.packagesKg)].sort((a,b) => a-b));
       assert.ok(row.packagesKg.every(kg => kg > 0 && Number.isFinite(kg)));
       const food = selectStoreManufacturerFood(row);
@@ -75,4 +77,27 @@ test('enrichment preserves a purchase, avoids similar formulas, and respects a c
   assert.equal(await enrichFoodFromStoreManufacturer(otherFormula), otherFormula);
   const confirmed = {...external, labelStatus:'user_confirmed_label' as const};
   assert.equal(await enrichFoodFromStoreManufacturer(confirmed), confirmed);
+});
+
+test('dry-matter percentages stay on their original basis while ration uses published metabolizable energy', async () => {
+  const row = (await getStoreManufacturerCatalog()).find(item => item.handle === 'hills-science-diet-adult-7-cat');
+  assert.ok(row);
+  const food = selectStoreManufacturerFood(row);
+  const protein = getEffectiveNutrientField(food,'proteina');
+  assert.equal(protein?.baseMedicion, 'materia_seca');
+  assert.equal(protein?.valor, 31.4);
+  assert.equal(food.proteinPct, 0);
+  assert.equal(getEffectiveNutrientField(food,'kcalPerKg')?.baseMedicion,'tal_como_se_vende');
+  assert.equal(getFoodKcalPerKg(food), 3926);
+});
+
+test('Mirringo Gaticos retains its portion guide, missing calories and the packaging discrepancy', async () => {
+  const row = (await getStoreManufacturerCatalog()).find(item => item.handle === 'mirringo-gaticos');
+  assert.ok(row);
+  const food = selectStoreManufacturerFood(row,1);
+  assert.equal(food.declaredIcaRegistration,'11705AL');
+  assert.equal(food.feedingGuide?.ranges[1].maxGrams,55);
+  assert.equal(getFoodKcalPerKg(food),undefined);
+  assert.equal(getEffectiveNutrientField(food,'cenizas')?.valor,8);
+  assert.equal(food.fichaNutricional?.discrepancies?.find(item => item.field === 'cenizas')?.other.valor,9);
 });

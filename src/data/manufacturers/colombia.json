@@ -7,11 +7,11 @@
       "agility-gold-adulto-obesos"
     ],
     "url": "https://www.italcolmascotas.com/agility-gold-cuidado-especial-obesos/",
-    "proteinMin": 27.0,
-    "fatMin": 9.0,
-    "fiberMax": 10.0,
-    "ashMax": 8.0,
-    "moistureMax": 12.0,
+    "proteinMin": 27,
+    "fatMin": 9,
+    "fiberMax": 10,
+    "ashMax": 8,
+    "moistureMax": 12,
     "registration": "17063AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
@@ -27,18 +27,54 @@
       "agility-gold-adulto-raza-grande"
     ],
     "url": "https://www.italcolmascotas.com/agility-gold-grandes-adultos-2/",
-    "proteinMin": 23.0,
-    "fatMin": 15.0,
-    "fiberMax": 4.0,
-    "ashMax": 8.0,
-    "moistureMax": 11.0,
+    "proteinMin": 23,
+    "fatMin": 15,
+    "fiberMax": 4,
+    "ashMax": 8,
+    "moistureMax": 11,
     "registration": "8548AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       1.5,
-      3.0,
-      15.0
-    ]
+      3,
+      15
+    ],
+    "feedingGuide": {
+      "sourceUrl": "https://www.italcolmascotas.com/agility-gold-grandes-adultos-2/",
+      "sourceName": "Italcol Mascotas",
+      "ranges": [
+        {
+          "minWeightKg": 6,
+          "maxWeightKg": 9,
+          "minGrams": 112,
+          "maxGrams": 140
+        },
+        {
+          "minWeightKg": 9.5,
+          "maxWeightKg": 16,
+          "minGrams": 140,
+          "maxGrams": 224
+        },
+        {
+          "minWeightKg": 16.5,
+          "maxWeightKg": 22.5,
+          "minGrams": 224,
+          "maxGrams": 261
+        },
+        {
+          "minWeightKg": 23,
+          "maxWeightKg": 34,
+          "minGrams": 261,
+          "maxGrams": 336
+        },
+        {
+          "minWeightKg": 34.5,
+          "maxWeightKg": 45,
+          "minGrams": 336,
+          "maxGrams": 411
+        }
+      ]
+    }
   },
   {
     "brand": "Agility Gold",
@@ -48,17 +84,17 @@
       "agility-gold-cachorros-raza-grande"
     ],
     "url": "https://www.italcolmascotas.com/agility-gold-pequenos-cachorros/",
-    "proteinMin": 24.0,
-    "fatMin": 15.0,
-    "fiberMax": 4.0,
-    "ashMax": 8.0,
-    "moistureMax": 11.0,
+    "proteinMin": 24,
+    "fatMin": 15,
+    "fiberMax": 4,
+    "ashMax": 8,
+    "moistureMax": 11,
     "registration": "8551AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       1.5,
-      3.0,
-      15.0
+      3,
+      15
     ]
   },
   {
@@ -69,17 +105,17 @@
       "agility-gold-cachorros-raza-pequena"
     ],
     "url": "https://www.italcolmascotas.com/agility-gold-pequenos-cachorros-2/",
-    "proteinMin": 28.0,
-    "fatMin": 17.0,
-    "fiberMax": 4.0,
-    "ashMax": 8.0,
-    "moistureMax": 11.0,
+    "proteinMin": 28,
+    "fatMin": 17,
+    "fiberMax": 4,
+    "ashMax": 8,
+    "moistureMax": 11,
     "registration": "8555AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       1.5,
-      3.0,
-      8.0
+      3,
+      8
     ]
   },
   {
@@ -90,17 +126,17 @@
       "agility-gold-gatitos"
     ],
     "url": "https://www.italcolmascotas.com/agility-gold-gatitos/",
-    "proteinMin": 42.0,
-    "fatMin": 14.0,
-    "fiberMax": 7.0,
-    "ashMax": 9.0,
-    "moistureMax": 12.0,
+    "proteinMin": 42,
+    "fatMin": 14,
+    "fiberMax": 7,
+    "ashMax": 9,
+    "moistureMax": 12,
     "registration": "15244AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
       1.5,
-      3.0
+      3
     ]
   },
   {
@@ -111,18 +147,18 @@
       "agility-gold-gato"
     ],
     "url": "https://www.italcolmascotas.com/agility-gold-gatos/",
-    "proteinMin": 36.0,
-    "fatMin": 14.0,
-    "fiberMax": 7.0,
-    "ashMax": 9.0,
-    "moistureMax": 12.0,
+    "proteinMin": 36,
+    "fatMin": 14,
+    "fiberMax": 7,
+    "ashMax": 9,
+    "moistureMax": 12,
     "registration": "14098AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
       1.5,
-      3.0,
-      7.0
+      3,
+      7
     ]
   },
   {
@@ -133,11 +169,11 @@
       "agility-gold-gato-esterilizado"
     ],
     "url": "https://www.italcolmascotas.com/agility-gold-cuidado-especial-esterilizados/",
-    "proteinMin": 36.0,
-    "fatMin": 11.0,
-    "fiberMax": 6.0,
-    "ashMax": 9.0,
-    "moistureMax": 12.0,
+    "proteinMin": 36,
+    "fatMin": 11,
+    "fiberMax": 6,
+    "ashMax": 9,
+    "moistureMax": 12,
     "registration": "16386AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
@@ -152,18 +188,18 @@
       "agility-gold-pequenos-adultos"
     ],
     "url": "https://www.italcolmascotas.com/agility-gold-pequenos-adultos-2/",
-    "proteinMin": 25.0,
-    "fatMin": 12.0,
-    "fiberMax": 4.0,
-    "ashMax": 8.0,
-    "moistureMax": 12.0,
+    "proteinMin": 25,
+    "fatMin": 12,
+    "fiberMax": 4,
+    "ashMax": 8,
+    "moistureMax": 12,
     "registration": "13844AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
       1.5,
-      3.0,
-      7.0
+      3,
+      7
     ]
   },
   {
@@ -174,18 +210,48 @@
       "sin-nombre-25jul_11-35"
     ],
     "url": "https://www.italcolmascotas.com/agility-gold-cuidado-especial-piel-grandes-adultos-2/",
-    "proteinMin": 24.0,
-    "fatMin": 15.0,
-    "fiberMax": 4.0,
-    "ashMax": 8.0,
-    "moistureMax": 11.0,
+    "proteinMin": 24,
+    "fatMin": 15,
+    "fiberMax": 4,
+    "ashMax": 8,
+    "moistureMax": 11,
     "registration": "14978AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       1.5,
       3,
       8
-    ]
+    ],
+    "feedingGuide": {
+      "sourceUrl": "https://www.italcolmascotas.com/agility-gold-cuidado-especial-piel-grandes-adultos-2/",
+      "sourceName": "Italcol Mascotas",
+      "ranges": [
+        {
+          "minWeightKg": 9.5,
+          "maxWeightKg": 16,
+          "minGrams": 140,
+          "maxGrams": 224
+        },
+        {
+          "minWeightKg": 16.5,
+          "maxWeightKg": 22.5,
+          "minGrams": 224,
+          "maxGrams": 261
+        },
+        {
+          "minWeightKg": 23,
+          "maxWeightKg": 34,
+          "minGrams": 261,
+          "maxGrams": 336
+        },
+        {
+          "minWeightKg": 34.5,
+          "maxWeightKg": 45,
+          "minGrams": 336,
+          "maxGrams": 411
+        }
+      ]
+    }
   },
   {
     "brand": "Agility Gold",
@@ -195,11 +261,11 @@
       "agility-gold-piel-sensible-razas-pequenas"
     ],
     "url": "https://www.italcolmascotas.com/agility-gold-cuidado-especial-piel-pequenos-adultos-2/",
-    "proteinMin": 26.0,
-    "fatMin": 12.0,
-    "fiberMax": 4.0,
-    "ashMax": 8.0,
-    "moistureMax": 12.0,
+    "proteinMin": 26,
+    "fatMin": 12,
+    "fiberMax": 4,
+    "ashMax": 8,
+    "moistureMax": 12,
     "registration": "14980AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
@@ -216,17 +282,17 @@
       "alimento-seco-para-perro-agility-mamas-y-cachorros-primera-fase"
     ],
     "url": "https://www.italcolmascotas.com/agility-gold-cuidado-especial-primera-fase-2/",
-    "proteinMin": 32.0,
-    "fatMin": 18.0,
-    "fiberMax": 4.0,
-    "ashMax": 8.0,
-    "moistureMax": 11.0,
+    "proteinMin": 32,
+    "fatMin": 18,
+    "fiberMax": 4,
+    "ashMax": 8,
+    "moistureMax": 11,
     "registration": "16615AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
       1.5,
-      8.0
+      8
     ]
   },
   {
@@ -238,16 +304,16 @@
       "chunky-adultos-mayores"
     ],
     "url": "https://www.italcolmascotas.com/chunky-adultos-mayores-pollo/",
-    "proteinMin": 18.0,
-    "fatMin": 7.0,
-    "fiberMax": 6.0,
-    "ashMax": 8.0,
-    "moistureMax": 12.0,
+    "proteinMin": 18,
+    "fatMin": 7,
+    "fiberMax": 6,
+    "ashMax": 8,
+    "moistureMax": 12,
     "registration": "10476AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       1.5,
-      12.0
+      12
     ]
   },
   {
@@ -258,17 +324,17 @@
       "alimento-para-perro-chunky-cachorro-cordero-arroz-salmon"
     ],
     "url": "https://www.italcolmascotas.com/chunky-cachorros-cordero-arroz-y-salmon/",
-    "proteinMin": 27.0,
-    "fatMin": 10.0,
-    "fiberMax": 4.0,
-    "ashMax": 8.0,
-    "moistureMax": 10.0,
+    "proteinMin": 27,
+    "fatMin": 10,
+    "fiberMax": 4,
+    "ashMax": 8,
+    "moistureMax": 10,
     "registration": "9378AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       1.5,
-      4.0,
-      8.0
+      4,
+      8
     ]
   },
   {
@@ -279,17 +345,17 @@
       "chunky-adulto-raza-pequenas"
     ],
     "url": "https://www.italcolmascotas.com/chunky-adultos-razas-pequenas-pollo/",
-    "proteinMin": 24.0,
-    "fatMin": 12.0,
-    "fiberMax": 4.0,
-    "ashMax": 8.0,
+    "proteinMin": 24,
+    "fatMin": 12,
+    "fiberMax": 4,
+    "ashMax": 8,
     "registration": "13609AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
       1.5,
-      4.0,
-      8.0
+      4,
+      8
     ]
   },
   {
@@ -297,20 +363,21 @@
     "name": "Chunky Cordero, Arroz y Salmón",
     "species": "dog",
     "handles": [
-      "chunky-cordero-arroz-y-salmon"
+      "chunky-cordero-arroz-y-salmon",
+      "alimento-para-perro-chunky-adulto-cordero"
     ],
     "url": "https://www.italcolmascotas.com/chunky-cordero-arroz-y-salmon/",
-    "proteinMin": 21.0,
-    "fatMin": 10.0,
-    "fiberMax": 4.0,
-    "ashMax": 8.0,
-    "moistureMax": 10.0,
+    "proteinMin": 21,
+    "fatMin": 10,
+    "fiberMax": 4,
+    "ashMax": 8,
+    "moistureMax": 10,
     "registration": "9377AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       1.5,
-      4.0,
-      12.0
+      4,
+      12
     ]
   },
   {
@@ -321,17 +388,17 @@
       "chunky-gatitos-pollo-y-cordero"
     ],
     "url": "https://www.italcolmascotas.com/chunky-gaticos-producto/",
-    "proteinMin": 40.0,
-    "fatMin": 14.0,
-    "fiberMax": 4.0,
-    "ashMax": 9.0,
-    "moistureMax": 12.0,
+    "proteinMin": 40,
+    "fatMin": 14,
+    "fiberMax": 4,
+    "ashMax": 9,
+    "moistureMax": 12,
     "registration": "14509AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
       1.5,
-      8.0
+      8
     ]
   },
   {
@@ -342,17 +409,17 @@
       "chunky-gato-salmon-cordero"
     ],
     "url": "https://www.italcolmascotas.com/chunky-gatos-salmon-y-cordero/",
-    "proteinMin": 31.0,
-    "fatMin": 10.0,
-    "fiberMax": 4.0,
-    "ashMax": 8.0,
-    "moistureMax": 12.0,
+    "proteinMin": 31,
+    "fatMin": 10,
+    "fiberMax": 4,
+    "ashMax": 8,
+    "moistureMax": 12,
     "registration": "14508AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
       1.5,
-      8.0
+      8
     ]
   },
   {
@@ -363,17 +430,17 @@
       "chunky-gatos-pollo"
     ],
     "url": "https://www.italcolmascotas.com/chunky-gatos-pollo/",
-    "proteinMin": 31.0,
-    "fatMin": 10.0,
-    "fiberMax": 4.0,
-    "ashMax": 8.0,
-    "moistureMax": 12.0,
+    "proteinMin": 31,
+    "fatMin": 10,
+    "fiberMax": 4,
+    "ashMax": 8,
+    "moistureMax": 12,
     "registration": "8304AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
       1.5,
-      8.0
+      8
     ]
   },
   {
@@ -384,22 +451,22 @@
       "chunky-perro-adulto-pollo"
     ],
     "url": "https://www.italcolmascotas.com/chunky-adulto-pollo/",
-    "proteinMin": 22.0,
-    "fatMin": 10.0,
-    "fiberMax": 4.0,
-    "ashMax": 8.0,
-    "moistureMax": 10.0,
+    "proteinMin": 22,
+    "fatMin": 10,
+    "fiberMax": 4,
+    "ashMax": 8,
+    "moistureMax": 10,
     "registration": "7194AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
-      2.0,
-      4.0,
-      8.0,
-      9.0,
-      14.0,
-      22.0,
-      25.0
+      2,
+      4,
+      8,
+      9,
+      14,
+      22,
+      25
     ]
   },
   {
@@ -410,19 +477,19 @@
       "chunky-perro-cachorro-pollo"
     ],
     "url": "https://www.italcolmascotas.com/chunky-cachorro-pollo/",
-    "proteinMin": 28.0,
-    "fatMin": 10.0,
-    "fiberMax": 4.0,
-    "ashMax": 10.0,
-    "moistureMax": 10.0,
+    "proteinMin": 28,
+    "fatMin": 10,
+    "fiberMax": 4,
+    "ashMax": 10,
+    "moistureMax": 10,
     "registration": "7724AL",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
-      2.0,
-      4.0,
-      9.0,
-      18.0
+      2,
+      4,
+      9,
+      18
     ]
   },
   {
@@ -433,18 +500,18 @@
       "alimento-seco-br-for-cat-pure-adultos-castrados-atun"
     ],
     "url": "https://www.gestoagro.net/productos/cats/br-for-cat-adultos-castrados-atun",
-    "proteinMin": 30.0,
-    "fatMin": 10.0,
-    "fiberMax": 5.0,
+    "proteinMin": 30,
+    "fatMin": 10,
+    "fiberMax": 5,
     "ashMax": 8.5,
-    "moistureMax": 9.0,
+    "moistureMax": 9,
     "kcalKg": 3690,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      3.0,
-      10.0
+      1,
+      3,
+      10
     ]
   },
   {
@@ -455,18 +522,18 @@
       "br-for-cat-castrados"
     ],
     "url": "https://www.gestoagro.net/productos/cats/br-for-cat-adultos-castrados",
-    "proteinMin": 30.0,
-    "fatMin": 8.0,
-    "fiberMax": 5.0,
-    "ashMax": 9.0,
-    "moistureMax": 9.0,
+    "proteinMin": 30,
+    "fatMin": 8,
+    "fiberMax": 5,
+    "ashMax": 9,
+    "moistureMax": 9,
     "kcalKg": 3313,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      3.0,
-      10.0
+      1,
+      3,
+      10
     ]
   },
   {
@@ -477,18 +544,18 @@
       "br-for-cat-adulto-salmon-1"
     ],
     "url": "https://www.gestoagro.net/productos/cats/br-for-cat-adultos-castrados-salmon",
-    "proteinMin": 30.0,
-    "fatMin": 10.0,
-    "fiberMax": 5.0,
+    "proteinMin": 30,
+    "fatMin": 10,
+    "fiberMax": 5,
     "ashMax": 8.5,
-    "moistureMax": 9.0,
+    "moistureMax": 9,
     "kcalKg": 3760,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      3.0,
-      10.0
+      1,
+      3,
+      10
     ]
   },
   {
@@ -499,18 +566,18 @@
       "br-cat-gatitos-sabor-pollo"
     ],
     "url": "https://www.gestoagro.net/productos/cats/br-for-cat-gatitos",
-    "proteinMin": 32.0,
-    "fatMin": 20.0,
-    "fiberMax": 4.0,
-    "ash": 8.0,
-    "moistureMax": 9.0,
+    "proteinMin": 32,
+    "fatMin": 20,
+    "fiberMax": 4,
+    "ash": 8,
+    "moistureMax": 9,
     "kcalKg": 3934,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      3.0,
-      10.0
+      1,
+      3,
+      10
     ]
   },
   {
@@ -521,18 +588,18 @@
       "br-for-cat-gatitos-sabor-salmon"
     ],
     "url": "https://www.gestoagro.net/productos/cats/br-for-cat-kitten-salmon",
-    "proteinMin": 32.0,
-    "fatMin": 20.0,
+    "proteinMin": 32,
+    "fatMin": 20,
     "fiberMax": 3.8,
-    "ashMax": 9.0,
-    "moistureMax": 10.0,
+    "ashMax": 9,
+    "moistureMax": 10,
     "kcalKg": 4195,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      3.0,
-      10.0
+      1,
+      3,
+      10
     ]
   },
   {
@@ -543,17 +610,17 @@
       "br-cat-adultos-sabor-pollo"
     ],
     "url": "https://www.gestoagro.net/productos/cats/br-for-cat-adultos",
-    "proteinMin": 30.0,
-    "fatMin": 15.0,
-    "fiberMax": 5.0,
-    "ash": 8.0,
-    "moistureMax": 9.0,
+    "proteinMin": 30,
+    "fatMin": 15,
+    "fiberMax": 5,
+    "ash": 8,
+    "moistureMax": 9,
     "kcalKg": 3655,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      3.0,
-      10.0
+      1,
+      3,
+      10
     ]
   },
   {
@@ -564,17 +631,17 @@
       "br-for-cat-adulto-salmon"
     ],
     "url": "https://www.gestoagro.net/productos/cats/br-for-cat-adultos-salmon",
-    "proteinMin": 30.0,
-    "fatMin": 15.0,
-    "fiberMax": 5.0,
-    "ashMax": 8.0,
-    "moistureMax": 9.0,
+    "proteinMin": 30,
+    "fatMin": 15,
+    "fiberMax": 5,
+    "ashMax": 8,
+    "moistureMax": 9,
     "kcalKg": 3655,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      3.0,
-      10.0
+      1,
+      3,
+      10
     ]
   },
   {
@@ -585,18 +652,18 @@
       "br-for-cat-senior"
     ],
     "url": "https://www.gestoagro.net/productos/cats/br-for-cat-senior",
-    "proteinMin": 30.0,
-    "fatMin": 14.0,
-    "fiberMax": 4.0,
-    "ashMax": 8.0,
-    "moistureMax": 10.0,
+    "proteinMin": 30,
+    "fatMin": 14,
+    "fiberMax": 4,
+    "ashMax": 8,
+    "moistureMax": 10,
     "kcalKg": 3670,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      3.0,
-      10.0
+      1,
+      3,
+      10
     ]
   },
   {
@@ -607,18 +674,18 @@
       "br-for-cat-vet-gastrointestinal"
     ],
     "url": "https://www.gestoagro.net/productos/cats/br-for-cat-vet-gastrointestinal",
-    "proteinMin": 30.0,
-    "fatMin": 19.0,
+    "proteinMin": 30,
+    "fatMin": 19,
     "fiberMax": 5.7,
-    "ashMax": 8.0,
-    "moistureMax": 9.0,
+    "ashMax": 8,
+    "moistureMax": 9,
     "kcalKg": 4100,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
       1.5,
-      3.0
+      3
     ]
   },
   {
@@ -629,18 +696,18 @@
       "br-for-cat-vet-hepatic"
     ],
     "url": "https://www.gestoagro.net/productos/cats/br-for-cat-vet-hepatic",
-    "proteinMin": 26.0,
-    "fatMin": 15.0,
+    "proteinMin": 26,
+    "fatMin": 15,
     "fiberMax": 3.5,
     "ashMax": 5.6,
-    "moistureMax": 9.0,
+    "moistureMax": 9,
     "kcalKg": 4060,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
       1.5,
-      3.0
+      3
     ]
   },
   {
@@ -651,18 +718,18 @@
       "br-for-cat-vet-kidney-function"
     ],
     "url": "https://www.gestoagro.net/productos/cats/br-for-cat-vet-kidney-function",
-    "proteinMin": 28.0,
+    "proteinMin": 28,
     "fatMin": 15.7,
     "fiberMax": 4.1,
     "ashMax": 5.6,
-    "moistureMax": 9.0,
+    "moistureMax": 9,
     "kcalKg": 4075,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
       1.5,
-      3.0
+      3
     ]
   },
   {
@@ -673,18 +740,18 @@
       "br-for-cat-vet-renal-care"
     ],
     "url": "https://www.gestoagro.net/productos/cats/br-for-cat-vet-renal-care",
-    "proteinMin": 25.0,
-    "fatMin": 14.0,
+    "proteinMin": 25,
+    "fatMin": 14,
     "fiberMax": 4.7,
     "ashMax": 5.5,
-    "moistureMax": 9.0,
+    "moistureMax": 9,
     "kcalKg": 3980,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
       1.5,
-      3.0
+      3
     ]
   },
   {
@@ -695,18 +762,18 @@
       "br-for-cat-vet-sensitive"
     ],
     "url": "https://www.gestoagro.net/productos/cats/br-for-cat-vet-sensitive",
-    "proteinMin": 28.0,
-    "fatMin": 11.0,
+    "proteinMin": 28,
+    "fatMin": 11,
     "fiberMax": 4.2,
     "ashMax": 8.6,
-    "moistureMax": 9.0,
+    "moistureMax": 9,
     "kcalKg": 3750,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
       1.5,
-      3.0
+      3
     ]
   },
   {
@@ -717,18 +784,18 @@
       "br-for-cat-vet-urinary"
     ],
     "url": "https://www.gestoagro.net/productos/cats/br-for-cat-vet-urinary",
-    "proteinMin": 31.0,
+    "proteinMin": 31,
     "fatMin": 10.5,
-    "fiberMax": 4.0,
+    "fiberMax": 4,
     "ashMax": 6.7,
-    "moistureMax": 9.0,
+    "moistureMax": 9,
     "kcalKg": 3825,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
       1.5,
-      3.0
+      3
     ]
   },
   {
@@ -739,18 +806,18 @@
       "br-for-cat-vet-weight-control-light"
     ],
     "url": "https://www.gestoagro.net/productos/cats/br-for-cat-vet-weight-control-light",
-    "proteinMin": 32.0,
-    "fatMin": 8.0,
+    "proteinMin": 32,
+    "fatMin": 8,
     "fiberMax": 11.4,
-    "ashMax": 9.0,
-    "moistureMax": 9.0,
+    "ashMax": 9,
+    "moistureMax": 9,
     "kcalKg": 3315,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
       1.5,
-      3.0
+      3
     ]
   },
   {
@@ -761,17 +828,17 @@
       "br-for-cat-wild-adultos"
     ],
     "url": "https://www.gestoagro.net/productos/cats/br-for-cat-wild-adults",
-    "proteinMin": 34.0,
-    "fatMin": 20.0,
+    "proteinMin": 34,
+    "fatMin": 20,
     "fiberMax": 3.5,
-    "ash": 8.0,
-    "moistureMax": 9.0,
+    "ash": 8,
+    "moistureMax": 9,
     "kcalKg": 3970,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      3.0
+      1,
+      3
     ]
   },
   {
@@ -782,17 +849,17 @@
       "br-for-cat-wild-gatico"
     ],
     "url": "https://www.gestoagro.net/productos/cats/br-for-cat-wild-kitten",
-    "proteinMin": 33.0,
-    "fatMin": 23.0,
-    "fiberMax": 3.0,
-    "ash": 8.0,
-    "moistureMax": 9.0,
+    "proteinMin": 33,
+    "fatMin": 23,
+    "fiberMax": 3,
+    "ash": 8,
+    "moistureMax": 9,
     "kcalKg": 4304,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      3.0
+      1,
+      3
     ]
   },
   {
@@ -803,16 +870,16 @@
       "alimento-seco-br-for-dog-pure-adulto-light"
     ],
     "url": "https://www.gestoagro.net/productos/dogs/br-for-dog-adulto-light",
-    "proteinMin": 18.0,
+    "proteinMin": 18,
     "fatMin": 6.5,
-    "fiberMax": 3.0,
-    "ashMax": 6.0,
-    "moistureMax": 9.0,
+    "fiberMax": 3,
+    "ashMax": 6,
+    "moistureMax": 9,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      3.0,
-      10.0
+      1,
+      3,
+      10
     ]
   },
   {
@@ -823,16 +890,16 @@
       "br-for-dog-cachorro-razas-pequenas"
     ],
     "url": "https://www.gestoagro.net/productos/dogs/br-for-dog-puppy-razas-pequenas",
-    "proteinMin": 29.0,
-    "fatMin": 19.0,
-    "fiberMax": 3.0,
-    "ashMax": 8.0,
-    "moistureMax": 9.0,
+    "proteinMin": 29,
+    "fatMin": 19,
+    "fiberMax": 3,
+    "ashMax": 8,
+    "moistureMax": 9,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      3.0,
-      10.0
+      1,
+      3,
+      10
     ]
   },
   {
@@ -843,16 +910,16 @@
       "br-for-dog-puppy-raza-mediana"
     ],
     "url": "https://www.gestoagro.net/productos/dogs/br-for-dog-puppy-razas-medianas",
-    "proteinMin": 27.0,
-    "fatMin": 14.0,
-    "fiberMax": 3.0,
+    "proteinMin": 27,
+    "fatMin": 14,
+    "fiberMax": 3,
     "ashMax": 8.5,
-    "moistureMax": 9.0,
+    "moistureMax": 9,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      3.0,
-      10.0
+      1,
+      3,
+      10
     ]
   },
   {
@@ -863,17 +930,18 @@
       "br-for-dog-pure-puppy-cordero"
     ],
     "url": "https://www.gestoagro.net/productos/dogs/br-for-dog-cachorro-todas-las-razas",
-    "proteinMin": 32.0,
+    "proteinMin": 32,
     "fiberMax": 4.1,
     "ashMax": 8.6,
-    "moistureMax": 9.0,
+    "moistureMax": 9,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      3.0,
-      10.0
-    ]
+      1,
+      3,
+      10
+    ],
+    "fatMin": 20.0
   },
   {
     "brand": "BR for Dog",
@@ -883,16 +951,17 @@
       "br-for-dog-adulto-raza-pequena"
     ],
     "url": "https://www.gestoagro.net/productos/dogs/br-for-dog-adulto-razas-pequenas",
-    "proteinMin": 24.0,
-    "fiberMax": 3.0,
-    "ashMax": 6.0,
-    "moistureMax": 9.0,
+    "proteinMin": 24,
+    "fiberMax": 3,
+    "ashMax": 6,
+    "moistureMax": 9,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      3.0,
-      10.0
-    ]
+      1,
+      3,
+      10
+    ],
+    "fatMin": 12.0
   },
   {
     "brand": "BR for Dog",
@@ -902,17 +971,18 @@
       "br-for-dog-pure-adulto-cordero"
     ],
     "url": "https://www.gestoagro.net/productos/dogs/br-for-dog-adulto-todas-las-razas",
-    "proteinMin": 27.0,
+    "proteinMin": 27,
     "fiberMax": 5.2,
-    "ashMax": 9.0,
-    "moistureMax": 9.0,
+    "ashMax": 9,
+    "moistureMax": 9,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      3.0,
-      10.0
-    ]
+      1,
+      3,
+      10
+    ],
+    "fatMin": 17.0
   },
   {
     "brand": "BR for Dog",
@@ -922,16 +992,17 @@
       "br-for-dog-pure-adulto-perro-raza-grande"
     ],
     "url": "https://www.gestoagro.net/productos/dogs/br-for-dog-razas-grandes-y-gigantes",
-    "proteinMin": 24.0,
+    "proteinMin": 24,
     "fiberMax": 3.5,
-    "ashMax": 9.0,
-    "moistureMax": 10.0,
+    "ashMax": 9,
+    "moistureMax": 10,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      3.0,
-      10.0
-    ]
+      1,
+      3,
+      10
+    ],
+    "fatMin": 14.0
   },
   {
     "brand": "BR for Dog",
@@ -941,15 +1012,16 @@
       "br-for-dog-adulto-raza-mediana"
     ],
     "url": "https://www.gestoagro.net/productos/dogs/br-for-dog-adulto-razas-medianas",
-    "proteinMin": 26.0,
-    "fiberMax": 3.0,
-    "moistureMax": 9.0,
+    "proteinMin": 26,
+    "fiberMax": 3,
+    "moistureMax": 9,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      3.0,
-      10.0
-    ]
+      1,
+      3,
+      10
+    ],
+    "fatMin": 16.0
   },
   {
     "brand": "BR for Dog",
@@ -959,18 +1031,18 @@
       "br-for-dog-vet-gastrointestinal"
     ],
     "url": "https://www.gestoagro.net/productos/dogs/br-for-dog-vet-gastrointestinal",
-    "proteinMin": 25.0,
-    "fatMin": 12.0,
+    "proteinMin": 25,
+    "fatMin": 12,
     "fiberMax": 5.3,
     "ashMax": 8.5,
-    "moistureMax": 10.0,
+    "moistureMax": 10,
     "kcalKg": 3650,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
-      2.0,
-      4.0
+      2,
+      4
     ]
   },
   {
@@ -985,14 +1057,14 @@
     "fatMin": 15.2,
     "fiberMax": 3.6,
     "ashMax": 5.1,
-    "moistureMax": 10.0,
+    "moistureMax": 10,
     "kcalKg": 4040,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
-      2.0,
-      4.0
+      2,
+      4
     ]
   },
   {
@@ -1004,17 +1076,17 @@
     ],
     "url": "https://www.gestoagro.net/productos/dogs/br-for-dog-vet-renal-care",
     "proteinMin": 14.4,
-    "fatMin": 15.0,
+    "fatMin": 15,
     "fiberMax": 4.4,
-    "ashMax": 5.0,
-    "moistureMax": 10.0,
+    "ashMax": 5,
+    "moistureMax": 10,
     "kcalKg": 3950,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
-      2.0,
-      4.0
+      2,
+      4
     ]
   },
   {
@@ -1025,18 +1097,18 @@
       "br-for-dog-vet-sensitives"
     ],
     "url": "https://www.gestoagro.net/productos/dogs/br-for-dog-vet-sensitives",
-    "proteinMin": 18.0,
-    "fatMin": 15.0,
+    "proteinMin": 18,
+    "fatMin": 15,
     "fiberMax": 5.3,
     "ashMax": 6.8,
-    "moistureMax": 10.0,
+    "moistureMax": 10,
     "kcalKg": 4040,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
-      2.0,
-      4.0
+      2,
+      4
     ]
   },
   {
@@ -1048,17 +1120,17 @@
     ],
     "url": "https://www.gestoagro.net/productos/dogs/br-for-dog-vet-urinary",
     "proteinMin": 20.3,
-    "fatMin": 7.0,
-    "fiberMax": 4.0,
+    "fatMin": 7,
+    "fiberMax": 4,
     "ashMax": 6.5,
-    "moistureMax": 10.0,
+    "moistureMax": 10,
     "kcalKg": 3670,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
-      2.0,
-      4.0
+      2,
+      4
     ]
   },
   {
@@ -1073,14 +1145,14 @@
     "fatMin": 7.3,
     "fiberMax": 9.8,
     "ashMax": 9.1,
-    "moistureMax": 10.0,
+    "moistureMax": 10,
     "kcalKg": 3195,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
-      2.0,
-      4.0
+      2,
+      4
     ]
   },
   {
@@ -1091,17 +1163,17 @@
       "br-for-dog-wild-cachorro"
     ],
     "url": "https://www.gestoagro.net/productos/dogs/br-for-dog-wild-puppies",
-    "proteinMin": 34.0,
-    "fatMin": 22.0,
-    "fiberMax": 3.0,
-    "ash": 11.0,
-    "moistureMax": 9.0,
+    "proteinMin": 34,
+    "fatMin": 22,
+    "fiberMax": 3,
+    "ash": 11,
+    "moistureMax": 9,
     "kcalKg": 4145,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2.0,
-      4.0
+      2,
+      4
     ]
   },
   {
@@ -1112,16 +1184,16 @@
       "br-for-dog-wild-adulto"
     ],
     "url": "https://www.gestoagro.net/productos/dogs/br-for-dog-wild-adults",
-    "proteinMin": 32.0,
-    "fatMin": 20.0,
-    "fiberMax": 3.0,
-    "moistureMax": 9.0,
+    "proteinMin": 32,
+    "fatMin": 20,
+    "fiberMax": 3,
+    "moistureMax": 9,
     "kcalKg": 3990,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2.0,
-      4.0
+      2,
+      4
     ]
   },
   {
@@ -1132,17 +1204,17 @@
       "alimento-seco-tommy-cats-adultos"
     ],
     "url": "https://www.gestoagro.net/productos/cats/tommy-cats-adultos",
-    "proteinMin": 32.0,
-    "fatMin": 14.0,
+    "proteinMin": 32,
+    "fatMin": 14,
     "fiberMax": 2.8,
-    "ashMax": 8.0,
-    "moistureMax": 10.0,
+    "ashMax": 8,
+    "moistureMax": 10,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      7.0,
-      15.0
+      1,
+      7,
+      15
     ]
   },
   {
@@ -1153,17 +1225,17 @@
       "alimento-seco-tommy-cats-adultos-castrados"
     ],
     "url": "https://www.gestoagro.net/productos/cats/tommy-cats-adultos-castrados",
-    "proteinMin": 32.0,
-    "fatMin": 8.0,
+    "proteinMin": 32,
+    "fatMin": 8,
     "fiberMax": 3.6,
-    "ashMax": 9.0,
-    "moistureMax": 10.0,
+    "ashMax": 9,
+    "moistureMax": 10,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      7.0,
-      15.0
+      1,
+      7,
+      15
     ]
   },
   {
@@ -1174,16 +1246,16 @@
       "alimento-seco-tommy-cats-gatitos"
     ],
     "url": "https://www.gestoagro.net/productos/cats/tommy-cats-gatitos",
-    "proteinMin": 30.0,
-    "fatMin": 12.0,
+    "proteinMin": 30,
+    "fatMin": 12,
     "fiberMax": 3.1,
-    "ashMax": 10.0,
-    "moistureMax": 10.0,
+    "ashMax": 10,
+    "moistureMax": 10,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      10.0
+      1,
+      10
     ]
   },
   {
@@ -1194,17 +1266,17 @@
       "alimento-seco-tommy-dog-adulto-razas-medianas-y-grandes"
     ],
     "url": "https://www.gestoagro.net/productos/dogs/tommy-dog-adulto-razas-medianas-y-grandes",
-    "proteinMin": 32.0,
-    "fatMin": 14.0,
+    "proteinMin": 32,
+    "fatMin": 14,
     "fiberMax": 2.8,
-    "ashMax": 8.0,
-    "moistureMax": 10.0,
+    "ashMax": 8,
+    "moistureMax": 10,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      7.0,
-      25.0
+      1,
+      7,
+      25
     ]
   },
   {
@@ -1215,17 +1287,17 @@
       "alimento-seco-tommy-dog-adulto-razas-pequenas"
     ],
     "url": "https://www.gestoagro.net/productos/dogs/tommy-dog-adulto-razas-pequenas",
-    "proteinMin": 28.0,
-    "fatMin": 14.0,
+    "proteinMin": 28,
+    "fatMin": 14,
     "fiberMax": 3.4,
-    "ashMax": 7.0,
+    "ashMax": 7,
     "moistureMax": 9.5,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      7.0,
-      15.0
+      1,
+      7,
+      15
     ]
   },
   {
@@ -1236,17 +1308,17 @@
       "alimento-seco-tommy-dog-cachorro-razas-medianas-y-grandes"
     ],
     "url": "https://www.gestoagro.net/productos/dogs/tommy-dog-cachorro-razas-medianas-y-grandes",
-    "proteinMin": 34.0,
-    "fatMin": 16.0,
-    "fiberMax": 3.0,
-    "ashMax": 8.0,
+    "proteinMin": 34,
+    "fatMin": 16,
+    "fiberMax": 3,
+    "ashMax": 8,
     "moistureMax": 9.5,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      7.0,
-      25.0
+      1,
+      7,
+      25
     ]
   },
   {
@@ -1257,16 +1329,16 @@
       "alimento-seco-tommy-dog-cachorro-razas-pequenas"
     ],
     "url": "https://www.gestoagro.net/productos/dogs/tommy-dog-cachorro-razas-pequenas",
-    "proteinMin": 34.0,
-    "fatMin": 16.0,
-    "fiberMax": 3.0,
-    "ashMax": 8.0,
+    "proteinMin": 34,
+    "fatMin": 16,
+    "fiberMax": 3,
+    "ashMax": 8,
     "moistureMax": 9.5,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      7.0
+      1,
+      7
     ]
   },
   {
@@ -1277,16 +1349,16 @@
       "alimento-seco-michiko-adultos"
     ],
     "url": "https://www.gestoagro.net/productos/cats/premium-michiko-adultos",
-    "proteinMin": 27.0,
-    "fatMin": 8.0,
-    "fiberMax": 4.0,
-    "ashMax": 10.0,
-    "moistureMax": 10.0,
+    "proteinMin": 27,
+    "fatMin": 8,
+    "fiberMax": 4,
+    "ashMax": 10,
+    "moistureMax": 10,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
-      8.0
+      8
     ]
   },
   {
@@ -1294,13 +1366,14 @@
     "name": "Bonnat Grain Free Canine Puppy Small Breeds",
     "species": "dog",
     "handles": [
-      "alimento-seco-bonnat-grain-free-canine-puppy-small-breeds"
+      "alimento-seco-bonnat-grain-free-canine-puppy-small-breeds",
+      "bonnat-pollo-fresco-con-pavo-libre-de-granos-perros-razas-pequenas"
     ],
     "url": "https://www.bonnatpets.com/es/perros-cachorros-pequeno/",
     "kcalKg": 3860,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2.0
+      2
     ]
   },
   {
@@ -1313,7 +1386,7 @@
     "url": "https://www.bonnatpets.com/es/dietas-gatos-gastrointestinal/",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2.0
+      2
     ]
   },
   {
@@ -1326,7 +1399,7 @@
     "url": "https://www.bonnatpets.com/es/dietas-perros-gastrointestinal/",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2.0
+      2
     ]
   },
   {
@@ -1340,7 +1413,7 @@
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2.0
+      2
     ]
   },
   {
@@ -1354,7 +1427,7 @@
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2.0
+      2
     ]
   },
   {
@@ -1368,7 +1441,7 @@
     "kcalKg": 4065,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2.0
+      2
     ]
   },
   {
@@ -1381,7 +1454,7 @@
     "url": "https://www.bonnatpets.com/es/dietas-per-hepaticsupport/",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2.0
+      2
     ]
   },
   {
@@ -1396,7 +1469,7 @@
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2.0
+      2
     ]
   },
   {
@@ -1410,7 +1483,7 @@
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2.0
+      2
     ]
   },
   {
@@ -1437,7 +1510,7 @@
     "kcalKg": 3860,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2.0
+      2
     ]
   },
   {
@@ -1450,23 +1523,8 @@
     "url": "https://www.bonnatpets.com/es/perros-adultos-medianoygrande/",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2.0,
-      10.0
-    ]
-  },
-  {
-    "brand": "Bonnat",
-    "name": "Bonnat Grain Free Canine Adult Small Breeds",
-    "species": "dog",
-    "handles": [
-      "bonnat-pollo-fresco-con-pavo-libre-de-granos-perros-razas-pequenas"
-    ],
-    "url": "https://www.bonnatpets.com/es/perros-adultos-pequeno/",
-    "kcalKg": 3780,
-    "verifiedOn": "2026-11-21",
-    "packagesKg": [
-      2.0,
-      10.0
+      2,
+      10
     ]
   },
   {
@@ -1505,21 +1563,23 @@
       "alimento-seco-para-gato-mirringo-adulto",
       "mirringo-adultos"
     ],
-    "url": "https://www.mirringo.com.co/nuestros-productos/mirringo-original",
-    "proteinMin": 30.0,
-    "fatMin": 10.0,
-    "fiberMax": 4.0,
-    "ashMax": 8.0,
-    "moistureMax": 10.0,
+    "url": "https://www.mizooco.com/products/mirringo-adultos",
+    "proteinMin": 30,
+    "fatMin": 10,
+    "fiberMax": 4,
+    "ashMax": 8,
+    "moistureMax": 10,
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       1,
+      8,
       15
     ],
     "packageSources": {
       "15": "https://www.contegral.co/Portals/contegral/2025/INFORME%20DE%20IMPACTO%20POSITIVO%20GRUPO%20BIOS%202024_.pdf"
-    }
+    },
+    "kcalKg": 3450
   },
   {
     "brand": "Mirringo",
@@ -1528,15 +1588,38 @@
     "handles": [
       "mirringo-gaticos-copia"
     ],
-    "url": "https://www.mirringo.com.co/nuestros-productos/mirringo-pro",
-    "proteinMin": 30.0,
-    "fatMin": 10.0,
+    "url": "https://www.mizooco.com/cdn/shop/files/MIRRINGO-_PRO-1KG-BACK.jpg?v=1777463041",
+    "proteinMin": 30,
+    "fatMin": 10,
     "fiberMax": 3.5,
-    "ashMax": 8.0,
-    "moistureMax": 10.0,
+    "ashMax": 9,
+    "moistureMax": 10,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1
+      1,
+      8
+    ],
+    "kcalKg": 3500,
+    "packageSources": {
+      "1": "https://www.mizooco.com/products/mirringo-pro",
+      "8": "https://www.mizooco.com/products/mirringo-pro"
+    },
+    "discrepancies": [
+      {
+        "field": "cenizas",
+        "other": {
+          "valor": 8,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Mirringo Colombia",
+            "url": "https://www.mirringo.com.co/nuestros-productos/mirringo-pro",
+            "observedAt": "2026-11-21"
+          }
+        },
+        "sourceUrl": "https://www.mirringo.com.co/nuestros-productos/mirringo-pro"
+      }
     ]
   },
   {
@@ -1547,16 +1630,64 @@
       "mirringo-gaticos"
     ],
     "url": "https://www.mirringo.com.co/nuestros-productos/mirringo-gaticos",
-    "proteinMin": 32.0,
-    "fatMin": 12.0,
+    "proteinMin": 32,
+    "fatMin": 12,
     "fiberMax": 3.5,
-    "ashMax": 8.0,
-    "moistureMax": 10.0,
+    "ashMax": 8,
+    "moistureMax": 10,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       1
     ],
-    "complete": true
+    "complete": true,
+    "registration": "11705AL",
+    "feedingGuide": {
+      "sourceName": "MizooCo · Mirringo Gaticos",
+      "sourceUrl": "https://www.mizooco.com/cdn/shop/files/Tabla-de-suministros-mirringo-gaticos-1000x1000_800x800.jpg?v=1690497284",
+      "lifeStage": "kitten",
+      "ranges": [
+        {
+          "minWeightKg": 0.25,
+          "maxWeightKg": 1,
+          "minGrams": 10,
+          "maxGrams": 25
+        },
+        {
+          "minWeightKg": 1,
+          "maxWeightKg": 3,
+          "minGrams": 25,
+          "maxGrams": 55
+        },
+        {
+          "minWeightKg": 3,
+          "maxWeightKg": 6,
+          "minGrams": 55,
+          "maxGrams": 85
+        }
+      ],
+      "aboveWeight": {
+        "afterKg": 6,
+        "startGrams": 85,
+        "gramsPerKg": 7
+      }
+    },
+    "discrepancies": [
+      {
+        "field": "cenizas",
+        "other": {
+          "valor": 9,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Etiqueta de MizooCo",
+            "url": "https://www.mizooco.com/cdn/shop/files/MIRRINGO-GATICOS-1KG-FRONT.jpg?v=1777463686",
+            "observedAt": "2026-11-21"
+          }
+        },
+        "sourceUrl": "https://www.mizooco.com/cdn/shop/files/MIRRINGO-GATICOS-1KG-FRONT.jpg?v=1777463686"
+      }
+    ]
   },
   {
     "brand": "Ringo",
@@ -1565,12 +1696,21 @@
     "handles": [
       "ringo-pro-cachorros"
     ],
-    "url": "https://www.ringo.com.co/nuestros-productos/ringo-pro-cachorros",
-    "proteinMin": 28.0,
-    "fiberMax": 3.0,
-    "ashMax": 10.0,
+    "url": "https://www.mizooco.com/products/ringo-pro-cachorro",
+    "proteinMin": 28,
+    "fiberMax": 3,
+    "ashMax": 10,
     "complete": true,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1,
+      2,
+      15,
+      30
+    ],
+    "kcalKg": 3500,
+    "fatMin": 12,
+    "moistureMax": 10
   },
   {
     "brand": "Ringo",
@@ -1579,12 +1719,21 @@
     "handles": [
       "ringo-pro-perros-adultos"
     ],
-    "url": "https://www.ringo.com.co/nuestros-productos/ringo-pro-adultos",
-    "proteinMin": 24.0,
-    "fiberMax": 4.0,
-    "ashMax": 9.0,
+    "url": "https://www.mizooco.com/products/ringo-pro-adultos",
+    "proteinMin": 24,
+    "fiberMax": 4,
+    "ashMax": 9,
     "complete": true,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1,
+      2,
+      20,
+      30
+    ],
+    "kcalKg": 3370,
+    "fatMin": 10,
+    "moistureMax": 10
   },
   {
     "brand": "Ringo",
@@ -1593,30 +1742,46 @@
     "handles": [
       "ringo-original-cachorros"
     ],
-    "url": "https://www.ringo.com.co/nuestros-productos/ringo-original-cachorros",
-    "proteinMin": 28.0,
-    "fatMin": 12.0,
-    "fiberMax": 4.0,
-    "ashMax": 9.0,
-    "moistureMax": 10.0,
+    "url": "https://www.mizooco.com/products/ringo-original-cachorros",
+    "proteinMin": 28,
+    "fatMin": 12,
+    "fiberMax": 4,
+    "ashMax": 9,
+    "moistureMax": 10,
     "complete": true,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1,
+      2,
+      15,
+      30
+    ],
+    "kcalKg": 3470
   },
   {
     "brand": "Ringo",
     "name": "Ringo Original Adultos",
     "species": "dog",
     "handles": [
-      "ringo-original-perro-adulto"
+      "ringo-original-perro-adulto",
+      "alimento-seco-para-perro-ringo-croquetas"
     ],
-    "url": "https://www.ringo.com.co/nuestros-productos/ringo-original-adultos",
-    "proteinMin": 24.0,
-    "fatMin": 8.0,
-    "fiberMax": 5.0,
-    "ashMax": 9.0,
-    "moistureMax": 10.0,
+    "url": "https://www.mizooco.com/products/ringo-croquetas-adultos",
+    "proteinMin": 24,
+    "fatMin": 8,
+    "fiberMax": 5,
+    "ashMax": 9,
+    "moistureMax": 10,
     "complete": true,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1,
+      2,
+      4,
+      20,
+      30
+    ],
+    "kcalKg": 3250
   },
   {
     "brand": "Vivance",
@@ -1626,12 +1791,24 @@
       "alimento-seco-para-perros-adultos-vivance-vitality"
     ],
     "url": "https://www.vivancepets.com/vitality/adultos",
-    "proteinMin": 24.0,
-    "fatMin": 13.0,
-    "fiberMax": 4.0,
-    "ashMax": 9.0,
-    "moistureMax": 10.0,
-    "verifiedOn": "2026-11-21"
+    "proteinMin": 24,
+    "fatMin": 13,
+    "fiberMax": 4,
+    "ashMax": 9,
+    "moistureMax": 10,
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1,
+      2,
+      10,
+      20
+    ],
+    "packageSources": {
+      "1": "https://www.mizooco.com/products/vivance-vitality-perros-adultos",
+      "2": "https://www.mizooco.com/products/vivance-vitality-perros-adultos",
+      "10": "https://www.mizooco.com/products/vivance-vitality-perros-adultos",
+      "20": "https://www.mizooco.com/products/vivance-vitality-perros-adultos"
+    }
   },
   {
     "brand": "Vivance",
@@ -1641,12 +1818,24 @@
       "alimento-seco-para-perros-cachorros-vivance-vitality"
     ],
     "url": "https://www.vivancepets.com/vitality/cachorros",
-    "proteinMin": 28.0,
-    "fatMin": 15.0,
-    "fiberMax": 4.0,
-    "ashMax": 9.0,
-    "moistureMax": 10.0,
-    "verifiedOn": "2026-11-21"
+    "proteinMin": 28,
+    "fatMin": 15,
+    "fiberMax": 4,
+    "ashMax": 9,
+    "moistureMax": 10,
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1,
+      2,
+      8,
+      15
+    ],
+    "packageSources": {
+      "1": "https://www.mizooco.com/products/vivance-vitality-perros-cachorros",
+      "2": "https://www.mizooco.com/products/vivance-vitality-perros-cachorros",
+      "8": "https://www.mizooco.com/products/vivance-vitality-perros-cachorros",
+      "15": "https://www.mizooco.com/products/vivance-vitality-perros-cachorros"
+    }
   },
   {
     "brand": "Guaumor",
@@ -1656,16 +1845,16 @@
       "comida-para-perro-guaumor-adultos-razas-pequenas"
     ],
     "url": "https://gabrica.co/personas/es-CO/producto/comida-seca-para-perro-guaumor-adulto-razas-pequenas-1-kg-11701018",
-    "proteinMin": 24.0,
-    "fatMin": 12.0,
-    "fiberMax": 3.0,
-    "ashMax": 9.0,
-    "moistureMax": 12.0,
+    "proteinMin": 24,
+    "fatMin": 12,
+    "fiberMax": 3,
+    "ashMax": 9,
+    "moistureMax": 12,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      2.0,
-      8.0
+      1,
+      2,
+      8
     ]
   },
   {
@@ -1676,17 +1865,17 @@
       "comida-para-perro-guaumor-adultos-razas-medianas-y-grandes"
     ],
     "url": "https://gabrica.co/personas/es-CO/producto/comida-seca-para-perro-guaumor-adulto-razas-medianas-y-grandes-2-kg-11701012",
-    "proteinMin": 22.0,
-    "fatMin": 9.0,
-    "fiberMax": 3.0,
-    "ashMax": 9.0,
-    "moistureMax": 12.0,
+    "proteinMin": 22,
+    "fatMin": 9,
+    "fiberMax": 3,
+    "ashMax": 9,
+    "moistureMax": 12,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2.0,
-      8.0,
-      17.0,
-      25.0
+      2,
+      8,
+      17,
+      25
     ]
   },
   {
@@ -1699,9 +1888,9 @@
     "url": "https://gabrica.co/personas/es-CO/producto/comida-seca-para-perro-guaumor-cachorro-razas-pequenas-1-kg-11701015",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      2.0,
-      8.0
+      1,
+      2,
+      8
     ]
   },
   {
@@ -1712,16 +1901,16 @@
       "comida-para-perro-guaumor-cachorros-razas-medianas-y-grandes"
     ],
     "url": "https://gabrica.co/personas/es-CO/producto/comida-seca-para-perro-guaumor-cachorro-razas-medianas-y-grandes-2-kg-11701005",
-    "proteinMin": 27.0,
-    "fatMin": 10.0,
-    "fiberMax": 4.0,
-    "ashMax": 10.0,
-    "moistureMax": 12.0,
+    "proteinMin": 27,
+    "fatMin": 10,
+    "fiberMax": 4,
+    "ashMax": 10,
+    "moistureMax": 12,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2.0,
-      8.0,
-      25.0
+      2,
+      8,
+      25
     ]
   },
   {
@@ -1735,9 +1924,9 @@
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
-      1.0,
-      3.0,
-      8.0
+      1,
+      3,
+      8
     ]
   },
   {
@@ -1748,17 +1937,17 @@
       "alimento-grand-vita-para-perro-cachorro-equilibrio"
     ],
     "url": "https://gabrica.co/personas/es-CO/producto/comida-seca-para-perro-grand-vita-equilibrio-cachorro-salmon-y-pavo-05-kg-14871016",
-    "proteinMin": 26.0,
-    "fatMin": 14.0,
-    "fiberMax": 5.0,
-    "ashMax": 9.0,
-    "moistureMax": 10.0,
+    "proteinMin": 26,
+    "fatMin": 14,
+    "fiberMax": 5,
+    "ashMax": 9,
+    "moistureMax": 10,
     "kcalKg": 3500,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
-      1.0,
-      3.0
+      1,
+      3
     ]
   },
   {
@@ -1769,17 +1958,17 @@
       "alimento-grand-vita-para-gato-cachorro-equilibrio"
     ],
     "url": "https://gabrica.co/personas/es-CO/producto/comida-seca-para-gato-grand-vita-equilibrio-gatito-500-g-14871012",
-    "proteinMin": 35.0,
-    "fatMin": 21.0,
-    "fiberMax": 5.0,
-    "ashMax": 9.0,
-    "moistureMax": 10.0,
+    "proteinMin": 35,
+    "fatMin": 21,
+    "fiberMax": 5,
+    "ashMax": 9,
+    "moistureMax": 10,
     "kcalKg": 4000,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
       1.5,
-      3.0
+      3
     ]
   },
   {
@@ -1793,7 +1982,7 @@
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       1.5,
-      8.0
+      8
     ]
   },
   {
@@ -1819,9 +2008,9 @@
     "url": "https://gabrica.co/personas/es-CO/producto/comida-seca-para-gato-grand-vita-equilibrio-adulto-light-1-kg-14871024",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
+      1,
       1.5,
-      3.0
+      3
     ]
   },
   {
@@ -1832,17 +2021,17 @@
       "alimento-grand-vita-salmon-para-perro-adulto-equilibrio"
     ],
     "url": "https://gabrica.co/personas/es-CO/producto/comida-seca-para-perro-grand-vita-equilibrio-adulto-salmon-y-pavo-1-kg-14871021",
-    "proteinMin": 23.0,
-    "fatMin": 13.0,
-    "fiberMax": 5.0,
-    "ashMax": 9.0,
-    "moistureMax": 10.0,
+    "proteinMin": 23,
+    "fatMin": 13,
+    "fiberMax": 5,
+    "ashMax": 9,
+    "moistureMax": 10,
     "kcalKg": 3500,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      3.0,
-      8.0
+      1,
+      3,
+      8
     ]
   },
   {
@@ -1857,8 +2046,8 @@
     "packagesKg": [
       0.5,
       1.5,
-      3.0,
-      8.0
+      3,
+      8
     ]
   },
   {
@@ -1872,7 +2061,7 @@
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       1.5,
-      3.0
+      3
     ]
   },
   {
@@ -1885,9 +2074,9 @@
     "url": "https://gabrica.co/personas/es-CO/producto/comida-seca-para-perro-manjar-adulto-nuggets-de-pollo-1-kg-51101001",
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      1.0,
-      2.0,
-      8.0
+      1,
+      2,
+      8
     ]
   },
   {
@@ -1903,7 +2092,13 @@
     "fiberMax": 3.5,
     "ashMax": 9.5,
     "moistureMax": 10,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1
+    ],
+    "packageSources": {
+      "1": "https://www.mizooco.com/products/nutriss-gaticos-pollo-y-leche"
+    }
   },
   {
     "brand": "Nutriss",
@@ -1918,7 +2113,15 @@
     "fiberMax": 3.5,
     "ashMax": 9.5,
     "moistureMax": 10,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1,
+      8
+    ],
+    "packageSources": {
+      "1": "https://www.mizooco.com/products/nutriss-gatos-adultos-cordero-pollo",
+      "8": "https://www.mizooco.com/products/nutriss-gatos-adultos-cordero-pollo"
+    }
   },
   {
     "brand": "Nutriss",
@@ -1933,7 +2136,15 @@
     "fiberMax": 3.5,
     "ashMax": 9.5,
     "moistureMax": 10,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1,
+      8
+    ],
+    "packageSources": {
+      "1": "https://www.mizooco.com/products/nutriss-gatos-adultos-salmon-atun",
+      "8": "https://www.mizooco.com/products/nutriss-gatos-adultos-salmon-atun"
+    }
   },
   {
     "brand": "Nutriss",
@@ -1943,15 +2154,24 @@
       "nutriss-leche-cachorros-copia"
     ],
     "url": "https://www.nutrisslovers.com/perros/nutriss-tribalance/nutriss-cachorros-con-carne-y-leche",
-    "proteinMin": 28.0,
-    "fatMin": 12.0,
-    "fiberMax": 4.0,
-    "ashMax": 9.0,
-    "moistureMax": 10.0,
+    "proteinMin": 28,
+    "fatMin": 12,
+    "fiberMax": 4,
+    "ashMax": 9,
+    "moistureMax": 10,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2
-    ]
+      1,
+      2,
+      15,
+      30
+    ],
+    "packageSources": {
+      "1": "https://www.mizooco.com/products/nutriss-tribalance-cachorros-carne-leche",
+      "2": "https://www.mizooco.com/products/nutriss-tribalance-cachorros-carne-leche",
+      "15": "https://www.mizooco.com/products/nutriss-tribalance-cachorros-carne-leche",
+      "30": "https://www.mizooco.com/products/nutriss-tribalance-cachorros-carne-leche"
+    }
   },
   {
     "brand": "Nutriss",
@@ -1961,15 +2181,26 @@
       "nutriss-pollo-y-vegetales-perros-adultos"
     ],
     "url": "https://www.nutrisslovers.com/perros/nutriss-tribalance/nutriss-adultos-con-pollo-y-vegetales",
-    "proteinMin": 24.0,
-    "fatMin": 11.0,
-    "fiberMax": 4.0,
-    "ashMax": 9.0,
-    "moistureMax": 10.0,
+    "proteinMin": 24,
+    "fatMin": 11,
+    "fiberMax": 4,
+    "ashMax": 9,
+    "moistureMax": 10,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2
-    ]
+      1,
+      2,
+      8,
+      20,
+      30
+    ],
+    "packageSources": {
+      "1": "https://www.mizooco.com/products/nutriss-tribalance-adultos-pollo-vegetales",
+      "2": "https://www.mizooco.com/products/nutriss-tribalance-adultos-pollo-vegetales",
+      "8": "https://www.mizooco.com/products/nutriss-tribalance-adultos-pollo-vegetales",
+      "20": "https://www.mizooco.com/products/nutriss-tribalance-adultos-pollo-vegetales",
+      "30": "https://www.mizooco.com/products/nutriss-tribalance-adultos-pollo-vegetales"
+    }
   },
   {
     "brand": "Nutriss",
@@ -1979,15 +2210,26 @@
       "nutriss-carne-y-vegetales-perros-adultos"
     ],
     "url": "https://www.nutrisslovers.com/perros/nutriss-tribalance/nutriss-adultos-con-carne-y-vegetales",
-    "proteinMin": 24.0,
-    "fatMin": 11.0,
-    "fiberMax": 4.0,
-    "ashMax": 9.0,
-    "moistureMax": 10.0,
+    "proteinMin": 24,
+    "fatMin": 11,
+    "fiberMax": 4,
+    "ashMax": 9,
+    "moistureMax": 10,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2
-    ]
+      1,
+      2,
+      8,
+      20,
+      30
+    ],
+    "packageSources": {
+      "1": "https://www.mizooco.com/products/nutriss-tribalance-adultos-carne-vegetales",
+      "2": "https://www.mizooco.com/products/nutriss-tribalance-adultos-carne-vegetales",
+      "8": "https://www.mizooco.com/products/nutriss-tribalance-adultos-carne-vegetales",
+      "20": "https://www.mizooco.com/products/nutriss-tribalance-adultos-carne-vegetales",
+      "30": "https://www.mizooco.com/products/nutriss-tribalance-adultos-carne-vegetales"
+    }
   },
   {
     "brand": "DonKan",
@@ -2104,8 +2346,8 @@
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2.0,
-      8.0
+      2,
+      8
     ],
     "packageSources": {
       "2": "https://www.plazacampo.com/nutrecan-cachorros-raza-mediana-y-grande-ext-2kg-1/p",
@@ -2129,15 +2371,15 @@
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.8,
-      2.0,
-      15.0,
-      25.0
+      2,
+      15,
+      25
     ],
     "packageSources": {
       "2": "https://www.plazacampo.com/nutrecan-croquetas-adultos-ext-8x2kg-1-jpg/p",
+      "15": "https://www.plazacampo.com/nutrecan-croquetas-adultos-ext-25kg-2/p",
       "25": "https://www.plazacampo.com/nutrecan-croquetas-adultos-ext-25kg-1/p",
-      "0.8": "https://www.plazacampo.com/nutrecan-croquetas-adultos-ext-800-g-1/p",
-      "15": "https://www.plazacampo.com/nutrecan-croquetas-adultos-ext-25kg-2/p"
+      "0.8": "https://www.plazacampo.com/nutrecan-croquetas-adultos-ext-800-g-1/p"
     }
   },
   {
@@ -2158,15 +2400,15 @@
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.5,
-      2.0,
-      4.0,
-      15.0
+      2,
+      4,
+      15
     ],
     "packageSources": {
-      "4": "https://www.plazacampo.com/nutrecan-croquetas-cachorros-ext-4kg-1/p",
-      "0.5": "https://www.plazacampo.com/nutrecan-croquetas-cachorros-ext-500g-1/p",
       "2": "https://www.plazacampo.com/nutrecan-croquetas-cachorros-ext-2kg-1/p",
-      "15": "https://www.plazacampo.com/nutrecan-croquetas-cachorros-ext-15-kg-1/p"
+      "4": "https://www.plazacampo.com/nutrecan-croquetas-cachorros-ext-4kg-1/p",
+      "15": "https://www.plazacampo.com/nutrecan-croquetas-cachorros-ext-15-kg-1/p",
+      "0.5": "https://www.plazacampo.com/nutrecan-croquetas-cachorros-ext-500g-1/p"
     }
   },
   {
@@ -2181,7 +2423,7 @@
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.8,
-      2.0
+      2
     ],
     "packageSources": {
       "2": "https://www.plazacampo.com/nutrecan-light-ext-8x2-kg-1-jpg/p",
@@ -2205,19 +2447,19 @@
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.8,
-      2.0,
-      6.0,
-      8.0,
-      16.0,
-      25.0
+      2,
+      6,
+      8,
+      16,
+      25
     ],
     "packageSources": {
-      "25": "https://www.plazacampo.com/nutrecan-adultos-raza-mediana-y-grande-ext-25kg-1/p",
-      "0.8": "https://www.plazacampo.com/nutrecan-adultos-raza-mediana-y-grande-ext-800g-1/p",
-      "8": "https://www.plazacampo.com/nutrecan-adultos-raza-mediana-y-grande-ext-8kg-1/p",
+      "2": "https://www.plazacampo.com/nutrecan-adultos-raza-mediana-y-grande-ext-2kg-1/p",
       "6": "https://www.plazacampo.com/nutrecan-adultos-razas-medianas-y-grandes-ext-6kg-1/p",
+      "8": "https://www.plazacampo.com/nutrecan-adultos-raza-mediana-y-grande-ext-8kg-1/p",
       "16": "https://www.plazacampo.com/nutrecan-adultos-raza-mediana-y-grande-ext-16kg-1/p",
-      "2": "https://www.plazacampo.com/nutrecan-adultos-raza-mediana-y-grande-ext-2kg-1/p"
+      "25": "https://www.plazacampo.com/nutrecan-adultos-raza-mediana-y-grande-ext-25kg-1/p",
+      "0.8": "https://www.plazacampo.com/nutrecan-adultos-raza-mediana-y-grande-ext-800g-1/p"
     }
   },
   {
@@ -2237,11 +2479,11 @@
     "verifiedOn": "2026-11-21",
     "packagesKg": [
       0.8,
-      4.0
+      4
     ],
     "packageSources": {
-      "0.8": "https://www.plazacampo.com/nutrecan-adultos-raza-peque%C3%B1a-ext-800g-1/p",
-      "4": "https://www.plazacampo.com/nutrecan-adultos-raza-peque%C3%B1a-ext-4kg-1/p"
+      "4": "https://www.plazacampo.com/nutrecan-adultos-raza-peque%C3%B1a-ext-4kg-1/p",
+      "0.8": "https://www.plazacampo.com/nutrecan-adultos-raza-peque%C3%B1a-ext-800g-1/p"
     }
   },
   {
@@ -2255,10 +2497,109 @@
     "complete": true,
     "verifiedOn": "2026-11-21",
     "packagesKg": [
-      2.0
+      2
     ],
     "packageSources": {
       "2": "https://www.plazacampo.com/nutrecan-cachorros-raz-peq-ext-8x2-kg-1-jpg/p"
     }
+  },
+  {
+    "brand": "Nutriss",
+    "name": "Nutriss al Natural Perros Cachorros",
+    "species": "dog",
+    "handles": [
+      "nutriss-al-natural-cachorros"
+    ],
+    "url": "https://www.mizooco.com/products/nutriss-al-natural-cachorros",
+    "proteinMin": 28,
+    "fatMin": 15,
+    "fiberMax": 3.5,
+    "ashMax": 9,
+    "moistureMax": 10,
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1,
+      2,
+      15
+    ]
+  },
+  {
+    "brand": "Nutriss",
+    "name": "Nutriss al Natural Perros Adultos",
+    "species": "dog",
+    "handles": [
+      "nutriss-al-natural-perros-adultos"
+    ],
+    "url": "https://www.mizooco.com/products/nutriss-al-natural-adultos",
+    "proteinMin": 24,
+    "fatMin": 12,
+    "fiberMax": 4,
+    "ashMax": 9,
+    "moistureMax": 10,
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1,
+      2,
+      20
+    ]
+  },
+  {
+    "brand": "Nutriss",
+    "name": "Nutriss al Natural Perros Senior",
+    "species": "dog",
+    "handles": [
+      "nutriss-al-natural-perros-senior"
+    ],
+    "url": "https://www.mizooco.com/products/nutriss-al-natural-senior",
+    "proteinMin": 26,
+    "fatMin": 9,
+    "fiberMax": 4.5,
+    "ashMax": 9,
+    "moistureMax": 10,
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      2
+    ]
+  },
+  {
+    "brand": "Chunky",
+    "name": "Chunky Adultos Pollo y Salmón",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-chunky-adulto-vida-activa"
+    ],
+    "url": "https://www.italcolmascotas.com/chunky-vida-activa/",
+    "proteinMin": 23,
+    "fatMin": 12,
+    "fiberMax": 4,
+    "ashMax": 8,
+    "moistureMax": 11,
+    "registration": "14977AL",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.5,
+      3,
+      8
+    ]
+  },
+  {
+    "brand": "BR for Dog",
+    "name": "BR for Dog Pure Softy and Moist Ring",
+    "species": "dog",
+    "handles": [
+      "br-for-dog-br-for-dog-pure-soft"
+    ],
+    "url": "https://www.gestoagro.net/productos/dogs/br-for-dog-pure-softy-and-moist-ring",
+    "proteinMin": 17.5,
+    "fatMin": 8,
+    "fiberMax": 4.3,
+    "ashMax": 9.6,
+    "moistureMax": 20.5,
+    "packagesKg": [
+      0.9,
+      2.7
+    ],
+    "complete": true,
+    "verifiedOn": "2026-11-21"
   }
 ]

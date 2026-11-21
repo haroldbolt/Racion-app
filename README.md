@@ -45,7 +45,9 @@ El servicio comparte resultados del mismo día para una fórmula, presentación 
 
 ## Alimentos y costo por toma
 
-El buscador abre **Internet** y consulta los productos y presentaciones del catálogo público de Laia Pets. Un enlace permite ampliar la búsqueda en la web. **Mis alimentos** conserva las fichas que el usuario ha revisado. No se presenta un catálogo precargado como resultado de una consulta en internet.
+Al buscar un concentrado, el bloque **Alimentos de Agrocentro Pets** muestra las referencias publicadas en la tienda. Al elegir una presentación, la calculadora, el comparador y **Mis alimentos** reciben la ficha de esa fórmula. Cada nutriente indica su fuente, fecha, unidad y tipo de declaración. Las referencias que aún requieren una ficha permiten completar la información con la etiqueta de la bolsa.
+
+Las [fichas de las casas comerciales](src/data/manufacturers) se verifican por fórmula, especie y referencia de Shopify y se distribuyen con la app. Los tamaños identifican si figuran en la ficha, en la tienda o en ambas. Las ofertas de los comercios se consultan en vivo y conservan el precio correspondiente a su empaque.
 
 Hoy abre con los anillos de tomas y energía. Cada registro guarda los gramos servidos y consumidos, la composición disponible y el costo de ese momento. Una toma con energía desconocida cuenta en el diario y deja las calorías pendientes.
 

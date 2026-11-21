@@ -16,7 +16,8 @@
     "packagesKg": [
       1.5
     ],
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "kcalQualifier": "minimo"
   },
   {
     "brand": "Guabi Natural",
@@ -36,7 +37,8 @@
       1.5,
       7.5
     ],
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "kcalQualifier": "minimo"
   },
   {
     "brand": "Guabi Natural",
@@ -56,7 +58,8 @@
       1.5,
       7.5
     ],
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "kcalQualifier": "minimo"
   },
   {
     "brand": "Guabi Natural",
@@ -76,7 +79,8 @@
       1.5,
       7.5
     ],
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "kcalQualifier": "minimo"
   },
   {
     "brand": "Virbac Veterinary HPM",
@@ -239,7 +243,8 @@
       12,
       20
     ],
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "kcalQualifier": "minimo"
   },
   {
     "brand": "Guabi Natural",
@@ -261,7 +266,8 @@
       10.1,
       20
     ],
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "kcalQualifier": "minimo"
   },
   {
     "brand": "Guabi Natural",
@@ -281,7 +287,32 @@
       2.5,
       10.1
     ],
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "kcalQualifier": "minimo"
+  },
+  {
+    "brand": "Guabi Natural",
+    "name": "Alimento Para Perro Cachorro Raza Mini y Pequeña Guabi Natural Sabor Pollo y Arroz Integral",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-cachorro-raza-mini-y-pequena-guabi-natural-sabor-pollo-y-arroz-integral"
+    ],
+    "url": "https://www.forzavet.com/wp-content/uploads/2024/02/alimento-para-cachorros-razas-mini-y-pequena-guabi-natural%E2%80%93pollo-y-arroz-integral.pdf",
+    "proteinMin": 32,
+    "fatMin": 20,
+    "fiberMax": 2.5,
+    "moistureMax": 9,
+    "ashMax": 8,
+    "kcalKg": 4350,
+    "packagesKg": [
+      0.1,
+      1,
+      2.5,
+      10.1,
+      20
+    ],
+    "verifiedOn": "2026-11-21",
+    "kcalQualifier": "minimo"
   },
   {
     "brand": "Guabi Natural",
@@ -301,7 +332,8 @@
       2.5,
       10.1
     ],
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "kcalQualifier": "minimo"
   },
   {
     "brand": "Sieger",
@@ -892,6 +924,27 @@
   },
   {
     "brand": "Evolve",
+    "name": "Evolve - Devoned Chicken Potato & Pea Recipe Dog Puppy",
+    "species": "dog",
+    "handles": [
+      "evolve-devoned-chicken-potato-pea-recipe-dog-puppy"
+    ],
+    "url": "https://evolvepetfood.com.co/tienda/perros/nutricion-dietas-secas/alimento-para-cachorros-evolve-grain-free/",
+    "proteinMin": 27,
+    "fatMin": 16,
+    "fiberMax": 5,
+    "moistureMax": 10,
+    "kcalKg": 3690,
+    "packagesKg": [
+      1.701,
+      6.35,
+      12.701
+    ],
+    "complete": true,
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Evolve",
     "name": "Evolve - Dog Classic Chicken & Rice Adulto",
     "species": "dog",
     "handles": [
@@ -1147,7 +1200,8 @@
       1.5,
       7.5
     ],
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "kcalQualifier": "minimo"
   },
   {
     "brand": "Holliday MV",

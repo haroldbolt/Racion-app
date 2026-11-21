@@ -37,7 +37,7 @@ export function FoodLabelComposition({ food, language, previewPending = false }:
               </span>
             </details> : display || (isEs ? 'Sin dato' : 'No data')}
             {conflicts.map(item => <span key={item.sourceUrl} className="block font-normal text-amber-900">
-              {isEs ? 'La tienda publica' : 'Store lists'} {qualifiers[item.other.calificador]} {format.format(item.other.valor)} {item.other.unidadOriginal}.{' '}
+              {item.other.source?.name ?? (isEs ? 'Otra fuente' : 'Another source')} · {qualifiers[item.other.calificador]} {format.format(item.other.valor)} {item.other.unidadOriginal}.{' '}
               <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer" className="underline">{isEs ? 'Contrastar con el empaque' : 'Compare with the label'}</a>
             </span>)}
           </dd>
