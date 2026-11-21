@@ -289,7 +289,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPurchasesChange, sta
           {source === 'plan' && (
             <label className="block space-y-1 text-xs font-bold text-[var(--text-primary)]">
               <span>{isEs ? 'Alimento de la compra' : 'Purchased food'}</span>
-              <select className={inputClass} value={selected ? `${selected.role}:${selected.food.id}` : ''} onChange={(event) => {
+              <select aria-label={isEs ? 'Alimento de la compra' : 'Purchased food'} className={inputClass} value={selected ? `${selected.role}:${selected.food.id}` : ''} onChange={(event) => {
                 const component = summary.components.find((item) => `${item.role}:${item.food.id}` === event.target.value);
                 setSelected(component ? { food: component.food, role: component.role } : undefined);
                 setError('');
@@ -308,7 +308,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPurchasesChange, sta
                 </label>
                 <label className="space-y-1 text-xs font-bold text-[var(--text-primary)]">
                   <span>{isEs ? 'Unidad del peso' : 'Weight unit'}</span>
-                  <select className={inputClass} name="weightUnit"><option value="kg">kg</option><option value="g">g</option></select>
+                  <select aria-label={isEs ? 'Unidad del peso' : 'Weight unit'} className={inputClass} name="weightUnit"><option value="kg">kg</option><option value="g">g</option></select>
                 </label>
                 <label className="space-y-1 text-xs font-bold text-[var(--text-primary)]">
                   <span>{isEs ? 'Cantidad de empaques' : 'Number of packages'}</span>

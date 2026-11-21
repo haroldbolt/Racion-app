@@ -163,7 +163,7 @@ export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 
                         {isEs ? 'Elegir' : 'Choose'} {packageLabel(size)}
                       </button>
                       <p className="max-w-36 text-[11px] text-[#44544A]">
-                        {price ? `${formatCOP(price.priceCop, true)} COP` : (isEs ? 'Precio por confirmar' : 'Price to confirm')}
+                        {price ? formatCOP(price.priceCop, true) : (isEs ? 'Precio por confirmar' : 'Price to confirm')}
                       </p>
                     </div>
                   );

@@ -13,10 +13,10 @@ const detail = {
   tags: 'gatos, feline health nutrition dry',
   images: [{ src: 'https://acdn-us.mitiendanube.com/stores/example.webp' }],
   variants: [
-    { id: 1, visible: true, values: ['400 g'], price: '30200.00', weight: '0.001', barcode: '3182550737555' },
-    { id: 2, visible: true, values: ['2 kg'], price: '137000.00', weight: '0.002', barcode: '3182550737555' },
-    { id: 3, visible: true, values: ['4 kg'], price: '253000.00', promotional_price: '245000.00', weight: '0.004', barcode: '3182550737555' },
-    { id: 4, visible: true, values: ['10 kg'], price: '499000.00', weight: '0.010', barcode: '3182550737555' },
+    { id: 1600409989, visible: true, values: ['400 g'], price: '30200.00', weight: '0.001', barcode: '3182550737555' },
+    { id: 1600409990, visible: true, values: ['2 kg'], price: '137000.00', weight: '0.002', barcode: '3182550737555' },
+    { id: 1600409991, visible: true, values: ['4 kg'], price: '253000.00', promotional_price: '245000.00', weight: '0.004', barcode: '3182550737555' },
+    { id: 1600409992, visible: true, values: ['10 kg'], price: '499000.00', weight: '0.010', barcode: '3182550737555' },
     { id: 5, visible: false, values: ['20 kg'] },
     { id: 6, visible: true, values: ['3 x 85 g'] },
     { id: 7, visible: true, values: ['Default Title'], weight: '7.000' },
@@ -91,7 +91,8 @@ test('package selection keeps formula and source metadata but only the exact pac
   assert.equal(twoKg.sourceFoodId, food.sourceFoodId);
   assert.equal(twoKg.name, food.name);
   assert.equal(twoKg.imageUrl, food.imageUrl);
-  assert.equal(twoKg.buyUrl, food.buyUrl);
+  assert.equal(twoKg.buyUrl, 'https://www.laiapets.com.co/productos/royal-canin-sterilised-37-x-400-g/?variant=1600409990');
+  assert.equal(twoKg.priceBasis?.sourceUrl, twoKg.buyUrl);
   assert.equal(twoKg.fichaNutricional?.fuenteUrl, food.fichaNutricional?.fuenteUrl);
   assert.equal(twoKg.bagSizeKg, 2);
   assert.equal(twoKg.priceBasis?.priceCop, 137000);
@@ -100,6 +101,7 @@ test('package selection keeps formula and source metadata but only the exact pac
   const manualPack = selectFoodPackage(twoKg, 3);
   assert.equal(manualPack.bagSizeKg, 3);
   assert.equal(manualPack.priceBasis, undefined);
+  assert.equal(manualPack.buyUrl, food.fichaNutricional?.fuenteUrl);
   assert.equal(selectFoodPackage(twoKg).priceBasis, undefined);
   assert.equal(food.priceBasis?.packageKg, 0.4, 'Changing the chosen package must not mutate the cached source');
 });

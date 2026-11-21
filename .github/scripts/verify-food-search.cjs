@@ -202,7 +202,7 @@ async function verifyFoodPriceCoherence(page, button) {
   await expensesDialog.getByLabel('Tienda (opcional)', { exact: true }).fill('Factura de Nube');
   await expensesDialog.getByLabel('Foto de factura o recibo (opcional)', { exact: true }).setInputFiles({
     name: 'recibo-de-prueba.png', mimeType: 'image/png',
-    buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aD1sAAAAASUVORK5CYII=', 'base64'),
+    buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=', 'base64'),
   });
   await expensesDialog.getByRole('img', { name: 'Factura adjunta', exact: true }).waitFor();
   await expensesDialog.getByRole('checkbox', { name: 'Confirmo el importe y el peso de este alimento', exact: true }).check();

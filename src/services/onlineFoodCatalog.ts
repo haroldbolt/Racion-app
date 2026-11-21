@@ -50,14 +50,16 @@ function positivePrice(value: unknown): number | undefined {
 
 /** A package change must never carry the previous package's price or barcode. */
 export function selectFoodPackage(food: FoodItem, packageKg?: number): FoodItem {
+  const packageQuote = food.packagePrices?.find((price) => price.packageKg === packageKg);
   const priceBasis = packageKg === undefined ? undefined
     : food.priceBasis?.packageKg === packageKg ? food.priceBasis
-    : food.packagePrices?.find((price) => price.packageKg === packageKg);
+    : packageQuote;
   return {
     ...food,
     bagSizeKg: packageKg,
     barcode: food.bagSizeKg === packageKg ? food.barcode : undefined,
     priceBasis,
+    buyUrl: priceBasis?.sourceUrl || packageQuote?.sourceUrl || food.fichaNutricional?.fuenteUrl || food.buyUrl,
   };
 }
 
@@ -104,7 +106,7 @@ function foodFromDetail(
   const productUrl = `${merchantOrigin}/productos/${handle}/`;
   const observedAt = new Date().toISOString();
   const variants = Array.isArray(detail.variants) ? detail.variants.map(record) : [];
-  const presentations = variants.flatMap((variant): Array<{ packageKg: number; priceCop?: number }> => {
+  const presentations = variants.flatMap((variant): Array<{ packageKg: number; priceCop?: number; sourceUrl: string }> => {
     if (variant.visible === false || !Array.isArray(variant.values)) return [];
     const values = variant.values.map(text).filter(Boolean);
     // A gift, combo or multipack is a distinct presentation, not a single bag.
@@ -114,14 +116,16 @@ function foodFromDetail(
     const regular = positivePrice(variant.price);
     const promotional = positivePrice(variant.promotional_price);
     const priceCop = promotional && (!regular || promotional < regular) ? promotional : regular;
-    return [{ packageKg: parsed[0].kg!, priceCop }];
+    const sourceUrl = numericId(variant.id) ? `${productUrl}?variant=${variant.id}` : productUrl;
+    return [{ packageKg: parsed[0].kg!, priceCop, sourceUrl }];
   });
   const availableSizesKg = [...new Set(presentations.map(({ packageKg }) => packageKg))].sort((a, b) => a - b);
   const packagePrices: FoodPriceBasis[] = availableSizesKg.flatMap((packageKg) => {
-    const prices = presentations.filter((pack) => pack.packageKg === packageKg).map((pack) => pack.priceCop);
+    const matching = presentations.filter((pack) => pack.packageKg === packageKg);
+    const prices = matching.map((pack) => pack.priceCop);
     // Conflicting or missing prices for the same weight need confirmation, not a guessed offer.
     if (prices.some((price) => price === undefined) || new Set(prices).size !== 1) return [];
-    return [{ packageKg, priceCop: prices[0]!, source: 'online', observedAt, storeName: 'Laia Pets', sourceUrl: productUrl, shippingCop: null }];
+    return [{ packageKg, priceCop: prices[0]!, source: 'online', observedAt, storeName: 'Laia Pets', sourceUrl: matching[0].sourceUrl, shippingCop: null }];
   });
   const brand = plainText(detail.brand);
   const name = brand && normalized(title).startsWith(normalized(brand) + ' ')
@@ -159,7 +163,7 @@ function foodFromDetail(
     packagePrices,
     priceBasis: packagePrices.find((price) => price.packageKg === availableSizesKg[0]),
     imageUrl,
-    buyUrl: productUrl,
+    buyUrl: packagePrices.find((price) => price.packageKg === availableSizesKg[0])?.sourceUrl || productUrl,
     labelStatus: 'unconfirmed',
     dataSource: 'Laia Pets · catálogo público consultado en internet',
     fichaNutricional: {
