@@ -49,10 +49,18 @@ export function foodPurchaseMatches(purchase: FoodCostEntry, food: FoodItem, pac
     (!positive(packageKg) || sameWeight(purchase.bagSizeKg / quantity, packageKg));
 }
 
-export function getPricePerGram(basis?: FoodPriceBasis): number | undefined {
+export function getPricePerGram(basis?: Pick<FoodPriceBasis, 'packageKg' | 'priceCop' | 'includeShipping' | 'shippingCop'>): number | undefined {
   if (!basis || !positive(basis.packageKg) || !positive(basis.priceCop)) return undefined;
   if (basis.includeShipping && !(typeof basis.shippingCop === 'number' && Number.isFinite(basis.shippingCop) && basis.shippingCop >= 0)) return undefined;
   return (basis.priceCop + (basis.includeShipping ? basis.shippingCop! : 0)) / (basis.packageKg * 1000);
+}
+
+/** A quick estimate uses the total paid for all packages of the same weight. */
+export function getPurchaseMealCost(priceCop: number | undefined, quantity: number, unitKg: number, mealGrams: number): number | undefined {
+  if (!positive(priceCop) || !Number.isSafeInteger(quantity) || quantity < 1 || !positive(unitKg) || !positive(mealGrams)) return undefined;
+  const perGram = getPricePerGram({priceCop, packageKg: unitKg * quantity});
+  const total = perGram !== undefined ? perGram * mealGrams : undefined;
+  return positive(total) ? total : undefined;
 }
 
 export function resolveFoodPrice(food: FoodItem, packageKg?: number, purchases: readonly FoodCostEntry[] = []): FoodPriceBasis | undefined {

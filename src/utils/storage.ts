@@ -11,6 +11,7 @@ import {
   TreatLog,
   HydrationDailyState,
 } from '../types';
+import { repairVetExamples } from './vetRecords';
 import { localDateKey } from './localDate';
 import { getPlanCostSummary, sameFormulaName, withPlanCosts } from './foodCosts';
 import { getPlannedMealComponents, getPlannedMeals } from './mealPortions';
@@ -112,7 +113,22 @@ function migrateHydrationDates() {
 
 export const StorageService = {
   initialize() {
-    if (typeof window === 'undefined' || localStorage.getItem(STORAGE_KEYS.LOCAL_DIARY_DATES)) return;
+    if (typeof window === 'undefined') return;
+    const pets = this.getPets();
+    if (pets.some(p => p.vetGuideline && !p.vetGuideline.confirmedByGuardian && !p.vetGuideline.needsReview)) {
+      const rawPlans = localStorage.getItem(STORAGE_KEYS.PLANS);
+      let plans: Record<string, FeedingPlan> | undefined;
+      try {
+        const parsed = JSON.parse(rawPlans ?? '{}');
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) plans = parsed;
+      } catch { /* Keep an unreadable plan store intact. */ }
+      if (repairVetExamples(pets, plans ?? {})) {
+        // Write plans first so an interrupted write can safely retry on the next load.
+        if (plans && rawPlans !== null) localStorage.setItem(STORAGE_KEYS.PLANS, JSON.stringify(plans));
+        this.savePets(pets);
+      }
+    }
+    if (localStorage.getItem(STORAGE_KEYS.LOCAL_DIARY_DATES)) return;
 
     // These IDs encode the recording instant. Entries dated manually keep their selected day.
     migrateDatedLogs(STORAGE_KEYS.MEAL_LOGS, /^ml_(\d{13})_/);

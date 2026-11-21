@@ -113,6 +113,7 @@ jobs:
       - run: |
           export PLAYWRIGHT_PATH="$RUNNER_TEMP/racion-browser/node_modules/playwright-core"
           node .github/scripts/verify-pages.cjs "$PAGES_URL"
+          node .github/scripts/verify-pages.cjs "https://racion-app.pages.dev/?release=$GITHUB_SHA" --published-offer
           node .github/scripts/verify-agility.cjs "https://racion-app.pages.dev/?release=$GITHUB_SHA"
           node .github/scripts/verify-colombia-foods.cjs "https://racion-app.pages.dev/?release=$GITHUB_SHA"
           node .github/scripts/verify-ica.cjs "https://racion-app.pages.dev/?release=$GITHUB_SHA"

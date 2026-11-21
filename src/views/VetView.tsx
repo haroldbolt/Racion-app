@@ -1,22 +1,19 @@
 import React, { useState } from 'react';
 import { Pet, FeedingPlan, WeightRecord, HealthLog, VetGuideline, UserAccount } from '../types';
 import { formatWeight, formatRation } from '../utils/i18n';
+import { readVetOrder, vetPhoneNumber } from '../utils/vetRecords';
+import { localDateKey } from '../utils/localDate';
 import { jsPDF } from 'jspdf';
 import {
-  FileText,
   Lock,
   Unlock,
   Share2,
   Phone,
   AlertTriangle,
-  HeartHandshake,
   Download,
-  Copy,
-  Check,
-  Search,
-  Activity,
-  Plus,
 } from 'lucide-react';
+
+const inputStyle = "mt-1 block min-h-11 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-[#1C2B21]";
 
 interface VetViewProps {
   pet: Pet;
@@ -24,6 +21,8 @@ interface VetViewProps {
   weightRecords: WeightRecord[];
   healthLogs: HealthLog[];
   userAccount: UserAccount;
+  onUpdatePetProfile: (pet: Pet) => void;
+  onAddHealthLog: (log: HealthLog) => void;
   onUpdateVetGuideline: (guideline: VetGuideline | undefined) => void;
   onNavigateTab?: (tab: any) => void;
 }
@@ -35,6 +34,8 @@ export const VetView: React.FC<VetViewProps> = ({
   healthLogs,
   userAccount,
   onUpdateVetGuideline,
+  onUpdatePetProfile,
+  onAddHealthLog,
 }) => {
   const isEs = userAccount.language === 'es';
   const units = userAccount.units;
@@ -42,45 +43,58 @@ export const VetView: React.FC<VetViewProps> = ({
   // Subtabs: 'report' | 'guideline' | 'diabetes' | 'emergency'
   const [subTab, setSubTab] = useState<'report' | 'guideline' | 'diabetes' | 'emergency'>('report');
 
-  // Vet guideline inputs
   const currentGuideline = pet.vetGuideline;
-  const [vetName, setVetName] = useState(currentGuideline?.vetName || 'Dra. Sofía Valenzuela');
-  const [clinicName, setClinicName] = useState(currentGuideline?.clinicName || 'Clínica Veterinaria San Francisco');
-  const [vetPhone, setVetPhone] = useState(currentGuideline?.phone || '+54 9 11 4567-8900');
-  const [prescribedKcal, setPrescribedKcal] = useState(currentGuideline?.prescribedKcal || (plan?.mer || 500));
-  const [prescribedFoodName, setPrescribedFoodName] = useState(currentGuideline?.prescribedFoodName || (plan?.foodName || 'Alimento Terapéutico Prescrito'));
-  const [prescribedGramsMeal, setPrescribedGramsMeal] = useState(currentGuideline?.prescribedGramsPerMeal || (plan?.gramsPerMeal || 70));
-  const [prescribedMealsDay, setPrescribedMealsDay] = useState(currentGuideline?.mealsPerDay || 2);
-  const [vetNotes, setVetNotes] = useState(currentGuideline?.notes || 'Control de glucosa y peso cada 15 días.');
+  const pending = isEs ? 'Pendiente' : 'Pending';
+  const metric = (value: number | undefined, unit = '') => typeof value === 'number' && Number.isFinite(value) && value > 0 ? String(value) + unit : pending;
+  const foodName = [plan?.foodBrand,plan?.foodName].filter(Boolean).join(' ') || pending;
+  const confirmedPlan = plan?.rationConfirmed && !currentGuideline?.needsReview;
+  const medicalLogs = healthLogs.filter(log => log.petId === pet.id && log.type === 'glucose');
+  const savedContact = pet.vetContact;
+  const savedPhone = savedContact && vetPhoneNumber(savedContact.phone);
+  const [confirmed, setConfirmed] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [contactError, setContactError] = useState('');
 
-  // Diabetes / condition tracking state
-  const [glucoseLogs, setGlucoseLogs] = useState<Array<{ time: string; value: number; insulinUnits: number; ate: boolean }>>([
-    { time: '08:00', value: 125, insulinUnits: 2, ate: true },
-    { time: '19:30', value: 138, insulinUnits: 2, ate: true },
-  ]);
-  const [newGlucoseValue, setNewGlucoseValue] = useState(130);
-  const [newInsulinUnits, setNewInsulinUnits] = useState(2);
-  const [newDidEat, setNewDidEat] = useState(true);
-
-  // Link copy toast
-  const [copiedLink, setCopiedLink] = useState(false);
-
-  // Handle Save Guideline (LOCKS THE PLAN)
-  const handleSaveGuideline = (e: React.FormEvent) => {
+  const handleSaveGuideline = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const guideline: VetGuideline = {
-      prescribedKcal: Number(prescribedKcal),
-      prescribedFoodName,
-      prescribedGramsPerMeal: Number(prescribedGramsMeal),
-      mealsPerDay: Number(prescribedMealsDay),
-      vetName,
-      clinicName,
-      phone: vetPhone,
-      date: new Date().toISOString().split('T')[0],
-      notes: vetNotes,
-      locked: true,
-    };
+    const guideline = readVetOrder(new FormData(e.currentTarget));
+    if (!guideline) {
+      setFormError(isEs ? 'Revisa los datos de la orden y confirma su origen.' : 'Review the order and confirm its source.');
+      return;
+    }
+    if (currentGuideline?.phone && vetPhoneNumber(currentGuideline.phone)) guideline.phone = currentGuideline.phone;
+    setConfirmed(false);
+    setFormError('');
     onUpdateVetGuideline(guideline);
+  };
+
+  const handleSaveObservation = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const values = new FormData(form);
+    const glucose = Number(values.get('glucose'));
+    const insulin = String(values.get('insulin') ?? '').trim();
+    const ate = values.get('ate');
+    if (!Number.isFinite(glucose) || glucose <= 0 || (insulin && (!Number.isFinite(Number(insulin)) || Number(insulin) < 0))) return;
+    const time = new Date();
+    const hour = time.toLocaleTimeString(isEs ? 'es-CO' : 'en', {hour:'2-digit',minute:'2-digit'});
+    const notes = [hour, glucose + ' mg/dL', insulin && insulin + (isEs ? ' U de insulina administrada' : ' U of insulin administered'),
+      ate === 'yes' ? (isEs ? 'Comió todo' : 'Ate all') : ate === 'no' ? (isEs ? 'No comió todo' : 'Did not eat all') : ''].filter(Boolean).join(' · ');
+    onAddHealthLog({id:crypto.randomUUID(),petId:pet.id,date:localDateKey(time),type:'glucose',title:isEs ? 'Medición de glucosa' : 'Glucose reading',notes});
+    form.reset();
+  };
+
+  const handleSaveContact = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const name = String(data.get('contact') ?? '').trim();
+    const phone = vetPhoneNumber(String(data.get('phone') ?? ''));
+    if (!name || !phone) {
+      setContactError(isEs ? 'Revisa el nombre y el teléfono de tu contacto.' : 'Check the contact name and phone number.');
+      return;
+    }
+    onUpdatePetProfile({...pet,vetContact:{name,phone}});
+    setContactError('');
   };
 
   const handleUnlockGuideline = () => {
@@ -106,22 +120,21 @@ export const VetView: React.FC<VetViewProps> = ({
 
     doc.setFontSize(10);
     doc.text(`Especie: ${pet.species === 'dog' ? 'Canino' : 'Felino'} | Raza: ${pet.breed} | Sexo: ${pet.sex} (${pet.isNeutered ? 'Castrado' : 'Entero'})`, 14, 50);
-    doc.text(`Edad: ${pet.ageYears || 1} años | Peso Actual: ${pet.currentWeightKg} kg | Meta: ${pet.targetWeightKg || pet.idealWeightKg} kg | BCS: ${pet.bcs}/9`, 14, 57);
-    doc.text(`Condición médica especial: ${pet.specialState !== 'none' ? pet.specialState.toUpperCase() : 'Ninguna / Sano'}`, 14, 64);
+    const age = pet.ageMonths != null ? pet.ageMonths + ' meses' : pet.ageYears != null ? pet.ageYears + ' años' : pending;
+    doc.text(`Edad: ${age} | Peso actual: ${metric(pet.currentWeightKg,' kg')} | Meta: ${metric(pet.targetWeightKg || pet.idealWeightKg,' kg')} | BCS: ${metric(pet.bcs,'/9')}`, 14, 57);
+    doc.text(`Condición registrada: ${pet.specialState === 'none' ? 'Ninguna declarada' : pet.specialState || pending}`, 14, 64);
 
-    // Plan & Calculations
     doc.setDrawColor(11, 93, 46);
     doc.setLineWidth(0.5);
     doc.line(14, 70, 196, 70);
-
     doc.setFontSize(12);
-    doc.text('Requerimientos Energéticos y Alimentación Actual:', 14, 78);
+    doc.text('Requerimientos energéticos y alimentación actual', 14, 78);
     doc.setFontSize(10);
-    doc.text(`RER (Energía en Reposo): ${plan?.rer || 0} kcal/día  |  Factor aplicado: ${plan?.factor || 1.6}`, 14, 86);
-    doc.text(`MER (Energía Mantenimiento): ${plan?.mer || 0} kcal/día`, 14, 93);
-    doc.text(`Alimento actual: ${plan?.foodBrand || ''} ${plan?.foodName || ''} (${plan?.foodType || 'seco'})`, 14, 100);
-    doc.text(`Ración recomendada: ${plan?.gramsPerMeal || 0} g en cada una de las ${plan?.mealsPerDay || 2} comidas (${plan?.gramsPerDay || 0} g/día)`, 14, 107);
-    doc.text(`Presupuesto de premios: máx ${plan?.treatsBudgetKcal || 0} kcal (descontado de la comida)`, 14, 114);
+    doc.text(`RER: ${metric(plan?.rer,' kcal/día')}  |  Factor aplicado: ${metric(plan?.factor)}`, 14, 86);
+    doc.text(`MER: ${metric(plan?.mer,' kcal/día')}`, 14, 93);
+    doc.text(`Alimento actual: ${foodName}`, 14, 100);
+    doc.text('Ración: ' + (confirmedPlan ? `${plan?.gramsPerMeal} g por toma · ${plan?.mealsPerDay} comidas · ${plan?.gramsPerDay} g/día` : pending), 14, 107);
+    if (plan && Number.isFinite(plan.treatsBudgetKcal)) doc.text(`Presupuesto de premios: ${plan.treatsBudgetKcal} kcal`, 14, 114);
 
     // Weight history
     doc.line(14, 122, 196, 122);
@@ -150,17 +163,11 @@ export const VetView: React.FC<VetViewProps> = ({
   const handleShareWhatsApp = () => {
     const text = encodeURIComponent(
       `Hola! Te comparto el informe nutricional y registro de peso de ${pet.name} desde Ración App:\n` +
-      `• Peso actual: ${pet.currentWeightKg} kg (Meta: ${pet.targetWeightKg} kg, BCS ${pet.bcs}/9)\n` +
-      `• Ración: ${plan?.gramsPerMeal || 0} g por comida (${plan?.mer || 0} kcal/día)\n` +
-      `• Alimento: ${plan?.foodBrand} ${plan?.foodName}`
+      `• Peso actual: ${metric(pet.currentWeightKg,' kg')} (Meta: ${metric(pet.targetWeightKg || pet.idealWeightKg,' kg')}, BCS ${metric(pet.bcs,'/9')})\n` +
+      `• Ración: ${confirmedPlan ? metric(plan?.gramsPerMeal,' g por comida') : pending}\n` +
+      `• Alimento: ${foodName}`
     );
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
-  };
-
-  const handleCopyExpiringLink = () => {
-    navigator.clipboard?.writeText(window.location.origin + `?vet_report=${pet.id}&token=exp_${Date.now() + 86400000}`);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2500);
   };
 
   return (
@@ -214,13 +221,13 @@ export const VetView: React.FC<VetViewProps> = ({
               <div>
                 <span className="text-[#44544A] block">{isEs ? 'Peso actual vs meta:' : 'Current vs target:'}</span>
                 <strong className="text-sm font-bold text-[#1C2B21]">
-                  {formatWeight(pet.currentWeightKg, units)} → {formatWeight(pet.targetWeightKg || pet.idealWeightKg, units)}
+                  {formatWeight(pet.currentWeightKg, units)} → {pet.targetWeightKg || pet.idealWeightKg ? formatWeight(pet.targetWeightKg || pet.idealWeightKg, units) : pending}
                 </strong>
               </div>
               <div>
                 <span className="text-[#44544A] block">{isEs ? 'RER / MER diario:' : 'Daily RER / MER:'}</span>
                 <strong className="text-sm font-bold text-[#0B5D2E]">
-                  {plan?.rer || 0} / {plan?.mer || 0} kcal
+                  {metric(plan?.rer)} / {metric(plan?.mer,' kcal')}
                 </strong>
               </div>
             </div>
@@ -228,7 +235,7 @@ export const VetView: React.FC<VetViewProps> = ({
             <div>
               <span className="text-[#44544A] block">{isEs ? 'Alimento y porción:' : 'Food & Portion:'}</span>
               <p className="font-semibold text-[#1C2B21]">
-                {plan?.foodBrand} {plan?.foodName} — <strong className="text-[#0B5D2E]">{formatRation(plan?.gramsPerMeal || 0, units)}</strong> en {plan?.mealsPerDay} tomas
+                {foodName} · {confirmedPlan && plan ? formatRation(plan.gramsPerMeal, units) + (isEs ? ' por toma' : ' per meal') : pending}
               </p>
             </div>
           </div>
@@ -241,7 +248,7 @@ export const VetView: React.FC<VetViewProps> = ({
               className="w-full min-h-[52px] bg-[#0B5D2E] text-white rounded-2xl font-heading font-extrabold text-base flex items-center justify-center gap-2 hover:bg-[#094723] transition active:scale-98 shadow-md"
             >
               <Download className="w-5 h-5" />
-              <span>{isEs ? 'Descargar Informe PDF Oficial' : 'Download Official PDF Report'}</span>
+              <span>{isEs ? 'Descargar informe PDF' : 'Download PDF report'}</span>
             </button>
 
             <button
@@ -253,18 +260,7 @@ export const VetView: React.FC<VetViewProps> = ({
               <span>{isEs ? 'Compartir por WhatsApp' : 'Share via WhatsApp'}</span>
             </button>
 
-            <button
-              type="button"
-              onClick={handleCopyExpiringLink}
-              className="w-full min-h-[44px] bg-white border border-[#0B5D2E30] text-[#0B5D2E] rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-[#EAF4EC]"
-            >
-              <Copy className="w-4 h-4" />
-              <span>
-                {copiedLink
-                  ? (isEs ? '¡Enlace temporal copiado al portapapeles!' : 'Temporary link copied!')
-                  : (isEs ? 'Copiar enlace temporal de visualización (24h)' : 'Copy temporary expiring link (24h)')}
-              </span>
-            </button>
+
           </div>
 
           <p className="text-[11px] text-[#44544A] bg-[#EAF4EC] p-3 rounded-2xl border border-[#0B5D2E15]">
@@ -320,91 +316,41 @@ export const VetView: React.FC<VetViewProps> = ({
             </div>
           ) : (
             <form onSubmit={handleSaveGuideline} className="space-y-3 text-xs">
+              {currentGuideline?.needsReview && <p role="status" className="rounded-xl bg-amber-50 p-3">{isEs
+                ? 'Esta pauta antigua incluía campos de ejemplo. Confirma los datos con la orden original antes de volver a fijarla.'
+                : 'This older order contained sample fields. Check the original order before locking it again.'}</p>}
               <div className="grid grid-cols-2 gap-2">
-                <div className="space-y-1">
-                  <label className="font-bold text-[#1C2B21]">{isEs ? 'Nombre del veterinario:' : 'Vet name:'}</label>
-                  <input
-                    type="text"
-                    required
-                    value={vetName}
-                    onChange={(e) => setVetName(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="font-bold text-[#1C2B21]">{isEs ? 'Clínica / Hospital:' : 'Clinic:'}</label>
-                  <input
-                    type="text"
-                    required
-                    value={clinicName}
-                    onChange={(e) => setClinicName(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl"
-                  />
-                </div>
+                <label className="space-y-1 font-bold">{isEs ? 'Nombre del veterinario' : 'Vet name'}
+                  <input name="vet" required defaultValue={currentGuideline?.vetName ?? ''} className={inputStyle} />
+                </label>
+                <label className="space-y-1 font-bold">{isEs ? 'Clínica / Hospital' : 'Clinic / Hospital'}
+                  <input name="clinic" required defaultValue={currentGuideline?.clinicName ?? ''} className={inputStyle} />
+                </label>
               </div>
-
-              <div className="space-y-1">
-                <label className="font-bold text-[#1C2B21]">{isEs ? 'Alimento prescrito / Dieta terapéutica:' : 'Prescribed diet:'}</label>
-                <input
-                  type="text"
-                  required
-                  value={prescribedFoodName}
-                  onChange={(e) => setPrescribedFoodName(e.target.value)}
-                  placeholder="Ej. Hill's k/d Renal o Royal Canin Hepatic"
-                  className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl font-semibold"
-                />
-              </div>
-
+              <label className="block space-y-1 font-bold">{isEs ? 'Alimento prescrito / Dieta terapéutica' : 'Prescribed food / diet'}
+                <input name="food" required defaultValue={currentGuideline?.prescribedFoodName ?? ''} className={inputStyle} />
+              </label>
               <div className="grid grid-cols-3 gap-2">
-                <div className="space-y-1">
-                  <label className="font-bold text-[#1C2B21]">{isEs ? 'Kcal / día:' : 'Kcal / day:'}</label>
-                  <input
-                    type="number"
-                    required
-                    value={prescribedKcal}
-                    onChange={(e) => setPrescribedKcal(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-center font-bold text-[#0B5D2E]"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="font-bold text-[#1C2B21]">{isEs ? 'Gramos por toma:' : 'Grams/meal:'}</label>
-                  <input
-                    type="number"
-                    required
-                    value={prescribedGramsMeal}
-                    onChange={(e) => setPrescribedGramsMeal(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-center font-bold text-[#0B5D2E]"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="font-bold text-[#1C2B21]">{isEs ? 'Tomas al día:' : 'Meals/day:'}</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="6"
-                    value={prescribedMealsDay}
-                    onChange={(e) => setPrescribedMealsDay(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-center font-bold"
-                  />
-                </div>
+                <label className="font-bold">{isEs ? 'Kcal / día' : 'Kcal / day'}
+                  <input type="number" name="kcal" required min="0" step="any" defaultValue={currentGuideline?.needsReview ? '' : currentGuideline?.prescribedKcal ?? ''} className={inputStyle} />
+                </label>
+                <label className="font-bold">{isEs ? 'Gramos por toma' : 'Grams per meal'}
+                  <input type="number" name="grams" required min="0" step="any" defaultValue={currentGuideline?.needsReview ? '' : currentGuideline?.prescribedGramsPerMeal ?? ''} className={inputStyle} />
+                </label>
+                <label className="font-bold">{isEs ? 'Tomas al día' : 'Meals per day'}
+                  <input type="number" name="meals" required min="1" max="6" step="1" defaultValue={currentGuideline?.needsReview ? '' : currentGuideline?.mealsPerDay ?? ''} className={inputStyle} />
+                </label>
               </div>
-
-              <div className="space-y-1">
-                <label className="font-bold text-[#1C2B21]">{isEs ? 'Indicaciones médicas especiales:' : 'Clinical instructions:'}</label>
-                <textarea
-                  value={vetNotes}
-                  onChange={(e) => setVetNotes(e.target.value)}
-                  placeholder="Instrucciones sobre medicamentos o administración..."
-                  className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl h-18"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full min-h-[50px] bg-[#0B5D2E] text-white rounded-2xl font-heading font-extrabold text-sm flex items-center justify-center gap-2 hover:bg-[#094723] transition active:scale-98 shadow-md mt-2"
-              >
-                <Lock className="w-4 h-4" />
-                <span>{isEs ? 'Fijar y Bloquear Plan a esta Pauta' : 'Lock Plan to this Vet Guideline'}</span>
+              <label className="block space-y-1 font-bold">{isEs ? 'Indicaciones médicas especiales' : 'Clinical instructions'}
+                <textarea name="notes" defaultValue={currentGuideline?.notes ?? ''} className={inputStyle} />
+              </label>
+              <label className="flex min-h-11 items-center gap-2">
+                <input type="checkbox" name="confirmed" required checked={confirmed} onChange={e=>setConfirmed(e.target.checked)} />
+                {isEs ? 'Confirmo que copié la orden de mi veterinario' : "I confirm that I copied my veterinarian's order"}
+              </label>
+              {formError && <p role="alert" className="text-red-800">{formError}</p>}
+              <button type="submit" disabled={!confirmed} className="w-full min-h-[50px] rounded-xl bg-[#0B5D2E] font-bold text-white disabled:opacity-50">
+                {isEs ? 'Fijar y Bloquear Plan a esta Pauta' : 'Lock Plan to this Vet Guideline'}
               </button>
             </form>
           )}
@@ -431,88 +377,32 @@ export const VetView: React.FC<VetViewProps> = ({
               : 'Ración App does not dose medications. This logs observations for your doctor.'}
           </div>
 
-          {/* Quick add glucose check */}
-          <div className="bg-[#EAF4EC] p-3.5 rounded-2xl border border-[#0B5D2E20] space-y-3 text-xs">
-            <span className="font-bold text-[#0B5D2E] block">
-              {isEs ? '+ Registrar toma de hoy' : '+ Log new entry'}
-            </span>
-
-            <div className="grid grid-cols-3 gap-2">
-              <div>
-                <label className="text-[#44544A] font-semibold">{isEs ? 'Glucosa (mg/dL):' : 'Glucose:'}</label>
-                <input
-                  type="number"
-                  value={newGlucoseValue}
-                  onChange={(e) => setNewGlucoseValue(Number(e.target.value))}
-                  className="w-full px-2 py-1.5 bg-white border border-gray-200 rounded-lg text-center font-bold"
-                />
-              </div>
-              <div>
-                <label className="text-[#44544A] font-semibold">{isEs ? 'Insulina (U):' : 'Insulin (U):'}</label>
-                <input
-                  type="number"
-                  step="0.5"
-                  value={newInsulinUnits}
-                  onChange={(e) => setNewInsulinUnits(Number(e.target.value))}
-                  className="w-full px-2 py-1.5 bg-white border border-gray-200 rounded-lg text-center font-bold"
-                />
-              </div>
-              <div>
-                <label className="text-[#44544A] font-semibold">{isEs ? '¿Comió todo?:' : 'Ate meal?:'}</label>
-                <button
-                  type="button"
-                  onClick={() => setNewDidEat(!newDidEat)}
-                  className={`w-full py-1.5 rounded-lg font-bold border transition ${
-                    newDidEat ? 'bg-[#0B5D2E] text-white border-[#0B5D2E]' : 'bg-white text-gray-400 border-gray-200'
-                  }`}
-                >
-                  {newDidEat ? 'Sí ✓' : 'No'}
-                </button>
-              </div>
+          <form onSubmit={handleSaveObservation} className="space-y-3 rounded-2xl bg-[#EAF4EC] p-3.5 text-xs">
+            <div className="grid grid-cols-2 gap-2">
+              <label className="font-semibold">{isEs ? 'Glucosa (mg/dL)' : 'Glucose (mg/dL)'}
+                <input name="glucose" type="number" required min="0.01" step="any" className={inputStyle} />
+              </label>
+              <label className="font-semibold">{isEs ? 'Insulina administrada (U)' : 'Insulin administered (U)'}
+                <input name="insulin" type="number" min="0" step="any" className={inputStyle} />
+              </label>
             </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setGlucoseLogs([
-                  {
-                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    value: newGlucoseValue,
-                    insulinUnits: newInsulinUnits,
-                    ate: newDidEat,
-                  },
-                  ...glucoseLogs,
-                ]);
-              }}
-              className="w-full py-2 bg-[#0B5D2E] text-white rounded-xl font-bold min-h-[44px]"
-            >
+            <label className="block font-semibold">{isEs ? '¿Comió todo?' : 'Ate the whole meal?'}
+              <select name="ate" defaultValue="" className={inputStyle}>
+                <option value="">{isEs ? 'Sin registrar' : 'Unrecorded'}</option>
+                <option value="yes">{isEs ? 'Sí' : 'Yes'}</option>
+                <option value="no">No</option>
+              </select>
+            </label>
+            <button type="submit" className="min-h-11 w-full rounded-xl bg-[#0B5D2E] font-bold text-white">
               {isEs ? 'Añadir al registro médico' : 'Add to medical log'}
             </button>
-          </div>
+          </form>
 
-          {/* Log list */}
-          <div className="space-y-2">
-            {glucoseLogs.map((item, idx) => (
-              <div
-                key={idx}
-                className="p-3 bg-[#F8FAF8] rounded-xl border border-gray-200 flex justify-between items-center text-xs"
-              >
-                <div>
-                  <span className="font-bold text-[#1C2B21]">{item.time}</span>
-                  <span className="text-[#44544A] ml-2">
-                    {item.ate ? '🥣 Comió su comida' : '⚠️ No comió'}
-                  </span>
-                </div>
-                <div className="flex gap-2">
-                  <span className="bg-[#EAF4EC] text-[#0B5D2E] px-2 py-0.5 rounded-md font-bold">
-                    {item.value} mg/dL
-                  </span>
-                  <span className="bg-[#FFF7ED] text-[#F57C1A] px-2 py-0.5 rounded-md font-bold">
-                    {item.insulinUnits} U Insulina
-                  </span>
-                </div>
-              </div>
-            ))}
+          <div aria-live="polite" className="space-y-2">
+            {medicalLogs.length === 0 && <p>{isEs ? 'Aún no hay mediciones de glucosa para esta mascota.' : 'No glucose readings for this pet yet.'}</p>}
+            {medicalLogs.map(log => <div key={log.id} className="space-y-1 rounded-xl border p-3 text-xs">
+              <span className="font-bold">{log.date}</span><p>{log.notes}</p>
+            </div>)}
           </div>
         </div>
       )}
@@ -532,23 +422,23 @@ export const VetView: React.FC<VetViewProps> = ({
             </p>
           </div>
 
-          {/* My Vet Contact Card */}
-          <div className="bg-[#FEF2F2] p-4 rounded-2xl border border-[#C0392B]/30 space-y-3">
-            <span className="text-xs font-black text-[#991B1B] uppercase tracking-wide block">
-              {isEs ? 'Mi Veterinario de Cabecera:' : 'My Primary Veterinarian:'}
-            </span>
-            <div>
-              <h4 className="font-heading font-extrabold text-base text-[#1C2B21]">{vetName}</h4>
-              <p className="text-xs text-[#44544A]">{clinicName}</p>
-            </div>
-
-            <a
-              href={`tel:${vetPhone}`}
-              className="w-full min-h-[50px] bg-[#C0392B] text-white rounded-2xl font-heading font-extrabold text-sm flex items-center justify-center gap-2 hover:bg-[#a3281c] transition active:scale-95 shadow-md"
-            >
-              <Phone className="w-5 h-5" />
-              <span>{isEs ? `Llamar a Urgencias (${vetPhone})` : `Call Emergency (${vetPhone})`}</span>
-            </a>
+          <div className="space-y-3 rounded-2xl border border-[#C0392B]/30 p-4">
+            <h4 className="font-bold">{isEs ? 'Contacto de urgencias' : 'Emergency contact'}</h4>
+            {savedPhone && savedContact ? (
+              <a href={'tel:' + savedPhone} className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#C0392B] font-bold text-white">
+                <Phone className="h-4 w-4" />{isEs ? 'Llamar a ' : 'Call '}{savedContact.name} ({savedPhone})
+              </a>
+            ) : <p className="text-sm">{isEs ? 'Guarda el contacto de tu veterinario o de una clínica de urgencias.' : 'Save the contact details for your vet or emergency clinic.'}</p>}
+            <form onSubmit={handleSaveContact} className="space-y-2 text-xs">
+              <label className="block font-semibold">{isEs ? 'Nombre del contacto de urgencias' : 'Emergency contact name'}
+                <input name="contact" required defaultValue={savedContact?.name || currentGuideline?.clinicName || ''} className={inputStyle} />
+              </label>
+              <label className="block font-semibold">{isEs ? 'Teléfono de urgencias' : 'Emergency phone number'}
+                <input name="phone" type="tel" required defaultValue={savedPhone || currentGuideline?.phone || ''} className={inputStyle} />
+              </label>
+              {contactError && <p role="alert">{contactError}</p>}
+              <button type="submit" className="min-h-11 w-full rounded-xl border font-bold text-[#0B5D2E]">{isEs ? 'Guardar contacto de urgencias' : 'Save emergency contact'}</button>
+            </form>
           </div>
 
           {/* Pet ID Digital Emergency Card */}
@@ -560,7 +450,7 @@ export const VetView: React.FC<VetViewProps> = ({
               <p><strong>{isEs ? 'Mascota:' : 'Pet:'}</strong> {pet.name}</p>
               <p><strong>{isEs ? 'Especie/Raza:' : 'Species:'}</strong> {pet.species === 'dog' ? 'Perro' : 'Gato'} ({pet.breed})</p>
               <p><strong>{isEs ? 'Peso:' : 'Weight:'}</strong> {pet.currentWeightKg} kg</p>
-              <p><strong>{isEs ? 'Contacto tutor:' : 'Owner email:'}</strong> {userAccount.email}</p>
+              {userAccount.email && <p><strong>{isEs ? 'Contacto tutor:' : 'Owner email:'}</strong> {userAccount.email}</p>}
             </div>
           </div>
 

@@ -24,6 +24,7 @@ import { FeedingPlanEditor } from '../components/FeedingPlanEditor';
 import { FoodCostTracker } from '../components/FoodCostTracker';
 import { getPlanCostSummary } from '../utils/foodCosts';
 import { DailyKcalRingChart } from '../components/DailyKcalRingChart';
+import { HomeMealCost } from '../components/HomeMealCost';
 import { LabelReviewModal } from '../components/LabelReviewModal';
 import { NutritionSummary } from '../components/NutritionSummary';
 import { WhyThisResultModal } from '../components/WhyThisResultModal';
@@ -321,6 +322,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
             <ChevronRight className="w-5 h-5" />
           </button>
         </DailyKcalRingChart>
+        <HomeMealCost language={userAccount.language} />
       </div>
     );
   }
@@ -378,6 +380,9 @@ export const TodayView: React.FC<TodayViewProps> = ({
           </button>
         </div>}
       </DailyKcalRingChart>
+      <HomeMealCost language={userAccount.language}
+        meal={effectivePlan.rationConfirmed && effectivePlan.gramsPerDay > 0 ? costSummary.meals[nextMeal.nextMealIndex ?? 0] : undefined}
+        estimated={costSummary.estimated} />
 
       {/* 1. VET LOCK BANNER */}
       {effectivePlan.isVetLocked && (
@@ -968,7 +973,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
       </div>
 
       {effectivePlan.rationConfirmed && effectivePlan.gramsPerDay > 0 && (
-        <section role="region" aria-label={isEs ? 'Costo de su ración' : 'Their feeding cost'} aria-hidden={showCostTracker} inert={showCostTracker} className="space-y-3 rounded-3xl border border-[var(--border-color)] bg-[var(--surface-card)] p-5">
+        <section id="today-meal-costs" role="region" aria-label={isEs ? 'Costo de su ración' : 'Their feeding cost'} aria-hidden={showCostTracker} inert={showCostTracker} className="scroll-mt-32 space-y-3 rounded-3xl border border-[var(--border-color)] bg-[var(--surface-card)] p-5">
           <h3 className="font-heading text-base font-extrabold text-[var(--text-primary)]">{isEs ? 'Costo de su ración' : 'Their feeding cost'}</h3>
           <div className="grid grid-cols-2 gap-3 rounded-2xl bg-[var(--surface-inner)] p-3">
             <div>

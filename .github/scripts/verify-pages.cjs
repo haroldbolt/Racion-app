@@ -1,4 +1,5 @@
 const assert = require('node:assert/strict');
+const { verifyQuickCost, verifyEmptyVet, verifyOffer, verifyPublishedOffer } = require('./verify-beta-cost.cjs');
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright-core');
 
 async function waitForPages(url) {
@@ -92,10 +93,14 @@ async function verifyAdjustmentAndPrices(page, button, text) {
   const result = page.getByRole('region', { name: 'Resultado de precios' });
   const winner = result.getByRole('article').filter({ hasText: 'Menor total confirmado' });
   await winner.getByRole('heading', { name: 'Tienda B' }).waitFor();
+  await verifyOffer(winner, 99000, 99000, [1337]);
+  const paidDelivery = result.getByRole('article').filter({has:page.getByRole('heading',{name:'Tienda A',exact:true})});
+  await verifyOffer(paidDelivery, 90000, 108000, [1458]);
   assert.match(await winner.innerText(), /99[.\s]000/);
   assert.equal(await winner.getByRole('link').getAttribute('href'), 'https://tienda-b.example/producto');
   const unknownDelivery = result.getByRole('article').filter({ has: page.getByRole('heading', { name: 'Tienda C' }) });
   assert.match(await unknownDelivery.innerText(), /Por confirmar/i);
+  await verifyOffer(unknownDelivery, 82000, null, [1107]);
   assert.doesNotMatch(await unknownDelivery.innerText(), /Más barato hoy/);
   await result.getByRole('heading', { name: 'Tienda D' }).waitFor();
 
@@ -109,6 +114,7 @@ async function verifyAdjustmentAndPrices(page, button, text) {
   await button('Consultar precios').click();
   const quoted = result.getByRole('article').filter({ has: page.getByRole('heading', { name: 'Tienda B' }) });
   await quoted.getByText('Menor total confirmado').waitFor();
+  await verifyOffer(quoted, 99000, 114650, [1548]);
   assert.match(await quoted.innerText(), /114[.\s]650/);
   assert.match(await quoted.innerText(), /15[.\s]650/);
   assert.match(await quoted.innerText(), /110111/);
@@ -135,6 +141,7 @@ async function verifyAdjustmentAndPrices(page, button, text) {
 async function verifyDiary() {
   const url = new URL(process.argv[2]);
   const usingPriceFixtures = process.argv.includes('--price-fixtures');
+  const publishedOffer = process.argv.includes('--published-offer');
   if (usingPriceFixtures) assert.equal(url.hostname, '127.0.0.1');
   assert.equal(url.protocol, usingPriceFixtures ? 'http:' : 'https:');
   if (process.env.GITHUB_SHA) url.searchParams.set('release-check', process.env.GITHUB_SHA);
@@ -145,7 +152,7 @@ async function verifyDiary() {
     const page = await browser.newPage({
       locale: 'es-CO',
       timezoneId: 'America/Bogota',
-      ...(usingPriceFixtures ? { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: 'block' } : {}),
+      ...(usingPriceFixtures || publishedOffer ? { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: 'block' } : {}),
     });
     const button = (name) => page.getByRole('button', { name, exact: typeof name === 'string' });
     const text = (value) => page.getByText(value, { exact: true });
@@ -162,6 +169,7 @@ async function verifyDiary() {
     };
     page.setDefaultTimeout(10000);
     await page.goto(url.href, { waitUntil: 'domcontentloaded' });
+    await verifyQuickCost(page);
     await openCatFoodStep('Agregar mascota', 'Luna');
     await button(/agregar alimento/i).click();
     const lunaLabel = page.getByRole('dialog', { name: 'Agregar alimento' });
@@ -204,6 +212,8 @@ async function verifyDiary() {
     await history.getByText('Pesaje de prueba de publicación', { exact: true }).waitFor();
 
     await button('Más').click();
+    await verifyEmptyVet(page);
+    if (publishedOffer) await verifyPublishedOffer(page);
     assert.doesNotMatch(await page.locator('main').innerText(), /iniciar sesión|activar licencia|activar pro|checkout/i);
     assert.equal(new URL(page.url()).origin, url.origin);
     console.log(`Chrome ${usingPriceFixtures ? 'móvil en entorno de prueba' : 'público anónimo'}: Luna conservó 59 g, horarios 08:30 y 19:30, toma servida de 29 g y pesaje de 4.3 kg tras recargar.`);

@@ -168,6 +168,9 @@ async function verifyRegistry() {
     const costs = page.getByRole('region', { name: 'Costo de su ración', exact: true });
     const dailyCop = Math.round(sku.priceCop * dailyGrams / (sku.packageKg * 1000));
     const mealCop = Math.round(sku.priceCop * portionGrams / (sku.packageKg * 1000));
+    const firstCost = page.getByRole('region', { name: 'Costo por toma', exact: true });
+    await firstCost.getByText(cop(mealCop)).first().waitFor();
+    assert.equal(await ring.evaluate(el => el.nextElementSibling?.getAttribute('aria-label')), 'Costo por toma');
     await costs.getByText(cop(dailyCop)).waitFor();
     for (const time of times) {
       await costs.getByRole('listitem').filter({ hasText: ' · ' + time }).getByText(cop(mealCop)).waitFor();

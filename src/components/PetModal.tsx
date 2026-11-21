@@ -298,6 +298,7 @@ export const PetModal: React.FC<PetModalProps> = ({
       photoUrl: photoUrl || '',
       hasVetGuideline: petToEdit?.hasVetGuideline,
       vetGuideline: petToEdit?.vetGuideline,
+      vetContact: petToEdit?.vetContact,
       createdAt: petToEdit ? petToEdit.createdAt : new Date().toISOString(),
     };
 

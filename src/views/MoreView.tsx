@@ -27,6 +27,8 @@ interface MoreViewProps {
   healthLogs: HealthLog[];
   userAccount: UserAccount;
   onUpdateAccount: (updated: Partial<UserAccount>) => void;
+  onAddHealthLog: (log: HealthLog) => void;
+  onUpdatePetProfile: (pet: Pet) => void;
   onUpdateVetGuideline: (guideline: VetGuideline | undefined) => void;
   onSelectFoodForPet: (food: FoodItem) => void;
   onResetAllData: () => void;
@@ -45,6 +47,8 @@ export const MoreView: React.FC<MoreViewProps> = ({
   userAccount,
   onUpdateAccount,
   onUpdateVetGuideline,
+  onUpdatePetProfile,
+  onAddHealthLog,
   onSelectFoodForPet,
   onResetAllData,
   onComparePrices,
@@ -99,6 +103,9 @@ export const MoreView: React.FC<MoreViewProps> = ({
           </button>
         </div>
         <VetView
+          key={pet.id}
+          onUpdatePetProfile={onUpdatePetProfile}
+          onAddHealthLog={onAddHealthLog}
           pet={pet}
           plan={plan}
           weightRecords={weightRecords}

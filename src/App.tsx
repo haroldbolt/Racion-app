@@ -3,6 +3,7 @@ import { Pet, FeedingPlan, MealLog, WeightRecord, HealthLog, UserAccount, FoodIt
 import { localDateKey } from './utils/localDate';
 import { StorageService } from './utils/storage';
 import { Header } from './components/Header';
+import { HomeMealCost } from './components/HomeMealCost';
 import { BottomNav, TabId } from './components/BottomNav';
 import { TodayView } from './views/TodayView';
 import { PetsView } from './views/PetsView';
@@ -322,7 +323,10 @@ export default function App() {
 
       />
 
-      <main className="flex-1 w-full max-w-md mx-auto">
+      <main className={`flex-1 w-full max-w-md mx-auto ${!activePet && currentTab === 'today' ? 'pb-24' : ''}`}>
+        {!activePet && currentTab === 'today' && (
+          <div className="mx-4 mt-4"><HomeMealCost language={userAccount.language} openInitially /></div>
+        )}
         {!activePet && currentTab !== 'more' && currentTab !== 'pets' && (
           <section className="mx-4 mt-6 rounded-3xl border border-emerald-900/10 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#17251C]">
             <h1 className="text-2xl font-extrabold">
@@ -472,6 +476,8 @@ export default function App() {
 
 
             onUpdateAccount={handleUpdateAccount}
+            onAddHealthLog={handleAddHealthLog}
+            onUpdatePetProfile={handleUpdatePetProfile}
             onUpdateVetGuideline={handleUpdateVetGuideline}
             onSelectFoodForPet={handleSelectFoodForPet}
             onResetAllData={handleResetAllData}

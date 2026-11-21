@@ -55,6 +55,7 @@ export interface Pet {
   };
   hasVetGuideline?: boolean;
   vetGuideline?: VetGuideline;
+  vetContact?: { name: string; phone: string };
   createdAt: string;
 }
 
@@ -345,13 +346,15 @@ export interface HealthLog {
   id: string;
   petId: string;
   date: string;
-  type: 'vaccine' | 'deworming' | 'medication' | 'vet_visit' | 'symptom' | 'stool' | 'water' | 'energy';
+  type: 'vaccine' | 'deworming' | 'medication' | 'vet_visit' | 'symptom' | 'stool' | 'water' | 'energy' | 'glucose';
   title: string;
   notes: string;
   severity?: 'normal' | 'attention' | 'alert';
 }
 
 export interface VetGuideline {
+  confirmedByGuardian?: boolean;
+  needsReview?: boolean;
   prescribedKcal: number;
   prescribedFoodName: string;
   prescribedGramsPerMeal: number;

@@ -1,8 +1,18 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { FeedingPlan, FoodCostEntry, FoodItem, FoodPriceBasis, Pet } from '../src/types';
-import { getPlanCostSummary, resolveFoodPrice, sameFoodIdentity, withPlanCosts, withPurchasedPackage } from '../src/utils/foodCosts';
+import { getPlanCostSummary, getPurchaseMealCost, resolveFoodPrice, sameFoodIdentity, withPlanCosts, withPurchasedPackage } from '../src/utils/foodCosts';
 import { buildFeedingPlan, calculateFeedingPlan } from '../src/utils/calculator';
+
+test('quick cost uses the total paid, individual package weight and actual portion without rounding early', () => {
+  assert.equal(getPurchaseMealCost(19200, 2, 1, 15), 144);
+  assert.equal(getPurchaseMealCost(6400, 1, 0.5, 15), 192);
+  assert.equal(getPurchaseMealCost(30000, 3, 0.5, 15.5), 310);
+  assert.equal(getPurchaseMealCost(undefined, 1, 1, 15), undefined);
+  assert.equal(getPurchaseMealCost(9600, 1.5, 1, 15), undefined);
+  assert.equal(getPurchaseMealCost(9600, 2, 0, 15), undefined);
+  assert.equal(getPurchaseMealCost(9600, 2, 1, NaN), undefined);
+});
 
 const dry: FoodItem = {
   id: 'rc37', brand: 'Royal Canin', name: 'Sterilised 37', type: 'dry', species: 'cat', lifeStage: 'adult',

@@ -1,11 +1,10 @@
 import { ArrowLeft, Clock3, ExternalLink, LoaderCircle, MapPin, Package, Search, Trophy } from 'lucide-react';
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useCity } from '../contexts/CityContext';
 import { CONFIRMED_FOOD_PRESENTATIONS } from '../data/foodPresentations';
 import { FoodSafetyAlerts } from '../components/FoodSafetyAlerts';
 import { UnifiedFoodSearchModal } from '../components/UnifiedFoodSearchModal';
-import { getPlanCostSummary, type PlanCostSummary } from '../utils/foodCosts';
-import { previewFoodChoice } from '../utils/offerPlan';
+import { getOfferCosts, getOfferPortions, type OfferPortions } from '../utils/offerCosts';
 import { selectFoodPackage } from '../services/onlineFoodCatalog';
 import { StorageService } from '../utils/storage';
 import type { FoodItem, FoodPriceBasis, FeedingPlan, Pet } from '../types';
@@ -106,7 +105,8 @@ function PriceOfferCard({
   formatKg,
   postalCode,
   winnerLabel,
-  costs,
+  portions,
+  locked,
   onUsePrice,
 }: {
   offer: LivePriceOffer;
@@ -114,14 +114,23 @@ function PriceOfferCard({
   formatKg: (grams: number) => string;
   postalCode?: string;
   winnerLabel?: string;
-  costs?: PlanCostSummary;
+  portions?: OfferPortions;
+  locked: boolean;
   onUsePrice?: (includeShipping: boolean) => void;
 }) {
   const link = storeUrl(offer.productUrl);
   const isShoppingLink = link && /(^|\.)google\.(com|com\.co)$/.test(new URL(link).hostname);
-  const quotedForSelection = matchesShippingScope(offer, postalCode);
-  const shippingCop = quotedForSelection ? offer.shippingCop : null;
-  const totalCop = quotedForSelection ? offer.totalCop : null;
+  const {shippingCop, totalCop, meals} = getOfferCosts(offer, postalCode, portions);
+  const amounts = meals?.map(meal => Math.round(meal.costCop)) ?? [];
+  const low = Math.min(...amounts);
+  const high = Math.max(...amounts);
+  const money = amounts.length
+    ? low === high ? formatCOP(low, true) : formatCOP(low) + ' – ' + formatCOP(high, true)
+    : undefined;
+  const pending = locked
+    ? (isEs ? 'Confirma la fórmula prescrita' : 'Confirm the prescribed formula')
+    : (isEs ? 'Faltan los gramos' : 'Serving grams needed');
+  const gramText = (grams: number) => new Intl.NumberFormat(isEs ? 'es-CO' : 'en', {maximumFractionDigits:3}).format(grams) + ' g';
   const shipping = shippingCop === null
     ? (isEs ? 'Por confirmar' : 'To confirm')
     : shippingCop === 0
@@ -151,7 +160,7 @@ function PriceOfferCard({
         </p>
       )}
       <dl className="mt-3 grid grid-cols-[1fr_auto] gap-x-2 gap-y-1.5 border-t border-[var(--border-color)] pt-3 text-xs">
-        <dt>{isEs ? 'Producto' : 'Product'}</dt>
+        <dt>{isEs ? 'Precio de la bolsa' : 'Package price'}</dt>
         <dd className="text-right tabular-nums">{formatCOP(offer.productPriceCop, true)}</dd>
         <dt>{isEs ? 'Envío' : 'Delivery'}</dt>
         <dd className="text-right tabular-nums">
@@ -166,16 +175,37 @@ function PriceOfferCard({
         <dd className="text-right font-black tabular-nums text-[var(--text-primary)]">
           {totalCop === null ? (isEs ? 'Por confirmar' : 'To confirm') : formatCOP(totalCop, true)}
         </dd>
+        <dt className="font-bold">{isEs ? 'Costo por toma' : 'Cost per serving'}</dt>
+        <dd className="text-right tabular-nums">
+          <strong className="block text-sm text-[var(--text-primary)]">{money ?? pending}</strong>
+          {money && <span className="block text-[11px] text-[var(--text-secondary)]">
+            {portions?.mixed && (isEs ? 'Solo este alimento · ' : 'This food only · ')}
+            {meals?.every(meal => meal.grams === meals[0].grams) && gramText(meals[0].grams) + ' · '}
+            {totalCop === null ? (isEs ? 'Sin envío' : 'Before delivery') : (isEs ? 'Con envío' : 'With delivery')}
+          </span>}
+        </dd>
         <dt>{isEs ? 'Producto por kilo' : 'Product per kilo'}</dt>
         <dd className="text-right tabular-nums">{formatCOP(offer.pricePerKgCop, true)} / kg</dd>
       </dl>
-      {costs && <div className="mt-3 rounded-xl bg-[var(--surface-subtle)] p-3 text-xs">
-        <p className="font-bold">{isEs ? 'Costo de la ración' : 'Feeding cost'} · {totalCop === null ? (isEs ? 'sin envío' : 'before delivery') : (isEs ? 'con envío' : 'with delivery')}</p>
-        {costs.costPerDayCop === undefined ? <p>{isEs ? 'Confirma los gramos del plan para ver el costo.' : 'Confirm the plan quantity to see meal costs.'}</p> : <>
-          <p>{formatCOP(costs.costPerDayCop, true)} / {isEs ? 'día' : 'day'}{costs.partial && (isEs ? ' (parcial)' : ' (partial)')}</p>
-          {costs.meals.map(meal => <p key={meal.index}>{meal.time} · {meal.grams} g · {meal.costCop === undefined ? '—' : formatCOP(meal.costCop, true)}</p>)}
-        </>}
-      </div>}
+      {meals?.length && !portions?.manual ? (
+        <details className="mt-3 rounded-xl bg-[var(--surface-subtle)] px-3 text-xs">
+          <summary className="cursor-pointer py-2.5 font-semibold">{isEs ? 'Ver costo por horario' : 'View cost by feeding time'}</summary>
+          <p className="mb-2">{isEs ? 'Este alimento al día' : 'This food per day'} · {formatCOP(meals.reduce((sum, meal) => sum + meal.costCop, 0), true)}</p>
+          {portions?.mixed && <p className="mb-2">
+            {isEs ? 'Ración mixta al día' : 'Mixed food per day'} · {meals.every(meal => meal.mixedMealCop !== undefined)
+              ? formatCOP(meals.reduce((sum, meal) => sum + meal.mixedMealCop!, 0), true)
+              : (isEs ? 'Falta el precio del otro alimento' : 'Other food price needed')}
+          </p>}
+          <ul className="space-y-2 pb-3">
+            {meals.map((meal,i) => <li key={i} className="tabular-nums">
+              {meal.time || (isEs ? 'Toma ' : 'Serving ') + (i + 1)} · {gramText(meal.grams)} · {formatCOP(meal.costCop, true)}
+              {portions?.mixed && <span className="block text-[var(--text-secondary)]">{meal.mixedMealCop === undefined
+                ? (isEs ? 'Falta el precio del otro alimento.' : 'Other food price needed.')
+                : (isEs ? 'Toma mixta · ' : 'Mixed meal · ') + formatCOP(meal.mixedMealCop, true)}</span>}
+            </li>)}
+          </ul>
+        </details>
+      ) : null}
       {link && (
         <a href={link} target="_blank" rel="noopener noreferrer"
           className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl border border-[var(--border-color)] bg-[var(--surface-card)] px-3 text-sm font-bold text-[#0B5D2E] focus-visible:outline-2 focus-visible:outline-offset-2 dark:text-green-300">
@@ -219,6 +249,13 @@ export function PriceComparisonView({ food, pet, plan, onPick, onReviewFood, pac
   const [inputError, setInputError] = useState(false);
   const [postalCodeInput, setPostalCodeInput] = useState('');
   const [postalCodeError, setPostalCodeError] = useState(false);
+  const [manualPortion, setManualPortion] = useState({petId:pet?.id, foodId:food.id, value:''});
+  const enteredGrams = manualPortion.petId === pet?.id && manualPortion.foodId === food.id ? manualPortion.value : '';
+  const parsedGrams = /^\d+(?:[.,]\d{1,3})?$/.test(enteredGrams) ? Number(enteredGrams.replace(',', '.')) : NaN;
+  const hasManualGrams = Number.isSafeInteger(Math.ceil(parsedGrams)) && parsedGrams > 0;
+  const planPortions = useMemo(() => getOfferPortions(pet, plan, food, pet ? StorageService.getFoodPurchases(pet.id) : []), [food, pet, plan]);
+  const locked = Boolean(plan?.isVetLocked || pet?.vetGuideline?.locked);
+  const portions = planPortions ?? (!locked && hasManualGrams ? {manual:true, mixed:false, meals:[{grams:parsedGrams}]} : undefined);
   const [lookup, setLookup] = useState<Lookup>({ state: 'idle' });
   const [today, setToday] = useState(colombiaPriceDay);
   const controller = useRef<AbortController>(null);
@@ -303,7 +340,7 @@ export function PriceComparisonView({ food, pet, plan, onPick, onReviewFood, pac
 
   const localizeKg = new Intl.NumberFormat(isEs ? 'es-CO' : 'en', { maximumFractionDigits: 3 });
   const formatKg = (weight: number) => localizeKg.format(weight / 1000);
-  const applyOffer = (offer: LivePriceOffer) => current && onUsePrice ? (includeShipping: boolean) => onUsePrice(food, {
+  const applyOffer = (offer: LivePriceOffer) => current && !locked && onUsePrice ? (includeShipping: boolean) => onUsePrice(food, {
     packageKg: offer.grams / 1000,
     priceCop: offer.productPriceCop,
     source: 'online',
@@ -319,13 +356,6 @@ export function PriceComparisonView({ food, pet, plan, onPick, onReviewFood, pac
   const otherSizes = (result?.offers.filter((offer) => offer.grams !== grams) ?? [])
     .sort((a, b) => a.pricePerKgCop - b.pricePerKgCop);
   const scopedTotal = (offer: LivePriceOffer) => matchesShippingScope(offer, postalCode) ? offer.totalCop : null;
-  function feedingCost(offer: LivePriceOffer) {
-    if (!pet || !plan || plan.isVetLocked) return undefined;
-    const basis: FoodPriceBasis = { packageKg: offer.grams / 1000, priceCop: offer.productPriceCop,
-      source: 'online', observedAt: result?.queriedAt ?? '', selectedAt: new Date().toISOString(),
-      shippingCop: offer.shippingCop, includeShipping: scopedTotal(offer) !== null };
-    return getPlanCostSummary(previewFoodChoice(pet, plan, food, basis), StorageService.getFoodPurchases(pet.id));
-  }
   const winner = current
     ? exactOffers.find((offer) => offer.id === result?.cheapestOfferId && scopedTotal(offer) !== null)
     : undefined;
@@ -512,6 +542,18 @@ export function PriceComparisonView({ food, pet, plan, onPick, onReviewFood, pac
             )}
           </div>
 
+          {!!result.offers.length && !locked && !planPortions && <label className="block rounded-xl border border-[var(--border-color)] p-3 text-sm">
+            <span className="font-bold">{isEs ? 'Gramos de este alimento por toma' : 'Grams of this food per serving'}</span>
+            <input type="text" inputMode="decimal" value={enteredGrams}
+              aria-label={isEs ? 'Gramos de este alimento por toma' : 'Grams of this food per serving'}
+              aria-invalid={Boolean(enteredGrams) && !hasManualGrams}
+              onChange={event => setManualPortion({petId:pet?.id, foodId:food.id, value:event.target.value})}
+              className="mt-2 block min-h-11 w-full rounded-lg border border-[var(--border-color)] px-3 text-sm" />
+            <span className="mt-1 block text-xs text-[var(--text-secondary)]">{enteredGrams && !hasManualGrams
+              ? (isEs ? 'Ingresa un peso mayor que cero con hasta tres decimales.' : 'Enter a positive weight with up to three decimals.')
+              : (isEs ? 'Usa el peso que sirves para comparar el costo de cada oferta.' : 'Enter the weight you serve to compare meal costs.')}</span>
+          </label>}
+
           {exactOffers.length > 0 && (
             <div>
               <h2 className="px-1 font-heading text-lg font-extrabold text-[var(--text-primary)]">
@@ -523,8 +565,8 @@ export function PriceComparisonView({ food, pet, plan, onPick, onReviewFood, pac
                 </p>
               )}
               <div className="mt-2 space-y-2">
-                {winner && <PriceOfferCard offer={winner} costs={feedingCost(winner)} isEs={isEs} formatKg={formatKg} postalCode={postalCode} winnerLabel={winnerLabel} onUsePrice={applyOffer(winner)} />}
-                {orderedExactOffers.map((offer) => <PriceOfferCard key={offer.id} offer={offer} costs={feedingCost(offer)} isEs={isEs} formatKg={formatKg} postalCode={postalCode} onUsePrice={applyOffer(offer)} />)}
+                {winner && <PriceOfferCard offer={winner} portions={portions} locked={locked} isEs={isEs} formatKg={formatKg} postalCode={postalCode} winnerLabel={winnerLabel} onUsePrice={applyOffer(winner)} />}
+                {orderedExactOffers.map((offer) => <PriceOfferCard key={offer.id} offer={offer} portions={portions} locked={locked} isEs={isEs} formatKg={formatKg} postalCode={postalCode} onUsePrice={applyOffer(offer)} />)}
               </div>
             </div>
           )}
@@ -538,7 +580,7 @@ export function PriceComparisonView({ food, pet, plan, onPick, onReviewFood, pac
                 {isEs ? 'Ordenados por precio del producto por kilo.' : 'Sorted by product price per kg.'}
               </p>
               <div className="space-y-2">
-                {otherSizes.map((offer) => <PriceOfferCard key={offer.id} offer={offer} costs={feedingCost(offer)} isEs={isEs} formatKg={formatKg} postalCode={postalCode} onUsePrice={applyOffer(offer)} />)}
+                {otherSizes.map((offer) => <PriceOfferCard key={offer.id} offer={offer} portions={portions} locked={locked} isEs={isEs} formatKg={formatKg} postalCode={postalCode} onUsePrice={applyOffer(offer)} />)}
               </div>
             </div>
           )}
