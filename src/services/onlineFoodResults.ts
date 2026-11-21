@@ -1,5 +1,5 @@
 import type { FoodItem } from '../types';
-import { enrichFoodFromStoreManufacturer } from '../services/storeManufacturerCatalog';
+import { enrichFoodFromStoreManufacturer } from './storeManufacturerCatalog';
 
 export function enrichMarketFoods(foods: FoodItem[]): Promise<FoodItem[]> {
   // An unavailable manufacturer index must not hide an offer returned by a store.

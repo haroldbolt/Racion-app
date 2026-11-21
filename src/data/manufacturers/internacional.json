@@ -1,5 +1,751 @@
 [
   {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-adult-dog-recipe-perros"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-adult.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Adult Dog Recipe Dry Dog Food",
+    "kcalKg": 3510.0,
+    "protein": 29.0,
+    "fiber": 5.0,
+    "moisture": 12.0,
+    "ash": 7.0,
+    "fat": 17.0,
+    "packagesKg": [
+      2.0,
+      6.0,
+      11.4,
+      17.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-adult-large-breed-recipe-perros"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-adult-large.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Adult Large Breed Recipe Dry Dog Food",
+    "kcalKg": 3375.0,
+    "protein": 31.0,
+    "fiber": 6.0,
+    "moisture": 12.0,
+    "ash": 7.0,
+    "fat": 15.0,
+    "packagesKg": [
+      11.4,
+      17.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "cat",
+    "handles": [
+      "acana-bountiful-catch-gatos"
+    ],
+    "url": "https://emea.acana.com/en/cats/cat-food/eu-aca-bountiful-catch-cat.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Bountiful Catch Dry Cat Food",
+    "kcalKg": 3800.0,
+    "protein": 34.0,
+    "fiber": 4.0,
+    "moisture": 10.0,
+    "ash": 9.0,
+    "fat": 16.0,
+    "packagesKg": [
+      1.8,
+      4.5
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-classics-prairie-poultry-perros"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-prairiepoultry.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Classics Prairie Poultry Dry Dog Food",
+    "kcalKg": 3443.0,
+    "protein": 27.0,
+    "fiber": 5.0,
+    "moisture": 12.0,
+    "ash": 7.5,
+    "fat": 16.0,
+    "packagesKg": [
+      2.0,
+      9.7,
+      14.5
+    ]
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-classics-red-meat-perros"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-classicred.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Classics Red Meat Dry Dog Food",
+    "kcalKg": 3425.0,
+    "protein": 27.0,
+    "fiber": 5.0,
+    "moisture": 12.0,
+    "ash": 8.0,
+    "fat": 16.0,
+    "packagesKg": [
+      2.0,
+      9.7,
+      14.5
+    ]
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-classics-wild-coast-perros"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-wildcoast.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Classics Wild Coast Dry Dog Food",
+    "kcalKg": 3443.0,
+    "protein": 27.0,
+    "fiber": 5.0,
+    "moisture": 12.0,
+    "ash": 7.5,
+    "fat": 16.0,
+    "packagesKg": [
+      2.0,
+      9.7,
+      14.5
+    ]
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-coldwater-fish-recipe-perros"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-cold-water-fish.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Coldwater Fish Recipe Dry Dog Food",
+    "kcalKg": 3545.0,
+    "protein": 29.0,
+    "fiber": 4.0,
+    "moisture": 12.0,
+    "ash": 7.0,
+    "fat": 17.0,
+    "packagesKg": [
+      2.0,
+      6.0,
+      11.4
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "cat",
+    "handles": [
+      "acana-first-feast-kitten-gatos"
+    ],
+    "url": "https://www.acana.com/en-US/cats/cat-food/first-feast-kitten/ds-aca-first-feast-cat.html",
+    "verifiedOn": "2026-11-21",
+    "name": "First Feast Kitten Dry Cat Food",
+    "kcalKg": 3850.0,
+    "proteinMin": 36.0,
+    "fatMin": 18.0,
+    "fiberMax": 4.0,
+    "moistureMax": 10.0,
+    "packagesKg": [
+      1.814369,
+      3.17
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-free-run-duck-perros"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-singles-duck-new.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Free-Run Duck Dry Dog Food",
+    "kcalKg": 3393.0,
+    "protein": 31.0,
+    "fiber": 5.0,
+    "moisture": 12.0,
+    "ash": 7.5,
+    "fat": 15.0,
+    "packagesKg": [
+      2.0,
+      6.0,
+      11.4
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-free-run-poultry-perros",
+      "acana-free-run-poultry-perros-presentaciones-por-confirmar"
+    ],
+    "url": "https://www.acana.com/en-US/dogs/dog-food/free-run-poultry-recipe/ds-aca-free-run-poultry.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Free-Run Poultry Recipe Dry Dog Food",
+    "kcalKg": 3475.0,
+    "proteinMin": 29.0,
+    "fatMin": 17.0,
+    "fiberMax": 6.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.041166,
+      5.896701,
+      11.339809
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-fresh-water-fish-perros",
+      "acana-fresh-water-fish-perros-presentaciones-por-confirmar"
+    ],
+    "url": "https://www.acana.com/en-US/dogs/dog-food/freshwater-fish-blend/ds-aca-freshwater-fish.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Freshwater Fish Blend Dry Dog Food",
+    "kcalKg": 3475.0,
+    "proteinMin": 29.0,
+    "fatMin": 17.0,
+    "fiberMax": 6.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.041166,
+      5.896701,
+      11.339809
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-grass-fed-lamb-recipe-perros"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-singles-lamb-new.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Grass-fed Lamb Dry Dog Food",
+    "kcalKg": 3393.0,
+    "protein": 31.0,
+    "fiber": 5.0,
+    "moisture": 12.0,
+    "ash": 7.5,
+    "fat": 15.0,
+    "packagesKg": [
+      2.0,
+      6.0,
+      11.4,
+      17.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "cat",
+    "handles": [
+      "acana-grasslands-gatos"
+    ],
+    "url": "https://emea.acana.com/en/cats/cat-food/eu-aca-grasslands-new-cat.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Grasslands Dry Cat Food",
+    "kcalKg": 3930.0,
+    "protein": 37.0,
+    "fiber": 3.0,
+    "moisture": 10.0,
+    "ash": 9.0,
+    "fat": 18.0,
+    "packagesKg": [
+      0.34,
+      1.8,
+      4.5
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-grasslands-perros"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-grasslands.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Grasslands Dry Dog Food",
+    "kcalKg": 3810.0,
+    "protein": 35.0,
+    "fiber": 6.0,
+    "moisture": 12.0,
+    "ash": 8.0,
+    "fat": 17.0,
+    "packagesKg": [
+      2.0,
+      6.0,
+      11.4
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "cat",
+    "handles": [
+      "acana-highest-protein-meadowlands-gatos",
+      "acana-highest-protein-meadowlands-gatos-presentaciones-por-confirmar"
+    ],
+    "url": "https://www.acana.com/en-US/cats/cat-food/highest-protein%2C-meadowlands/ds-aca-meadowlands-new-cat.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Highest Protein, Meadowlands Dry Cat Food",
+    "kcalKg": 3850.0,
+    "proteinMin": 36.0,
+    "fatMin": 18.0,
+    "fiberMax": 4.0,
+    "moistureMax": 10.0,
+    "packagesKg": [
+      1.814369,
+      4.535924
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "cat",
+    "handles": [
+      "acana-homestead-harvest-gatos"
+    ],
+    "url": "https://emea.acana.com/en/cats/cat-food/eu-aca-homestead-cat.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Homestead Harvest Dry Cat Food",
+    "kcalKg": 3760.0,
+    "protein": 34.0,
+    "fiber": 4.0,
+    "moisture": 10.0,
+    "ash": 8.0,
+    "fat": 16.0,
+    "packagesKg": [
+      0.34,
+      1.8,
+      4.5
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "cat",
+    "handles": [
+      "acana-indoor-entree-gatos"
+    ],
+    "url": "https://emea.acana.com/en/cats/cat-food/eu-aca-indoor-entree-cat.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Indoor Entrée Dry Cat Food",
+    "kcalKg": 3630.0,
+    "protein": 37.0,
+    "fiber": 6.0,
+    "moisture": 10.0,
+    "ash": 9.0,
+    "fat": 14.0,
+    "packagesKg": [
+      0.34,
+      1.8,
+      4.5
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "cat",
+    "handles": [
+      "acana-indoor-entree-recipe-with-fish-gatos"
+    ],
+    "url": "https://www.acana.com/en-US/cats/cat-food/indoor-entr%C3%A9e-recipe-with-fish/ds-aca-indoor-entree-fish.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Indoor Entrée Recipe with Fish Dry Cat Food",
+    "kcalKg": 3670.0,
+    "proteinMin": 36.0,
+    "fatMin": 14.0,
+    "fiberMax": 5.0,
+    "moistureMax": 10.0,
+    "packagesKg": [
+      1.814369,
+      4.535924
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-light-fit-recipe-perros"
+    ],
+    "url": "https://www.acana.com/en-US/dogs/dog-food/light-and-fit-recipe/ds-aca-light-fit.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Light & Fit Recipe Dry Dog Food",
+    "kcalKg": 3020.0,
+    "proteinMin": 33.0,
+    "fatMin": 10.0,
+    "fiberMax": 8.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.041166,
+      5.896701,
+      11.339809
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "cat",
+    "handles": [
+      "acana-pacifica-gatos"
+    ],
+    "url": "https://emea.acana.com/en/cats/cat-food/eu-aca-pacifica-new-cat.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Pacifica Dry Cat Food",
+    "kcalKg": 3930.0,
+    "protein": 37.0,
+    "fiber": 3.0,
+    "moisture": 10.0,
+    "ash": 9.0,
+    "fat": 18.0,
+    "packagesKg": [
+      0.34,
+      1.8,
+      4.5
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-pacifica-perros"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-pacifica.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Pacifica Dry Dog Food",
+    "kcalKg": 3850.0,
+    "protein": 35.0,
+    "fiber": 6.0,
+    "moisture": 12.0,
+    "ash": 7.0,
+    "fat": 17.0,
+    "packagesKg": [
+      2.0,
+      6.0,
+      11.4
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-puppy-large-breed-recipe-perros"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-puppy-large.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Puppy Large Breed Recipe Dry Dog Food",
+    "kcalKg": 3375.0,
+    "protein": 33.0,
+    "fiber": 6.0,
+    "moisture": 12.0,
+    "ash": 7.0,
+    "fat": 15.0,
+    "packagesKg": [
+      11.4,
+      17.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-puppy-recipe-perros",
+      "acana-puppy-recipe-perros-presentaciones-por-confirmar"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-puppy-junior.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Puppy Recipe Dry Dog Food",
+    "kcalKg": 3660.0,
+    "protein": 33.0,
+    "fiber": 5.0,
+    "moisture": 12.0,
+    "ash": 7.0,
+    "fat": 20.0,
+    "packagesKg": [
+      2.0,
+      6.0,
+      11.4,
+      17.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-puppy-small-breed-recipe-perros"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-puppy-small.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Puppy Small Breed Recipe Dry Dog Food",
+    "kcalKg": 3660.0,
+    "protein": 33.0,
+    "fiber": 5.0,
+    "moisture": 12.0,
+    "ash": 7.0,
+    "fat": 20.0,
+    "packagesKg": [
+      2.0,
+      6.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-ranchlands-perros"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-ranchlands.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Ranchlands Dry Dog Food",
+    "kcalKg": 3790.0,
+    "protein": 35.0,
+    "fiber": 6.0,
+    "moisture": 12.0,
+    "ash": 8.5,
+    "fat": 17.0,
+    "packagesKg": [
+      2.0,
+      6.0,
+      11.4
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-red-meat-recipe-perros"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-red-meat.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Red Meat Recipe Dry Dog Food",
+    "kcalKg": 3475.0,
+    "protein": 29.0,
+    "fiber": 4.0,
+    "moisture": 12.0,
+    "ash": 9.0,
+    "fat": 17.0,
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "cat",
+    "handles": [
+      "acana-senior-entree-gatos"
+    ],
+    "url": "https://www.acana.com/en-US/cats/cat-food/senior-entr%C3%A9e/ds-aca-senior-entree.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Senior Entrée Dry Cat Food",
+    "kcalKg": 3670.0,
+    "proteinMin": 33.0,
+    "fatMin": 14.0,
+    "fiberMax": 4.0,
+    "moistureMax": 10.0,
+    "packagesKg": [
+      1.814369,
+      4.535924
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-senior-recipe-perros"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-senior.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Senior Recipe Dry Dog Food",
+    "kcalKg": 3325.0,
+    "protein": 33.0,
+    "fiber": 6.0,
+    "moisture": 12.0,
+    "ash": 7.0,
+    "fat": 14.0,
+    "packagesKg": [
+      2.0,
+      6.0,
+      11.4
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-singles-beef-with-pumpkin-recipe-perros"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-singles-beef-new.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Singles Beef With Pumpkin Recipe Dry Dog Food",
+    "kcalKg": 3440.0,
+    "protein": 31.0,
+    "fiber": 4.0,
+    "moisture": 12.0,
+    "ash": 10.0,
+    "fat": 17.0,
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-singles-duck-pear-recipe-perros"
+    ],
+    "url": "https://www.acana.com/en-US/dogs/dog-food/singles%2C-duck-and-pear-recipe/ds-aca-singles-duck-pear-2020.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Singles, Duck & Pear Recipe Dry Dog Food",
+    "kcalKg": 3405.0,
+    "proteinMin": 31.0,
+    "fatMin": 17.0,
+    "fiberMax": 5.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.041166,
+      5.896701,
+      10.205828
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-pork-and-squash-perros",
+      "acana-pork-and-squash-perros-presentaciones-por-confirmar"
+    ],
+    "url": "https://www.acana.com/en-US/dogs/dog-food/singles%2C-pork-and-squash-recipe/ds-aca-singles-pork-squash-2020.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Singles, Pork & Squash Recipe Dry Dog Food",
+    "kcalKg": 3405.0,
+    "proteinMin": 31.0,
+    "fatMin": 17.0,
+    "fiberMax": 5.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.041166,
+      10.205828
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-sport-agility-recipe-perros"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-sport-agility.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Sport & Agility Recipe Dry Dog Food",
+    "kcalKg": 3725.0,
+    "protein": 35.0,
+    "fiber": 5.0,
+    "moisture": 12.0,
+    "ash": 8.0,
+    "fat": 22.0,
+    "packagesKg": [
+      11.4,
+      17.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "cat",
+    "handles": [
+      "acana-wild-prairie-gatos"
+    ],
+    "url": "https://emea.acana.com/en/cats/cat-food/eu-aca-wild-prairie-new-cat.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Wild Prairie Dry Cat Food",
+    "kcalKg": 3930.0,
+    "protein": 37.0,
+    "fiber": 3.0,
+    "moisture": 10.0,
+    "ash": 9.0,
+    "fat": 18.0,
+    "packagesKg": [
+      0.34,
+      1.8,
+      4.5
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-wild-prairie-perros"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-wild-prairie.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Wild Prairie Dry Dog Food",
+    "kcalKg": 3850.0,
+    "protein": 35.0,
+    "fiber": 6.0,
+    "moisture": 12.0,
+    "ash": 7.0,
+    "fat": 17.0,
+    "packagesKg": [
+      2.0,
+      6.0,
+      11.4
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ACANA",
+    "species": "dog",
+    "handles": [
+      "acana-yorkshire-pork-recipe-perros"
+    ],
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-singles-pork-new.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Yorkshire Pork Dry Dog Food",
+    "kcalKg": 3393.0,
+    "protein": 31.0,
+    "fiber": 5.0,
+    "moisture": 12.0,
+    "ash": 7.5,
+    "fat": 15.0,
+    "packagesKg": [
+      2.0,
+      6.0,
+      11.4
+    ],
+    "complete": true
+  },
+  {
     "brand": "ALPO",
     "species": "dog",
     "handles": [
@@ -1089,6 +1835,977 @@
     ]
   },
   {
+    "brand": "Hill’s",
+    "name": "Adult 7+ concentrado para gato",
+    "url": "https://www.hillspet.co/cat-food/science-diet-mature-adult-senior-dry",
+    "handles": [
+      "hills-science-diet-adult-7-cat"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      3.17
+    ],
+    "protein": 31.4,
+    "basis": "materia_seca",
+    "fat": 18.5,
+    "fiber": 1.3,
+    "kcalKg": 3926.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Adult concentrado para perro",
+    "url": "https://www.hillspet.co/dog-food/sd-canine-adult-original-dry",
+    "handles": [
+      "hills-science-diet-adult-1-6-chicken-barley-recipe"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      3,
+      7.5,
+      15
+    ],
+    "protein": 23.9,
+    "basis": "materia_seca",
+    "fat": 14.7,
+    "fiber": 2.1,
+    "kcalKg": 3675.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Alimento Seco para Cachorro Raza Gigante Receta Pollo y Avena",
+    "url": "https://www.hillspet.co/dog-food/science-diet-puppy-large-breed-dry",
+    "handles": [
+      "alimento-seco-para-perro-hills-science-diet-puppy-large-breed-pollo-razas-grandes"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      7.03,
+      12.5,
+      13.6
+    ],
+    "protein": 29.2,
+    "basis": "materia_seca",
+    "fat": 16.1,
+    "fiber": 2.1,
+    "kcalKg": 3628.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Cachorro Receta de harina de pollo y cebada",
+    "url": "https://www.hillspet.co/dog-food/science-diet-puppy-original-dry",
+    "handles": [
+      "hills-science-diet-puppy-original-cachorro-ob-dog"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      13.6
+    ],
+    "protein": 29.8,
+    "basis": "materia_seca",
+    "fat": 19.1,
+    "fiber": 1.7,
+    "kcalKg": 3774.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Concentrado para gato",
+    "url": "https://www.hillspet.co/cat-food/pd-feline-gastrointestinal-biome-stress-dry",
+    "handles": [
+      "hills-prescription-diet-gastrobiome-cat"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.81
+    ],
+    "protein": 37.3,
+    "basis": "materia_seca",
+    "fat": 17.0,
+    "fiber": 3.3,
+    "kcalKg": 3807.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Light comida bajo en calorías gato adulto control bolas pelo 3.2Kg",
+    "url": "https://www.hillspet.co/cat-food/science-plan-adult-hairball-light-dry",
+    "handles": [
+      "alimento-seco-para-gato-hills-science-diet-hairball-control-light-bajo-en-calorias-y-control-bolas-de-pelo"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      3.17
+    ],
+    "protein": 40.2,
+    "basis": "materia_seca",
+    "fat": 9.7,
+    "fiber": 8.2,
+    "kcalKg": 3180.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Light comida para perro adulto bajo en calorías raza pequeña 2Kg",
+    "url": "https://www.hillspet.co/dog-food/science-plan-adult-light-small-paws-breed-dry",
+    "handles": [
+      "hills-science-diet-small-paws-light-adult-1-6-dog"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      2.04
+    ],
+    "protein": 24.9,
+    "basis": "materia_seca",
+    "fat": 8.2,
+    "fiber": 12.2,
+    "kcalKg": 2968.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Metabolic comida para gato pérdida y mantenimiento de peso 1.8 Kg",
+    "url": "https://www.hillspet.co/cat-food/prescription-diet-metabolic-weight-management-dry",
+    "handles": [
+      "hills-prescription-diet-metabolic-weight-management-cat"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.81
+    ],
+    "protein": 39.0,
+    "basis": "materia_seca",
+    "fat": 13.1,
+    "fiber": 9.6,
+    "kcalKg": 3391.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Metabolic comida para perro mantenimiento y pérdida de peso 8 Kg",
+    "url": "https://www.hillspet.co/dog-food/prescription-diet-metabolic-weight-management-dry",
+    "handles": [
+      "hills-prescription-diet-metabolic-weight-managment-dog"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      7.98
+    ],
+    "protein": 28.3,
+    "basis": "materia_seca",
+    "fat": 11.8,
+    "fiber": 12.3,
+    "kcalKg": 3145.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Onc Care comida para perro apoyo y recuperación cancer 6.8 Kg",
+    "url": "https://www.hillspet.co/dog-food/prescription-diet-onc-on-care-chicken-restorative-care-dry",
+    "handles": [
+      "alimento-seco-para-perro-hills-prescription-diet-onc-care-apoyo-nutricional-y-recuperacion"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      2.72,
+      6.8
+    ],
+    "protein": 30.8,
+    "basis": "materia_seca",
+    "fat": 26.4,
+    "fiber": 2.5,
+    "kcalKg": 4158.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Prescription Diet c/d comida para perro, cuidado urinario 1.5 Kg",
+    "url": "https://www.hillspet.co/dog-food/prescription-diet-cd-multicare-urinary-care-dry",
+    "handles": [
+      "hills-prescription-diet-c-d-multicare-canine-dog"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.5
+    ],
+    "protein": 22.2,
+    "basis": "materia_seca",
+    "fat": 16.5,
+    "fiber": 1.5,
+    "kcalKg": 3820.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Prescription Diet i/d comida para gato Cuidado Digestivo 1.8 kg",
+    "url": "https://www.hillspet.co/cat-food/prescription-diet-id-digestive-care-dry",
+    "handles": [
+      "hills-prescription-diet-i-d-digestive-care-cat"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.81
+    ],
+    "protein": 37.4,
+    "basis": "materia_seca",
+    "fat": 20.1,
+    "fiber": 1.9,
+    "kcalKg": 3934.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Prescription Diet i/d comida para perro Cuidado Digestivo 3.9 kg",
+    "url": "https://www.hillspet.co/dog-food/prescription-diet-id-digestive-care-dry",
+    "handles": [
+      "alimento-seco-para-perro-hills-prescription-diet-i-d-cuidado-digestivo"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      3.85
+    ],
+    "protein": 26.2,
+    "basis": "materia_seca",
+    "fat": 13.6,
+    "fiber": 2.0,
+    "kcalKg": 3589.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Prescription Diet k/d comida para gato cuidado renal 1.8 Kg",
+    "url": "https://www.hillspet.co/cat-food/prescription-diet-kd-kidney-care-dry",
+    "handles": [
+      "hills-prescription-diet-k-d-kidney-care-cat"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.81
+    ],
+    "protein": 28.6,
+    "basis": "materia_seca",
+    "fat": 23.1,
+    "fiber": 3.6,
+    "kcalKg": 4083.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Prescription Diet k/d comida para perro cuidado renal 8 Kg",
+    "url": "https://www.hillspet.co/dog-food/prescription-diet-kd-kidney-care-dry",
+    "handles": [
+      "hills-prescription-diet-k-d-kidney-care-dog"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      7.98
+    ],
+    "protein": 15.6,
+    "basis": "materia_seca",
+    "fat": 21.1,
+    "fiber": 1.5,
+    "kcalKg": 3991.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Prescription Diet l/d comida para perro Cuidado Hepático 8 Kg",
+    "url": "https://www.hillspet.co/dog-food/prescription-diet-ld-liver-care-dry",
+    "handles": [
+      "alimento-seco-para-perro-hills-prescription-diet-l-d-cuidado-hepatico"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      7.98
+    ],
+    "protein": 18.1,
+    "basis": "materia_seca",
+    "fat": 23.9,
+    "fiber": 3.0,
+    "kcalKg": 4719.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Prescription Diet r/d comida para Gato pérdida de peso 1.8 Kg",
+    "url": "https://www.hillspet.co/cat-food/prescription-diet-rd-weight-management-dry",
+    "handles": [
+      "hills-prescription-diet-r-d-weight-reduction-cat"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.81
+    ],
+    "protein": 36.5,
+    "basis": "materia_seca",
+    "fat": 8.8,
+    "fiber": 11.3,
+    "kcalKg": 3027.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Prescription Diet u/d comida para perro cuidado urinario 3.9 Kg",
+    "url": "https://www.hillspet.co/dog-food/prescription-diet-ud-urinary-care-dry",
+    "handles": [
+      "alimento-seco-para-perro-hills-prescription-diet-u-d-cuidado-urinario"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      3.85
+    ],
+    "protein": 13.8,
+    "basis": "materia_seca",
+    "fat": 20.7,
+    "fiber": 0.9,
+    "kcalKg": 3986.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Science Diet Adult 7+ comida para perro senior bocados pequeños 1.8Kg",
+    "url": "https://www.hillspet.co/dog-food/science-plan-mature-adult-small-bites-dry",
+    "handles": [
+      "hills-science-diet-adult-7-small-bites-chicken-meal-dog-1"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      2,
+      6.8
+    ],
+    "protein": 18.8,
+    "basis": "materia_seca",
+    "fat": 13.4,
+    "fiber": 2.4,
+    "kcalKg": 3550.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Science Diet Adult comida para perro adulto receta de cordero 7Kg",
+    "url": "https://www.hillspet.co/dog-food/science-plan-adult-lamb-rice-dry",
+    "handles": [
+      "alimento-seco-para-perro-hills-science-diet-adult-cordero-y-arroz-integral"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      7.03
+    ],
+    "protein": 23.4,
+    "basis": "materia_seca",
+    "fat": 16.7,
+    "fiber": 1.7,
+    "kcalKg": 3719.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Science Diet Light comida bajo en calorías para gato adulto 1.8 Kg",
+    "url": "https://www.hillspet.co/cat-food/science-plan-adult-light-dry",
+    "handles": [
+      "hills-science-diet-adult-light-cat"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.81,
+      3.17,
+      7.25
+    ],
+    "protein": 38.3,
+    "basis": "materia_seca",
+    "fat": 8.5,
+    "fiber": 6.0,
+    "kcalKg": 3171.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Science Diet Light comida para perro adulto bajo en calorías 13.6Kg",
+    "url": "https://www.hillspet.co/dog-food/science-plan-adult-light-dry",
+    "handles": [
+      "alimento-seco-para-perro-hills-science-diet-adult-light-bajo-en-calorias"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      6.8,
+      13.6
+    ],
+    "protein": 25.3,
+    "basis": "materia_seca",
+    "fat": 8.1,
+    "fiber": 12.2,
+    "kcalKg": 2961.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Science Diet Small&Mini comida para perro adulto raza pequeña y mini 7Kg",
+    "url": "https://www.hillspet.co/dog-food/science-plan-adult-small-paws-lamb-rice-dry",
+    "handles": [
+      "alimento-seco-para-perro-hills-science-diet-small-and-mini-adulto-razas-pequenas-y-mini-cordero-y-arroz-integral"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      2.04,
+      7.03
+    ],
+    "protein": 25.0,
+    "basis": "materia_seca",
+    "fat": 15.4,
+    "fiber": 1.7,
+    "kcalKg": 3647.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Science Diet bocados pequeños Light comida para perro 2.2 kg",
+    "url": "https://www.hillspet.co/dog-food/science-diet-adult-light-small-bites-dry",
+    "handles": [
+      "alimento-seco-para-perro-hills-science-diet-adult-light-small-bites-bajo-en-calorias-bocados-pequenos"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      2.26
+    ],
+    "protein": 25.3,
+    "basis": "materia_seca",
+    "fat": 8.1,
+    "fiber": 12.2,
+    "kcalKg": 2961.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Science Diet comida control de bolas de pelo para gato adulto 3.2Kg",
+    "url": "https://www.hillspet.co/cat-food/science-plan-adult-hairball-dry",
+    "handles": [
+      "hills-science-diet-adult-hairball-control-cat"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      3.17
+    ],
+    "protein": 34.0,
+    "basis": "materia_seca",
+    "fat": 18.6,
+    "fiber": 9.0,
+    "kcalKg": 3651.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Science Diet comida para gatos adultos, salmón y arroz 1.5 Kg",
+    "url": "https://www.hillspet.co/cat-food/science-plan-adult-salmon-brown-rice-dry",
+    "handles": [
+      "alimento-seco-para-gato-hills-adult-salmon"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.58
+    ],
+    "protein": 33.8,
+    "basis": "materia_seca",
+    "fat": 19.8,
+    "fiber": 1.5,
+    "kcalKg": 3942.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Science Diet comida para perros bocados pequeño 7 Kg",
+    "url": "https://www.hillspet.co/dog-food/science-plan-adult-lamb-rice-small-bites-dry",
+    "handles": [
+      "hills-science-diet-adult-small-bites-1-6-lamb-meal-brown-rice-recipe-dog"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      7.03
+    ],
+    "protein": 23.4,
+    "basis": "materia_seca",
+    "fat": 16.6,
+    "fiber": 1.7,
+    "kcalKg": 3721.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's Senior Vitality comida para perro senior raza pequeña y mini 1.6Kg",
+    "url": "https://www.hillspet.co/dog-food/science-plan-adult-7-senior-vitality-small-paws-chicken-rice-dry",
+    "handles": [
+      "hills-science-diet-senior-vitality-small-mini-adult-7-chicken-rice-recipe"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.58
+    ],
+    "protein": 22.4,
+    "basis": "materia_seca",
+    "fat": 14.5,
+    "fiber": 1.2,
+    "kcalKg": 3649.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's comida para perro adulto piel y estómago sensibles 7Kg",
+    "url": "https://www.hillspet.co/dog-food/science-plan-canine-adult-sensitive-stomach-skin-chicken-dry",
+    "handles": [
+      "hills-science-diet-adult-sensitive-stomach-skin-dog"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      7.03
+    ],
+    "protein": 24.8,
+    "basis": "materia_seca",
+    "fat": 16.7,
+    "fiber": 1.5,
+    "kcalKg": 3732.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's comida para perro adulto raza pequeña piel y estómago sensible 6.8Kg",
+    "url": "https://www.hillspet.co/dog-food/science-plan-adult-sensitive-stomach-skin-small-mini-chicken-dry",
+    "handles": [
+      "alimento-seco-para-perro-hills-science-diet-razas-pequenas-y-mini-piel-y-estomago-sensibles"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      6.8
+    ],
+    "protein": 25.9,
+    "basis": "materia_seca",
+    "fat": 15.8,
+    "fiber": 1.2,
+    "kcalKg": 3728.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's i/d comida para perro bajo en grasas Cuidado Digestivo 3.9 kg",
+    "url": "https://www.hillspet.co/dog-food/prescription-diet-id-low-fat-digestive-care-dry",
+    "handles": [
+      "alimento-seco-para-perro-hills-prescription-diet-i-d-low-fat-cuidado-digestivo-bajo-en-grasa"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      3.85
+    ],
+    "protein": 26.1,
+    "basis": "materia_seca",
+    "fat": 7.4,
+    "fiber": 1.8,
+    "kcalKg": 3511.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's w/d comida para gato manejo de peso/glucosa 3.9 Kg",
+    "url": "https://www.hillspet.co/cat-food/prescription-diet-wd-glucose-management-dry",
+    "handles": [
+      "alimento-seco-para-gato-hills-prescription-diet-w-d-manejo-peso-y-glucosa"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.81,
+      3.85
+    ],
+    "protein": 41.6,
+    "basis": "materia_seca",
+    "fat": 9.5,
+    "fiber": 6.2,
+    "kcalKg": 3228.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Hill's z/d comida para perro sensibilidades alimentarias 8 Kg",
+    "url": "https://www.hillspet.co/dog-food/prescription-diet-zd-food-sensitivities-dry",
+    "handles": [
+      "hills-prescription-diet-z-d-skin-food-sensitivities-dog"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      7.98
+    ],
+    "protein": 20.1,
+    "basis": "materia_seca",
+    "fat": 14.5,
+    "fiber": 6.4,
+    "kcalKg": 3505.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Indoor alimento para gato 11+",
+    "url": "https://www.hillspet.co/cat-food/science-diet-senior-11-indoor-age-defying-dry",
+    "handles": [
+      "alimento-seco-para-gato-hills-science-diet-adult-11-plus-indoor-senior-de-interiores"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.58
+    ],
+    "protein": 34.3,
+    "basis": "materia_seca",
+    "fat": 20.4,
+    "fiber": 8.6,
+    "kcalKg": 3772.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Indoor concentrado para gato",
+    "url": "https://www.hillspet.co/cat-food/science-diet-adult-indoor-dry",
+    "handles": [
+      "hills-science-diet-adult-indoor-cat"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      3.17
+    ],
+    "protein": 36.1,
+    "basis": "materia_seca",
+    "fat": 14.8,
+    "fiber": 8.5,
+    "kcalKg": 3492.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Large Breed concentrado para perros",
+    "url": "https://www.hillspet.co/dog-food/science-diet-adult-lamb-rice-large-breed-dry",
+    "handles": [
+      "hills-science-diet-large-breed-adult-1-5-lamb-meal-brown-rice-recipe-dog"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      14.9
+    ],
+    "protein": 23.4,
+    "basis": "materia_seca",
+    "fat": 16.6,
+    "fiber": 1.7,
+    "kcalKg": 3721.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Large Breed concentrado para perros",
+    "url": "https://www.hillspet.co/dog-food/science-diet-adult-large-breed-dry",
+    "handles": [
+      "hills-science-diet-large-breed-adult-1-5-dog"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      15
+    ],
+    "protein": 23.9,
+    "basis": "materia_seca",
+    "fat": 14.7,
+    "fiber": 2.1,
+    "kcalKg": 3657.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Senior Vitality concentrado para gato",
+    "url": "https://www.hillspet.co/cat-food/science-diet-adult-7-senior-vitality-chicken-rice-dry",
+    "handles": [
+      "hills-science-diet-cat-youthful-vitality-adult-7-3lb-concentrado-para-gatos-mayores-9-anos"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.36
+    ],
+    "protein": 34.6,
+    "basis": "materia_seca",
+    "fat": 16.1,
+    "fiber": 1.2,
+    "kcalKg": 3789.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Small Bites concentrado perro",
+    "url": "https://www.hillspet.co/dog-food/science-diet-adult-small-bites-dry",
+    "handles": [
+      "alimento-seco-para-perro-hills-science-diet-small-bites-adulto-bocados-pequenos"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      2,
+      6.8
+    ],
+    "protein": 24.0,
+    "basis": "materia_seca",
+    "fat": 15.1,
+    "fiber": 1.7,
+    "kcalKg": 3683.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Small&Mini concentrado para perro",
+    "url": "https://www.hillspet.co/dog-food/science-diet-puppy-small-paws-breed-dry",
+    "handles": [
+      "hills-science-diet-puppy-small-paws-dog"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      5.67
+    ],
+    "protein": 28.9,
+    "basis": "materia_seca",
+    "fat": 19.7,
+    "fiber": 2.3,
+    "kcalKg": 3780.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Small&Mini concentrado perro",
+    "url": "https://www.hillspet.co/dog-food/science-diet-adult-small-paws-breed-dry",
+    "handles": [
+      "hills-science-diet-adult-small-paws-chicken-dog"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      2.04
+    ],
+    "protein": 25.0,
+    "basis": "materia_seca",
+    "fat": 15.3,
+    "fiber": 1.5,
+    "kcalKg": 3699.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "alimento de control de bolas de pelo para gato",
+    "url": "https://www.hillspet.co/cat-food/science-diet-mature-adult-hairball-dry",
+    "handles": [
+      "alimento-seco-para-gato-hills-mature-hairball-control"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.58
+    ],
+    "protein": 31.8,
+    "basis": "materia_seca",
+    "fat": 19.4,
+    "fiber": 9.0,
+    "kcalKg": 3713.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "c/d Concentrado para gato",
+    "url": "https://www.hillspet.co/cat-food/pd-feline-cd-multicare-chicken-dry",
+    "handles": [
+      "hills-prescription-diet-c-d-multicare-urinary-care-chicken-cat"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.81
+    ],
+    "protein": 33.8,
+    "basis": "materia_seca",
+    "fat": 16.1,
+    "fiber": 1.0,
+    "kcalKg": 3844.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "c/d Concentrado para gato",
+    "url": "https://www.hillspet.co/cat-food/pd-feline-cd-multicare-metabolic-dry-pd-feline-metabolic-urinary-dry",
+    "handles": [
+      "alimento-seco-para-gato-hills-prescription-diet-c-d-multicare-plus-metabolic-cuidado-urinario"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      2.88
+    ],
+    "protein": 38.8,
+    "basis": "materia_seca",
+    "fat": 12.0,
+    "fiber": 13.4,
+    "kcalKg": 3255.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "c/d Concentrado para gato",
+    "url": "https://www.hillspet.co/cat-food/pd-feline-cd-multicare-stress-with-chicken-dry",
+    "handles": [
+      "alimento-seco-para-gato-hills-prescription-diet-c-d-multicare-stress-cuidado-urinario"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.81
+    ],
+    "protein": 33.9,
+    "basis": "materia_seca",
+    "fat": 16.1,
+    "fiber": 1.0,
+    "kcalKg": 3844.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "concentrado de control de peso para gato",
+    "url": "https://www.hillspet.co/cat-food/science-diet-adult-perfect-weight-dry",
+    "handles": [
+      "hills-science-diet-perfect-weight-cat"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.36
+    ],
+    "protein": 39.4,
+    "basis": "materia_seca",
+    "fat": 11.9,
+    "fiber": 6.0,
+    "kcalKg": 3412.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "concentrado para gato",
+    "url": "https://www.hillspet.co/cat-food/science-diet-adult-sensitive-stomach-skin-dry",
+    "handles": [
+      "hills-science-diet-adult-sensitive-stomach-skin-cat"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.58
+    ],
+    "protein": 35.0,
+    "basis": "materia_seca",
+    "fat": 22.0,
+    "fiber": 0.9,
+    "kcalKg": 4104.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "concentrado para perro",
+    "url": "https://www.hillspet.co/dog-food/sdsd-pro-puppy-small-bites-dry",
+    "handles": [
+      "hills-science-diet-puppy-small-bites-dog"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      2.04
+    ],
+    "protein": 27.8,
+    "basis": "materia_seca",
+    "fat": 19.0,
+    "fiber": 2.5,
+    "kcalKg": 3747.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "j/d Concentrado para perro",
+    "url": "https://www.hillspet.co/dog-food/pd-canine-jd-dry",
+    "handles": [
+      "hills-prescription-diet-j-d-joint-care-dog"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      12.5
+    ],
+    "protein": 20.0,
+    "basis": "materia_seca",
+    "fat": 15.9,
+    "fiber": 4.1,
+    "kcalKg": 3670.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "j/d Concentrado para perro",
+    "url": "https://www.hillspet.co/dog-food/pd-canine-metabolic-mobility-dry",
+    "handles": [
+      "hills-c-metabolic-mobility-alimento-para-perro"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      3.85,
+      10.8
+    ],
+    "protein": 28.5,
+    "basis": "materia_seca",
+    "fat": 13.9,
+    "fiber": 13.9,
+    "kcalKg": 3223.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "r/d Concentrado para perro",
+    "url": "https://www.hillspet.co/dog-food/pd-canine-rd-dry",
+    "handles": [
+      "hills-prescription-diet-r-d-weight-reduction-dog"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.5,
+      3.85,
+      7.98,
+      12.5
+    ],
+    "protein": 33.9,
+    "basis": "materia_seca",
+    "fat": 8.6,
+    "fiber": 14.6,
+    "kcalKg": 2943.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "w/d Concentrado para perro",
+    "url": "https://www.hillspet.co/dog-food/pd-canine-wd-dry",
+    "handles": [
+      "hills-prescription-diet-w-d-multi-benefit-dog"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      3.85,
+      7.98
+    ],
+    "protein": 20.7,
+    "basis": "materia_seca",
+    "fat": 13.0,
+    "fiber": 16.0,
+    "kcalKg": 3100.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "z/d Sensibilidades Alimentarias",
+    "url": "https://www.hillspet.co/cat-food/pd-feline-zd-dry",
+    "handles": [
+      "hills-prescription-diet-z-d-skin-food-sensitivities-cat"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.81
+    ],
+    "protein": 34.3,
+    "basis": "materia_seca",
+    "fat": 17.3,
+    "fiber": 1.4,
+    "kcalKg": 3847.0
+  },
+  {
     "brand": "N&D",
     "species": "dog",
     "handles": [
@@ -1515,6 +3232,261 @@
     "protein": 31.0,
     "fat": 20.0,
     "fiber": 3.0
+  },
+  {
+    "brand": "ORIJEN",
+    "species": "cat",
+    "handles": [
+      "orijen-fit-trim-gatos",
+      "orijen-fit-trim-gatos-presentaciones-por-confirmar"
+    ],
+    "url": "https://www.orijenpetfoods.com/en-US/cats/cat-food/fit-and-trim/ds-ori-fit-trim-cat.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Fit & Trim™ Dry Cat Food",
+    "kcalKg": 3700.0,
+    "proteinMin": 42.0,
+    "fatMin": 14.0,
+    "fiberMax": 6.0,
+    "moistureMax": 10.0,
+    "packagesKg": [
+      1.814369,
+      3.175147,
+      5.443108
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ORIJEN",
+    "species": "cat",
+    "handles": [
+      "orijen-guardian-8-gatos"
+    ],
+    "url": "https://emea.orijenpetfoods.com/en/cats/cat-food/eu-ori-ns-ori-guardian-8.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Guardian 8™ Complete Dry Cat Food",
+    "kcalKg": 3980.0,
+    "protein": 40.0,
+    "fat": 18.0,
+    "fiber": 4.0,
+    "moisture": 10.0,
+    "ash": 9.0,
+    "packagesKg": [
+      0.34,
+      1.8,
+      4.5
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ORIJEN",
+    "species": "cat",
+    "handles": [
+      "orijen-kitten-gatos",
+      "orijen-kitten-gatos-presentaciones-por-confirmar"
+    ],
+    "url": "https://www.orijenpetfoods.com/en-US/cats/cat-food/kitten-formula/ds-ori-kitten.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Kitten Formula Dry Cat Food",
+    "kcalKg": 4120.0,
+    "proteinMin": 40.0,
+    "fatMin": 20.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "packagesKg": [
+      1.814369,
+      3.175147
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ORIJEN",
+    "species": "dog",
+    "handles": [
+      "orijen-large-breed-adult-recipe-perros"
+    ],
+    "url": "https://www.orijenpetfoods.com/en-US/dogs/dog-food/large-breed-adult-recipe/ds-ori-large-breed-adult.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Large Breed Adult Recipe Dry Dog Food",
+    "kcalKg": 3610.0,
+    "proteinMin": 38.0,
+    "fatMin": 13.0,
+    "fiberMax": 6.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      10.659421
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ORIJEN",
+    "species": "cat",
+    "handles": [
+      "orijen-original-cat-gatos",
+      "orijen-original-cat-gatos-presentaciones-por-confirmar"
+    ],
+    "url": "https://www.orijenpetfoods.com/en-US/cats/cat-food/original-cat/ds-ori-cat-kitten.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Original Cat Dry Cat Food",
+    "kcalKg": 4120.0,
+    "proteinMin": 40.0,
+    "fatMin": 20.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "packagesKg": [
+      1.814369,
+      3.175147,
+      5.443108
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ORIJEN",
+    "species": "dog",
+    "handles": [
+      "orijen-original-perros",
+      "orijen-original-perros-presentaciones-por-confirmar"
+    ],
+    "url": "https://www.orijenpetfoods.com/en-US/dogs/dog-food/original/ds-ori-original-dog.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Original Dry Dog Food",
+    "kcalKg": 3940.0,
+    "proteinMin": 38.0,
+    "fatMin": 18.0,
+    "fiberMax": 4.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.041166,
+      5.896701,
+      10.659421,
+      14.061363
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ORIJEN",
+    "species": "dog",
+    "handles": [
+      "orijen-puppy-perros",
+      "orijen-puppy-perros-presentaciones-por-confirmar"
+    ],
+    "url": "https://www.orijenpetfoods.com/en-US/dogs/dog-food/puppy/ds-ori-puppy.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Puppy Dry Dog Food",
+    "kcalKg": 3960.0,
+    "proteinMin": 38.0,
+    "fatMin": 20.0,
+    "fiberMax": 6.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.041166,
+      5.896701,
+      10.659421
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ORIJEN",
+    "species": "dog",
+    "handles": [
+      "orijen-puppy-large-perros"
+    ],
+    "url": "https://www.orijenpetfoods.com/en-US/dogs/dog-food/puppy-large/ds-ori-puppylrg.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Puppy Large Dry Dog Food",
+    "kcalKg": 3760.0,
+    "proteinMin": 38.0,
+    "fatMin": 16.0,
+    "fiberMax": 6.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      5.896701,
+      10.659421
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ORIJEN",
+    "species": "dog",
+    "handles": [
+      "orijen-senior-perros"
+    ],
+    "url": "https://www.orijenpetfoods.com/en-US/dogs/dog-food/senior/ds-ori-senior.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Senior Dry Dog Food",
+    "kcalKg": 3710.0,
+    "proteinMin": 38.0,
+    "fatMin": 15.0,
+    "fiberMax": 8.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.041166,
+      5.896701,
+      10.659421
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ORIJEN",
+    "species": "cat",
+    "handles": [
+      "orijen-six-fish-gatos",
+      "orijen-six-fish-gatos-presentaciones-por-confirmar"
+    ],
+    "url": "https://www.orijenpetfoods.com/en-US/cats/cat-food/six-fish/ds-ori-six-fish-cat.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Six Fish™ Dry Cat Food",
+    "kcalKg": 4120.0,
+    "proteinMin": 40.0,
+    "fatMin": 20.0,
+    "fiberMax": 3.0,
+    "moistureMax": 10.0,
+    "packagesKg": [
+      1.814369,
+      3.175147,
+      5.443108
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ORIJEN",
+    "species": "dog",
+    "handles": [
+      "orijen-six-fish-recipe-perros"
+    ],
+    "url": "https://www.orijenpetfoods.com/en-US/dogs/dog-food/six-fish-recipe/ds-ori-six-fish-dog.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Six Fish™ Recipe Dry Dog Food",
+    "kcalKg": 3760.0,
+    "proteinMin": 40.0,
+    "fatMin": 16.0,
+    "fiberMax": 4.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.041166,
+      5.896701,
+      10.659421
+    ],
+    "complete": true
+  },
+  {
+    "brand": "ORIJEN",
+    "species": "dog",
+    "handles": [
+      "orijen-small-breed-perros"
+    ],
+    "url": "https://www.orijenpetfoods.com/en-US/dogs/dog-food/small-breed/ds-ori-small-breed.html",
+    "verifiedOn": "2026-11-21",
+    "name": "Small Breed Dry Dog Food",
+    "kcalKg": 3940.0,
+    "proteinMin": 38.0,
+    "fatMin": 18.0,
+    "fiberMax": 4.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      1.814369,
+      4.535924
+    ],
+    "complete": true
   },
   {
     "brand": "Pro Plan",

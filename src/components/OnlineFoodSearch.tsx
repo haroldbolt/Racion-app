@@ -7,7 +7,7 @@ import { ColombiaRegistrySearch } from './ColombiaRegistrySearch';
 import { LabelReviewModal } from './LabelReviewModal';
 import { OnlineFoodCards } from './OnlineFoodCards';
 import { StoreManufacturerResults } from './StoreManufacturerResults';
-import { enrichMarketFoods } from './onlineFoodResults';
+import { enrichMarketFoods } from '../services/onlineFoodResults';
 
 interface OnlineFoodSearchProps {
   species: Species;

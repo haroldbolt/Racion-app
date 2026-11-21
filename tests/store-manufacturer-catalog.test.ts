@@ -65,11 +65,11 @@ test('enrichment preserves a purchase, avoids similar formulas, and respects a c
   const [row] = await searchStoreManufacturerFoods('monello select castrados', 'cat');
   const chosen = selectStoreManufacturerFood(row, 1.5);
   const external = {...chosen, id:'market-offer', storeName:'Otra tienda', storeProductUrl:'https://example.org/monello',
-    packagePriceCop: 54000, labelStatus:'unconfirmed' as const, fichaNutricional:undefined, kcalPerKg:0};
+    packagePrices:[{packageKg:1.5, priceCop:54000, source:'online' as const, observedAt:'2026-11-21'}], labelStatus:'unconfirmed' as const, fichaNutricional:undefined, kcalPerKg:0};
   const enriched = await enrichFoodFromStoreManufacturer(external);
   assert.equal(getFoodKcalPerKg(enriched), 3650);
   assert.equal(enriched.storeProductUrl, external.storeProductUrl);
-  assert.equal(enriched.packagePriceCop, 54000);
+  assert.equal(enriched.packagePrices?.[0].priceCop, 54000);
   assert.equal(enriched.bagSizeKg, 1.5);
   const otherFormula = {...external, name:external.name + ' renal'};
   assert.equal(await enrichFoodFromStoreManufacturer(otherFormula), otherFormula);

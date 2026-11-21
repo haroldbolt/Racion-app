@@ -1445,5 +1445,487 @@
       7.0,
       15.0
     ]
+  },
+  {
+    "brand": "Fórmula Natural",
+    "name": "Fórmula Natural Fresh Meat Gatos Filhotes Frango, Maçã e Cúrcuma",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-cachorro-formula-natural"
+    ],
+    "url": "https://adimax.com.br/produto/formula-natural-fresh-meat-gatos-filhotes/",
+    "verifiedOn": "2026-11-21",
+    "moistureMax": 9.0,
+    "proteinMin": 40.0,
+    "fatMin": 18.0,
+    "fiberMax": 3.0,
+    "ashMax": 8.0,
+    "kcalKg": 4050,
+    "kcalQualifier": "minimo",
+    "packagesKg": [
+      1.0,
+      10.1
+    ]
+  },
+  {
+    "brand": "Fórmula Natural",
+    "name": "Fórmula Natural Fresh Meat Gatos Sênior, Frango, Tomate e Chá Verde",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-senior-formula-natural",
+      "alimento-seco-formula-natural-para-gato-senior"
+    ],
+    "url": "https://adimax.com.br/produto/formula-natural-fresh-meat-gatos-senior/",
+    "verifiedOn": "2026-11-21",
+    "moistureMax": 9.0,
+    "proteinMin": 34.0,
+    "fatMin": 17.0,
+    "fiberMax": 3.5,
+    "ashMax": 7.0,
+    "kcalKg": 4000,
+    "kcalQualifier": "minimo",
+    "packagesKg": [
+      1.0,
+      10.1
+    ]
+  },
+  {
+    "brand": "Fórmula Natural",
+    "name": "Fórmula Natural Fresh Meat Gatos Castrados Carne, Batata-doce e Cúrcuma",
+    "species": "cat",
+    "handles": [
+      "alimento-sabor-carne-para-gato-adulto-castrado-formula-natural",
+      "alimento-seco-formula-natural-para-gato-adulto-castrado-carne"
+    ],
+    "url": "https://adimax.com.br/produto/formula-natural-fresh-meat-gatos-castrados-sabor-carne/",
+    "verifiedOn": "2026-11-21",
+    "moistureMax": 9.0,
+    "proteinMin": 40.0,
+    "fatMin": 12.0,
+    "fiberMax": 4.5,
+    "ashMax": 8.0,
+    "kcalKg": 3750,
+    "kcalQualifier": "minimo",
+    "packagesKg": [
+      1.0,
+      10.1
+    ]
+  },
+  {
+    "brand": "Fórmula Natural",
+    "name": "Fórmula Natural Fresh Meat Gatos Adultos Frango, Chá Verde e Alecrim",
+    "species": "cat",
+    "handles": [
+      "alimento-sabor-pollo-para-gato-adulto-formula-natural",
+      "alimento-seco-formula-natural-para-gato-adulto-pollo"
+    ],
+    "url": "https://adimax.com.br/produto/formula-natural-fresh-meat-gatos-adultos-sabor-frango/",
+    "verifiedOn": "2026-11-21",
+    "moistureMax": 9.0,
+    "proteinMin": 38.0,
+    "fatMin": 16.0,
+    "fiberMax": 3.0,
+    "ashMax": 8.0,
+    "kcalKg": 3980,
+    "kcalQualifier": "minimo",
+    "packagesKg": [
+      1.0,
+      10.1
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Fórmula Natural",
+    "name": "Fórmula Natural Super Premium Fresh Meat Cão Sênior Portes Médio e Grande Frango, Tomate e Chá Verde",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-formula-natural-para-perro-senior-md-gr-pollo"
+    ],
+    "url": "https://adimax.com.br/produto/formula-natural-fresh-meat-caes-senior-portes-medio-e-grande/",
+    "verifiedOn": "2026-11-21",
+    "moistureMax": 9.0,
+    "proteinMin": 28.0,
+    "fatMin": 16.0,
+    "fiberMax": 4.5,
+    "ashMax": 8.5,
+    "packagesKg": [
+      2.5,
+      12.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Fórmula Natural",
+    "name": "Fórmula Natural Super Premium Fresh Meat Cão Sênior Portes Mini e Pequeno Frango, Tomate e Chá Verde",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-formula-natural-para-perro-senior-mini-peq-pollo"
+    ],
+    "url": "https://adimax.com.br/produto/formula-natural-fresh-meat-caes-senior-portes-mini-e-pequeno/",
+    "verifiedOn": "2026-11-21",
+    "moistureMax": 9.0,
+    "proteinMin": 28.0,
+    "fatMin": 16.0,
+    "fiberMax": 4.5,
+    "ashMax": 8.5,
+    "packagesKg": [
+      1.0,
+      2.5,
+      10.1
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Fórmula Natural",
+    "name": "Fórmula Natural Fresh Meat Cães Light Portes Médio e Grande",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-para-perro-adulo-formula-natural-light-med-gra-pollo"
+    ],
+    "url": "https://adimax.com.br/wp-content/uploads/2021/09/cat-formula-natural.pdf#page=19",
+    "packagesKg": [
+      2.5,
+      12
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Fórmula Natural",
+    "name": "Fórmula Natural Fresh Meat Cães Light Portes Mini e Pequeno",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-para-perro-adulo-formula-natural-light-min-peq-pollo"
+    ],
+    "url": "https://adimax.com.br/wp-content/uploads/2021/09/cat-formula-natural.pdf#page=19",
+    "packagesKg": [
+      1,
+      2.5,
+      7
+    ],
+    "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Fórmula Natural",
+    "name": "Fórmula Natural Super Premium Fresh Meat Cães Filhotes Portes Grande e Gigante Frango, Mandioca e Cúrcuma",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-para-perro-cachorro-formula-natural-gran-gig-pollo"
+    ],
+    "url": "https://adimax.com.br/produto/formula-natural-fresh-meat-caes-filhotes-portes-grande-e-gigante-2/",
+    "verifiedOn": "2026-11-21",
+    "moistureMax": 9.0,
+    "proteinMin": 30.0,
+    "fatMin": 19.0,
+    "fiberMax": 3.0,
+    "ashMax": 8.5,
+    "packagesKg": [
+      2.5,
+      12.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Fórmula Natural",
+    "name": "Fórmula Natural Super Premium Fresh Meat Cães Filhotes Portes Mini e Pequeno Frango, Mandioca e Cúrcuma",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-para-perro-cachorro-formula-natural-min-peq-pollo"
+    ],
+    "url": "https://adimax.com.br/produto/formula-natural-fresh-meat-caes-filhotes-portes-mini-e-pequeno-2/",
+    "verifiedOn": "2026-11-21",
+    "moistureMax": 9.0,
+    "proteinMin": 30.0,
+    "fatMin": 19.0,
+    "fiberMax": 3.0,
+    "ashMax": 8.5,
+    "packagesKg": [
+      1.0,
+      2.5,
+      10.1
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Fórmula Natural",
+    "name": "Fórmula Natural Super Premium Fresh Meat Cães Filhotes Porte Médio Frango, Mandioca e Cúrcuma",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-para-perro-cachorro-mediano-formula-natural-pollo"
+    ],
+    "url": "https://adimax.com.br/produto/formula-natural-fresh-meat-caes-filhotes-porte-medio-2/",
+    "verifiedOn": "2026-11-21",
+    "moistureMax": 9.0,
+    "proteinMin": 30.0,
+    "fatMin": 19.0,
+    "fiberMax": 3.0,
+    "ashMax": 8.5,
+    "packagesKg": [
+      1.0,
+      2.5,
+      12.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Fórmula Natural",
+    "name": "Fórmula Natural Super Premium Fresh Meat Cães Adultos Portes Grande e Gigante Frango, Mandioca e Alecrim",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-para-perro-formula-natural-adulto-gra-gig-pollo"
+    ],
+    "url": "https://adimax.com.br/produto/formula-natural-fresh-meat-caes-adultos-portes-grande-e-gigante-2/",
+    "verifiedOn": "2026-11-21",
+    "moistureMax": 9.0,
+    "proteinMin": 29.0,
+    "fatMin": 17.0,
+    "fiberMax": 3.0,
+    "ashMax": 8.5,
+    "packagesKg": [
+      2.5,
+      12.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Fórmula Natural",
+    "name": "Fórmula Natural Super Premium Fresh Meat Cães Adultos Porte Médio Frango, Mandioca e Alecrim",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-para-perro-formula-natural-adulto-mediano-pollo"
+    ],
+    "url": "https://adimax.com.br/produto/formula-natural-fresh-meat-caes-adultos-porte-medio-2/",
+    "verifiedOn": "2026-11-21",
+    "moistureMax": 9.0,
+    "proteinMin": 29.0,
+    "fatMin": 17.0,
+    "fiberMax": 3.0,
+    "ashMax": 8.5,
+    "packagesKg": [
+      1.0,
+      2.5,
+      12.0
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Fórmula Natural",
+    "name": "Fórmula Natural Super Premium Fresh Meat Cães Adultos Portes Mini e Pequeno Frango, Mandioca e Alecrim",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-para-perro-formula-natural-adulto-min-peq-pollo"
+    ],
+    "url": "https://adimax.com.br/produto/formula-natural-fresh-meat-caes-adultos-portes-mini-e-pequeno-2/",
+    "verifiedOn": "2026-11-21",
+    "moistureMax": 9.0,
+    "proteinMin": 29.0,
+    "fatMin": 17.0,
+    "fiberMax": 3.0,
+    "ashMax": 8.5,
+    "packagesKg": [
+      1.0,
+      2.5,
+      10.1
+    ],
+    "complete": true
+  },
+  {
+    "brand": "Max",
+    "name": "Comida Seca para Gato Max Professional Line Adulto Pollo y Arroz",
+    "species": "cat",
+    "handles": [
+      "alimento-para-gato-max-adultos-pollo-y-arroz",
+      "max-gato-adultos-pollo-y-arroz"
+    ],
+    "url": "https://gabrica.co/personas/es-CO/producto/comida-seca-para-gato-max-professional-line-adulto-pollo-y-arroz-1-kg-11101034",
+    "verifiedOn": "2026-11-21",
+    "sourceName": "Gabrica Colombia (importador de Max)",
+    "proteinMin": 30.0,
+    "fatMin": 10.0,
+    "fiberMax": 4.0,
+    "ashMax": 10.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      1.0,
+      3.0,
+      10.1
+    ]
+  },
+  {
+    "brand": "Max",
+    "name": "Comida Seca para Gato Max Professional Line Gatito Pollo",
+    "species": "cat",
+    "handles": [
+      "max-gatitos-pollo-1kg"
+    ],
+    "url": "https://gabrica.co/personas/es-CO/producto/comida-seca-para-gato-max-professional-line-gatito-pollo-1-kg-11101033",
+    "verifiedOn": "2026-11-21",
+    "sourceName": "Gabrica Colombia (importador de Max)",
+    "proteinMin": 32.0,
+    "fatMin": 10.0,
+    "fiberMax": 4.0,
+    "ashMax": 9.0,
+    "moistureMax": 10.0,
+    "packagesKg": [
+      1.0
+    ]
+  },
+  {
+    "brand": "Max",
+    "name": "Comida Seca para Gato Max Adulto Castrado",
+    "species": "cat",
+    "handles": [
+      "max-gato-castrados-pollo"
+    ],
+    "url": "https://gabrica.co/personas/es-CO/producto/comida-seca-para-gato-max-adulto-castrado-1-kg-11101024",
+    "verifiedOn": "2026-11-21",
+    "sourceName": "Gabrica Colombia (importador de Max)",
+    "proteinMin": 34.0,
+    "fatMin": 9.0,
+    "fiberMax": 5.5,
+    "ashMax": 10.0,
+    "moistureMax": 12.0,
+    "packageSources": {
+      "3": "https://gabrica.co/personas/es-CO/producto/comida-seca-para-gato-max-adulto-castrado-3-kg-11101025"
+    },
+    "packagesKg": [
+      1,
+      3
+    ]
+  },
+  {
+    "brand": "Max",
+    "name": "Comida Seca para Perro Max Adulto Promo Máximo Desempeño Carne",
+    "species": "dog",
+    "handles": [
+      "max-premium-especial-adultos-maximo-desempeno-carne-15-kg"
+    ],
+    "url": "https://gabrica.co/personas/es-CO/producto/comida-seca-para-perro-max-adulto-promo-maximo-desempeno-carne-20-kg-11180033",
+    "verifiedOn": "2026-11-21",
+    "sourceName": "Gabrica Colombia (importador de Max)",
+    "proteinMin": 21.0,
+    "fatMin": 10.0,
+    "fiberMax": 4.0,
+    "ashMax": 11.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      20.0
+    ]
+  },
+  {
+    "brand": "Max",
+    "name": "Comida Seca para Perro Max Adulto Light Pollo y Arroz",
+    "species": "dog",
+    "handles": [
+      "max-professional-line-light-pollo-y-arroz"
+    ],
+    "url": "https://gabrica.co/personas/es-CO/producto/comida-seca-para-perro-max-adulto-light-pollo-y-arroz-2-kg-11101011",
+    "verifiedOn": "2026-11-21",
+    "sourceName": "Gabrica Colombia (importador de Max)",
+    "proteinMin": 24.0,
+    "fatMin": 6.0,
+    "fiberMax": 6.0,
+    "ashMax": 11.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.0,
+      15.0
+    ]
+  },
+  {
+    "brand": "Max",
+    "name": "Comida Seca para Perro Max Adulto Performance Pollo",
+    "species": "dog",
+    "handles": [
+      "max-professional-line-performance-adultos-pollo-y-arroz"
+    ],
+    "url": "https://gabrica.co/personas/es-CO/producto/comida-seca-para-perro-max-adulto-performance-pollo-2-kg-11101007",
+    "verifiedOn": "2026-11-21",
+    "sourceName": "Gabrica Colombia (importador de Max)",
+    "proteinMin": 23.0,
+    "fatMin": 12.0,
+    "fiberMax": 4.0,
+    "ashMax": 11.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.0,
+      22.0
+    ]
+  },
+  {
+    "brand": "Max",
+    "name": "Comida Seca para Perro Max Cachorro Performance Pollo",
+    "species": "dog",
+    "handles": [
+      "max-professional-line-performance-cachorro-pollo-y-arroz"
+    ],
+    "url": "https://gabrica.co/personas/es-CO/producto/comida-seca-para-perro-max-cachorro-performance-pollo-2-kg-11101001",
+    "verifiedOn": "2026-11-21",
+    "sourceName": "Gabrica Colombia (importador de Max)",
+    "proteinMin": 28.0,
+    "fatMin": 12.0,
+    "fiberMax": 4.0,
+    "ashMax": 11.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.0,
+      8.0,
+      20.0
+    ]
+  },
+  {
+    "brand": "Max",
+    "name": "Comida Seca para Perro Max Adulto Razas Pequeñas Performance Pollo",
+    "species": "dog",
+    "handles": [
+      "max-professional-line-performance-razas-pequenas-pollo-y-arroz"
+    ],
+    "url": "https://gabrica.co/personas/es-CO/producto/comida-seca-para-perro-max-adulto-razas-pequenas-performance-pollo-2-kg-11101005",
+    "verifiedOn": "2026-11-21",
+    "sourceName": "Gabrica Colombia (importador de Max)",
+    "proteinMin": 23.0,
+    "fatMin": 12.0,
+    "fiberMax": 4.0,
+    "ashMax": 11.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.0,
+      8.0
+    ]
+  },
+  {
+    "brand": "Max",
+    "name": "Comida Seca para Perro Max Senior Maduro Pollo y Arroz",
+    "species": "dog",
+    "handles": [
+      "total-max-performance-mature"
+    ],
+    "url": "https://gabrica.co/personas/es-CO/producto/comida-seca-para-perro-max-senior-maduro-pollo-y-arroz-2-kg-11101012",
+    "verifiedOn": "2026-11-21",
+    "sourceName": "Gabrica Colombia (importador de Max)",
+    "proteinMin": 24.0,
+    "fatMin": 6.0,
+    "fiberMax": 6.0,
+    "ashMax": 11.0,
+    "moistureMax": 12.0,
+    "packagesKg": [
+      2.0,
+      15.0
+    ]
+  },
+  {
+    "brand": "Equilíbrio",
+    "name": "Perros de Raza Pequeña Adultos Pollo",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-equilibrio-adulto-razas-pequenas"
+    ],
+    "url": "https://equilibriopetfood.com/es/produto/caes-porte-pequeno-adulto-frango",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.0,
+      3.0,
+      10.0
+    ],
+    "sourceName": "Equilíbrio (Total Agronorte)"
   }
 ]

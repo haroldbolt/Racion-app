@@ -62,14 +62,18 @@ export function StoreManufacturerResults({ query, signal, species, lang, choose 
             {sizes.map(size => {
               const fromBrand = item.officialPackagesKg?.includes(size);
               const fromStore = item.storePackagesKg.includes(size);
-              const source = fromBrand && fromStore ? (es ? 'Fabricante y tienda' : 'Brand and store')
-                : fromBrand ? (es ? 'Fabricante' : 'Brand') : (es ? 'Tienda' : 'Store');
+              const source = fromBrand && fromStore ? (es ? 'Ficha y tienda' : 'Sheet and store')
+                : fromBrand ? (es ? 'Ficha oficial' : 'Product sheet') : (es ? 'Tienda' : 'Store');
               return <div key={size} className="text-center">
                 <button type="button" onClick={() => choose(selectStoreManufacturerFood(item, size))}
                   className="min-h-11 rounded-xl border border-[#0B5D2E40] bg-[#EAF4EC] px-3 font-bold text-[#0B5D2E]">
                   {es ? 'Elegir' : 'Choose'} {packageLabel(size)}
                 </button>
-                <p className="mt-1 text-[11px] text-[#44544A]">{source}</p>
+                <p className="mt-1 text-[11px] text-[#44544A]">
+                  {item.formula?.packageSources?.[String(size)]
+                    ? <a href={item.formula.packageSources[String(size)]} target="_blank" rel="noopener noreferrer" className="underline">{source}</a>
+                    : source}
+                </p>
               </div>;
             })}
           </div>

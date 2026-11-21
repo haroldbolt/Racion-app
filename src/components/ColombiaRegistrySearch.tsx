@@ -5,7 +5,7 @@ import type { FoodCatalogResult } from '../services/onlineFoodCatalog';
 import { registryFormulaKey, searchRegistryMarket } from '../services/registryMarket';
 import { findRegistrations, type RegistryFood } from '../utils/colombiaRegistryRows';
 import { OnlineFoodCards } from './OnlineFoodCards';
-import { enrichMarketFoods } from './onlineFoodResults';
+import { enrichMarketFoods } from '../services/onlineFoodResults';
 
 type Registry = Awaited<ReturnType<typeof loadColombiaRegistry>>;
 interface Props {

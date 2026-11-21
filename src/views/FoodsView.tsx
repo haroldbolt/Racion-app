@@ -14,6 +14,7 @@ import { sameFoodIdentity } from '../utils/foodCosts';
 import { FoodCostTracker } from '../components/FoodCostTracker';
 import { FoodLabelComposition } from '../components/FoodLabelComposition';
 import { LabelReviewModal } from '../components/LabelReviewModal';
+import { useManufacturerFoods } from '../hooks/useManufacturerFoods';
 import { OnlineFoodSearch } from '../components/OnlineFoodSearch';
 import { getConfirmedPresentations } from '../data/foodPresentations';
 import { selectFoodPackage } from '../services/onlineFoodCatalog';
@@ -133,8 +134,9 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
   const [toxicQuery, setToxicQuery] = useState('');
 
   // Personal food labels remain available without an internet connection.
+  const library = useManufacturerFoods(customFoods, showingLibrary);
   const filteredFoods = useMemo(() => {
-    const matches = customFoods.filter((f) => {
+    const matches = library.foods.filter((f) => {
       if (f.species !== pet.species) return false;
       if (filterType !== 'all' && f.type !== filterType) return false;
       if (!query) return true;
@@ -146,7 +148,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
       );
     });
     return matches;
-  }, [customFoods, filterType, query, pet.species]);
+  }, [library.foods, filterType, query, pet.species]);
 
   const addOrToggleCompareFood = (food: FoodItem) => {
     const existsIdx = selectedCompareFoods.findIndex((f) => f.id === food.id);
@@ -628,7 +630,8 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
           </div>
           {showingLibrary && (
             <div className="space-y-3">
-              {filteredFoods.length === 0 && (
+              {library.loading && <p role="status" className="p-4 text-sm text-[#44544A]">{isEs ? 'Cargando fichas…' : 'Loading food labels…'}</p>}
+              {!library.loading && filteredFoods.length === 0 && (
                 <p className="rounded-2xl bg-white p-4 text-sm text-[#44544A]">
                   {isEs ? 'Guarda una etiqueta para reutilizar su ficha en los planes.' : 'Save a label to reuse its details in feeding plans.'}
                 </p>

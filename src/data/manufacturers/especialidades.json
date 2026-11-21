@@ -942,8 +942,12 @@
       7.5
     ],
     "kcalKg": 3365,
-    "protein": 35.0,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 35,
+    "fatMin": 12,
+    "fiberMax": 3,
+    "moistureMax": 12,
+    "ashMax": 6
   },
   {
     "brand": "Fawna",
@@ -958,8 +962,12 @@
       7.5
     ],
     "kcalKg": 3145,
-    "protein": 38.0,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 38,
+    "fatMin": 9,
+    "fiberMax": 5,
+    "moistureMax": 12,
+    "ashMax": 6
   },
   {
     "brand": "Fawna",
@@ -974,8 +982,12 @@
       3.0
     ],
     "kcalKg": 3665,
-    "protein": 39.0,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 39,
+    "fatMin": 18,
+    "fiberMax": 3,
+    "moistureMax": 12,
+    "ashMax": 6
   },
   {
     "brand": "Fawna",
@@ -990,8 +1002,12 @@
       7.5
     ],
     "kcalKg": 3330,
-    "protein": 35.0,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 35,
+    "fatMin": 12,
+    "fiberMax": 4,
+    "moistureMax": 12,
+    "ashMax": 6
   },
   {
     "brand": "Fawna",
@@ -1006,8 +1022,12 @@
       15.0
     ],
     "kcalKg": 2990,
-    "protein": 33.0,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 33,
+    "fatMin": 8,
+    "fiberMax": 7,
+    "moistureMax": 12,
+    "ashMax": 7
   },
   {
     "brand": "Fawna",
@@ -1022,8 +1042,12 @@
       15.0
     ],
     "kcalKg": 3460,
-    "protein": 31.0,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 31,
+    "fatMin": 16,
+    "fiberMax": 4,
+    "moistureMax": 12,
+    "ashMax": 8
   },
   {
     "brand": "Fawna",
@@ -1033,13 +1057,17 @@
       "fawna-salmon-perros-adultos-raza-pequena"
     ],
     "url": "https://fawna.com.ar/__trashed/",
-    "protein": 33,
     "kcalKg": 3460,
     "packagesKg": [
       3,
       7.5
     ],
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 33,
+    "fatMin": 16,
+    "fiberMax": 4,
+    "moistureMax": 12,
+    "ashMax": 8
   },
   {
     "brand": "Fawna",
@@ -1054,8 +1082,12 @@
       7.5
     ],
     "kcalKg": 3560,
-    "protein": 33.0,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 33,
+    "fatMin": 18,
+    "fiberMax": 4,
+    "moistureMax": 12,
+    "ashMax": 8
   },
   {
     "brand": "Fawna",
@@ -1070,8 +1102,12 @@
       7.5
     ],
     "kcalKg": 3660,
-    "protein": 34.0,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 34,
+    "fatMin": 20,
+    "fiberMax": 4,
+    "moistureMax": 12,
+    "ashMax": 8
   },
   {
     "brand": "Fawna",
@@ -1086,8 +1122,12 @@
       15.0
     ],
     "kcalKg": 3090,
-    "protein": 31.0,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "proteinMin": 31,
+    "fatMin": 8,
+    "fiberMax": 4,
+    "moistureMax": 12,
+    "ashMax": 7
   },
   {
     "brand": "Guabi Natural",

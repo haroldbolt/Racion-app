@@ -13,7 +13,11 @@
     "ashMax": 8.0,
     "moistureMax": 12.0,
     "registration": "17063AL",
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.5,
+      7
+    ]
   },
   {
     "brand": "Agility Gold",
@@ -135,7 +139,10 @@
     "ashMax": 9.0,
     "moistureMax": 12.0,
     "registration": "16386AL",
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.5
+    ]
   },
   {
     "brand": "Agility Gold",
@@ -173,7 +180,12 @@
     "ashMax": 8.0,
     "moistureMax": 11.0,
     "registration": "14978AL",
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.5,
+      3,
+      8
+    ]
   },
   {
     "brand": "Agility Gold",
@@ -189,7 +201,12 @@
     "ashMax": 8.0,
     "moistureMax": 12.0,
     "registration": "14980AL",
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.5,
+      3,
+      8
+    ]
   },
   {
     "brand": "Agility Gold",
@@ -1495,7 +1512,14 @@
     "ashMax": 8.0,
     "moistureMax": 10.0,
     "complete": true,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1,
+      15
+    ],
+    "packageSources": {
+      "15": "https://www.contegral.co/Portals/contegral/2025/INFORME%20DE%20IMPACTO%20POSITIVO%20GRUPO%20BIOS%202024_.pdf"
+    }
   },
   {
     "brand": "Mirringo",
@@ -1510,7 +1534,10 @@
     "fiberMax": 3.5,
     "ashMax": 8.0,
     "moistureMax": 10.0,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1
+    ]
   },
   {
     "brand": "Mirringo",
@@ -1525,7 +1552,11 @@
     "fiberMax": 3.5,
     "ashMax": 8.0,
     "moistureMax": 10.0,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1
+    ],
+    "complete": true
   },
   {
     "brand": "Ringo",
@@ -1917,7 +1948,10 @@
     "fiberMax": 4.0,
     "ashMax": 9.0,
     "moistureMax": 10.0,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      2
+    ]
   },
   {
     "brand": "Nutriss",
@@ -1932,7 +1966,10 @@
     "fiberMax": 4.0,
     "ashMax": 9.0,
     "moistureMax": 10.0,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      2
+    ]
   },
   {
     "brand": "Nutriss",
@@ -1947,6 +1984,281 @@
     "fiberMax": 4.0,
     "ashMax": 9.0,
     "moistureMax": 10.0,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      2
+    ]
+  },
+  {
+    "brand": "DonKan",
+    "name": "Donkan Adultos Carne y Cereales",
+    "species": "dog",
+    "handles": [
+      "donkan-adultos-carne-y-cereales"
+    ],
+    "url": "https://empresaspolar.com.co/nuestras-marcas/donkan/",
+    "complete": true,
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      12
+    ]
+  },
+  {
+    "brand": "DonKan",
+    "name": "Donkan Cachorros Carne y Cereales",
+    "species": "dog",
+    "handles": [
+      "donkan-cachorros"
+    ],
+    "url": "https://empresaspolar.com.co/nuestras-marcas/donkan/",
+    "complete": true,
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      22
+    ]
+  },
+  {
+    "brand": "DonKat",
+    "name": "Donkat Gaticos",
+    "species": "cat",
+    "handles": [
+      "alimento-gatos-don-kat-gatitos-cuidado-total"
+    ],
+    "url": "https://empresaspolar.com.co/nuestras-marcas/donkat/",
+    "complete": true,
+    "protein": 32,
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1,
+      7
+    ],
+    "packageSources": {
+      "7": "https://empresaspolar.com/terminos-y-condiciones-generales-de-la-actividad-comercial/"
+    }
+  },
+  {
+    "brand": "Oh Mai Gat!",
+    "name": "¡Oh Mai Gat! Caseros y Delicados",
+    "species": "cat",
+    "handles": [
+      "oh-mai-gat-caseros-y-delicados"
+    ],
+    "url": "https://empresaspolar.com.co/nuestras-marcas/oh-mai-gat/",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      8
+    ]
+  },
+  {
+    "brand": "Oh Mai Gat!",
+    "name": "¡Oh Mai Gat! Inquietos y Aventureros",
+    "species": "cat",
+    "handles": [
+      "oh-mai-gat-inquietos-y-aventureros"
+    ],
+    "url": "https://empresaspolar.com.co/nuestras-marcas/oh-mai-gat/",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      8
+    ]
+  },
+  {
+    "brand": "Oh Mai Gat!",
+    "name": "¡Oh Mai Gat! Sedentarios y Territoriales",
+    "species": "cat",
+    "handles": [
+      "oh-mai-gat-sedentarios-y-territoriales"
+    ],
+    "url": "https://empresaspolar.com.co/nuestras-marcas/oh-mai-gat/",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      8
+    ]
+  },
+  {
+    "brand": "Dogourmet",
+    "name": "Dogourmet Cachorros 3 Cereales y DHA",
+    "species": "dog",
+    "handles": [
+      "dogourmet-cachorros-3-cereales-y-dha"
+    ],
+    "url": "https://empresaspolar.com.co/nuestras-marcas/dogourmet-colombia/",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      2
+    ]
+  },
+  {
+    "brand": "Nutrecan",
+    "name": "Nutrecan Cachorros Raza Mediana y Grande",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-nutrecan-cachorro-raza-mediana-y-raza-grande"
+    ],
+    "url": "https://www.plazacampo.com/nutrecan-cachorros-raza-mediana-y-grande-ext-2kg-1/p",
+    "proteinMin": 27,
+    "fatMin": 12,
+    "fiberMax": 3,
+    "moistureMax": 12,
+    "ashMax": 7.5,
+    "complete": true,
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      2.0,
+      8.0
+    ],
+    "packageSources": {
+      "2": "https://www.plazacampo.com/nutrecan-cachorros-raza-mediana-y-grande-ext-2kg-1/p",
+      "8": "https://www.plazacampo.com/nutrecan-cachorros-raza-mediana-y-grande-ext-8kg-1/p"
+    }
+  },
+  {
+    "brand": "Nutrecan",
+    "name": "Nutrecan Croquetas Adultos",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-nutrecan-croquetas-adulto"
+    ],
+    "url": "https://www.plazacampo.com/nutrecan-croquetas-adultos-ext-25kg-1/p",
+    "proteinMin": 18,
+    "fatMin": 9.5,
+    "fiberMax": 4,
+    "moistureMax": 12,
+    "ashMax": 7.5,
+    "complete": true,
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      0.8,
+      2.0,
+      15.0,
+      25.0
+    ],
+    "packageSources": {
+      "2": "https://www.plazacampo.com/nutrecan-croquetas-adultos-ext-8x2kg-1-jpg/p",
+      "25": "https://www.plazacampo.com/nutrecan-croquetas-adultos-ext-25kg-1/p",
+      "0.8": "https://www.plazacampo.com/nutrecan-croquetas-adultos-ext-800-g-1/p",
+      "15": "https://www.plazacampo.com/nutrecan-croquetas-adultos-ext-25kg-2/p"
+    }
+  },
+  {
+    "brand": "Nutrecan",
+    "name": "Nutrecan Croquetas Cachorros",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-nutrecan-croquetas-cachorros"
+    ],
+    "url": "https://www.plazacampo.com/nutrecan-croquetas-cachorros-ext-4kg-1/p",
+    "proteinMin": 24,
+    "fatMin": 9.5,
+    "fiberMax": 3.5,
+    "moistureMax": 12,
+    "ashMax": 7.5,
+    "complete": true,
+    "kcalKg": 3750,
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      0.5,
+      2.0,
+      4.0,
+      15.0
+    ],
+    "packageSources": {
+      "4": "https://www.plazacampo.com/nutrecan-croquetas-cachorros-ext-4kg-1/p",
+      "0.5": "https://www.plazacampo.com/nutrecan-croquetas-cachorros-ext-500g-1/p",
+      "2": "https://www.plazacampo.com/nutrecan-croquetas-cachorros-ext-2kg-1/p",
+      "15": "https://www.plazacampo.com/nutrecan-croquetas-cachorros-ext-15-kg-1/p"
+    }
+  },
+  {
+    "brand": "Nutrecan",
+    "name": "Nutrecan Light",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-nutrecan-light"
+    ],
+    "url": "https://www.plazacampo.com/nutrecan-light-ext-8x2-kg-1-jpg/p",
+    "complete": true,
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      0.8,
+      2.0
+    ],
+    "packageSources": {
+      "2": "https://www.plazacampo.com/nutrecan-light-ext-8x2-kg-1-jpg/p",
+      "0.8": "https://www.plazacampo.com/nutrecan-light-ext-20x800-g-1-jpg/p"
+    }
+  },
+  {
+    "brand": "Nutrecan",
+    "name": "Nutrecan Adultos Raza Mediana y Grande",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-nutrecan-raza-mediana-y-grande"
+    ],
+    "url": "https://www.plazacampo.com/nutrecan-adultos-raza-mediana-y-grande-ext-25kg-1/p",
+    "proteinMin": 21,
+    "fatMin": 12,
+    "fiberMax": 3.5,
+    "moistureMax": 12,
+    "ashMax": 7,
+    "complete": true,
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      0.8,
+      2.0,
+      6.0,
+      8.0,
+      16.0,
+      25.0
+    ],
+    "packageSources": {
+      "25": "https://www.plazacampo.com/nutrecan-adultos-raza-mediana-y-grande-ext-25kg-1/p",
+      "0.8": "https://www.plazacampo.com/nutrecan-adultos-raza-mediana-y-grande-ext-800g-1/p",
+      "8": "https://www.plazacampo.com/nutrecan-adultos-raza-mediana-y-grande-ext-8kg-1/p",
+      "6": "https://www.plazacampo.com/nutrecan-adultos-razas-medianas-y-grandes-ext-6kg-1/p",
+      "16": "https://www.plazacampo.com/nutrecan-adultos-raza-mediana-y-grande-ext-16kg-1/p",
+      "2": "https://www.plazacampo.com/nutrecan-adultos-raza-mediana-y-grande-ext-2kg-1/p"
+    }
+  },
+  {
+    "brand": "Nutrecan",
+    "name": "Nutrecan Adultos Raza Pequeña",
+    "species": "dog",
+    "handles": [
+      "alimento-para-perro-nutrecan-razas-pequenas"
+    ],
+    "url": "https://www.plazacampo.com/nutrecan-adultos-raza-peque%C3%B1a-ext-800g-1/p",
+    "proteinMin": 26,
+    "fatMin": 14,
+    "fiberMax": 3.5,
+    "moistureMax": 12,
+    "ashMax": 7,
+    "complete": true,
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      0.8,
+      4.0
+    ],
+    "packageSources": {
+      "0.8": "https://www.plazacampo.com/nutrecan-adultos-raza-peque%C3%B1a-ext-800g-1/p",
+      "4": "https://www.plazacampo.com/nutrecan-adultos-raza-peque%C3%B1a-ext-4kg-1/p"
+    }
+  },
+  {
+    "brand": "Nutrecan",
+    "name": "Nutrecan Cachorros Raza Pequeña",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-para-perro-nutrecan-cachorro-raza-pequena"
+    ],
+    "url": "https://www.plazacampo.com/nutrecan-cachorros-raz-peq-ext-8x2-kg-1-jpg/p",
+    "complete": true,
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      2.0
+    ],
+    "packageSources": {
+      "2": "https://www.plazacampo.com/nutrecan-cachorros-raz-peq-ext-8x2-kg-1-jpg/p"
+    }
   }
 ]

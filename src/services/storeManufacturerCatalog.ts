@@ -17,6 +17,8 @@ export interface OfficialFormula {
   verifiedOn: string;
   complete?: boolean;
   registration?: string;
+  sourceName?: string;
+  packageSources?: Record<string,string>;
   basis?: MeasurementBasis;
   protein?: number;
   proteinMin?: number;
@@ -112,8 +114,8 @@ const fields = [
 function withFormula(food: FoodItem, row:StoreManufacturerFood): FoodItem {
   const formula = row.formula;
   if (!formula || food.labelStatus === 'user_confirmed_label') return food;
-  const source = {name:row.house, url:formula.url, observedAt:formula.verifiedOn};
-  const data: NutritionDatasheet = { ...food.fichaNutricional, fuenteNombre:row.house, fuenteUrl:formula.url,
+  const source = {name:formula.sourceName ?? row.house, url:formula.url, observedAt:formula.verifiedOn};
+  const data: NutritionDatasheet = { ...food.fichaNutricional, fuenteNombre:source.name, fuenteUrl:formula.url,
     fechaConsulta:formula.verifiedOn, coincidenciaEstado:'verificado' };
   const result = {...food};
   const basis = formula.basis ?? 'tal_como_se_vende';
@@ -140,7 +142,7 @@ function withFormula(food: FoodItem, row:StoreManufacturerFood): FoodItem {
     values.every(v => v.source?.url === formula.url || (formula.kcalSourceUrl && v.source?.url === formula.kcalSourceUrl)));
   data.coincidenciaEstado = onlyOfficial ? 'verificado' : values.length ? 'revision_requerida' : 'pendiente';
   data.notasRevision = onlyOfficial ? 'Ficha oficial de la fórmula seleccionada.' : 'Revisa la procedencia de cada valor y completa los campos pendientes con el empaque.';
-  return {...result, fichaNutricional:data, dataSource:row.house,
+  return {...result, fichaNutricional:data, dataSource:source.name,
     declaredIcaRegistration:formula.registration || food.declaredIcaRegistration,
     labelStatus:onlyOfficial ? 'verified_manufacturer' : 'unconfirmed',
     nutritionalUse:formula.complete ? 'complete' : food.nutritionalUse,
@@ -148,8 +150,8 @@ function withFormula(food: FoodItem, row:StoreManufacturerFood): FoodItem {
 }
 
 export function selectStoreManufacturerFood(row:StoreManufacturerFood, packageKg?:number): FoodItem {
-  const title=fold(row.name);
-  const stage = /\b(gatitos?|gaticos?|kittens?|cachorros?|pupp(?:y|ies))\b/.test(title) ? (row.species === 'dog' ? 'puppy' : 'kitten')
+  const title=fold([row.formula?.name, row.name].filter(Boolean).join(' '));
+  const stage = /\b(gatitos?|gaticos?|filhotes?|kittens?|cachorros?|pupp(?:y|ies))\b/.test(title) ? (row.species === 'dog' ? 'puppy' : 'kitten')
     : /\b(senior|mature)\b/.test(title) ? 'senior' : /\b(adultos?|adults?)\b/.test(title) ? 'adult' : 'all';
   const id = 'agrocentro-' + row.handle;
   return withFormula({id,sourceFoodId:id,brand:row.brand,name:row.name,species:row.species,type:'dry',lifeStage:stage,lifeStageKnown:stage!=='all',
@@ -164,8 +166,13 @@ export function selectStoreManufacturerFood(row:StoreManufacturerFood, packageKg
 export async function enrichFoodFromStoreManufacturer(food:FoodItem): Promise<FoodItem> {
   if (food.type !== 'dry' || food.labelStatus === 'user_confirmed_label') return food;
   const catalog = await getStoreManufacturerCatalog();
-  const direct = catalog.find(row => row.storeUrl === food.storeProductUrl && row.species === food.species);
-  if (direct) return withFormula(food,direct);
+  const listing = food.storeProductUrl?.split(/[?#]/)[0].replace(/\/$/,'');
+  const direct = catalog.find(row => row.species === food.species &&
+    (row.storeUrl === listing || (!listing && food.sourceFoodId === 'agrocentro-' + row.handle)));
+  if (direct) {
+    const availableSizesKg = distinctSizes([...(food.availableSizesKg ?? []), ...direct.packagesKg]);
+    return withFormula({...food, availableSizesKg}, direct);
+  }
   const brand = identity(food.brand);
   if (!brand) return food;
   const equivalents = (name:string) => {
@@ -179,5 +186,8 @@ export async function enrichFoodFromStoreManufacturer(food:FoodItem): Promise<Fo
   if (!matches.length || pages.size !== 1 || !matches[0].formula) return food;
   const formula = matches[0].formula;
   if (food.declaredIcaRegistration && formula.registration && food.declaredIcaRegistration !== formula.registration) return food;
-  return withFormula(food,matches[0]);
+  const hasRetailOffer = !!(food.storeProductUrl || food.buyUrl || food.priceBasis || food.packagePrices?.length);
+  const base = hasRetailOffer ? food : {...food,
+    availableSizesKg:distinctSizes([...(food.availableSizesKg ?? []), ...(formula.packagesKg ?? [])])};
+  return withFormula(base,matches[0]);
 }

@@ -9,6 +9,7 @@ import { getPlanSafetyNotices } from '../utils/foodSafety';
 import { getApplicableFeedingRange } from '../utils/manufacturerRation';
 import { FoodLabelComposition } from '../components/FoodLabelComposition';
 import { LabelReviewModal } from '../components/LabelReviewModal';
+import { useManufacturerFoods } from '../hooks/useManufacturerFoods';
 import { OnlineFoodSearch } from '../components/OnlineFoodSearch';
 import { getConfirmedPresentations } from '../data/foodPresentations';
 import { NutritionSummary } from '../components/NutritionSummary';
@@ -162,7 +163,8 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
   const [showFormulasDetails, setShowFormulasDetails] = useState<boolean>(false);
 
   const filter = foodSearchQuery.trim().toLowerCase();
-  const matchingFoods = savedFoods.filter((food) => {
+  const library = useManufacturerFoods(savedFoods, foodSource === 'library');
+  const matchingFoods = library.foods.filter((food) => {
     return food.species === editablePet.species && !food.kcalPerPiece && food.estadoCatalogo !== 'archivado' &&
       (foodType === 'mixed' ? food.type === 'dry' || food.type === 'wet' : food.type === foodType) && (
         food.name.toLowerCase().includes(filter) ||
@@ -893,7 +895,8 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
 
             {/* Food items scroll list */}
             <div className="max-h-56 overflow-y-auto space-y-1.5 pr-1">
-              {matchingFoods.length === 0 && (
+              {library.loading && <p role="status" className="p-2 text-xs text-[#44544A]">{isEs ? 'Cargando fichas…' : 'Loading food labels…'}</p>}
+              {!library.loading && matchingFoods.length === 0 && (
                 <p className="p-2 text-xs text-[#44544A]">
                   {foodSource === 'library' && !filter
                     ? (isEs ? 'Aún no hay fichas guardadas para esta especie.' : 'No foods saved for this species yet.')

@@ -4,6 +4,7 @@ import { Pet, FoodItem, FeedingPlan } from '../types';
 import { StorageService } from '../utils/storage';
 import { getConfirmedPresentations } from '../data/foodPresentations';
 import { selectFoodPackage } from '../services/onlineFoodCatalog';
+import { useManufacturerFoods } from '../hooks/useManufacturerFoods';
 import { OnlineFoodSearch } from './OnlineFoodSearch';
 import { formatCOP } from '../utils/i18n';
 
@@ -79,11 +80,13 @@ export function resolveFoodThumbnail(
   return undefined;
 }
 
+const emptyPlans: Record<string, FeedingPlan> = {};
+
 export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
   isOpen,
   onClose,
   activePet,
-  plans = {},
+  plans = emptyPlans,
   onSelectFood,
   lang = 'es',
   category = 'all',
@@ -109,13 +112,16 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
     return () => window.removeEventListener('keydown', escape);
   }, [isOpen, onClose]);
 
-  const personalFoods = useMemo(() => {
+  const savedFoods = useMemo(() => {
     const planFoods = Object.values(plans).flatMap((plan) => [plan.dryFood, plan.wetFood])
       .filter((food): food is FoodItem => Boolean(food));
-    const foods = [...StorageService.getCustomFoods(), ...planFoods];
+    return [...StorageService.getCustomFoods(), ...planFoods];
+  }, [plans, isOpen, source]);
+  const library = useManufacturerFoods(savedFoods, isOpen && source === 'library');
+  const personalFoods = useMemo(() => {
     const seen = new Set<string>();
     const tokens = normalizeText(query).split(/\s+/).filter(Boolean);
-    return foods.filter((food) => {
+    return library.foods.filter((food) => {
       if (seen.has(food.id)) return false;
       seen.add(food.id);
       if (activePet && food.species !== activePet.species) return false;
@@ -126,7 +132,7 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
       const haystack = normalizeText(`${food.brand} ${food.name} ${food.barcode || ''}`);
       return tokens.every((token) => haystack.includes(token));
     });
-  }, [plans, activePet?.species, formulaType, category, includeArchived, query, isOpen]);
+  }, [library.foods, activePet?.species, formulaType, category, includeArchived, query]);
 
   function select(food: FoodItem) {
     onSelectFood({
@@ -192,7 +198,8 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
                   className="min-h-11 w-full rounded-xl border border-[#0B5D2E30] py-2 pl-9 pr-3 text-sm text-[#1C2B21]"
                 />
               </label>
-              {personalFoods.length === 0 && (
+              {library.loading && <p role="status" className="text-xs text-[#44544A]">{isEs ? 'Cargando fichas…' : 'Loading food labels…'}</p>}
+              {!library.loading && personalFoods.length === 0 && (
                 <p className="text-xs text-[#44544A]">
                   {isEs ? 'No hay fichas personales que coincidan. Busca en internet o guarda la etiqueta de tu alimento.' : 'No matching personal foods. Search online or save your food label.'}
                 </p>
