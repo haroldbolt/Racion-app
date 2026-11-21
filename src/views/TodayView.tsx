@@ -1178,7 +1178,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
 
       {showCostTracker && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/55 sm:items-center sm:p-4">
-          <section role="dialog" aria-modal="true" aria-labelledby="food-cost-dialog-title" className="flex max-h-[93dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl bg-[var(--surface-page)] shadow-xl sm:rounded-3xl">
+          <section role="dialog" aria-modal="true" aria-labelledby="food-cost-dialog-title" className="flex max-h-[93dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl bg-[var(--bg-page)] shadow-xl sm:rounded-3xl">
             <header className="flex items-center justify-between gap-3 border-b border-[var(--border-color)] px-4 py-3">
               <h2 id="food-cost-dialog-title" className="font-heading text-lg font-extrabold text-[var(--text-primary)]">{isEs ? 'Gastos de alimentación' : 'Food expenses'}</h2>
               <button type="button" onClick={() => setShowCostTracker(false)} aria-label={isEs ? 'Cerrar gastos' : 'Close expenses'} className="flex size-11 items-center justify-center rounded-full text-[var(--text-primary)]">×</button>
