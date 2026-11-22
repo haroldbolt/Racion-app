@@ -6,18 +6,41 @@
     "handles": [
       "nupec-1st-care-cachorro"
     ],
-    "url": "https://nupec.com/es/nutricion-canina/nutricion-especializada/1st-care",
-    "verifiedOn": "2026-11-21",
+    "url": "https://cdn.sanity.io/files/qyunqto3/production/59204c96ba6595ae74b35b4a84efabc04c244c51.pdf",
+    "verifiedOn": "2026-11-22",
     "fatMin": 21.0,
     "fiberMax": 4.0,
     "ashMax": 7.0,
-    "basis": "materia_seca",
+    "basis": "tal_como_se_vende",
     "packagesKg": [
       2.0,
       8.0
     ],
     "kcalKg": 4000,
-    "kcalSourceUrl": "https://cdn.sanity.io/files/qyunqto3/production/59204c96ba6595ae74b35b4a84efabc04c244c51.pdf"
+    "sourceName": "NUPEC · ficha técnica del fabricante",
+    "moistureMax": 12,
+    "packageSources": {
+      "2": "https://nupec.com/es/nutricion-canina/nutricion-especializada/1st-care",
+      "8": "https://nupec.com/es/nutricion-canina/nutricion-especializada/1st-care"
+    },
+    "proteinMin": 29,
+    "discrepancies": [
+      {
+        "field": "proteina",
+        "other": {
+          "valor": 29,
+          "unidadOriginal": "%",
+          "baseMedicion": "materia_seca",
+          "calificador": "maximo",
+          "source": {
+            "name": "NUPEC · página del producto",
+            "url": "https://nupec.com/es/nutricion-canina/nutricion-especializada/1st-care",
+            "observedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://nupec.com/es/nutricion-canina/nutricion-especializada/1st-care"
+      }
+    ]
   },
   {
     "brand": "NUPEC",
@@ -26,18 +49,25 @@
     "handles": [
       "nupec-adulto-indoor-gato"
     ],
-    "url": "https://nupec.com/es/nutricion-felina/nutricion-diaria/felino-indoor",
-    "verifiedOn": "2026-11-21",
+    "url": "https://nucan-by-nupec-aguascalientes.com/wp-content/uploads/2026/07/Ficha-INDOOR.pdf",
+    "verifiedOn": "2026-11-22",
     "proteinMin": 32.0,
     "fatMin": 14.0,
     "fiberMax": 3.0,
     "ashMax": 7.5,
-    "basis": "materia_seca",
+    "basis": "tal_como_se_vende",
     "packagesKg": [
       1.5,
       3.0,
       5.0
-    ]
+    ],
+    "sourceName": "NUPEC · ficha técnica del fabricante",
+    "moistureMax": 10,
+    "packageSources": {
+      "1.5": "https://nupec.com/es/nutricion-felina/nutricion-diaria/felino-indoor",
+      "3": "https://nupec.com/es/nutricion-felina/nutricion-diaria/felino-indoor",
+      "5": "https://nupec.com/es/nutricion-felina/nutricion-diaria/felino-indoor"
+    }
   },
   {
     "brand": "NUPEC",
@@ -71,7 +101,7 @@
       "nupec-adulto-perro-razas-mini-3-kg"
     ],
     "url": "https://nupec.com/es/nutricion-canina/nutricion-diaria/adulto-razas-mini",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "proteinMin": 25.0,
     "fatMin": 14.0,
     "fiberMax": 4.0,
@@ -89,17 +119,24 @@
     "handles": [
       "nupec-adulto-raza-pequena"
     ],
-    "url": "https://nupec.com/es/nutricion-canina/nutricion-diaria/adulto-razas-pequenas",
-    "verifiedOn": "2026-11-21",
+    "url": "https://nucan-by-nupec-aguascalientes.com/wp-content/uploads/2026/07/Ficha-Adulto-RP.pdf",
+    "verifiedOn": "2026-11-22",
     "proteinMin": 24.0,
     "fatMin": 12.0,
     "fiberMax": 4.0,
     "ashMax": 8.0,
-    "basis": "materia_seca",
+    "basis": "tal_como_se_vende",
     "packagesKg": [
       2.0,
       8.0
-    ]
+    ],
+    "sourceName": "NUPEC · ficha técnica del fabricante",
+    "moistureMax": 9,
+    "packageSources": {
+      "2": "https://nupec.com/es/nutricion-canina/nutricion-diaria/adulto-razas-pequenas",
+      "8": "https://nupec.com/es/nutricion-canina/nutricion-diaria/adulto-razas-pequenas"
+    },
+    "kcalKg": 3500
   },
   {
     "brand": "NUPEC",
@@ -153,17 +190,24 @@
     "handles": [
       "nupec-cachorro-razas-mini-3-kg"
     ],
-    "url": "https://nupec.com/es/nutricion-canina/nutricion-diaria/cachorro-razas-mini",
-    "verifiedOn": "2026-11-21",
+    "url": "https://nucan-by-nupec-aguascalientes.com/wp-content/uploads/2026/07/Ficha-cachorro-raza-mini.pdf",
+    "verifiedOn": "2026-11-22",
     "proteinMin": 29.0,
     "fatMin": 17.0,
     "fiberMax": 4.0,
     "ashMax": 8.0,
-    "basis": "materia_seca",
+    "basis": "tal_como_se_vende",
     "packagesKg": [
       1.0,
       3.0
-    ]
+    ],
+    "sourceName": "NUPEC · ficha técnica del fabricante",
+    "moistureMax": 12,
+    "packageSources": {
+      "1": "https://nupec.com/es/nutricion-canina/nutricion-diaria/cachorro-razas-mini",
+      "3": "https://nupec.com/es/nutricion-canina/nutricion-diaria/cachorro-razas-mini"
+    },
+    "kcalKg": 3650
   },
   {
     "brand": "NUPEC",
@@ -193,17 +237,23 @@
     "handles": [
       "nupec-felino-digestive-health"
     ],
-    "url": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-digestive-health",
-    "verifiedOn": "2026-11-21",
+    "url": "https://nucan-by-nupec-aguascalientes.com/wp-content/uploads/2026/07/Ficha-Digestive-Health-1.pdf",
+    "verifiedOn": "2026-11-22",
     "proteinMin": 31.0,
     "fatMin": 17.5,
     "fiberMax": 6.5,
     "ashMax": 7.5,
-    "basis": "materia_seca",
+    "basis": "tal_como_se_vende",
     "packagesKg": [
       1.5,
       3.0
-    ]
+    ],
+    "sourceName": "NUPEC · ficha técnica del fabricante",
+    "moistureMax": 11,
+    "packageSources": {
+      "1.5": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-digestive-health",
+      "3": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-digestive-health"
+    }
   },
   {
     "brand": "NUPEC",
@@ -213,7 +263,7 @@
       "nupec-felino-hairball-control"
     ],
     "url": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-hairball",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "proteinMin": 32.0,
     "fatMin": 13.0,
     "fiberMax": 7.0,
@@ -231,17 +281,23 @@
     "handles": [
       "nupec-felino-kitten"
     ],
-    "url": "https://nupec.com/es/nutricion-felina/nutricion-diaria/felino-kitten",
-    "verifiedOn": "2026-11-21",
+    "url": "https://nucan-by-nupec-aguascalientes.com/wp-content/uploads/2026/07/Ficha-KITTEN.pdf",
+    "verifiedOn": "2026-11-22",
     "proteinMin": 35.0,
     "fatMin": 18.0,
     "fiberMax": 3.0,
     "ashMax": 7.0,
-    "basis": "materia_seca",
+    "basis": "tal_como_se_vende",
     "packagesKg": [
       1.5,
       3.0
-    ]
+    ],
+    "sourceName": "NUPEC · ficha técnica del fabricante",
+    "moistureMax": 10,
+    "packageSources": {
+      "1.5": "https://nupec.com/es/nutricion-felina/nutricion-diaria/felino-kitten",
+      "3": "https://nupec.com/es/nutricion-felina/nutricion-diaria/felino-kitten"
+    }
   },
   {
     "brand": "NUPEC",
@@ -251,7 +307,7 @@
       "nupec-felino-renal-care-1-5-kg"
     ],
     "url": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-renal-care",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "proteinMin": 26.0,
     "fatMin": 17.0,
     "fiberMax": 4.0,
@@ -268,17 +324,23 @@
     "handles": [
       "nupec-felino-senior"
     ],
-    "url": "https://nupec.com/es/nutricion-felina/nutricion-diaria/felino-senior",
-    "verifiedOn": "2026-11-21",
+    "url": "https://nucan-by-nupec-aguascalientes.com/wp-content/uploads/2026/07/Ficha-SENIOR.pdf",
+    "verifiedOn": "2026-11-22",
     "proteinMin": 34.0,
     "fatMin": 14.0,
     "fiberMax": 5.0,
     "ashMax": 8.0,
-    "basis": "materia_seca",
+    "basis": "tal_como_se_vende",
     "packagesKg": [
       1.5,
       3.0
-    ]
+    ],
+    "sourceName": "NUPEC · ficha técnica del fabricante",
+    "moistureMax": 12,
+    "packageSources": {
+      "1.5": "https://nupec.com/es/nutricion-felina/nutricion-diaria/felino-senior",
+      "3": "https://nupec.com/es/nutricion-felina/nutricion-diaria/felino-senior"
+    }
   },
   {
     "brand": "NUPEC",
@@ -288,14 +350,16 @@
       "nupec-felino-weight-care-adulto"
     ],
     "url": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-weight-care",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "fiberMax": 4.5,
     "ashMax": 8.0,
     "basis": "materia_seca",
     "packagesKg": [
       1.5,
       3.0
-    ]
+    ],
+    "proteinMin": 38,
+    "fatMin": 11
   },
   {
     "brand": "NUPEC",
@@ -346,18 +410,26 @@
     "handles": [
       "nupec-senior-perro-adulto-mayor"
     ],
-    "url": "https://nupec.com/es/nutricion-canina/nutricion-diaria/senior",
-    "verifiedOn": "2026-11-21",
+    "url": "https://nucan-by-nupec-aguascalientes.com/wp-content/uploads/2025/09/NUP_CAN_FichTec_Senior_NMC-1.pdf",
+    "verifiedOn": "2026-11-22",
     "proteinMin": 29.0,
     "fatMin": 12.0,
     "fiberMax": 4.5,
     "ashMax": 7.0,
-    "basis": "materia_seca",
+    "basis": "tal_como_se_vende",
     "packagesKg": [
       2.0,
       8.0,
       15.0
-    ]
+    ],
+    "sourceName": "NUPEC · ficha técnica del fabricante",
+    "moistureMax": 11,
+    "packageSources": {
+      "2": "https://nupec.com/es/nutricion-canina/nutricion-diaria/senior",
+      "8": "https://nupec.com/es/nutricion-canina/nutricion-diaria/senior",
+      "15": "https://nupec.com/es/nutricion-canina/nutricion-diaria/senior"
+    },
+    "kcalKg": 3500
   },
   {
     "brand": "NUPEC",
@@ -431,7 +503,7 @@
       "nupec-urinary-management-gato"
     ],
     "url": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-urinary-management",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "proteinMin": 32.5,
     "fatMin": 12.5,
     "fiberMax": 4.0,
@@ -1497,7 +1569,7 @@
       "birbo-premium-cachorros"
     ],
     "url": "https://www.nutrire.ind.br/produto/birbo-premium-filhotes",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "proteinMin": 27.0,
     "fiberMax": 3.0,
     "ashMax": 9.0,
@@ -1507,7 +1579,8 @@
       1.0,
       7.0,
       15.0
-    ]
+    ],
+    "fatMin": 11
   },
   {
     "brand": "Birbo",
@@ -1517,7 +1590,7 @@
       "birbo-premium-carne-para-perros-adultos"
     ],
     "url": "https://www.nutrire.ind.br/produto/birbo-premium-carne",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "proteinMin": 21.0,
     "fiberMax": 4.0,
     "ashMax": 10.0,
@@ -1529,7 +1602,8 @@
       10.1,
       15.0,
       25.0
-    ]
+    ],
+    "fatMin": 10
   },
   {
     "brand": "Birbo",
@@ -2150,18 +2224,18 @@
   },
   {
     "brand": "Equilíbrio",
-    "name": "Perros de Raza Pequeña Adultos Pollo",
+    "name": "Equilibrio Adultos Razas Pequeñas",
     "species": "dog",
     "handles": [
       "alimento-para-perro-equilibrio-adulto-razas-pequenas"
     ],
-    "url": "https://equilibriopetfood.com/es/produto/caes-porte-pequeno-adulto-frango",
-    "verifiedOn": "2026-11-21",
+    "url": "https://directus.gabrica.moodlinestudio.com/uploads/3c6fced1-6f6c-4f04-bb4c-f9e112d3498f.pdf#page=22",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
-      1.0,
-      3.0,
-      10.0
+      0.5,
+      2,
+      7.5
     ],
-    "sourceName": "Equilíbrio (Total Agronorte)"
+    "sourceName": "Gabrica Colombia · guía de productos Equilibrio"
   }
 ]

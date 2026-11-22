@@ -1751,7 +1751,7 @@
       "dog-chow-triple-proteina-adultos-todos-los-tamanos"
     ],
     "url": "https://purina.com.co/dogchow/productos/triple-proteina-todos-tamanios",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "DOG CHOW TODAS LAS RAZAS CON TRIPLE PROTEÍNA",
     "proteinMin": 25.0,
     "fatMin": 12.0,
@@ -1762,7 +1762,10 @@
       2.0,
       8.0,
       22.7
-    ]
+    ],
+    "kcalKg": 3800,
+    "kcalSourceUrl": "https://purina.com.co/sites/default/files/styles/webp/public/2023-05/triple%20proteina%203.jpg.webp?itok=HJScRgXp",
+    "kcalSourceName": "Dog Chow Colombia · etiqueta de Triple Proteína"
   },
   {
     "brand": "Dog Chow",
@@ -1867,7 +1870,7 @@
       "excellent-adult-skin-care"
     ],
     "url": "https://purina.com.co/excellent/perros-skin-care-salmon",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Adult Skin Care",
     "ashMax": 9.0,
     "fiberMax": 4.0,
@@ -1878,7 +1881,8 @@
       3.0,
       8.0
     ],
-    "complete": true
+    "complete": true,
+    "fatMin": 11
   },
   {
     "brand": "Excellent",
@@ -3446,7 +3450,8 @@
     "proteinMin": 30.0,
     "fatMin": 18.0,
     "ashMax": 7.8,
-    "kcalKg": 3999
+    "kcalKg": 3999,
+    "fiberMax": 3.5
   },
   {
     "brand": "N&D",
@@ -3931,7 +3936,7 @@
       "pro-plan-perros-adultos-paladares-exigentes-razas-pequenas"
     ],
     "url": "https://purina.com.co/proplan/perros/exigentes/razas-pequenas",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Exigent Razas Pequeñas",
     "proteinMin": 31.0,
     "fiberMax": 3.0,
@@ -3941,7 +3946,8 @@
       1.0,
       3.0,
       7.5
-    ]
+    ],
+    "fatMin": 20
   },
   {
     "brand": "Pro Plan",
@@ -4052,17 +4058,20 @@
       "pro-plan-veterinary-diets-en-dietas-gastroenterico"
     ],
     "url": "https://purina.com.co/proplan/veterinary-diets/perros/gastroenterico",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Pro Plan Gastroentérico para perros con problemas gastrointestinales",
-    "proteinMin": 24.0,
-    "fiberMax": 2.0,
-    "fatMin": 10.0,
-    "moistureMax": 12.0,
+    "proteinMin": 24,
+    "fiberMax": 2,
+    "fatMin": 10,
+    "moistureMax": 12,
     "ashMax": 8.5,
     "packagesKg": [
       2.0,
       7.5
-    ]
+    ],
+    "kcalKg": 3810,
+    "kcalSourceUrl": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/8445290532374_2.png.webp?itok=ZD2Ub7Bz",
+    "kcalSourceName": "Purina Colombia · energía declarada en la bolsa"
   },
   {
     "brand": "Pro Plan",
@@ -4091,17 +4100,87 @@
     "handles": [
       "alimento-gato-pro-plan-veterinary-diets-ha"
     ],
-    "url": "https://purina.com.co/proplan/dietas-veterinarias/gatos/hydrolizado",
-    "verifiedOn": "2026-11-21",
+    "url": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/38100145413_2.png.webp?itok=5aVyO8Li",
+    "verifiedOn": "2026-11-22",
     "name": "Pro Plan HA Alimento hidrolizado para gatos",
-    "proteinMin": 29.5,
-    "fatMin": 9.0,
-    "fiberMax": 4.0,
-    "moistureMax": 10.0,
+    "proteinMin": 31,
+    "fatMin": 10,
+    "fiberMax": 3,
+    "moistureMax": 12,
     "packagesKg": [
       1.8
     ],
-    "complete": true
+    "complete": true,
+    "kcalKg": 3750,
+    "kcalSourceUrl": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/38100145413_2.png.webp?itok=5aVyO8Li",
+    "kcalSourceName": "Purina Colombia · energía declarada en la bolsa",
+    "discrepancies": [
+      {
+        "field": "proteina",
+        "other": {
+          "valor": 29.5,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "minimo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/dietas-veterinarias/gatos/hydrolizado",
+            "retrievedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/gatos/hydrolizado"
+      },
+      {
+        "field": "grasa",
+        "other": {
+          "valor": 9.0,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "minimo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/dietas-veterinarias/gatos/hydrolizado",
+            "retrievedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/gatos/hydrolizado"
+      },
+      {
+        "field": "fibra",
+        "other": {
+          "valor": 4.0,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/dietas-veterinarias/gatos/hydrolizado",
+            "retrievedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/gatos/hydrolizado"
+      },
+      {
+        "field": "humedad",
+        "other": {
+          "valor": 10.0,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/dietas-veterinarias/gatos/hydrolizado",
+            "retrievedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/gatos/hydrolizado"
+      }
+    ],
+    "ashMax": 8.5,
+    "sourceName": "Purina Colombia · etiqueta de la presentación fotografiada",
+    "packageSources": {
+      "1.8": "https://purina.com.co/proplan/dietas-veterinarias/gatos/hydrolizado"
+    }
   },
   {
     "brand": "Pro Plan",
@@ -4109,18 +4188,89 @@
     "handles": [
       "pro-plan-veterinary-diet-canine-ha-chicken"
     ],
-    "url": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado",
-    "verifiedOn": "2026-11-21",
+    "url": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/38100169815_2.png.webp?itok=57OWfd2O",
+    "verifiedOn": "2026-11-22",
     "name": "Pro Plan HA Hydrolized Fórmula Canina",
-    "moistureMax": 11.0,
-    "fatMin": 9.5,
-    "fiberMax": 4.0,
-    "ashMax": 7.0,
+    "moistureMax": 12,
+    "fatMin": 11,
+    "fiberMax": 4,
+    "ashMax": 8,
     "packagesKg": [
       2.7,
       7.5
     ],
-    "complete": true
+    "complete": true,
+    "kcalKg": 3750,
+    "kcalSourceUrl": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/38100169815_2.png.webp?itok=57OWfd2O",
+    "kcalSourceName": "Purina Colombia · energía declarada en la bolsa",
+    "proteinMin": 19,
+    "discrepancies": [
+      {
+        "field": "grasa",
+        "other": {
+          "valor": 9.5,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "minimo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado",
+            "retrievedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado"
+      },
+      {
+        "field": "humedad",
+        "other": {
+          "valor": 11.0,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado",
+            "retrievedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado"
+      },
+      {
+        "field": "cenizas",
+        "other": {
+          "valor": 7.0,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado",
+            "retrievedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado"
+      },
+      {
+        "field": "proteina",
+        "other": {
+          "valor": 18,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado",
+            "retrievedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado"
+      }
+    ],
+    "sourceName": "Purina Colombia · etiqueta de la presentación fotografiada",
+    "packageSources": {
+      "2.7": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado",
+      "7.5": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado"
+    }
   },
   {
     "brand": "Pro Plan",
@@ -4128,18 +4278,73 @@
     "handles": [
       "alimento-para-perro-medicado-ppvd-jm-movilidad-articular"
     ],
-    "url": "https://purina.com.co/proplan/veterinary-diets/perros/articulaciones",
-    "verifiedOn": "2026-11-21",
+    "url": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/8445290538703_2.png.webp?itok=HwQ4_ehC",
+    "verifiedOn": "2026-11-22",
     "name": "Pro Plan JM: Alimento terapéutico para perros",
-    "moistureMax": 11.0,
-    "proteinMin": 30.0,
-    "fatMin": 12.0,
-    "fiberMax": 4.0,
-    "ashMax": 8.0,
+    "moistureMax": 12,
+    "proteinMin": 30,
+    "fatMin": 15,
+    "fiberMax": 4,
+    "ashMax": 8.5,
     "packagesKg": [
       2.0,
       7.5
-    ]
+    ],
+    "kcalKg": 3842,
+    "kcalSourceUrl": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/8445290538703_2.png.webp?itok=HwQ4_ehC",
+    "kcalSourceName": "Purina Colombia · energía declarada en la bolsa",
+    "discrepancies": [
+      {
+        "field": "grasa",
+        "other": {
+          "valor": 12.0,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "minimo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/veterinary-diets/perros/articulaciones",
+            "retrievedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/perros/articulaciones"
+      },
+      {
+        "field": "humedad",
+        "other": {
+          "valor": 11.0,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/veterinary-diets/perros/articulaciones",
+            "retrievedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/perros/articulaciones"
+      },
+      {
+        "field": "cenizas",
+        "other": {
+          "valor": 8.0,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/veterinary-diets/perros/articulaciones",
+            "retrievedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/perros/articulaciones"
+      }
+    ],
+    "sourceName": "Purina Colombia · etiqueta de la presentación fotografiada",
+    "packageSources": {
+      "2": "https://purina.com.co/proplan/veterinary-diets/perros/articulaciones",
+      "7.5": "https://purina.com.co/proplan/veterinary-diets/perros/articulaciones"
+    }
   },
   {
     "brand": "Pro Plan",
@@ -4166,16 +4371,19 @@
       "pro-plan-perro-veterinary-diets-nc-neurocare"
     ],
     "url": "https://purina.com.co/proplan/veterinary-diets/perros/neurologico",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Pro Plan Neurocare NC Fórmula Canina",
-    "moistureMax": 12.0,
-    "proteinMin": 29.0,
-    "fatMin": 15.0,
-    "fiberMax": 3.0,
+    "moistureMax": 12,
+    "proteinMin": 29,
+    "fatMin": 15,
+    "fiberMax": 3,
     "ashMax": 8.5,
     "packagesKg": [
       2.0
-    ]
+    ],
+    "kcalKg": 4020,
+    "kcalSourceUrl": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/8445290539045_2.png.webp?itok=EBzqVIEO",
+    "kcalSourceName": "Purina Colombia · energía declarada en la bolsa"
   },
   {
     "brand": "Pro Plan",
@@ -4224,15 +4432,19 @@
       "alimento-gato-pro-plan-veterinary-diets-kidney-function-etapa-inicial"
     ],
     "url": "https://purina.com.co/proplan/veterinary-diets/gatos/renal-temprano",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Pro Plan Veterinary Diets Comida renal para gatos etapa inicial",
-    "proteinMin": 33.0,
-    "fatMin": 13.0,
-    "moistureMax": 12.0,
-    "fiberMax": 5.0,
+    "proteinMin": 33,
+    "fatMin": 13,
+    "moistureMax": 12,
+    "fiberMax": 5,
     "packagesKg": [
       1.4
-    ]
+    ],
+    "kcalKg": 4000,
+    "kcalSourceUrl": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/38100179005_2.png.webp?itok=cu11kJYP",
+    "kcalSourceName": "Purina Colombia · energía declarada en la bolsa",
+    "ashMax": 7.5
   },
   {
     "brand": "Pro Plan",
@@ -4240,18 +4452,42 @@
     "handles": [
       "proplan-veterinary-gastrointestinal-en"
     ],
-    "url": "https://purina.com.co/proplan/dietas-veterinarias/gatos/gastroenterico",
-    "verifiedOn": "2026-11-21",
+    "url": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/8445290570802_2.png.webp?itok=-ogRemt2",
+    "verifiedOn": "2026-11-22",
     "name": "Pro Plan Veterinary Diets EN Gastrointestinal Formula Felina",
-    "proteinMin": 50.0,
-    "fatMin": 16.0,
-    "moistureMax": 12.0,
-    "ashMax": 7.5,
-    "fiberMax": 3.0,
+    "proteinMin": 50,
+    "fatMin": 16,
+    "moistureMax": 12,
+    "ashMax": 8,
+    "fiberMax": 3,
     "packagesKg": [
       1.5
     ],
-    "complete": true
+    "complete": true,
+    "kcalKg": 4249,
+    "kcalSourceUrl": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/8445290570802_2.png.webp?itok=-ogRemt2",
+    "kcalSourceName": "Purina Colombia · energía declarada en la bolsa",
+    "discrepancies": [
+      {
+        "field": "cenizas",
+        "other": {
+          "valor": 7.5,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/dietas-veterinarias/gatos/gastroenterico",
+            "retrievedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/gatos/gastroenterico"
+      }
+    ],
+    "sourceName": "Purina Colombia · etiqueta de la presentación fotografiada",
+    "packageSources": {
+      "1.5": "https://purina.com.co/proplan/dietas-veterinarias/gatos/gastroenterico"
+    }
   },
   {
     "brand": "Pro Plan",
@@ -4259,17 +4495,56 @@
     "handles": [
       "proplan-veterinary-nf-renal-gato-advance"
     ],
-    "url": "https://purina.com.co/proplan/veterinary-diets/gatos/funcion-renal-avanzada",
-    "verifiedOn": "2026-11-21",
+    "url": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/8445290571045_2.png.webp?itok=xFz68OI5",
+    "verifiedOn": "2026-11-22",
     "name": "Pro Plan Veterinary Diets NF Renal Function fórmula felina",
-    "proteinMin": 26.5,
-    "fatMin": 16.0,
-    "moistureMax": 12.0,
-    "ashMax": 7.0,
-    "fiberMax": 5.0,
+    "proteinMin": 27,
+    "fatMin": 16,
+    "moistureMax": 12,
+    "ashMax": 7.5,
+    "fiberMax": 5,
     "packagesKg": [
       1.5
-    ]
+    ],
+    "kcalKg": 4000,
+    "kcalSourceUrl": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/8445290571045_2.png.webp?itok=xFz68OI5",
+    "kcalSourceName": "Purina Colombia · energía declarada en la bolsa",
+    "discrepancies": [
+      {
+        "field": "proteina",
+        "other": {
+          "valor": 26.5,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "minimo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/veterinary-diets/gatos/funcion-renal-avanzada",
+            "retrievedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/gatos/funcion-renal-avanzada"
+      },
+      {
+        "field": "cenizas",
+        "other": {
+          "valor": 7.0,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/veterinary-diets/gatos/funcion-renal-avanzada",
+            "retrievedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/gatos/funcion-renal-avanzada"
+      }
+    ],
+    "sourceName": "Purina Colombia · etiqueta de la presentación fotografiada",
+    "packageSources": {
+      "1.5": "https://purina.com.co/proplan/veterinary-diets/gatos/funcion-renal-avanzada"
+    }
   },
   {
     "brand": "Pro Plan",
@@ -4277,17 +4552,57 @@
     "handles": [
       "proplan-veterinary-om-gato"
     ],
-    "url": "https://purina.com.co/proplan/veterinary-diets/gatos/obesidad",
-    "verifiedOn": "2026-11-21",
+    "url": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/8445290567925_2.png.webp?itok=JTf8LFDT",
+    "verifiedOn": "2026-11-22",
     "name": "Pro Plan Veterinary Diets OM Obesidad Fórmula Felina",
-    "proteinMin": 50.0,
-    "fatMin": 8.0,
-    "fiberMax": 9.0,
-    "moistureMax": 12.0,
+    "proteinMin": 50,
+    "fatMin": 6,
+    "fiberMax": 8,
+    "moistureMax": 12,
     "packagesKg": [
       1.5
     ],
-    "complete": true
+    "complete": true,
+    "kcalKg": 3540,
+    "kcalSourceUrl": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/8445290567925_2.png.webp?itok=JTf8LFDT",
+    "kcalSourceName": "Purina Colombia · energía declarada en la bolsa",
+    "discrepancies": [
+      {
+        "field": "grasa",
+        "other": {
+          "valor": 8.0,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "minimo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/veterinary-diets/gatos/obesidad",
+            "retrievedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/gatos/obesidad"
+      },
+      {
+        "field": "fibra",
+        "other": {
+          "valor": 9.0,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/veterinary-diets/gatos/obesidad",
+            "retrievedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/gatos/obesidad"
+      }
+    ],
+    "ashMax": 8.5,
+    "sourceName": "Purina Colombia · etiqueta de la presentación fotografiada",
+    "packageSources": {
+      "1.5": "https://purina.com.co/proplan/veterinary-diets/gatos/obesidad"
+    }
   },
   {
     "brand": "Pro Plan",
@@ -4459,18 +4774,42 @@
     "handles": [
       "proplan-veterinary-dm-diabetes-gato"
     ],
-    "url": "https://purina.com.co/proplan/dietas-veterinarias/gatos/diabetes",
-    "verifiedOn": "2026-11-21",
+    "url": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/38100016751_2.png.webp?itok=K_9xJ4Sg",
+    "verifiedOn": "2026-11-22",
     "name": "Veterinary Diets DM Diabetes Feline",
-    "moistureMax": 12.0,
-    "proteinMin": 51.0,
-    "fatMin": 15.0,
-    "fiberMax": 3.0,
-    "ashMax": 7.7,
+    "moistureMax": 12,
+    "proteinMin": 51,
+    "fatMin": 15,
+    "fiberMax": 3,
+    "ashMax": 8.5,
     "packagesKg": [
       2.72
     ],
-    "complete": true
+    "complete": true,
+    "kcalKg": 4217,
+    "kcalSourceUrl": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/38100016751_2.png.webp?itok=K_9xJ4Sg",
+    "kcalSourceName": "Purina Colombia · energía declarada en la bolsa",
+    "discrepancies": [
+      {
+        "field": "cenizas",
+        "other": {
+          "valor": 7.7,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/dietas-veterinarias/gatos/diabetes",
+            "retrievedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/gatos/diabetes"
+      }
+    ],
+    "sourceName": "Purina Colombia · etiqueta de la presentación fotografiada",
+    "packageSources": {
+      "2.72": "https://purina.com.co/proplan/dietas-veterinarias/gatos/diabetes"
+    }
   },
   {
     "brand": "Pro Plan",
@@ -4478,17 +4817,56 @@
     "handles": [
       "alimento-gato-pro-plan-veterinary-diets-ur-urinary-st-ox-feline"
     ],
-    "url": "https://purina.com.co/proplan/veterinary-diets/gatos/urinario",
-    "verifiedOn": "2026-11-21",
+    "url": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/8445290570116_2.png.webp?itok=PzcUcmzP",
+    "verifiedOn": "2026-11-22",
     "name": "Veterinary Diets UR Urinario ST/OX Feline",
-    "fiberMax": 8.5,
+    "fiberMax": 4,
     "ashMax": 9.5,
-    "proteinMin": 40.0,
-    "fatMin": 8.0,
-    "moistureMax": 12.0,
+    "proteinMin": 40,
+    "fatMin": 11,
+    "moistureMax": 12,
     "packagesKg": [
       1.5
-    ]
+    ],
+    "kcalKg": 3750,
+    "kcalSourceUrl": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/8445290570116_2.png.webp?itok=PzcUcmzP",
+    "kcalSourceName": "Purina Colombia · energía declarada en la bolsa",
+    "discrepancies": [
+      {
+        "field": "grasa",
+        "other": {
+          "valor": 8.0,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "minimo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/veterinary-diets/gatos/urinario",
+            "retrievedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/gatos/urinario"
+      },
+      {
+        "field": "fibra",
+        "other": {
+          "valor": 8.5,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/veterinary-diets/gatos/urinario",
+            "retrievedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/gatos/urinario"
+      }
+    ],
+    "sourceName": "Purina Colombia · etiqueta de la presentación fotografiada",
+    "packageSources": {
+      "1.5": "https://purina.com.co/proplan/veterinary-diets/gatos/urinario"
+    }
   },
   {
     "brand": "Pro Plan",
@@ -4497,7 +4875,7 @@
       "pro-plan-perro-veterinary-diets-ur-cuidado-urinario"
     ],
     "url": "https://purina.com.co/proplan/veterinary-diets/perros/urinario",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Veterinary Diets Urinario ST/OX Canine",
     "moistureMax": 12.0,
     "proteinMin": 21.0,
@@ -4506,7 +4884,10 @@
     "ashMax": 8.5,
     "packagesKg": [
       2.0
-    ]
+    ],
+    "kcalKg": 3542,
+    "kcalSourceUrl": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/8445290538628_2.png.webp?itok=T7T59UDy",
+    "kcalSourceName": "Purina Colombia · energía declarada en la bolsa"
   },
   {
     "brand": "Royal Canin",
@@ -4553,7 +4934,7 @@
       "alimento-seco-para-perro-royal-canin-veterinary-health-nutrition-anallergenic"
     ],
     "url": "https://www.royalcanin.com/co/dogs/products/vet-products/anallergenic-4014",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Anallergenic Perro",
     "packagesKg": [
       3.0
@@ -4561,7 +4942,10 @@
     "protein": 18.0,
     "fat": 16.5,
     "fiber": 2.0,
-    "ash": 6.2
+    "ash": 6.2,
+    "kcalKg": 3917,
+    "kcalSourceUrl": "https://marspetcareaprimocdn.petcare.global/7f9f0a60-93fa-4152-b45f-b2490008d6b4/7f9f0a60-93fa-4152-b45f-b2490008d6b4_DownloadAsJpg.jpg",
+    "kcalSourceName": "Royal Canin Colombia · guía de alimentación de la fórmula"
   },
   {
     "brand": "Royal Canin",
@@ -4570,7 +4954,7 @@
       "alimento-seco-para-perro-royal-canin-veterinary-health-nutrition-anallergenic-small-dog"
     ],
     "url": "https://www.royalcanin.com/co/dogs/products/vet-products/anallergenic-small-dog-3317",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Anallergenic Perro Pequeño",
     "packagesKg": [
       1.5
@@ -4579,7 +4963,10 @@
     "fat": 15.0,
     "fiber": 1.9,
     "ash": 7.2,
-    "complete": true
+    "complete": true,
+    "kcalKg": 3851,
+    "kcalSourceUrl": "https://marspetcareaprimocdn.petcare.global/a3658530-f229-4ca2-9521-b2490009c5e0/a3658530-f229-4ca2-9521-b2490009c5e0_DownloadAsJpg.jpg",
+    "kcalSourceName": "Royal Canin Colombia · guía de alimentación de la fórmula"
   },
   {
     "brand": "Royal Canin",
@@ -4640,7 +5027,7 @@
       "alimento-para-perro-royal-canin-breed-health-nutrition-bulldog-adulto"
     ],
     "url": "https://www.royalcanin.com/co/dogs/products/retail-products/bulldog-adult-2590",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Bulldog Inglés Adulto",
     "packagesKg": [
       3.0
@@ -4648,7 +5035,10 @@
     "protein": 24.0,
     "fat": 14.0,
     "fiber": 2.8,
-    "ash": 6.5
+    "ash": 6.5,
+    "kcalKg": 3720,
+    "kcalSourceUrl": "https://cdn.royalcanin-weshare-online.io/p-jkY4oBaPOZra8qKA02/v7/rc-bhn-bulldogadult-cv-eretailkit-5-es-es",
+    "kcalSourceName": "Royal Canin Colombia · guía de alimentación de la fórmula"
   },
   {
     "brand": "Royal Canin",
@@ -4785,7 +5175,7 @@
       "royal-canin-cocker-cachorro"
     ],
     "url": "https://www.royalcanin.com/co/dogs/products/retail-products/cocker-puppy-4133",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Cocker Puppy",
     "packagesKg": [
       3.0
@@ -4794,7 +5184,10 @@
     "fat": 18.0,
     "fiber": 1.8,
     "ash": 7.7,
-    "complete": true
+    "complete": true,
+    "kcalKg": 3962,
+    "kcalSourceUrl": "https://marspetcareaprimocdn.petcare.global/d66ed971-2067-4586-850e-b1ef00107bcd/d66ed971-2067-4586-850e-b1ef00107bcd_DownloadAsJpg.jpg",
+    "kcalSourceName": "Royal Canin Colombia · guía de alimentación de la fórmula"
   },
   {
     "brand": "Royal Canin",
@@ -4874,7 +5267,7 @@
       "royal-canin-early-renal-gato"
     ],
     "url": "https://www.royalcanin.com/co/cats/products/vet-products/early-renal-1242",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Early Renal Gato",
     "packagesKg": [
       1.5
@@ -4883,7 +5276,10 @@
     "fat": 14.0,
     "fiber": 5.1,
     "ash": 5.5,
-    "complete": true
+    "complete": true,
+    "kcalKg": 3808,
+    "kcalSourceUrl": "https://marspetcareaprimocdn.petcare.global/8e8dfee0-6a64-45a6-9cbc-b37701128f44/8e8dfee0-6a64-45a6-9cbc-b37701128f44_DownloadAsJpg.jpg",
+    "kcalSourceName": "Royal Canin Colombia · guía de alimentación de la fórmula"
   },
   {
     "brand": "Royal Canin",
@@ -4913,7 +5309,7 @@
       "alimento-seco-para-gato-royal-canin-veterinary-health-nutrition-gastro-intestinal"
     ],
     "url": "https://www.royalcanin.com/co/cats/products/vet-products/gastrointestinal-3905",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Gastroinstestinal Gato",
     "packagesKg": [
       0.4,
@@ -4924,7 +5320,10 @@
     "fiberMax": 5.8,
     "moistureMax": 6.5,
     "ashMax": 9.3,
-    "complete": true
+    "complete": true,
+    "kcalKg": 4095,
+    "kcalSourceUrl": "https://marspetcareaprimocdn.petcare.global/8ac15f9c-0a0c-408e-bbc4-b1ef001d7de0/8ac15f9c-0a0c-408e-bbc4-b1ef001d7de0_DownloadAsJpg.jpg",
+    "kcalSourceName": "Royal Canin Colombia · guía de alimentación de la fórmula"
   },
   {
     "brand": "Royal Canin",
@@ -4953,7 +5352,7 @@
       "alimento-para-perro-royal-canin-veterinary-health-nutrition-gastro-intestinal-junior"
     ],
     "url": "https://www.royalcanin.com/co/dogs/products/vet-products/gastrointestinal-puppy-3957",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Gastrointestinal Cachorro",
     "packagesKg": [
       2.5
@@ -4961,7 +5360,11 @@
     "protein": 29.0,
     "fiber": 1.3,
     "ash": 7.9,
-    "complete": true
+    "complete": true,
+    "fat": 22.0,
+    "kcalKg": 4235,
+    "kcalSourceUrl": "https://marspetcareaprimocdn.petcare.global/2cd1afae-057b-4013-a66f-b377014d7396/2cd1afae-057b-4013-a66f-b377014d7396_DownloadAsJpg.jpg",
+    "kcalSourceName": "Royal Canin Colombia · guía de alimentación de la fórmula"
   },
   {
     "brand": "Royal Canin",
@@ -4970,7 +5373,7 @@
       "alimento-seco-para-gato-royal-canin-veterinary-health-nutrition-gastrointestinal-moderate-calorie"
     ],
     "url": "https://www.royalcanin.com/co/cats/products/vet-products/gastrointestinal-moderate-calorie-4008",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Gastrointestinal Calorías Moderadas",
     "packagesKg": [
       2.0
@@ -4978,7 +5381,11 @@
     "protein": 35.0,
     "fiber": 5.2,
     "ash": 7.8,
-    "complete": true
+    "complete": true,
+    "fat": 13.0,
+    "kcalKg": 3714,
+    "kcalSourceUrl": "https://marspetcareaprimocdn.petcare.global/e128de06-bf2c-460c-a7c5-b1ef001d8133/e128de06-bf2c-460c-a7c5-b1ef001d8133_DownloadAsJpg.jpg",
+    "kcalSourceName": "Royal Canin Colombia · guía de alimentación de la fórmula"
   },
   {
     "brand": "Royal Canin",
@@ -4987,7 +5394,7 @@
       "alimento-seco-para-gato-royal-canin-veterinary-health-nutrition-gastrointestinal-fibre-response"
     ],
     "url": "https://www.royalcanin.com/co/cats/products/vet-products/gastrointestinal-fibre-response-4007",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Gastrointestinal Fibre Response",
     "packagesKg": [
       2.0
@@ -4995,7 +5402,8 @@
     "protein": 31.0,
     "fiber": 2.9,
     "ash": 7.3,
-    "complete": true
+    "complete": true,
+    "fat": 15.0
   },
   {
     "brand": "Royal Canin",
@@ -5041,7 +5449,7 @@
       "alimento-seco-para-gato-royal-canin-veterinary-health-nutrition-gastrointestinal-kitten"
     ],
     "url": "https://www.royalcanin.com/co/cats/products/vet-products/gastrointestinal-kitten-1228",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Gastrointestinal Kitten",
     "packagesKg": [
       0.4,
@@ -5050,7 +5458,11 @@
     "protein": 35.0,
     "fiber": 2.0,
     "ash": 8.7,
-    "complete": true
+    "complete": true,
+    "fat": 24.0,
+    "kcalKg": 4334,
+    "kcalSourceUrl": "https://marspetcareaprimocdn.petcare.global/5dd3273d-28ad-4cce-a6c2-b379009d0d75/5dd3273d-28ad-4cce-a6c2-b379009d0d75_DownloadAsJpg.jpg",
+    "kcalSourceName": "Royal Canin Colombia · guía de alimentación de la fórmula"
   },
   {
     "brand": "Royal Canin",
@@ -5078,7 +5490,7 @@
       "alimento-para-perro-royal-canin-veterinary-health-nutrition-gastro-intestinal"
     ],
     "url": "https://www.royalcanin.com/co/dogs/products/vet-products/gastrointestinal-3911",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Gastrointestinal Perro",
     "packagesKg": [
       2.0,
@@ -5087,7 +5499,8 @@
     "protein": 25.0,
     "fiber": 1.9,
     "ash": 6.6,
-    "complete": true
+    "complete": true,
+    "fat": 20.0
   },
   {
     "brand": "Royal Canin",
@@ -5132,7 +5545,7 @@
       "royal-canin-golden-retriever-perro-adulto"
     ],
     "url": "https://www.royalcanin.com/co/dogs/products/retail-products/golden-retriever-adult-3970",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Golden Retriever Adulto",
     "packagesKg": [
       13.607771
@@ -5141,7 +5554,10 @@
     "fatMin": 11.0,
     "fiberMax": 5.7,
     "moistureMax": 10.0,
-    "ashMax": 8.7
+    "ashMax": 8.7,
+    "kcalKg": 3489,
+    "kcalSourceUrl": "https://catvets.com/wp-content/uploads/2025/09/Royal-Canin-Healthy-Pet-Product-Guide-February-2025-sml.pdf#page=98",
+    "kcalSourceName": "Royal Canin · Healthy Pet Product Guide 2025, Golden Retriever Adult"
   },
   {
     "brand": "Royal Canin",
@@ -5150,7 +5566,7 @@
       "royal-canin-golden-retriever-cachorro"
     ],
     "url": "https://www.royalcanin.com/co/dogs/products/retail-products/golden-retriever-puppy-3979",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Golden Retriever Cachorros",
     "packagesKg": [
       12.0
@@ -5159,7 +5575,10 @@
     "fat": 16.0,
     "fiber": 3.7,
     "ash": 7.4,
-    "complete": true
+    "complete": true,
+    "kcalKg": 3726,
+    "kcalSourceUrl": "https://marspetcareaprimocdn.petcare.global/34b2954a-670f-4672-a268-b3b50110772e/34b2954a-670f-4672-a268-b3b50110772e_DownloadAsJpg.jpg",
+    "kcalSourceName": "Royal Canin Colombia · guía de alimentación de la fórmula"
   },
   {
     "brand": "Royal Canin",
@@ -5201,7 +5620,7 @@
       "alimento-para-gato-royal-canin-veterinary-health-nutrition-hepatic"
     ],
     "url": "https://www.royalcanin.com/co/cats/products/vet-products/hepatic-4012",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Hepatic",
     "packagesKg": [
       2.0,
@@ -5210,7 +5629,8 @@
     "protein": 26.0,
     "fiber": 5.1,
     "ash": 6.2,
-    "complete": true
+    "complete": true,
+    "fat": 22.0
   },
   {
     "brand": "Royal Canin",
@@ -5275,7 +5695,7 @@
       "alimento-medicado-royal-canin-vhn-hipoalergenico-para-perro-cachorro"
     ],
     "url": "https://www.royalcanin.com/co/dogs/products/vet-products/hypoallergenic-puppy-3318",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Hypoallergenic Cachorro",
     "packagesKg": [
       1.5
@@ -5284,7 +5704,10 @@
     "fat": 19.0,
     "fiber": 1.0,
     "ash": 8.1,
-    "complete": true
+    "complete": true,
+    "kcalKg": 4021,
+    "kcalSourceUrl": "https://marspetcareaprimocdn.petcare.global/733d6ac2-2b60-469a-bbb7-b1ef00186708/733d6ac2-2b60-469a-bbb7-b1ef00186708_DownloadAsJpg.jpg",
+    "kcalSourceName": "Royal Canin Colombia · guía de alimentación de la fórmula"
   },
   {
     "brand": "Royal Canin",
@@ -5312,7 +5735,7 @@
       "alimento-seco-para-gato-royal-canin-feline-health-nutrition-indoor27-adulto"
     ],
     "url": "https://www.royalcanin.com/co/cats/products/retail-products/indoor-27-2529",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Indoor 27",
     "packagesKg": [
       0.4,
@@ -5321,7 +5744,8 @@
     "protein": 27.0,
     "fiber": 4.0,
     "ash": 7.0,
-    "complete": true
+    "complete": true,
+    "fat": 13.0
   },
   {
     "brand": "Royal Canin",
@@ -5391,7 +5815,7 @@
       "royal-canin-alimento-gatitos-esterilizados"
     ],
     "url": "https://www.royalcanin.com/co/cats/products/retail-products/kitten-sterilised-2562",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "KITTEN STERILISED",
     "packagesKg": [
       0.4,
@@ -5401,7 +5825,10 @@
     "fat": 12.0,
     "fiber": 9.8,
     "ash": 7.4,
-    "complete": true
+    "complete": true,
+    "kcalKg": 3481,
+    "kcalSourceUrl": "https://marspetcareaprimocdn.petcare.global/9f7a56a3-6c40-431f-82d1-b1ef001b6c70/9f7a56a3-6c40-431f-82d1-b1ef001b6c70_DownloadAsJpg.jpg",
+    "kcalSourceName": "Royal Canin Colombia · guía de alimentación de la fórmula"
   },
   {
     "brand": "Royal Canin",
@@ -5468,7 +5895,7 @@
       "alimento-para-perro-royal-canin-shn-mini-ageing-12"
     ],
     "url": "https://www.royalcanin.com/co/dogs/products/retail-products/mini-ageing-12%2b-1007",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Mini Ageing 12+",
     "packagesKg": [
       1.5
@@ -5476,7 +5903,9 @@
     "fiber": 1.5,
     "ash": 5.5,
     "kcalKg": 3854.0,
-    "complete": true
+    "complete": true,
+    "protein": 26.0,
+    "fat": 14.0
   },
   {
     "brand": "Royal Canin",
@@ -5751,7 +6180,7 @@
       "royal-canin-perro-mediano-adulto"
     ],
     "url": "https://www.royalcanin.com/co/dogs/products/retail-products/medium-adult-3004",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Perro Mediano Adulto",
     "packagesKg": [
       4.0,
@@ -5759,7 +6188,9 @@
     ],
     "fiber": 1.4,
     "ash": 6.2,
-    "complete": true
+    "complete": true,
+    "protein": 25.0,
+    "fat": 14.0
   },
   {
     "brand": "Royal Canin",
@@ -5807,7 +6238,7 @@
       "royal-canin-perro-mini-adulto"
     ],
     "url": "https://www.royalcanin.com/co/dogs/products/retail-products/mini-adult-3001",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Perro Miniatura Adulto",
     "packagesKg": [
       0.8,
@@ -5818,7 +6249,9 @@
     "fiber": 1.3,
     "ash": 6.8,
     "kcalKg": 3920.0,
-    "complete": true
+    "complete": true,
+    "protein": 27.0,
+    "fat": 16.0
   },
   {
     "brand": "Royal Canin",
@@ -5827,7 +6260,7 @@
       "royal-canin-perro-x-small-adulto"
     ],
     "url": "https://www.royalcanin.com/co/dogs/products/retail-products/x-small-adult-1003",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Perro X-Small Adulto",
     "packagesKg": [
       0.5,
@@ -5836,7 +6269,9 @@
     ],
     "fiber": 1.7,
     "ash": 5.6,
-    "complete": true
+    "complete": true,
+    "protein": 24.0,
+    "fat": 18.0
   },
   {
     "brand": "Royal Canin",
@@ -6009,14 +6444,17 @@
       "royal-canin-renal-hypoallergenic-gato"
     ],
     "url": "https://www.royalcanin.com/co/cats/products/vet-products/renal-%2b-hyppoallergenic-6531",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Renal + Hypoallergenic Gato",
     "packagesKg": [
       2.0
     ],
     "ash": 5.7,
     "kcalKg": 4102.0,
-    "complete": true
+    "complete": true,
+    "protein": 26.0,
+    "fat": 20.0,
+    "fiber": 4.1
   },
   {
     "brand": "Royal Canin",
@@ -6077,13 +6515,19 @@
       "royal-canin-renal-perro-pequeno"
     ],
     "url": "https://www.royalcanin.com/co/dogs/products/vet-products/renal-small-dog-1249",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Renal Perro Pequeño",
     "packagesKg": [
       1.5
     ],
     "ash": 4.0,
-    "complete": true
+    "complete": true,
+    "protein": 14.0,
+    "fat": 18.0,
+    "fiber": 2.4,
+    "kcalKg": 3984,
+    "kcalSourceUrl": "https://marspetcareaprimocdn.petcare.global/437c89d5-5262-4bb5-ba99-b1ef0018913a/437c89d5-5262-4bb5-ba99-b1ef0018913a_DownloadAsJpg.jpg",
+    "kcalSourceName": "Royal Canin Colombia · guía de alimentación de la fórmula"
   },
   {
     "brand": "Royal Canin",
@@ -6092,7 +6536,7 @@
       "alimento-seco-para-gato-royal-canin-veterinary-health-nutrition-renal-special"
     ],
     "url": "https://www.royalcanin.com/co/cats/products/vet-products/renal-special-3949",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Renal Special",
     "packagesKg": [
       0.4,
@@ -6102,7 +6546,10 @@
     "fat": 17.0,
     "fiber": 4.8,
     "ash": 6.2,
-    "complete": true
+    "complete": true,
+    "kcalKg": 3908,
+    "kcalSourceUrl": "https://cdn.royalcanin-weshare-online.io/V1bQI3gBBKJuub5qQ6lR/v5/vhn-renal-special-cat-colombia-6",
+    "kcalSourceName": "Royal Canin Colombia · guía de alimentación de la fórmula"
   },
   {
     "brand": "Royal Canin",
@@ -6131,7 +6578,7 @@
       "alimento-para-gato-royal-canin-veterinary-health-nutrition-satiety"
     ],
     "url": "https://www.royalcanin.com/co/cats/products/vet-products/satiety-weight-management-3943",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Satiety Weight Management",
     "packagesKg": [
       1.5
@@ -6140,7 +6587,8 @@
     "fiber": 14.6,
     "ash": 8.6,
     "kcalKg": 3040.0,
-    "complete": true
+    "complete": true,
+    "fat": 9.0
   },
   {
     "brand": "Royal Canin",
@@ -6222,13 +6670,19 @@
       "royal-canin-shih-tzu-cachorro"
     ],
     "url": "https://www.royalcanin.com/co/dogs/products/retail-products/shih-tzu-puppy-2439",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Shih Tzu Puppy",
     "packagesKg": [
       0.5
     ],
     "ash": 7.6,
-    "complete": true
+    "complete": true,
+    "protein": 28.0,
+    "fat": 18.0,
+    "fiber": 1.5,
+    "kcalKg": 3973,
+    "kcalSourceUrl": "https://marspetcareaprimocdn.petcare.global/98390a07-9904-4bf9-9109-b1ef00108aa0/98390a07-9904-4bf9-9109-b1ef00108aa0_DownloadAsJpg.jpg",
+    "kcalSourceName": "Royal Canin Colombia · guía de alimentación de la fórmula"
   },
   {
     "brand": "Royal Canin",
@@ -6255,7 +6709,7 @@
       "royal-canin-skin-care-perro"
     ],
     "url": "https://www.royalcanin.com/co/dogs/products/vet-products/skin-care-4013",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Skin Care Perro",
     "packagesKg": [
       2.0
@@ -6264,7 +6718,10 @@
     "fat": 16.0,
     "fiber": 2.0,
     "ash": 5.6,
-    "complete": true
+    "complete": true,
+    "kcalKg": 3896,
+    "kcalSourceUrl": "https://marspetcareaprimocdn.petcare.global/0ff39283-1184-4c03-82d8-b37701507c98/0ff39283-1184-4c03-82d8-b37701507c98_DownloadAsJpg.jpg",
+    "kcalSourceName": "Royal Canin Colombia · guía de alimentación de la fórmula"
   },
   {
     "brand": "Royal Canin",
@@ -6293,7 +6750,7 @@
       "alimento-medicado-para-perro-royal-canin-vhn-skintopic-razas-pequenas"
     ],
     "url": "https://www.royalcanin.com/co/dogs/products/vet-products/skintopic-small-dog-3315",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Skintopic Perro Miniatura",
     "packagesKg": [
       1.5
@@ -6302,7 +6759,10 @@
     "fat": 14.0,
     "fiber": 1.4,
     "ash": 7.9,
-    "complete": true
+    "complete": true,
+    "kcalKg": 3770,
+    "kcalSourceUrl": "https://cdn.royalcanin-weshare-online.io/lz_d338BRYZmsWpcaNfr/v47/rc-vet-dry-dogskintopsd-b1-page-5",
+    "kcalSourceName": "Royal Canin Colombia · guía de alimentación de la fórmula"
   },
   {
     "brand": "Royal Canin",
@@ -6555,7 +7015,7 @@
       "royal-canin-yorkshire-terrier-8-perro-adulto"
     ],
     "url": "https://www.royalcanin.com/co/dogs/products/retail-products/yorkshire-terrier-8%2b-1260",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Yorkshire Terrier 8+",
     "packagesKg": [
       1.5
@@ -6564,7 +7024,10 @@
     "fat": 18.0,
     "fiber": 2.9,
     "ash": 5.0,
-    "complete": true
+    "complete": true,
+    "kcalKg": 3963,
+    "kcalSourceUrl": "https://cdn.royalcanin-weshare-online.io/b-dTXnsBaPOZra8q07mM/v9/racionamiento",
+    "kcalSourceName": "Royal Canin Colombia · guía de alimentación de la fórmula"
   },
   {
     "brand": "Royal Canin",
@@ -7294,5 +7757,310 @@
     "fiberMax": 2.0,
     "ashMax": 6.0,
     "kcalKg": 3840
+  },
+  {
+    "handles": [
+      "nutra-nuggets-profesional-para-gato"
+    ],
+    "name": "Nutra-Nuggets Professional for Cats",
+    "species": "cat",
+    "brand": "Nutra-Nuggets",
+    "verifiedOn": "2026-11-21",
+    "url": "https://diamondpet.cl/wp-content/uploads/2021/03/394B-1512_Nutra_Nuggets_Brochure_LR.pdf#page=14",
+    "protein": 32,
+    "fat": 21,
+    "ash": 6.5,
+    "fiber": 3,
+    "moisture": 10,
+    "kcalKg": 4040,
+    "complete": true
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Combo Hills Gato Adult 7+ 3.2kg + Feliway Classic Spray 60ml",
+    "url": "https://www.hillspet.co/cat-food/science-diet-mature-adult-senior-dry",
+    "handles": [
+      "combo-hills-gato-adult-7-3-2kg-feliway-classic-spray-60ml"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      3.17
+    ],
+    "protein": 31.4,
+    "basis": "materia_seca",
+    "fat": 18.5,
+    "fiber": 1.3,
+    "kcalKg": 3926.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Combo Hills Gato Adult Hairball 1.59kg + Revolution 6% 0.75mL",
+    "url": "https://www.hillspet.co/cat-food/science-plan-adult-hairball-dry",
+    "handles": [
+      "combo-hills-gato-adult-hairball-1-59kg-revolution-6-0-75ml"
+    ],
+    "species": "cat",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      1.59
+    ],
+    "protein": 34.0,
+    "basis": "materia_seca",
+    "fat": 18.6,
+    "fiber": 9.0,
+    "kcalKg": 3651.0
+  },
+  {
+    "brand": "Hill’s",
+    "name": "Combo Hills Perro Senior Vitality 7+ 12.5lb + Collar Yoos M/L",
+    "url": "https://www.hillspet.co/dog-food/science-plan-adult-7-senior-vitality-chicken-rice-dry",
+    "handles": [
+      "combo-hills-perro-senior-vitality-7-12-5lb-collar-yoos-m-l"
+    ],
+    "species": "dog",
+    "verifiedOn": "2026-11-21",
+    "packagesKg": [
+      5.67
+    ],
+    "protein": 22.1,
+    "basis": "materia_seca",
+    "fat": 14.2,
+    "fiber": 1.6,
+    "kcalKg": 3619.0
+  },
+  {
+    "handles": [
+      "acana-adult-small-breed-recipe-perros"
+    ],
+    "name": "Acana Adult Small Breed Recipe – Alimento para perros",
+    "species": "dog",
+    "brand": "ACANA",
+    "verifiedOn": "2026-11-21",
+    "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-adult-small.html",
+    "complete": true,
+    "packagesKg": [
+      2,
+      6
+    ],
+    "kcalKg": 3510.0,
+    "protein": 31.0,
+    "fat": 17.0,
+    "ash": 7.0,
+    "fiber": 5.0,
+    "moisture": 12.0
+  },
+  {
+    "handles": [
+      "orijen-regional-red-gatos"
+    ],
+    "name": "Orijen Regional Red – Alimento para gatos",
+    "species": "cat",
+    "brand": "ORIJEN",
+    "verifiedOn": "2026-11-21",
+    "url": "https://emea.orijenpetfoods.com/en/cats/cat-food/eu-ori-ns-ori-regionalred-cat.html",
+    "complete": true,
+    "packagesKg": [
+      0.34,
+      1.8,
+      5.4
+    ],
+    "kcalKg": 4100.0,
+    "protein": 40.0,
+    "fat": 20.0,
+    "ash": 9.5,
+    "fiber": 3.0,
+    "moisture": 10.0
+  },
+  {
+    "handles": [
+      "orijen-tundra-gatos"
+    ],
+    "name": "Orijen Tundra – Alimento para gatos",
+    "species": "cat",
+    "brand": "ORIJEN",
+    "verifiedOn": "2026-11-21",
+    "url": "https://emea.orijenpetfoods.com/en/cats/cat-food/eu-ori-ns-ori-tundra-cat.html",
+    "complete": true,
+    "packagesKg": [
+      0.34,
+      1.8,
+      5.4
+    ],
+    "kcalKg": 4120.0,
+    "protein": 40.0,
+    "fat": 20.0,
+    "ash": 9.0,
+    "fiber": 3.0,
+    "moisture": 10.0
+  },
+  {
+    "handles": [
+      "orijen-small-breed-marine-fish-perros"
+    ],
+    "name": "Orijen Small Breed Marine Fish – Alimento para perros",
+    "species": "dog",
+    "brand": "ORIJEN",
+    "verifiedOn": "2026-11-21",
+    "url": "https://emea.orijenpetfoods.com/en/dogs/dog-food/eu-ori-ns-ori-small-breed-marine-fish.html",
+    "complete": true,
+    "packagesKg": [
+      1.8,
+      4.5
+    ],
+    "kcalKg": 3710.0,
+    "protein": 40.0,
+    "fat": 15.0,
+    "ash": 10.0,
+    "fiber": 4.0,
+    "moisture": 12.0
+  },
+  {
+    "handles": [
+      "alimento-seco-para-gato-hills-kitten-pescado-del-mar-y-arroz"
+    ],
+    "name": "Alimento seco para gato Hills Kitten pescado del mar y arroz",
+    "species": "cat",
+    "brand": "Hill’s",
+    "verifiedOn": "2026-11-21",
+    "url": "https://www.hillspet.com/cat-food/science-diet-kitten-ocean-fish-rice-dry",
+    "basis": "materia_seca",
+    "kcalKg": 4046.0,
+    "complete": true,
+    "protein": 37.3,
+    "fat": 22.7,
+    "fiber": 2.2,
+    "carbs": 29.3
+  },
+  {
+    "handles": [
+      "hills-science-diet-kitten-indoor-kitten"
+    ],
+    "name": "Hills - Science Diet Kitten Indoor Kitten",
+    "species": "cat",
+    "brand": "Hill’s",
+    "verifiedOn": "2026-11-21",
+    "url": "https://www.hillspet.com/cat-food/science-diet-kitten-indoor-dry",
+    "basis": "materia_seca",
+    "kcalKg": 3900.0,
+    "complete": true,
+    "protein": 38.0,
+    "fat": 19.4,
+    "fiber": 2.0,
+    "carbs": 32.1
+  },
+  {
+    "handles": [
+      "alimento-seco-para-perro-hills-science-diet-puppy-cordero-y-arroz"
+    ],
+    "name": "Alimento seco para perro Hills Science Diet Puppy cordero y arroz",
+    "species": "dog",
+    "brand": "Hill’s",
+    "verifiedOn": "2026-11-21",
+    "url": "https://www.hillspet.com/dog-food/science-diet-puppy-lamb-meal-rice-dry",
+    "basis": "materia_seca",
+    "kcalKg": 3734.0,
+    "complete": true,
+    "protein": 28.6,
+    "fat": 19.4,
+    "fiber": 2.6,
+    "carbs": 40.8
+  },
+  {
+    "handles": [
+      "alimento-seco-para-perro-hills-prescription-diet-i-d-small-bites-cuidado-digestivo"
+    ],
+    "name": "Alimento seco para perro Hills Prescription Diet i/d Small Bites cuidado digestivo",
+    "species": "dog",
+    "brand": "Hill’s",
+    "verifiedOn": "2026-11-21",
+    "url": "https://www.hillspet.com/dog-food/prescription-diet-id-small-bites-digestive-care-dry",
+    "basis": "materia_seca",
+    "kcalKg": 3589.0,
+    "complete": true,
+    "protein": 26.2,
+    "fat": 13.6,
+    "fiber": 2.0,
+    "carbs": 52.3
+  },
+  {
+    "handles": [
+      "orijen-regional-red-perros"
+    ],
+    "name": "Orijen Regional Red – Alimento para perros",
+    "species": "dog",
+    "brand": "ORIJEN",
+    "verifiedOn": "2026-11-21",
+    "url": "https://emea.orijenpetfoods.com/en/eu-ori-ns-ori-regionalred.html",
+    "kcalKg": 3860,
+    "protein": 38,
+    "fat": 18,
+    "ash": 9,
+    "fiber": 5,
+    "moisture": 12,
+    "packagesKg": [
+      0.34,
+      2,
+      6,
+      11.4
+    ],
+    "complete": true
+  },
+  {
+    "handles": [
+      "orijen-tundra-perros"
+    ],
+    "name": "Orijen Tundra – Alimento para perros",
+    "species": "dog",
+    "brand": "ORIJEN",
+    "verifiedOn": "2026-11-21",
+    "url": "https://www.orijenpetfoods.com/en-CA/dogs/dog-food/tundra/ns-ori-tundra.html",
+    "kcalKg": 3860,
+    "protein": 40,
+    "fat": 18,
+    "ash": 9,
+    "fiber": 5,
+    "moisture": 12,
+    "packagesKg": [
+      11.4
+    ],
+    "complete": true
+  },
+  {
+    "handles": [
+      "orijen-small-breed-puppy-perros"
+    ],
+    "name": "Orijen Small Breed Puppy – Alimento para perros",
+    "species": "dog",
+    "brand": "ORIJEN",
+    "verifiedOn": "2026-11-21",
+    "url": "https://www.orijenpetfoods.co.uk/product/orijen-small-breed-puppy/",
+    "kcalKg": 4000,
+    "protein": 38,
+    "fat": 20,
+    "ash": 9,
+    "fiber": 4,
+    "moisture": 12,
+    "complete": true
+  },
+  {
+    "handles": [
+      "hills-science-diet-kitten"
+    ],
+    "name": "Hills - Science Diet Kitten",
+    "species": "cat",
+    "brand": "Hill’s",
+    "verifiedOn": "2026-11-21",
+    "url": "https://www.hillspet.co/cat-food/science-plan-kitten-original-dry",
+    "kcalKg": 4067,
+    "protein": 38.5,
+    "fat": 23.1,
+    "carbs": 27.9,
+    "fiber": 1.9,
+    "basis": "materia_seca",
+    "complete": true,
+    "packagesKg": [
+      1.59
+    ]
   }
 ]

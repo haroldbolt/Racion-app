@@ -13,11 +13,15 @@
     "ashMax": 8,
     "moistureMax": 12,
     "registration": "17063AL",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1.5,
       7
-    ]
+    ],
+    "ingredients": "Harina de pollo, arroz, fibra de arveja, salmón, pulpa de remolacha, aceite de pollo, hidrolizado de hígado de pollo, celulosa, lignocelulosa, cloruro de sodio, cloruro de potasio, inulina, manano-oligosacáridos, L-Carnitina, extracto de yucca schidigera, carbonato de calcio, minerales orgánicos (hierro, zinc, selenio, cobre, manganeso), vitamina A retinol, vitamina B1 tiamina, vitamina B2 riboflavina, vitamina B3 niacinamida, vitamina B5 ácido pantoténico, vitamina B6 piridoxina, vitamina B9 ácido fólico, vitamina B12 cianocobalamina, vitamina D3 colecalciferol, vitamina E tocoferol acetato, vitamina H biotina, taurina, tocoferoles y aceite de romero.",
+    "kcalKg": 3100,
+    "kcalSourceUrl": "https://www.italcolmascotas.com/wp-content/uploads/2026/07/Portafolio-Super-Premium.pdf#page=20",
+    "kcalSourceName": "Italcol · Portafolio Super Premium"
   },
   {
     "brand": "Agility Gold",
@@ -180,10 +184,18 @@
     "ashMax": 9,
     "moistureMax": 12,
     "registration": "16386AL",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
-      1.5
-    ]
+      1.5,
+      3
+    ],
+    "ingredients": "Salmón, pollo, harina de vísceras de pollo, arroz, harina de carne, plasma, pulpa de remolacha, aceite de pollo, hidrolizado de hígado de pollo, celulosa, cloruro de colina, cloruro de sodio, bisulfato ácido de sodio, metionina, manano-oligosacáridos, taurina, beta-glucanos, hierro quelado, sulfato ferroso, hidroxicloruro de zinc, zinc quelado, selenio quelado, cobre básico cloruro, cobre quelado, yodato de calcio, hidroxicloruro de manganeso, manganeso quelado, selenito de sodio, vitamina E tocoferol acetato, vitamina A retinol, vitamina B1 tiamina, vitamina B2 riboflavina, vitamina B3 niacinamida, vitamina B5 ácido pantoténico, vitamina B6 piridoxina, vitamina B9 ácido fólico, vitamina B12 cianocobalamina, vitamina H biotina, vitamina K3 menadiona, vitamina D3 colecalciferol, l-carnitina, sales de ácido propiónico, tocoferoles, aceite de romero, ácido cítrico.",
+    "kcalKg": 3750,
+    "kcalSourceUrl": "https://www.italcolmascotas.com/wp-content/uploads/2026/07/Portafolio-Super-Premium.pdf#page=21",
+    "kcalSourceName": "Italcol · Portafolio Super Premium",
+    "packageSources": {
+      "3": "https://www.italcolmascotas.com/wp-content/uploads/2026/07/Portafolio-Super-Premium.pdf#page=21"
+    }
   },
   {
     "brand": "Agility Gold",
@@ -222,7 +234,7 @@
     "ashMax": 8,
     "moistureMax": 11,
     "registration": "14978AL",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1.5,
       3,
@@ -257,7 +269,8 @@
           "maxGrams": 411
         }
       ]
-    }
+    },
+    "ingredients": "Salmón, cordero, arroz cristal, harina de pollo, almidón de arveja, aceite de pollo, pulpa de remolacha, hidrolizado hígado de pollo, cloruro de sodio, fosfato dicálcico, celulosa, harina de alga (Schizochytrium sp), cloruro de potasio, betaglucanos, manano-oligosacáridos (sacchromyces cerevisae), extracto de yucca schidigera, carbonato de calcio, hierro quelado, sulfato ferroso, hidroxicloruro de zinc, zinc quelado, selenio quelado, cobre básico cloruro, cobre quelado, yodato de calcio, hidroxicloruro de manganeso, manganeso quelado, selenito de sodio, taurina, vitamina E tocoferol acetato, vitamina A retinol, vitamina B1 tiamina, vitamina B2 riboflavina, vitamina B3 niacinamida, vitamina B5 ácido pantoténico, vitamina B6 piridoxina, vitamina B9 ácido fólico, vitamina B12 cianocobalamina, vitamina H biotina, vitamina K3 menadiona, vitamina D3 colecalciferol, tocoferoles y aceite de romero como conservantes."
   },
   {
     "brand": "Agility Gold",
@@ -273,12 +286,13 @@
     "ashMax": 8,
     "moistureMax": 12,
     "registration": "14980AL",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1.5,
       3,
       8
-    ]
+    ],
+    "ingredients": "Salmón, cordero, arroz cristal, harina de pollo, almidón de arveja, aceite de pollo, pulpa de remolacha, hidrolizado hígado de pollo, cloruro de sodio, fosfato dicálcico, celulosa, cloruro de potasio, harina de alga (Schizochytrium sp), betaglucanos, manano-oligosacáridos (sacchromyces cerevisae), extracto de yucca schidigera, carbonato de calcio, hierro quelado, sulfato ferroso, hidroxicloruro de zinc, zinc quelado, selenio quelado, cobre básico cloruro, cobre quelado, yodato de calcio, hidroxicloruro de manganeso, manganeso quelado, selenito de sodio, vitamina E tocoferol acetato, vitamina A retinol, vitamina B1 tiamina, vitamina B2 riboflavina, vitamina B3 niacinamida, vitamina B5 ácido pantoténico, vitamina B6 piridoxina, vitamina B9 ácido fólico, vitamina B12 cianocobalamina, vitamina H biotina, vitamina K3 menadiona, vitamina D3 colecalciferol, tocoferoles y aceite de romero como conservantes."
   },
   {
     "brand": "Agility Gold",
@@ -317,11 +331,12 @@
     "ashMax": 8,
     "moistureMax": 12,
     "registration": "10476AL",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1.5,
       12
-    ]
+    ],
+    "ingredients": "Arroz, pollo, salmón, harina de pollo, salvado de trigo, aceite de pollo, semilla de lino, hidrolizado de hígado de pollo, cloruro de sodio, carbonato de calcio, fosfato dicálcico, cloruro de potasio, manano-oligosacáridos saccharomyces cerevisiae, cloruro de colina, hierro quelado, sulfato ferroso, hidroxicloruro de zinc, zinc quelado, beta-glucanos, selenio quelado, cobre básico cloruro, cobre quelado, yodato de calcio, hidroxicloruro de manganeso, manganeso quelado, selenito de sodio, vitamina E tocoferol acetato, vitamina B3 niacinamida, vitamina B5 ácido pantoténico, vitamina A retinol, vitamina H biotina, vitamina B2 riboflavina, vitamina K3 menadiona, vitamina B12 cianocobalamina, vitamina B1 tiamina, vitamina B6 piridoxina, vitamina D3 colecalciferol, vitamina B9 ácido fólico, sales de ácido propiónico, tocoferoles, aceite de romero, ácido cítrico."
   },
   {
     "brand": "Chunky",
@@ -337,12 +352,13 @@
     "ashMax": 8,
     "moistureMax": 10,
     "registration": "9378AL",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1.5,
       4,
       8
-    ]
+    ],
+    "ingredients": "Arroz, salmón, cordero, harina de salmón, salvado de trigo, aceite de pollo, hidrolizado de hígado de pollo, semilla de lino, cloruro de sodio, carbonato de calcio, fosfato dicálcico, cloruro de potasio, probióticos (lactobacilus s.p), manano-oligosacáridos saccharomyces cerevisiae, cloruro de colina, hierro quelado, sulfato ferroso, hidroxicloruro de zinc, zinc quelado, beta-glucanos, selenio quelado, cobre básico cloruro, cobre quelado, yodato de calcio, hidroxicloruro de manganeso, manganeso quelado, selenito de sodio, vitamina E tocoferol acetato, vitamina B3 niacinamida, vitamina B5 ácido pantoténico, vitamina A retinol, vitamina H biotina, vitamina B2 riboflavina, vitamina K3 menadiona, vitamina B12 cianocobalamina, vitamina B1 tiamina, vitamina B6 piridoxina, vitamina D3 colecalciferol, vitamina B9 ácido fólico, sales de ácido propiónico, colorante rojo natural, tocoferoles, aceite de romero, ácido cítrico."
   },
   {
     "brand": "Chunky",
@@ -357,13 +373,14 @@
     "fiberMax": 4,
     "ashMax": 8,
     "registration": "13609AL",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       0.5,
       1.5,
       4,
       8
-    ]
+    ],
+    "ingredients": "Arroz, harina de pollo, pollo, salmón, maíz, aceite de pollo, salvado de trigo, harina de pescado, hidrolizado de hígado de pollo, cloruro de sodio, carbonato de calcio, fosfato dicálcico, cloruro de potasio, Manano-oligosacaridos saccharomyces cerevisiae, betaglucanos, cloruro de colina, hierro quelado, sulfato ferroso, hidroxicloruro de zinc, zinc quelado, selenio quelado, cobre básico cloruro, cobre quelado, yodato de calcio, hidroxicloruro de manganeso, manganeso quelado, selenito de sodio, vitamina E tocoferol acetato, vitamina B3 niacinamida, vitamina B5 ácido pantoténico, vitamina A retinol, vitamina H biotina, vitamina B2 riboflavina, vitamina K3 menadiona, vitamina B12 cianocobalamina, vitamina B1 tiamina, vitamina B6 piridoxina, vitamina D3 colecalciferol, vitamina B9 ácido fólico, sales de ácido propiónico, tocoferoles, aceite de romero, ácido cítrico."
   },
   {
     "brand": "Chunky",
@@ -380,12 +397,13 @@
     "ashMax": 8,
     "moistureMax": 10,
     "registration": "9377AL",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1.5,
       4,
       12
-    ]
+    ],
+    "ingredients": "Arroz, salmón, cordero, harina de salmón, salvado de trigo, aceite de pollo, hidrolizado de hígado de pollo, semilla de lino, cloruro de sodio, carbonato de calcio, fosfato dicálcico, cloruro de potasio, manano-oligosacaridos saccharomyces cerevisiae, betaglucanos, cloruro de colina, hierro quelado, sulfato ferroso, hidroxicloruro de zinc, zinc quelado, selenio quelado, cobre básico cloruro, cobre quelado, yodato de calcio, hidroxicloruro de manganeso, manganeso quelado, selenito de sodio, vitamina E tocoferol acetato, vitamina B3 niacinamida, vitamina B5 ácido pantoténico, vitamina A retinol, vitamina H biotina, vitamina B2 riboflavina, vitamina K3 menadiona, vitamina B12 cianocobalamina, vitamina B1 tiamina, vitamina B6 piridoxina, vitamina D3 colecalciferol, vitamina B9 ácido fólico, sales de ácido propiónico, tocoferoles, aceite de romero, ácido cítrico."
   },
   {
     "brand": "Chunky",
@@ -466,7 +484,7 @@
     "ashMax": 8,
     "moistureMax": 10,
     "registration": "7194AL",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       0.5,
       2,
@@ -476,7 +494,8 @@
       14,
       22,
       25
-    ]
+    ],
+    "ingredients": "Arroz, pollo, harina de pollo, maíz, salvado de trigo, yuca, aceite de pollo, hidrolizado de hígado de pollo, semilla de lino, cloruro de sodio, carbonato de calcio, fosfato dicálcico, cloruro de potasio, Manano-oligosacaridos saccharomyces cerevisiae, betaglucanos, cloruro de colina, hierro quelado, sulfato ferroso, hidroxicloruro de zinc, zinc quelado, , selenio quelado, cobre básico cloruro, cobre quelado, yodato de calcio, hidroxicloruro de manganeso, manganeso quelado, selenito de sodio, vitamina E tocoferol acetato, vitamina B3 niacinamida, vitamina B5 ácido pantoténico, vitamina A retinol, Vitamina H biotina, vitamina B2 riboflavina, vitamina K3 menadiona, vitamina B12 cianocobalamina, vitamina B1 tiamina, vitamina B6 piridoxina, vitamina D3 colecalciferol, vitamina B9 ácido fólico, sales de ácido propiónico, tocoferoles, aceite de romero, ácido cítrico."
   },
   {
     "brand": "Chunky",
@@ -492,14 +511,15 @@
     "ashMax": 10,
     "moistureMax": 10,
     "registration": "7724AL",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       0.5,
       2,
       4,
       9,
       18
-    ]
+    ],
+    "ingredients": "Arroz, pollo, harina de pollo, maíz, salvado de trigo, yuca, aceite de pollo, hidrolizado de hígado de pollo, semilla de lino, cloruro de sodio, carbonato de calcio, fosfato dicálcico, cloruro de potasio, manano-oligosacáridos saccharomyces cerevisiae, cloruro de colina, hierro quelado, sulfato ferroso, hidroxicloruro de zinc, zinc quelado, betaglucanos, selenio quelado, cobre básico cloruro, cobre quelado, yodato de calcio, hidroxicloruro de manganeso, manganeso quelado, selenito de sodio, vitamina E tocoferol acetato, vitamina B3 niacinamida, vitamina B5 ácido pantoténico, vitamina A retinol, vitamina H biotina, vitamina B2 riboflavina, vitamina K3 menadiona, vitamina B12 cianocobalamina, vitamina B1 tiamina, vitamina B6 piridoxina, vitamina D3 colecalciferol, vitamina B9 ácido fólico, sales de ácido propiónico, tocoferoles, aceite de romero, ácido cítrico."
   },
   {
     "brand": "BR for Cat",
@@ -516,12 +536,13 @@
     "moistureMax": 9,
     "kcalKg": 3690,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       3,
       10
-    ]
+    ],
+    "ingredients": "proteínas de atún deshidratadas, proteínas de pollo deshidratadas, arroz integral, cebada, guisantes, proteínas animales hidrolizadas, grasa de pollo, proteína de guisantes, fibra de celulosa, pulpa de achicoria, aceite de Salmón, Sacharomyces cereviae, harían de flor de Marigold (fuente de luteína), paredes de levaduras (fuente de MOS), yucca schidigera, hierbas y frutos deshidratados (Camelia sinensis, Cinnamomium cassia, Thymus vulgaris, Curcuma cedoaria, Vitis vinífera, Melissa officinalis, Citrus limoni), glucosamina, condroitin sulfato, vitamina A, vitamina D3, vitamina E, biotina, taurina, L-carnitina, sustancias minerales (sulfato de hierro monohidratado, sulfato de zinc monohidratado, sulfato manganoso monohidratado, sulfato de cobre pentahidratado, yodato de calcio anhidro, selenito de sodio), cloruro de amonio."
   },
   {
     "brand": "BR for Cat",
@@ -538,12 +559,13 @@
     "moistureMax": 9,
     "kcalKg": 3313,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       3,
       10
-    ]
+    ],
+    "ingredients": "Pollo deshidratado, Arroz blanco, Pulpa de remolacha, Semilla de lino, Celulosa, Proteína animal hidrolizada (pollo),Sacharomyces cerevisiae, Pescado deshidratado, Aceite de pescado, Huevos secos, Grasa de pollo, Yuca Schidigera, Extracto de plantas (Extracto de romero, Extracto de semilla de uva, Extracto de cúrcuma, Extracto de Silimarina), Aceite de uva, Aceite hoja de trébol, Vitaminas {A, 03, E), Taurina, Minerales (Sulfato de hierro, Sulfato de cobre,Sulfato de Zinc, Sulfato de Manganeso, Yodato de calcio y Selenita de sodio)."
   },
   {
     "brand": "BR for Cat",
@@ -560,12 +582,13 @@
     "moistureMax": 9,
     "kcalKg": 3760,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       3,
       10
-    ]
+    ],
+    "ingredients": "Arroz integral, proteínas de pollo deshidratadas, proteínas de pescado deshidratadas, cebada, guisantes, grasa de pollo, proteína de guisante, proteínas de pollo hidrolizadas, fibras de celulosa, pulpa de remolacha, aceite de salmón, Sacharomyces cereviae, extracto de silimarina, harían de flor de Marigold (fuente de luteína), paredes de levaduras (fuente de MOS), yucca schidigera, hierbas y frutos deshidratados (Camelia sinensis, Cinnamomium cassia, Thymus vulgaris, Curcuma cedoaria, Vitis vinífera, Melissa officinalis, Citrus limoni), glucosamina, condroitin sulfato, vitamina A, vitamina D3, vitamina E, biotina, taurina, L-carnitina, minerales (sulfato de hierro monohidratado, óxido de zinc, óxido de manganeso, sulfato manganoso, sulfato de cobre pentahidratado, yodato de calcio anhidro, selenito de sodio), cloruro de amonio."
   },
   {
     "brand": "BR for Cat",
@@ -582,12 +605,13 @@
     "moistureMax": 9,
     "kcalKg": 3934,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       3,
       10
-    ]
+    ],
+    "ingredients": "Pescado deshidratado, Pollo deshidratado, Arroz blanco, Grasa de pollo, Pulpa de remolacha, Huevos secos, Prolefna Pollo hidrolizada, Semilla de lino, Sacharomyces cerevisiae, Extracto de yuca, Extracto de Romero, Extracto de semilla de uva, Extracto de cúrcuma, Extracto de Silimarina, Aceite de uva, Aceite de hoja de clavo, Vitaminas (A, D3, E), Taurina, Sulfato de hierro, Sulfato de cobre, Sulfato de Zinc, Sulfato de Manganeso, Yodato de calcio y Selenita de sodio."
   },
   {
     "brand": "BR for Cat",
@@ -604,12 +628,13 @@
     "moistureMax": 10,
     "kcalKg": 4195,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       3,
       10
-    ]
+    ],
+    "ingredients": "Proteínas de salmón deshidratadas, proteínas de pollo deshidratadas, grasa de ave, arroz, maíz, guisantes, proteínas animales hidrolizadas, fibra de trigo, proteína de maíz, pulpa de achicoria, aceite de salmón, semilla de lino, levadura de cerveza, sustancias minerales, hierbas y frutas deshidratadas (Camelia sinensis, Cinnamomium cassia, Thymus vulgaris, Curcuma cedoaria, Vitis vinifera, Melissa officinalis, Eugenol, Citrus limoni), romero deshidratado, Yucca schidigera."
   },
   {
     "brand": "BR for Cat",
@@ -625,12 +650,13 @@
     "ash": 8,
     "moistureMax": 9,
     "kcalKg": 3655,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       3,
       10
-    ]
+    ],
+    "ingredients": "Pollo deshidratado, Pescado deshidratado, Arroz blanco, Grasa de pollo, Pollo hidrolizado, Pulpa de remolacha, semilla de lino, sacharomyces cerevisiae, Aceite de pescado, Celulosa, Extracto de yuca, Extracto de romero, Extraclo de semilla de uva, Extracto de cúrcuma, Extracto de silimari na, Aceite de uva, Aceite de hoja de clavo, Vi taminas (A, 03, E), Taurina, Sulfato de hierro, Sulfato de cobre, Sulfato de Zi nc, Sulfato de manganeso, Yodato de calcio y Selenita de sodio."
   },
   {
     "brand": "BR for Cat",
@@ -646,12 +672,13 @@
     "ashMax": 8,
     "moistureMax": 9,
     "kcalKg": 3655,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       3,
       10
-    ]
+    ],
+    "ingredients": "Salmón deshidratado, Pollo deshidratado, Arroz blanco, Grasa de pollo, Pollo hidrolizado, Pulpa de remolacha, Semilla de lino, Sacharomyces cerevisiae, Aceite de pescado, Celulosa, Extracto de silimarina, Extracto de yuca, Extracto de romero, Extracto de semilla de uva, Extracto de cúrcuma, Aceite de uva, Aceite de hoja de clavo, Vitaminas (A, D3, E), Taurina, Minerales (Sulfato de hierro, Sulfato de cobre, Sulfato de Zinc, Sulfato de Manganeso, Yodato de calcio y Selenito de sodio)."
   },
   {
     "brand": "BR for Cat",
@@ -668,12 +695,13 @@
     "moistureMax": 10,
     "kcalKg": 3670,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       3,
       10
-    ]
+    ],
+    "ingredients": "Harina de pollo, harina de pescado (fuente natural de DHA), grasa de pollo (preservada con mezcla de tocoferoles, una mezcla de vitamina E), arroz cervecero, levadura de cerveza (saccharomyces cerevisiae), harina de avena, proteína de papa, papa deshidratada, yucca Schidigera, beta-caroteno, huevo deshidratado, arroz, pulpa de remolacha (azúcar extraída), sabor natural a pescado, extracto de romero, extrato de silimarina, linaza (fuente natural de omega 3 y ácidos grasos), taurina, extracto de hemicelulosa, cloruro de colina, clorhidrato de potasio, DL-metionina, L-lisina, suplemento de vitamina E, L-ascorbyl-2, polifosfato (como fuente de vitamina C), niacina, suplemento de vitamina A, pantotenato de Calcio, carbonato de Calcio, riboflavina, mononitrato de tiamina, clorhidrato de piridoxina, suplemento de vitamina D3, ácido fólico, biotina, suplemento de vitamina B12, sulfato ferroso, óxido de zinc, óxido de manganeso, sulfato de cobre, carbonato de cobalto, yodado de Calcio, selenio de sodio, L-carnitine, extracto de cardo mariano."
   },
   {
     "brand": "BR for Cat",
@@ -690,12 +718,13 @@
     "moistureMax": 9,
     "kcalKg": 4100,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       0.5,
       1.5,
       3
-    ]
+    ],
+    "ingredients": "Proteína de Pollo Hidrolizada, Proteína de Pollo Deshidratada, Huevo Deshidratado, Grasa de Pollo, Arroz, Fibra Vegetal, Semilla de Lino, Fibra de psyllium, Yucca Shidigera, Pulpa de Achicoria, Sacharomyces Cerevisiae, FOS, B - glucanos, MOS, Selenito de Sodio, Sulfato de Cobre, Sulfato de Hierro, Sulfato de Manganeso, Sulfato de Zinc, Yodato de Calcio, Taurina, Vitamina A, Vitamina D3, Vitamina E, Bentonita, BHT."
   },
   {
     "brand": "BR for Cat",
@@ -712,12 +741,13 @@
     "moistureMax": 9,
     "kcalKg": 4060,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       0.5,
       1.5,
       3
-    ]
+    ],
+    "ingredients": "Proteína de Pollo Deshidratada, Proteína de Pollo Hidrolizada, Huevo Deshidratado, Grasa de Pollo, Arroz, Semilla de Lino, Pulpa de Achicoria, Cardo Mariano Deshidratado, Sacharomyces Cerevisiae, FOS, Selenito de Sodio, Sulfato De Cobre, Sulfato de Hierro, Sulfato de Manganeso, Sulfato de Zinc, Yodato de Calcio, L-Carnitina, Taurina, Vitamina A, Vitamina D3, Vitamina E, BHT."
   },
   {
     "brand": "BR for Cat",
@@ -734,12 +764,13 @@
     "moistureMax": 9,
     "kcalKg": 4075,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       0.5,
       1.5,
       3
-    ]
+    ],
+    "ingredients": "Proteínas De Pollo Deshidratadas, Huevo Deshidratado, Proteínas De Pollo Hidrolizadas, Grasa De Pollo, Aceite De Algas (Fuente de Ácidos Grasos EPA y DHA), Arroz, Guisantes, Semilla De Lino, (FOS), Pulpa De Achicoria, Paredes De Levaduras (Fuente De MOS y β-Glucanos), Sulfato De Hierro Monohidratado, Sulfato De Zinc Monohidratado, Sulfato Manganoso Monohidratado, Sulfato De Cobre Pentahidratado, Yodato De Calcio Anhidro, Selenito De Sodio, Cloruro De Amonio, Vitamina A, Vitamina D3, Vitamina E, Taurina, BHT."
   },
   {
     "brand": "BR for Cat",
@@ -756,12 +787,13 @@
     "moistureMax": 9,
     "kcalKg": 3980,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       0.5,
       1.5,
       3
-    ]
+    ],
+    "ingredients": "Proteínas De Pollo Deshidratadas, Huevo Deshidratado, Proteínas De Pollo Hidrolizadas, Grasa De Pollo, Arroz, Guisantes, Pulpa De Achicoria, Semilla De Lino, (FOS), Aceite De Algas (Fuente De Ácidos Grasos EPA Y DHA), Paredes De Levaduras (Fuente De MOS Y β-Glucanos), Sulfato De Hierro Monohidratado, Sulfato De Zinc Monohidratado, Amino Quelato De Zinc, Sulfato Manganoso Monohidratado, Sulfato De Cobre Pentahidratado, Yodato De Calcio Anhidro, Selenito De Sodio, Vitamina A, Vitamina D3, Vitamina E, Taurina, BHT."
   },
   {
     "brand": "BR for Cat",
@@ -778,12 +810,13 @@
     "moistureMax": 9,
     "kcalKg": 3750,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       0.5,
       1.5,
       3
-    ]
+    ],
+    "ingredients": "Proteína de Pavo Deshidratada, Proteína de Guisantes, Grasa de Pollo, Arroz, Almidón de Tapioca, Guisantes, Semilla de Lino, Pulpa de Achicoria, Celulosa en Polvo, Sacharomyces Cerevisiae, Selenito de Sodio, Sulfato de Cobre, Sulfato de Hierro, Sulfato de Manganeso, Sulfato de Zinc, Yodato de Calcio, Taurina, Vitamina A, Vitamina D3, Vitamina E, BHT"
   },
   {
     "brand": "BR for Cat",
@@ -800,12 +833,13 @@
     "moistureMax": 9,
     "kcalKg": 3825,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       0.5,
       1.5,
       3
-    ]
+    ],
+    "ingredients": "Proteína de Cerdo Hidrolizada, Proteína de Pollo Hidrolizada, Proteína de Pollo Deshidratada, Proteína de Cerdo Deshidratada, Pollo Fresco, Grasa de Pollo, Aceite de Salmón, Fibras Vegetales, Arándanos Deshidratados, Pulpa de Achicoria, Sacharomyces Cerevisiae, MOS, Selenito de Sodio, Sulfato de Cobre Pentahidratado, Sulfato de Hierro Monohidratado, Óxido de Manganeso, Yodato de Calcio Anhidro, Óxido de Zinc, Cloruro De Amonio, DL-Metionina, L-Triptofano, L-Carnitina, Taurina, Vitamina A, Vitamina D3, Vitamina C y Vitamina E."
   },
   {
     "brand": "BR for Cat",
@@ -822,12 +856,13 @@
     "moistureMax": 9,
     "kcalKg": 3315,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       0.5,
       1.5,
       3
-    ]
+    ],
+    "ingredients": "Salmón Fresco, Proteínas De Pollo Deshidratadas, Proteína De Pollo Hidrolizada, Grasa De Pollo, Aceite De Pescado, Cebada, Fibra De Guisante, Celulosa, Pulpa De Remolacha, Yucca Schidigera, Fibra De Manzana, Paredes De Levaduras, MOS, Sulfato De Cobre Pentahidratado, Sulfato De Hierro Mono-hidratado, Óxido De Manganeso, Yodato De Calcio Anhidro, Óxido De Zinc, Selenito De Sodio, L-Carnitina, Taurina, Vitamina A, Vitamina D3, Y Vitamina E."
   },
   {
     "brand": "BR for Cat",
@@ -844,11 +879,12 @@
     "moistureMax": 9,
     "kcalKg": 3970,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       3
-    ]
+    ],
+    "ingredients": "Salmón fresco (25%), Pato deshidratado (12%) Pollo deshidratado (12%) Grasa animal (pollo 11%) Guisantes verdes, Arvejas verdes, Batata, Proteína de pollo hidrolizada (7%), Pulpa de remolacha seca, semillas de lino, Manzanas secas, MOS (Mono-oligosacaridos), Achicoria seca (Fuente natural de Inulina y FOS), Secado levadura de cerveza, minerales, Aceite de salmón (1%), Secado brócoli, Espinacas secas, Arándanos rojos secos, Arándanos azules secos, Extractos de plantas (Rosmarinus sp., Vitis sp., Cúrcuma sp., Citrus sp., Eugenia sp.)."
   },
   {
     "brand": "BR for Cat",
@@ -865,11 +901,12 @@
     "moistureMax": 9,
     "kcalKg": 4304,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       3
-    ]
+    ],
+    "ingredients": "Salmón fresco (25%), Pollo deshidratado (25%), Grasa animal (pollo 14%), Guisantes verdes, Arvejas verdes, Proteína de pollo hidratado(7%), Batata, Pulpa de remolacha seca, Levadura de cerveza seca, Semillas de lino, Aceite de salmón (1%), Achicoria seca (Una fuente natural de FOS (fructo-oligosacáridos y Inulina), MOS (Mono-oligosacáridos), Minerales, Brócoli seco, Espinacas secas, Arándanos rojos secos, Arándanos azules secos, Extractos de plantas (Rosmarinus sp., Vitis sp., Cúrcuma sp., Citrus sp., Eugenia sp.)."
   },
   {
     "brand": "BR for Dog",
@@ -884,12 +921,13 @@
     "fiberMax": 3,
     "ashMax": 6,
     "moistureMax": 9,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       3,
       10
-    ]
+    ],
+    "ingredients": "Arroz, pollo deshidratado, trigo, pulpa de remolacha, proteína hidrolizada de poll, semillas de linaza, vitaminas y minerales, grasa animal (pollo), huevos secos enteros, aceite de salmón, pescado deshidratado, levadura seca, sacharomyces cerevissiae, extracto de romero, extracto de cúrcuma, extracto de semillas de uva, extracto de silimarina, aceite de pomelo, aceite de hojas de clavo."
   },
   {
     "brand": "BR for Dog",
@@ -904,12 +942,13 @@
     "fiberMax": 3,
     "ashMax": 8,
     "moistureMax": 9,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       3,
       10
-    ]
+    ],
+    "ingredients": "Pollo deshidratado, arroz, trigo, harina de pollo, grasa animal (pollo), proteína hidratada de pollo, pulpa de remolacha, semillas de linaza, vitamina y minerales, huevos secos enteros, aceite de salmón, harina de pescado, sacharomyces cerevisiae, extracto de romero, extracto de semilla de uva, extracto de cúrcuma, extracto de silimarina, aceite de pomelo, aceite de hojas de clavo, vitaminas (A, D3, E)."
   },
   {
     "brand": "BR for Dog",
@@ -924,12 +963,13 @@
     "fiberMax": 3,
     "ashMax": 8.5,
     "moistureMax": 9,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       3,
       10
-    ]
+    ],
+    "ingredients": "Pollo deshidratad, arroz, harina de ave, grasa animal (pollo), proteína de pollo hidrolizada, pulpa de remolacha, semilla de lino, vitaminas y minerales, huevo seco entero, aceite de salmón, harina de pescado, levadura de cerveza seca, extracto de romero, extracto de semilla de uva, extracto de cúrcuma, extracto de silimarina, aceite de pomelo expresado, aceite de hoja de clavo."
   },
   {
     "brand": "BR for Dog",
@@ -944,13 +984,14 @@
     "ashMax": 8.6,
     "moistureMax": 9,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       3,
       10
     ],
-    "fatMin": 20
+    "fatMin": 20,
+    "ingredients": "Cordero (15% Cordero fresco, 15% Cordero deshidratado), guisantes, harina de arroz integral, hojuelas de papa seca, grasa animal, pulpa de remolacha, proteína de papa, proteína vegetal hidrolizada, alfalfa, levadura de cerveza deshidratada, suero seco, vitaminas y minerales, aceite de salmón fresco, achicoria seca, (fuente natural de FOS e inulina), manzana seca, mannan-oligosacaridos MOS, extracto de plantas (romero sp., cúrcuma sp., vitis sp., syzigium sp., yucca shidigera)."
   },
   {
     "brand": "BR for Dog",
@@ -964,13 +1005,14 @@
     "fiberMax": 3,
     "ashMax": 6,
     "moistureMax": 9,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       3,
       10
     ],
-    "fatMin": 12
+    "fatMin": 12,
+    "ingredients": "Pollo deshidratado, arroz, trigo, guisantes, grasa animal (pollo), proteína de pollo hidrolizado, pulpa de remolacha, semillas de linaza, vitaminas y minerales, huevos secos enteros, aceite de salmón, harina de pescado, levadura de cerveza seca, extracto de romero, extracto de semilla de uva, extracto de cúrcuma, extracto de silimarina, aceite de pomelo expresado, aceite de hoja de clavo."
   },
   {
     "brand": "BR for Dog",
@@ -985,13 +1027,14 @@
     "ashMax": 9,
     "moistureMax": 9,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       3,
       10
     ],
-    "fatMin": 17
+    "fatMin": 17,
+    "ingredients": "Codero (15% cordero fresco, 17% cordero deshidratado), guisantes, harina de arroz integral, hojuelas de papa seca, grasa animal, proteína de papa, semillas de linaza, proteína vegetal hidrolizada, pulpa de remolacha, harina de algarrobo, levadura de cerveza deshidratada, vitaminas y minerales, alfalfa, achicoria seca (fuente natural de FOS e inulina), manzana seca, manano-oligosacaridos MOS, extracto de manzanilla, extracto de plantas (romero sp., cúrcuma sp., vitis sp., syzigium sp., yucca shidigera)."
   },
   {
     "brand": "BR for Dog",
@@ -1005,13 +1048,14 @@
     "fiberMax": 3.5,
     "ashMax": 9,
     "moistureMax": 10,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       3,
       10
     ],
-    "fatMin": 14
+    "fatMin": 14,
+    "ingredients": "Arroz marrón (27%), cordero deshidratado (15%), grasa animal (cerdo), cerdo deshidratado, pulpa de remolacha, minerales, harían de algarroba, celulosa, krill antártico desecado (fuente natural de EPA y DHA), manzanas desecadas, semillas de linaza, lecitina, MOS (mannanoligosacaridos), romero sp., extracto de silimarina, glucosamina clorhidrato, condroitin sulfato, MSm (metilsulfonilmetano), GLM (mejillón de valvas verdes)."
   },
   {
     "brand": "BR for Dog",
@@ -1024,13 +1068,14 @@
     "proteinMin": 26,
     "fiberMax": 3,
     "moistureMax": 9,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       3,
       10
     ],
-    "fatMin": 16
+    "fatMin": 16,
+    "ingredients": "Arroz blanco (26%), cordero deshidratado (13,5%), pollo deshidratado (13,5%), grasa animal (pollo), proteína de pollo hidrolizado, pulpa de remolacha, semillas de linaza, minerales, aceite de salmón, celulosa, krill antártico seco (una fuente natural de EPA y DHA), manzana seca, MOS (mannan-oligosacáridos), harina de algarroba, mezcla de extracto de plantas (rosmarinus sp., vitis sp., cúrcuma sp., citrus sp., Eugenia sp.), extracto de silimarina, clorhidrato de glucosamina, sulfato de condroitina, GLM (mejillón de labios verdes)."
   },
   {
     "brand": "BR for Dog",
@@ -1047,12 +1092,13 @@
     "moistureMax": 10,
     "kcalKg": 3650,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       0.5,
       2,
       4
-    ]
+    ],
+    "ingredients": "Proteína de Pollo Hidrolizada, Proteína de Pollo Deshidratada, Huevo Deshidratado, Proteína de Maíz, Grasa de Pollo, Arroz, Fibra Vegetal, Semilla de Lino, Fibra de psyllium, Yucca Shidigera, Pulpa de Achicoria, Sacharomyces Cerevisiae, FOS, B-glucanos, MOS, Cloruro de Sodio, Cloruro de Potasio, Selenito de Sodio, Sulfato de Cobre, Sulfato de Hierro, Sulfato de Manganeso, Sulfato De Zinc, Yodato de Calcio, Taurina, Vitamina A, Vitamina D3, Vitamina E, Bentonita, BHT."
   },
   {
     "brand": "BR for Dog",
@@ -1069,12 +1115,13 @@
     "moistureMax": 10,
     "kcalKg": 4040,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       0.5,
       2,
       4
-    ]
+    ],
+    "ingredients": "Proteína Animal Hidrolizada, Proteína de Pollo Deshidratada, Huevo Deshidratado, Proteina de Maíz, Grasa de Pollo, Aceite de Salmón, Arroz, Semilla de Lino, Pulpa de Achicoria, Cardo Mariano Deshidratado, Sacharomyces Cerevisiae, FOS, Selenito de Sodio, Sulfato de Cobre, Quelato de Cobre, Sulfato de Hierro, Quelato de Hierro, Sulfato de Manganeso, Quelato de Manganeso, Sulfato de Zinc, Quelato de Zinc, Yodato de Calcio, L-Carnitina, Taurina, Vitamina A, Vitamina D3, Vitamina E, y BHT."
   },
   {
     "brand": "BR for Dog",
@@ -1091,12 +1138,13 @@
     "moistureMax": 10,
     "kcalKg": 3950,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       0.5,
       2,
       4
-    ]
+    ],
+    "ingredients": "Arroz, Almidón De Patata, Proteínas De Pollo Deshidratadas, Grasa De Pollo, Huevo Deshidratado, Patata, Pulpa De Achicoria Deshidratada, Semilla De Linaza, Proteínas Animales Hidrolizadas, Fructooligosacáridos (FOS), Aceite De Algas (Fuente De Ácidos Grasos EPA Y DHA), Paredes De Levaduras (Fuente De MOS Y β-Glucanos), Vitamina A, Vitamina D3, Vitamina E, Sustancias Minerales (Sulfato De Hierro Monohidratado, Aminoquelato de Hierro, Aminoquelato de Zinc, Sulfato De Zinc Monohidratado, Sulfato Manganoso Monohidratado, Aminoquelato de Manganeso, Sulfato De Cobre Pentahidratado, Aminoquelato de Cobre, Yodato De Calcio Anhidro, Selenito De Sodio)."
   },
   {
     "brand": "BR for Dog",
@@ -1113,12 +1161,13 @@
     "moistureMax": 10,
     "kcalKg": 4040,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       0.5,
       2,
       4
-    ]
+    ],
+    "ingredients": "Proteína de Pavo Deshidratada, Proteína de Guisantes, Grasa de Pollo, Guisantes, Arroz, Almidón de Tapioca, Celulosa en Polvo, Semilla de Lino, Pulpa de Achicoria, Selenito de Sodio, Sulfato de Cobre, Quelato de Cobre, Sulfato de Hierro, Quelato de Hierro, Sulfato de Manganeso, Quelato de Manganeso, Sulfato de Zinc, Quelato de Zinc, Yodato de Calcio, Taurina, Vitamina A, Vitamina D3, Vitamina E y BHT."
   },
   {
     "brand": "BR for Dog",
@@ -1135,12 +1184,13 @@
     "moistureMax": 10,
     "kcalKg": 3670,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       0.5,
       2,
       4
-    ]
+    ],
+    "ingredients": "Proteínas de pollo deshidratadas, Proteínas animales hidrolizadas, Pollo fresco, Proteína de maíz, Grasa de pollo, Aceite de salmón, Maíz, Trigo, Fibras Vegetales, Pulpa de achicoria, Saccharomyces cerevisiae, Paredes de levaduras (MOS), Arándanos Deshidratados, Sulfato de cobre pentahidratado, Sulfato de hierro monohidratado, Sulfato Manganoso monohidratado, Yodato de calcio anhidro, Óxido de zinc, Selenito de sodio, Cloruro Amónico, DL-metionina, Taurina, L-Carnitina, Vitamina A, Vitamina D3, Vitamina C y Vitamina E."
   },
   {
     "brand": "BR for Dog",
@@ -1157,12 +1207,13 @@
     "moistureMax": 10,
     "kcalKg": 3195,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       0.5,
       2,
       4
-    ]
+    ],
+    "ingredients": "Proteínas de pollo deshidratadas, Proteínas animales hidrolizadas (ave y cerdo), Salmón fresco, Proteína de maíz, Grasa de pollo, Aceite de pescado, Arroz, Trigo, Cebada hidrolizada, Guisantes, Fibras Vegetales, Pulpa de remolacha, Fibra de guisante, Fibra de manzana, Paredes de levaduras, MOS, Sulfato de hierro monohidratado, Sulfato Manganoso monohidratado, yodato de calcio anhidro, oxido de zinc, Sulfato de Cobre, selenito de sodio, L-carnitina, Vitamina A, Vitamina D3 y Vitamina E."
   },
   {
     "brand": "BR for Dog",
@@ -1179,11 +1230,12 @@
     "moistureMax": 9,
     "kcalKg": 4145,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       2,
       4
-    ]
+    ],
+    "ingredients": "Pollo fresco (25%), Salmón Deshidratado (20%), Grasa animal (pollo 13%), Batata, Guisantes verdes, Arveja verde, Proteína de papa, Proteína de polo hidrolizada (8%), Semillas de lino, Pulpa de remolacha, Minerales, Levadura de cerveza seca, Aceite de salmón (1%), Achicoria seca (una fuente natural de FOS (fructo oligosacáridos y Inulina), Manzana fresca, MOS (Mono-oligosacáridos), Brócoli seco, Espinacas secas, Arándanos rojos secos, Arándanos azules secos, Clorhidrato de glucosamina (150 mg / kg), Condroitina sulfato (150 mg, kg), Extractos de plantas (Rosmarinus sp., Vitis sp., Cúrcuma sp., Citrus sp., Eugenia sp.)."
   },
   {
     "brand": "BR for Dog",
@@ -1199,11 +1251,12 @@
     "moistureMax": 9,
     "kcalKg": 3990,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       2,
       4
-    ]
+    ],
+    "ingredients": "Pollo fresco (25%), Salmón deshidratado (23%), Grasa animal (pollo 11%), Batata, Guisantes verdes, Arvejas verdes, Proteína animal hidrolizados (8%), pulpa de remolacha, Semilla de lino, Minerales, Manzanas secas, Aceite de salmón (1%), Achicoria seca (una fuente natural de FOS (fructo-oligosacaridos) e inulina), MOS (Mono-oligosacáridos), Levadura de cerveza deshidratada, Brócoli seco, Espinacas secas, Arándanos rojos secos, Arándanos azules secos, clorhidrato de glucosamina (150 mg / kg), Sulfato de Condroitina (150 mg / kg) Extracto de plantas (Rosmarinus sp., Vitis sp., Cúrcuma sp., Citrus sp., Eugenia sp.)."
   },
   {
     "brand": "Tommy",
@@ -1219,12 +1272,13 @@
     "ashMax": 8,
     "moistureMax": 10,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       7,
       15
-    ]
+    ],
+    "ingredients": "Cebada en grano, maíz, arroz, harina de pollo, harina de pescado, pulpa de remolacha, grasa de pollo, vitamina A, vitamina D3, vitamina E, vitamina B1, vitamina B2, vitamina B6, niacina,ácido fálico, biotina, betaina, BHT, sepiolita, carbonato de calcio, ácido propiónico, ácido fórmico, propionato cálcico, sílice coloidal, BHA, ácido cítrico, L-carnitina, taurina, ácido silícico precipitado y seco, ácido ortofosfórico, cloruro de colina, agua y sabor a pollo."
   },
   {
     "brand": "Tommy",
@@ -1240,12 +1294,13 @@
     "ashMax": 9,
     "moistureMax": 10,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       7,
       15
-    ]
+    ],
+    "ingredients": "Cebada en grano, maíz, arroz, salvadillo de trigo, harina de carne, harina de pollo, pulpa de remolacha, grasa de pollo, vitamina A, vitamina D3, vitamina E, vitamina B1, vitamina B2, vitamina B6, niacina, ácido fálico, biotina, betaina, BHT, sepiolita, carbonato de calcio, ácido propiónico, ácido fórmico, propionato cálcico, sílice coloidal, BHA, ácido cítrico, L-carnitina, taurina, ácido silícico precipitado y seco, ácido ortofosfórico, cloruro de colina, agua y sabor a pollo."
   },
   {
     "brand": "Tommy",
@@ -1261,11 +1316,12 @@
     "ashMax": 10,
     "moistureMax": 10,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       10
-    ]
+    ],
+    "ingredients": "Cebada en grano, maíz, arroz, salvadillo de trigo, harina de carne, harina de pollo, harina de pescado, pulpa de remolacha, grasa de pollo, vitamina A, vitamina D3, vitamina E, vitamina B1, vitamina B2, vitamina B6, niacina, ácido fólico, biotina, betaina, BHT, sepiolita, carbonato de calcio, ácido propiónico, ácido fórmico, propionato cálcico, sílice coloidal, BHA, ácido cítrico, L-carnitina, taurina, ácido silícico precipitado y seco, ácido ortofosfórico, cloruro de colina, agua y sabor a pollo."
   },
   {
     "brand": "Tommy",
@@ -1281,12 +1337,13 @@
     "ashMax": 8,
     "moistureMax": 10,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       7,
       25
-    ]
+    ],
+    "ingredients": "cebada en grano, maíz, arroz, harina de pollo, pulpa de remolacha, pulpa de manzana, algarroba, saccharomyces cerevisiae, grasa de pollo, vitamina A, vitamina D3, vitamina E, vitamina B1, vitamina B2, vitamina B6, niacina, ácido fálico, biotina, betaina, BHT, sepiolita, carbonato de calcio, sal, ácido propiónico, ácido fórmico, propionato cálcico, sílice coloidal, BHA, ácido cítrico, L-carnitina, taurina, ácido silícico precipitado y seco y sabor a carne."
   },
   {
     "brand": "Tommy",
@@ -1302,12 +1359,13 @@
     "ashMax": 7,
     "moistureMax": 9.5,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       7,
       15
-    ]
+    ],
+    "ingredients": "Cebada en grano, maíz, arroz, harina de pollo, pulpa de remolacha, pulpa de manzana, algarroba, saccharomyces cerevisiae, grasa de pollo, vitamina A, vitamina D3, vitamina E, vitamina B1, vitamina B2, vitamina B6, Niacina, Ácido fálico, biotina, betaina, BHT, sepiolita, carbonato de calcio, sal, ácido propiónico, ácido fórmico, propionato cálcico, sílice coloidal, BHA, ácido cítrico, L-carnitina, taurina, ácido silícico precipitado y seco y sabor a carne."
   },
   {
     "brand": "Tommy",
@@ -1323,12 +1381,13 @@
     "ashMax": 8,
     "moistureMax": 9.5,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       7,
       25
-    ]
+    ],
+    "ingredients": "Cebada en grano, maíz. arroz, harina de pollo, pulpa de remolacha, pulpa de manzana, algarroba. saccharomyces cerevisiae, grasa de pollo, vitamina A, vitamina D3, vitamina E. vitamina 81, vitamina B2, vitamina 86, niacina, ácido fólico, biotina, betaina, BHT, sepiolita, carbonato de calcio, sal, ácido propiónico, ácido fórmico, propionato cálcico, sílice coloidal, BHA, ácido citrico, L-carnitina, taurina, ácido silícico precipitado y seco y sabor a carne."
   },
   {
     "brand": "Tommy",
@@ -1344,11 +1403,12 @@
     "ashMax": 8,
     "moistureMax": 9.5,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       7
-    ]
+    ],
+    "ingredients": "Cebada en grano, maíz, arroz, harina de pollo, pulpa de remolacha, pulpa de manzana, algarroba, saccharomyces cerevisiae, grasa de pollo, vitamina A, vitamina D3, vitamina E. vitamina B1, vitamina B2, vitamina B6, niacina, ácido fálico, biotina, betaina, BHT, sepiolita, carbonato de calcio, sal, ácido propiónico, ácido fórmico, propionato cálcico, sílice coloidal, BHA, ácido cítrico, L-carnitina, taurina, ácido silícico precipitado y seco y sabor a carne."
   },
   {
     "brand": "Michiko",
@@ -1364,11 +1424,12 @@
     "ashMax": 10,
     "moistureMax": 10,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       0.5,
       8
-    ]
+    ],
+    "ingredients": "Hígado de pollo hidrolizado, harina de despojos de pescado, maíz entero molido, harina de trigo, harina de carne y hueso, salvado de arroz, grasa animal estabilizada, harina de salmón, harina de pescado, salvado de trigo, salvado de gluten de maíz, salvado de soja, pulpa de remolacha, leche en polvo, huevo en polvo, zanahoria deshidratada, espinaca deshidratadas, B.H.T, saccharomyces cerevisiae, seolita, ácido propiónico, sal, ácido cítrico, mananooligosacaridos, colorante rojo #40 taurina, metionina, lisina, proteinato de zinc, sulfato de hierro, ácido nicotínico, proteinato de hierro, extracto de yucca shidigera, sulfato de cobre, proteinato de manganeso, proteinato de cobre, vitamina A, yodado de calcio, ácido pantoténico, yodado de potasio, vitamina B2, vitamina B12, vitamina C, vitamina B6, Vitamina B1, vitamina E, selenito de sodio, levadura enriquecida con selenio, vitamina D3, vitamina K3 y biotina."
   },
   {
     "brand": "Bonnat",
@@ -1380,10 +1441,16 @@
     ],
     "url": "https://www.bonnatpets.com/es/perros-cachorros-pequeno/",
     "kcalKg": 3860,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       2
-    ]
+    ],
+    "ingredients": "Pollo fresco (26%), proteínas de pollo deshidratadas, almidón de patata, guisantes (5%), proteínas animales hidrolizadas, grasa de ave, proteína de pavo deshidratada (4%), proteína de pescado deshidratada (2%), patata (28%), pulpa de remolacha deshidratada, alfalfa deshidratada, aceite de salmón, pulpa de achicoria deshidratada, fibras vegetales, fibra de Psyllium, levadura de cerveza, sustancias minerales, zanahoria deshidratada, tripolifosfato de sodio, manano-oligosacáridos (MOS), huevo deshidratado (1%), manzana deshidratada, espinaca deshidratada, arándanos rojos deshidratados, arándanos azules deshidratados, condroitín sulfato, glucosamina. Extracto de tocoferoles de aceites vegetales.",
+    "protein": 37,
+    "fat": 16,
+    "fiber": 4,
+    "nutrientSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Grain-Free-Canine-Puppy-Small-Breed-2KG_Racion.jpg?nc=1738581516",
+    "nutrientSourceName": "Bonnat · Tabla nutricional del fabricante"
   },
   {
     "brand": "Bonnat",
@@ -1393,10 +1460,19 @@
       "bonnat-dieta-veterinaria-gastrointestinal-gatos"
     ],
     "url": "https://www.bonnatpets.com/es/dietas-gatos-gastrointestinal/",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       2
-    ]
+    ],
+    "ingredients": "Proteínas de pollo deshidratadas (27%), maíz, huevo deshidratado (14,17%), arroz, grasa de ave, fibra vegetal, sustancias minerales, pulpa de remolacha deshidratada, proteínas animales hidrolizadas, levadura de cerveza, fibra de psyllium (0,5%), aceite de salmón, fructooligosacáridos (FOS), pulpa de achicoria deshidratada (0,5%), semilla de lino (0,5%), paredes de levaduras (fuente de MOS y B-glucanos) (0,2%), Yucca schidigera.",
+    "protein": 30,
+    "fat": 20,
+    "fiber": 6,
+    "nutrientSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Veterinary-Diet-Feline-Gastrointestinal-_Racion.jpg?nc=1738592509",
+    "nutrientSourceName": "Bonnat · Tabla nutricional del fabricante",
+    "kcalKg": 3825,
+    "kcalSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Veterinary-Diet-Feline-Gastrointestinal-_Racion.jpg?nc=1738592509",
+    "kcalSourceName": "Bonnat · Tabla nutricional del fabricante"
   },
   {
     "brand": "Bonnat",
@@ -1406,10 +1482,19 @@
       "bonnat-dieta-veterinaria-gastrointestinal-perros"
     ],
     "url": "https://www.bonnatpets.com/es/dietas-perros-gastrointestinal/",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       2
-    ]
+    ],
+    "ingredients": "Proteínas de pollo deshidratadas (27,8%), maíz, arroz, grasa de ave, huevo deshidratado (5%), proteínas de pollo hidrolizadas (3%), fibra vegetal, sustancias minerales, pulpa de remolacha deshidratada, paredes de levaduras (fuente de MOS y B-glucanos), aceite de salmón, semilla de lino, fructooligosacáridos (FOS), levadura de cerveza, pulpa de achicoria deshidratada (0,5%), fibra de psyllium (0,2%), Yucca schidigera (0,03%).",
+    "protein": 25,
+    "fat": 12,
+    "fiber": 5,
+    "nutrientSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Veterinary-Diet-Canine-Gastrointestinal_Racion.jpg?nc=1738591707",
+    "nutrientSourceName": "Bonnat · Tabla nutricional del fabricante",
+    "kcalKg": 3695,
+    "kcalSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Veterinary-Diet-Canine-Gastrointestinal_Racion.jpg?nc=1738591707",
+    "kcalSourceName": "Bonnat · Tabla nutricional del fabricante"
   },
   {
     "brand": "Bonnat",
@@ -1420,10 +1505,19 @@
     ],
     "url": "https://www.bonnatpets.com/es/dietas-gatos-hypoallergenic/",
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       2
-    ]
+    ],
+    "ingredients": "Arroz, proteínas de salmón hidrolizadas (20,7%), guisantes, proteína de guisante, aceite de salmón, pulpa de remolacha deshidratada, levaduras, pulpa de achicoria deshidratada, levadura de cerveza, sustancias minerales, fibra vegetal.",
+    "protein": 28,
+    "fat": 11,
+    "fiber": 4.4,
+    "nutrientSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Veterinary-Diet-Feline-Hypoallergenic_Racion.jpg?nc=1738592365",
+    "nutrientSourceName": "Bonnat · Tabla nutricional del fabricante",
+    "kcalKg": 3825,
+    "kcalSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Veterinary-Diet-Feline-Hypoallergenic_Racion.jpg?nc=1738592365",
+    "kcalSourceName": "Bonnat · Tabla nutricional del fabricante"
   },
   {
     "brand": "Bonnat",
@@ -1434,10 +1528,19 @@
     ],
     "url": "https://www.bonnatpets.com/es/dietas-perros-hypoallergenic/",
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       2
-    ]
+    ],
+    "ingredients": "Arroz, proteínas de salmón hidrolizadas (18%), guisantes, patata dulce, aceite de salmón, pulpa de remolacha deshidratada, proteína de guisante, sustancias minerales, fibra vegetal, pulpa de achicoria deshidratada, Yucca schidigera.",
+    "protein": 18,
+    "fat": 16,
+    "fiber": 5.4,
+    "nutrientSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Veterinary-Diet-Canine-Hypoallergenic_Racion.jpg?nc=1738591205",
+    "nutrientSourceName": "Bonnat · Tabla nutricional del fabricante",
+    "kcalKg": 3890,
+    "kcalSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Veterinary-Diet-Canine-Hypoallergenic_Racion.jpg?nc=1738591205",
+    "kcalSourceName": "Bonnat · Tabla nutricional del fabricante"
   },
   {
     "brand": "Bonnat",
@@ -1448,10 +1551,18 @@
     ],
     "url": "https://www.bonnatpets.com/es/dietas-gatos-hepaticsupport/",
     "kcalKg": 4065,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       2
-    ]
+    ],
+    "ingredients": "Arroz, proteína de maíz, huevo deshidratado, proteínas de pollo deshidratadas, grasa de ave, semilla de lino (1,5%), pulpa de remolacha deshidratada, proteínas de pollo hidrolizadas, sustancias minerales, levadura de cerveza, aceite de salmón",
+    "protein": 26,
+    "fat": 15,
+    "fiber": 3.5,
+    "nutrientSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Veterinary-Diet-Feline-Hepatic-Suport_Racion.jpg?nc=1738592219",
+    "nutrientSourceName": "Bonnat · Tabla nutricional del fabricante",
+    "kcalSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Veterinary-Diet-Feline-Hepatic-Suport_Racion.jpg?nc=1738592219",
+    "kcalSourceName": "Bonnat · Tabla nutricional del fabricante"
   },
   {
     "brand": "Bonnat",
@@ -1461,10 +1572,19 @@
       "bonnat-dieta-veterinaria-soporte-hepatico-perros"
     ],
     "url": "https://www.bonnatpets.com/es/dietas-per-hepaticsupport/",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       2
-    ]
+    ],
+    "ingredients": "Arroz, proteínas de pollo deshidratadas (10,6%), huevo deshidratado (10%), grasa de ave, maíz, proteínas animales hidrolizadas, semilla de lino (1,88%), sustancias minerales, pulpa de remolacha deshidratada, levadura de cerveza, cardo mariano deshidratado (0,15%).",
+    "protein": 16,
+    "fat": 15,
+    "fiber": 3.4,
+    "nutrientSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Veterinary-Diet-Canine-Hepatic-Suport_Racion.jpg?nc=1738590810",
+    "nutrientSourceName": "Bonnat · Tabla nutricional del fabricante",
+    "kcalKg": 4050,
+    "kcalSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Veterinary-Diet-Canine-Hepatic-Suport_Racion.jpg?nc=1738590810",
+    "kcalSourceName": "Bonnat · Tabla nutricional del fabricante"
   },
   {
     "brand": "Bonnat",
@@ -1476,10 +1596,18 @@
     "url": "https://www.bonnatpets.com/es/dietas-gatos-renalsupport/",
     "kcalKg": 3695,
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       2
-    ]
+    ],
+    "ingredients": "Arroz, proteína de maíz, guisantes, huevo deshidratado (7,77%), proteínas de pollo deshidratadas, pulpa de remolacha deshidratada, aceite de salmón (3,79%), sustancias minerales, semilla de lino, proteínas de pollo hidrolizadas, fibra vegetal, grasa de ave, levadura de cerveza.",
+    "protein": 25,
+    "fat": 10,
+    "fiber": 5.4,
+    "nutrientSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Veterinary-Diet-Feline-Renal-Suport_Racion.jpg?nc=1738591975",
+    "nutrientSourceName": "Bonnat · Tabla nutricional del fabricante",
+    "kcalSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Veterinary-Diet-Feline-Renal-Suport_Racion.jpg?nc=1738591975",
+    "kcalSourceName": "Bonnat · Tabla nutricional del fabricante"
   },
   {
     "brand": "Bonnat",
@@ -1490,10 +1618,19 @@
     ],
     "url": "https://www.bonnatpets.com/es/dietas-per-renalsupport/",
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       2
-    ]
+    ],
+    "ingredients": "Arroz, maíz, guisantes (10%), grasa de ave, huevo deshidratado (6,69%), proteínas de salmón deshidratadas (4%), proteínas animales hidrolizadas (3%), aceite de salmón (2,7%), proteína de maíz (2,33%), sustancias minerales, pulpa de remolacha deshidratada, levadura de cerveza.",
+    "protein": 12.5,
+    "fat": 15,
+    "fiber": 3.4,
+    "nutrientSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Veterinary-Diet-Canine-Renal-Suport_Racion.jpg?nc=1738590222",
+    "nutrientSourceName": "Bonnat · Tabla nutricional del fabricante",
+    "kcalKg": 4020,
+    "kcalSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Veterinary-Diet-Canine-Renal-Suport_Racion.jpg?nc=1738590222",
+    "kcalSourceName": "Bonnat · Tabla nutricional del fabricante"
   },
   {
     "brand": "Bonnat",
@@ -1503,10 +1640,16 @@
       "bonnat-esterilizado-libre-de-granos-gatos"
     ],
     "url": "https://www.bonnatpets.com/es/gatos-esterilizados/",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1.5
-    ]
+    ],
+    "ingredients": "Pollo fresco (26%), proteínas de pollo deshidratadas, almidón de guisante, proteínas de pollo hidrolizadas, proteínas de pavo deshidratadas, proteínas de pescado deshidratadas (4%), pulpa de remolacha deshidratada (2,6%), guisantes, fibra vegetal, grasa de ave, patata, aceite de salmón (0,8%), pulpa de achicoria deshidratada (0,8%), levadura de cerveza, fibra de Psyllium (0,8%), tripolifosfato de sodio, sustancias minerales, manano-oligosacáridos (MOS), huevo deshidratado, zanahoria deshidratada, alfafa deshidratada, manzana deshidratada, espinaca deshidratada, arándanos rojos deshidratados, arándanos azules deshidratados, condroítin sulfato, glucosamina.",
+    "protein": 40,
+    "fat": 10,
+    "fiber": 5.9,
+    "nutrientSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Grain-Free-Feline-Sterilized_Racion.jpg?nc=1738584261",
+    "nutrientSourceName": "Bonnat · Tabla nutricional del fabricante"
   },
   {
     "brand": "Bonnat",
@@ -1517,10 +1660,16 @@
     ],
     "url": "https://www.bonnatpets.com/es/perros-cachorros-medianoygrande/",
     "kcalKg": 3860,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       2
-    ]
+    ],
+    "ingredients": "Pollo fresco (26%), proteínas de pollo deshidratadas, almidón de patata, guisantes (5%), proteínas animales hidrolizadas, grasa de ave, proteína de pavo deshidratada (4%), proteína de pescado deshidratada (2%), patata (28%), pulpade remolacha deshidratada, alfalfa deshidratada, aceite de salmón, pulpa de achicoria deshidratada, fibras vegetales, fibra de Psyllium, levadura de cerveza, sustancias minerales, zanahoria deshidratada, tripolifosfato de sodio, manano-oligosacáridos (MOS), huevo deshidratado (1%), manzana deshidratada, espinaca deshidratada, arándanos rojos deshidratados, arándanos azules deshidratados, condroitín sulfato, glucosamina. Extracto de tocoferoles de aceites vegetales.",
+    "protein": 37,
+    "fat": 16,
+    "fiber": 4,
+    "nutrientSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Grain-Free-Canine-Adult-MediumLarge-Breeds-2KG_Racion.jpg?nc=1738582635",
+    "nutrientSourceName": "Bonnat · Tabla nutricional del fabricante"
   },
   {
     "brand": "Bonnat",
@@ -1530,11 +1679,17 @@
       "bonnat-pollo-fresco-con-pavo-libre-de-granos-perros"
     ],
     "url": "https://www.bonnatpets.com/es/perros-adultos-medianoygrande/",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       2,
       10
-    ]
+    ],
+    "ingredients": "Pollo fresco (26%), proteínas de pollo deshidratadas, guisantes (12,4%), almidón de patata (9.58%), proteínas de pollo hidrolizadas, grasa de ave, proteínas de pescado deshidratadas (4%), proteínas de pavo deshidratadas (4%), patata (3%), alfalfa deshidratada, pulpa de remolacha deshidratada, vaina de habas, aceite de salmón (0,8%), pulpa de achicoria deshidratada, fibras vegetales, fibra de Psyllium, levadura de cerveza, sustancias minerales, tripolifosfato de sodio, zanahoria deshidratada, huevo deshidratado, manano-oligosacáridos (MOS), manzana deshidratada, espinaca deshidratada, arándanos rojos deshidratados, arándanos azules deshidratados, condroitín sulfato, glucosamina.",
+    "protein": 36.5,
+    "fat": 15,
+    "fiber": 4.2,
+    "nutrientSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Grain-Free-Canine-Puppy-MediumLarge-Breeds2kg_Racion.jpg?nc=1738583123",
+    "nutrientSourceName": "Bonnat · Tabla nutricional del fabricante"
   },
   {
     "brand": "Bonnat",
@@ -1545,10 +1700,16 @@
     ],
     "url": "https://www.bonnatpets.com/es/gatos-gatitos/",
     "kcalKg": 4140,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1.5
-    ]
+    ],
+    "ingredients": "Pollo fresco (26%), proteínas de pollo deshidratadas, almidón de guisante, grasa de ave, proteínas de pollo hidrolizadas, proteínas de pescado deshidratadas, proteínas de pavo deshidratadas, guisantes, patata, aceite de salmón, pulpa de achicoria deshidratada, levadura de cerveza, pulpa de remolacha deshidratada, fibra de Psyllium, fibras vegetales, tripolifosfato de sodio, manano-oligosacáridos (MOS), sustancias minerales, huevo deshidratado, zanahoria deshidratada, alfalfa deshidratada, manzana deshidratada, espinaca deshidratada, arándanos rojos deshidratados, arándanos azules deshidratados, condroitín sulfato, glucosamina.",
+    "protein": 40,
+    "fat": 17,
+    "fiber": 3.4,
+    "nutrientSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Grain-Free-Feline-Kitten_Racion.jpg?nc=1738583829",
+    "nutrientSourceName": "Bonnat · Tabla nutricional del fabricante"
   },
   {
     "brand": "Bonnat",
@@ -1559,10 +1720,16 @@
     ],
     "url": "https://www.bonnatpets.com/es/gatos-adultos/",
     "kcalKg": 3660,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1.5
-    ]
+    ],
+    "ingredients": "Pollo fresco (26%), proteínas de pollo deshidratadas, almidón de guisante, grasa de ave, proteínas de pollo hidrolizadas, proteínas de pescado deshidratadas, proteínas de pavo deshidratadas, guisantes, patata, aceite de salmón, pulpa de achicoria deshidratada, levadura de cerveza, pulpa de remolacha deshidratada, fibra de Psyllium, fibras vegetales, tripolifosfato de sodio, manano-oligosacáridos (MOS), sustancias minerales, huevo deshidratado, zanahoria deshidratada, alfalfa deshidratada, manzana deshidratada, espinaca deshidratada, arándanos rojos deshidratados, arándanos azules deshidratados, condroitín sulfato, glucosamina.",
+    "protein": 40,
+    "fat": 15,
+    "fiber": 3.6,
+    "nutrientSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Grain-Free-Feline-Adult_-Racion.jpg?nc=1738584047",
+    "nutrientSourceName": "Bonnat · Tabla nutricional del fabricante"
   },
   {
     "brand": "Mirringo",
@@ -1644,8 +1811,9 @@
     "fiberMax": 3.5,
     "ashMax": 8,
     "moistureMax": 10,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
+      0.5,
       1
     ],
     "complete": true,
@@ -1696,7 +1864,11 @@
         },
         "sourceUrl": "https://www.mizooco.com/cdn/shop/files/MIRRINGO-GATICOS-1KG-FRONT.jpg?v=1777463686"
       }
-    ]
+    ],
+    "packageSources": {
+      "0.5": "https://mercacentro.vteximg.com.br/arquivos/ids/177916/mirringo-gaticos-x-500-g-1.jpg?v=638950489508670000",
+      "1": "https://www.mizooco.com/products/mirringo-gaticos"
+    }
   },
   {
     "brand": "Ringo",
@@ -1805,7 +1977,7 @@
     "fiberMax": 4,
     "ashMax": 9,
     "moistureMax": 10,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       2,
@@ -1817,7 +1989,8 @@
       "2": "https://www.mizooco.com/products/vivance-vitality-perros-adultos",
       "10": "https://www.mizooco.com/products/vivance-vitality-perros-adultos",
       "20": "https://www.mizooco.com/products/vivance-vitality-perros-adultos"
-    }
+    },
+    "ingredients": "Harina de Pollo, Almidón de Yuca, Harina de Cordero, Arveja, Aceite de Pollo, Pulpa de Remolacha, Harina de Atún, Saccharomyces cerevisiae, Semillas de Chía, Hidrolizado de Pollo, Huevo Deshidratado. Prebióticos: Fructoligosacáridos, Mananoligosacáridos y Betaglucanos. Alga Schizochytrium spp (fuente de DHA y EPA), Zeolita, Cloruro de Sodio, Inulina. Probióticos: Enterococcus faecium, Bacillus subtilis, S. boulardii, Lactobacillus spp, Bifidobacterias spp. Extracto de Quillaja, Cloruro de Potasio. Minerales: Manganeso Orgánico, Cobre Orgánico, Zinc Orgánico, Hierro Orgánico, Yodato de Calcio, Selenio Orgánico, Cromo Orgánico. Vitaminas: A, C, D3, E, K, B12, Tiamina, Piridoxina, Riboflavina, Niacina, Ácido Pantoténico, Ácido Fólico, Biotina, Cloruro de Colina. Aminoácidos: DL-Metionina, L-Arginina, L-Triptófano, Taurina. Antioxidantes Naturales: Extracto de Romero."
   },
   {
     "brand": "Vivance",
@@ -1832,7 +2005,7 @@
     "fiberMax": 4,
     "ashMax": 9,
     "moistureMax": 10,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       2,
@@ -1844,7 +2017,8 @@
       "2": "https://www.mizooco.com/products/vivance-vitality-perros-cachorros",
       "8": "https://www.mizooco.com/products/vivance-vitality-perros-cachorros",
       "15": "https://www.mizooco.com/products/vivance-vitality-perros-cachorros"
-    }
+    },
+    "ingredients": "Harina de Pollo, Almidón de Yuca, Harina de Cordero, Arveja, Harina de Atún, Aceite de Pollo, Saccharomyces cerevisiae, Pulpa de Remolacha, Huevo Deshidratado, Semillas de Chía, Leche en Polvo Deslactosada, Hidrolizado de Pollo. Prebióticos: Fructoligosacáridos, Mananoligosacáridos y Betaglucanos. Alga Schizochytrium spp (fuente de DHA y EPA), Zeolita, Cloruro de Sodio, Inulina. Probióticos: Enterococcus faecium, Bacillus subtilis, S. boulardii, Lactobacillus spp, Bifidobacterias spp. Extracto de Quillaja, Cloruro de Potasio. Minerales: Manganeso Orgánico, Cobre Orgánico, Zinc Orgánico, Hierro Orgánico, Yodato de Calcio, Selenio Orgánico, Cromo Orgánico. Vitaminas: A, C, D3, E, K, B12, Tiamina, Piridoxina, Riboflavina, Niacina, Ácido Pantoténico, Ácido Fólico, Biotina, Cloruro de Colina. Aminoácidos: DL-Metionina, L-Arginina, L-Triptófano, Taurina. Antioxidantes Naturales: Extracto de Romero."
   },
   {
     "brand": "Guaumor",
@@ -2101,13 +2275,14 @@
     "fiberMax": 3.5,
     "ashMax": 9.5,
     "moistureMax": 10,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1
     ],
     "packageSources": {
       "1": "https://www.mizooco.com/products/nutriss-gaticos-pollo-y-leche"
-    }
+    },
+    "ingredients": "Harina de Pollo, Arroz, Harina de Carne de Cerdo y Res, Arveja, Grasa de Pollo, Maíz, Torta de Soya, Plasma Bovino, Saccharomyces cerevisiae, Hidrolizado de Pollo, Leche Deslactosada, Pulpa de Remolacha, Zeolita, Algas Schizochytrium spp (Omega 3 y fuente de DHA). Prebióticos: Fructooligosacáridos, Mananoligosacáridos y Betaglucanos. Inulina. Ácido Butírico. Probióticos: Enteroccocus faecium, Bacillus Subtilis y S. Boulardii. Cloruro de Potasio, Cloruro de Sodio, Extracto de Yucca Schidigera. Minerales: Manganeso Orgánico, Sulfato de Manganeso, Cobre Orgánico, Sulfato de Cobre, Zinc Orgánico, Óxido de Zinc, Hierro Orgánico, Sulfato Ferroso, Yodato de Calcio, Selenio Orgánico, Cromo Orgánico. Vitaminas: A, C, D3, E, K, B12, Tiamina, Piridoxina, Riboflavina, Niacina, Ácido Pantoténico, Ácido Fólico, Biotina, Cloruro de Colina. Aminoácidos: DL-Metionina, Taurina, L-Triptófano. Antioxidantes Naturales: Extracto de Romero."
   },
   {
     "brand": "Nutriss",
@@ -2122,7 +2297,7 @@
     "fiberMax": 3.5,
     "ashMax": 9.5,
     "moistureMax": 10,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       8
@@ -2130,7 +2305,8 @@
     "packageSources": {
       "1": "https://www.mizooco.com/products/nutriss-gatos-adultos-cordero-pollo",
       "8": "https://www.mizooco.com/products/nutriss-gatos-adultos-cordero-pollo"
-    }
+    },
+    "ingredients": "Harina de Pollo, Arroz, Harina de Carne de Cerdo y Res, Arveja, Maíz, Harina de Cordero, Torta de Soya, Grasa de Pollo, Saccharomyces cerevisiae, Hidrolizado de Pollo, Pulpa de Remolacha, Bisulfato Ácido de Sodio, Cascara de Psyllium, Extracto de Arándanos, Lignocelulosa, Algas Schizochytrium spp (Omega 3 y fuente de DHA), Zeolita. Prebióticos: Mananoligosacáridos y Betaglucanos. Inulina. Ácido Butírico. Probióticos: Enteroccocus faecium, Bacillus Subtilis y S. Boulardii. Cloruro de Potasio, Cloruro de Sodio, Extracto de Yucca Schidigera. Minerales: Manganeso Orgánico, Sulfato de Manganeso, Cobre Orgánico, Sulfato de Cobre, Zinc Orgánico, Óxido de Zinc, Hierro Orgánico, Sulfato Ferroso, Yodato de Calcio, Selenio Orgánico, Cromo Orgánico. Vitaminas: A, C, D3, E, K, B12, Tiamina, Piridoxina, Riboflavina, Niacina, Ácido Pantoténico, Ácido Fólico, Biotina, Cloruro de Colina. Aminoácidos: DL-Metionina, Taurina, L-Triptófano. Antioxidantes Naturales: Extracto de Romero."
   },
   {
     "brand": "Nutriss",
@@ -2145,7 +2321,7 @@
     "fiberMax": 3.5,
     "ashMax": 9.5,
     "moistureMax": 10,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       8
@@ -2153,7 +2329,8 @@
     "packageSources": {
       "1": "https://www.mizooco.com/products/nutriss-gatos-adultos-salmon-atun",
       "8": "https://www.mizooco.com/products/nutriss-gatos-adultos-salmon-atun"
-    }
+    },
+    "ingredients": "Harina de Pollo, Arroz, Harina de Atún, Arveja, Maíz, Harina de Salmón, Torta de Soya, Grasa de Pollo, Harina de Carne de Cerdo y Res, Saccharomyces cerevisiae, Hidrolizado de Pollo, Pulpa de Remolacha, Bisulfato Ácido de Sodio, Cascara de Psyllium, Extracto de Arándanos, Lignocelulosa, Algas Schizochytrium spp (Omega 3 y fuente de DHA), Zeolita. Prebióticos: Mananoligosacáridos y Betaglucanos. Inulina. Ácido Butírico. Probióticos: Enteroccocus faecium, Bacillus Subtilis y S. Boulardii. Cloruro de Potasio, Cloruro de Sodio, Extracto de Yucca Schidigera. Minerales: Manganeso Orgánico, Sulfato de Manganeso, Cobre Orgánico, Sulfato de Cobre, Zinc Orgánico, Óxido de Zinc, Hierro Orgánico, Sulfato Ferroso, Yodato de Calcio, Selenio Orgánico, Cromo Orgánico. Vitaminas: A, C, D3, E, K, B12, Tiamina, Piridoxina, Riboflavina, Niacina, Ácido Pantoténico, Ácido Fólico, Biotina, Cloruro de Colina. Aminoácidos: DL-Metionina, Taurina, L-Triptófano. Antioxidantes Naturales: Extracto de Romero."
   },
   {
     "brand": "Nutriss",
@@ -2168,7 +2345,7 @@
     "fiberMax": 4,
     "ashMax": 9,
     "moistureMax": 10,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1,
       2,
@@ -2180,7 +2357,9 @@
       "2": "https://www.mizooco.com/products/nutriss-tribalance-cachorros-carne-leche",
       "15": "https://www.mizooco.com/products/nutriss-tribalance-cachorros-carne-leche",
       "30": "https://www.mizooco.com/products/nutriss-tribalance-cachorros-carne-leche"
-    }
+    },
+    "ingredients": "Proteína Hidrolizada de Cerdo, Carne de Res Deshidratada, Arroz, Maíz, Harina Integral de Trigo, Harina Integral de Arroz, Harina de Pollo, Grasa Bovina y Porcina, Hidrolizado de Pollo, Pulpa de Remolacha, Levadura Saccharomyces cerevisiae, Arveja, Zeolita Clinoptilolita, Prebióticos: Fructoligosacáridos, Mananoligosacáridos y Betaglucanos. Leche Deslactosada, Alga Schizochytrium sp (Fuente de DHA y EPA), Cloruro de Sodio. Probióticos: Enterococcus faecium, Bacillus subtilis, S. boulardii, Lactobacillus spp, Bifidobacterias spp. Extracto de Yucca Schidigera. Minerales: Complejo Magnesio Glicina, Sulfato Ferroso, Complejo Zinc Glicina, Óxido de Zinc, Complejo Hierro Glicina, Sulfato de Cobre, Sulfato de Manganeso, Complejo Cobre Glicina, Disglicinato de Cromo, Complejo Selenio Glicina, Yodato de Calcio. Vitaminas: Cloruro de Colina, Vitamina E, Vitamina C, Niacina, Vitamina A, Ácido Pantoténico, Biotina, Riboflavina, Vitamina K, Tiamina, Piridoxina, Vitamina D3, Vitamina B12, Ácido Fólico. Aminoácidos: Triptófano, DL- Metionina. Antioxidantes: Tocoferoles Mixtos, Extracto de Romero, Galato de Propilo. Ácidos Orgánicos: Cítrico y Propiónico. Aluminosilicato Cálcico y Sódico.",
+    "kcalKg": 3550
   },
   {
     "brand": "Nutriss",
@@ -2249,10 +2428,15 @@
     ],
     "url": "https://empresaspolar.com.co/nuestras-marcas/donkan/",
     "complete": true,
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       12
-    ]
+    ],
+    "proteinMin": 18,
+    "ashMax": 11,
+    "moistureMax": 12,
+    "nutrientSourceUrl": "https://jumbocolombiaio.vteximg.com.br/arquivos/ids/717975/7702084000206-3.jpg.jpg?v=638709111607030000",
+    "nutrientSourceName": "Alimentos Polar Colombia · Reverso de Donkan Adultos en Jumbo"
   },
   {
     "brand": "DonKan",
@@ -2584,12 +2768,13 @@
     "ashMax": 8,
     "moistureMax": 11,
     "registration": "14977AL",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1.5,
       3,
       8
-    ]
+    ],
+    "ingredients": "Pollo, arroz, harina de pollo, salmón, maíz, aceite de pollo, salvado de trigo, harina de pescado, hidrolizado de hígado de pollo, cloruro de sodio, carbonato de calcio, fosfato dicálcico, cloruro de potasio, manano-oligosacaridos saccharomyces cerevisiae, betaglucanos, cloruro de colina, hierro quelado, sulfato ferroso, hidroxicloruro de zinc, zinc quelado, selenio quelado, cobre básico cloruro, cobre quelado, yodato de calcio, hidroxicloruro de manganeso, manganeso quelado, selenito de sodio, vitamina E tocoferol acetato, vitamina B3 niacinamida, vitamina B5 ácido pantoténico, vitamina A retinol, vitamina H biotina, vitamina B2 riboflavina, vitamina K3 menadiona, vitamina B12 cianocobalamina, vitamina B1 tiamina, vitamina B6 piridoxina, vitamina D3 colecalciferol, vitamina B9 ácido fólico, sales de ácido propiónico, tocoferoles, aceite de romero, ácido cítrico."
   },
   {
     "brand": "BR for Dog",
@@ -2609,6 +2794,103 @@
       2.7
     ],
     "complete": true,
-    "verifiedOn": "2026-11-21"
+    "verifiedOn": "2026-11-22",
+    "ingredients": "Trigo, harina de pollo, glicerina, grasa de pollo, agua, proteína de pollo hidrolizada, zanahoria seca, pulpa de remolacha, ácido fosfórico, sulfato monohidratado de hierro, sulfato monohidratado de manganeso, sulfato pentahidratado de cobre, yodado de calcio, oxido de zinc, vitamin A, vitamina D3, vitamina E, lignosulfonato, aceite de pescado, aceite de girasol, sorbato de potasio, ajo seco, óxido de hierro, sacharomyces cerevisiae, fosfato monocálcico y cloruro de potasio."
+  },
+  {
+    "brand": "GrandVita Equilibrio",
+    "name": "GrandVita Equilibrio Indoor Light Adult All Breeds – Chicken",
+    "species": "dog",
+    "handles": [
+      "alimento-grand-vita-light-para-perro-adulto-equilibrio"
+    ],
+    "url": "https://cdn.shopify.com/s/files/1/0881/6997/1992/files/7709572713105.png?v=1789290640",
+    "sourceName": "GrandVita Equilibrio · Etiqueta del fabricante fotografiada en la tienda",
+    "verifiedOn": "2026-11-22",
+    "packagesKg": [
+      1
+    ]
+  },
+  {
+    "brand": "GrandVita Equilibrio",
+    "name": "GrandVita Equilibrio Indoor Adult +7 Small Breeds – Salmon & Turkey",
+    "species": "dog",
+    "handles": [
+      "alimento-grand-vita-mature-para-perro-senior-equilibrio"
+    ],
+    "url": "https://cdn.shopify.com/s/files/1/0881/6997/1992/files/7709087114299.png?v=1789292676",
+    "sourceName": "GrandVita Equilibrio · Etiqueta del fabricante fotografiada en la tienda",
+    "verifiedOn": "2026-11-22",
+    "packagesKg": [
+      1
+    ]
+  },
+  {
+    "brand": "GrandVita Equilibrio",
+    "name": "GrandVita Equilibrio Indoor Sterilized Hairball Control +7 – Chicken",
+    "species": "cat",
+    "handles": [
+      "alimento-grand-vita-para-gato-castrado-senior-equilibrio"
+    ],
+    "url": "https://cdn.shopify.com/s/files/1/0881/6997/1992/files/7709331898722.png?v=1789292827",
+    "sourceName": "GrandVita Equilibrio · Etiqueta del fabricante fotografiada en la tienda",
+    "verifiedOn": "2026-11-22",
+    "packagesKg": [
+      1.5
+    ]
+  },
+  {
+    "brand": "Filpo",
+    "name": "Filpo Adultos sabor a carne",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-para-perro-filpo-adultos"
+    ],
+    "url": "https://cdn.shopify.com/s/files/1/0881/6997/1992/files/alimento-para-perro-filpo-adulto-30-kg-front.png?v=1789290943",
+    "sourceName": "Filpo · Etiqueta del fabricante fotografiada en la tienda",
+    "verifiedOn": "2026-11-22",
+    "packagesKg": [
+      10,
+      30
+    ],
+    "packageSources": {
+      "10": "https://cdn.shopify.com/s/files/1/0881/6997/1992/files/alimento-para-perro-filpo-adulto-10-kg-front.png?v=1789290944",
+      "30": "https://cdn.shopify.com/s/files/1/0881/6997/1992/files/alimento-para-perro-filpo-adulto-30-kg-front.png?v=1789290943"
+    },
+    "proteinMin": 18,
+    "fatMin": 7,
+    "fiberMax": 5,
+    "ashMax": 10,
+    "moistureMax": 10,
+    "nutrientSourceUrl": "https://puppiscolombia.vteximg.com.br/arquivos/ids/174118/alimento-para-perro-filpo-adulto-10-kg-back.png?v=637630874757100000",
+    "nutrientSourceName": "Filpo · Reverso del empaque colombiano en Puppis"
+  },
+  {
+    "brand": "Filpo",
+    "name": "Filpo Cachorros sabor lácteo",
+    "species": "dog",
+    "handles": [
+      "alimento-seco-para-perro-filpo-cachorros"
+    ],
+    "url": "https://cdn.shopify.com/s/files/1/0881/6997/1992/files/Alimento-Para-Perro-filpo-cachorro.png?v=1789292684",
+    "sourceName": "Filpo · Etiqueta del fabricante fotografiada en la tienda",
+    "verifiedOn": "2026-11-22",
+    "packagesKg": [
+      10
+    ]
+  },
+  {
+    "brand": "Filpo",
+    "name": "Filpo Gatos para todas las edades",
+    "species": "cat",
+    "handles": [
+      "filpo-gatos-para-todas-las-edades"
+    ],
+    "url": "https://cdn.shopify.com/s/files/1/0881/6997/1992/files/ag-filpo-gatos-8kg.png?v=1789453173",
+    "sourceName": "Filpo · Etiqueta del fabricante fotografiada en la tienda",
+    "verifiedOn": "2026-11-22",
+    "packagesKg": [
+      8
+    ]
   }
 ]

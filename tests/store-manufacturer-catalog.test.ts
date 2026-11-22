@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { getStoreManufacturerCatalog, searchStoreManufacturerFoods, selectStoreManufacturerFood,
-  enrichFoodFromStoreManufacturer } from '../src/services/storeManufacturerCatalog';
+  enrichFoodFromStoreManufacturer, getStoreSheetCoverage, storeSheetStatus } from '../src/services/storeManufacturerCatalog';
 import { getEffectiveNutrientField } from '../src/utils/mealNutrition';
 import { getFoodKcalPerKg } from '../src/utils/mealPortions';
 import domestic from '../src/data/manufacturers/colombia.json';
@@ -100,4 +100,31 @@ test('Mirringo Gaticos retains its portion guide, missing calories and the packa
   assert.equal(getFoodKcalPerKg(food),undefined);
   assert.equal(getEffectiveNutrientField(food,'cenizas')?.valor,8);
   assert.equal(food.fichaNutricional?.discrepancies?.find(item => item.field === 'cenizas')?.other.valor,9);
+});
+
+test('store coverage counts each listing with a documented package and the four analysis values', async () => {
+  const rows = await getStoreManufacturerCatalog();
+  const counts = await getStoreSheetCoverage();
+  assert.equal(counts.complete + counts.partial + counts.pending, rows.length);
+  assert.equal(counts.total, rows.length);
+  const puppy = rows.find(row => row.handle === 'birbo-premium-cachorros');
+  assert.ok(puppy?.formula);
+  assert.equal(storeSheetStatus(puppy), 'complete');
+  assert.equal(getEffectiveNutrientField(selectStoreManufacturerFood(puppy), 'grasa')?.valor, 11);
+  assert.equal(storeSheetStatus({...puppy, formula:undefined}), 'pending');
+  assert.equal(storeSheetStatus({...puppy, packagesKg:[]}), 'partial');
+  assert.equal(storeSheetStatus({...puppy, formula:{...puppy.formula, kcalKg:undefined}}), 'partial');
+  assert.equal(storeSheetStatus({...puppy, formula:{...puppy.formula, fiberMax:0}}), 'complete');
+});
+
+test('NUPEC 1st Care uses the manufacturer guarantee on the product sheet', async () => {
+  const [row] = await searchStoreManufacturerFoods('nupec 1st care', 'dog');
+  const food = selectStoreManufacturerFood(row, 2);
+  assert.equal(getFoodKcalPerKg(food), 4000);
+  const protein = getEffectiveNutrientField(food, 'proteina');
+  assert.equal(protein?.valor, 29);
+  assert.equal(protein?.calificador, 'minimo');
+  assert.equal(protein?.baseMedicion, 'tal_como_se_vende');
+  assert.equal(protein?.source?.url, row.officialUrl);
+  assert.equal(food.fichaNutricional?.discrepancies?.[0].other.calificador, 'maximo');
 });

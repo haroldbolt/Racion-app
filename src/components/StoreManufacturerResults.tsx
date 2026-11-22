@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { FoodItem, Species } from '../types';
 import {
+  getStoreSheetCoverage,
   searchStoreManufacturerFoods,
   selectStoreManufacturerFood,
   type StoreManufacturerFood,
@@ -22,6 +23,7 @@ function packageLabel(kg: number) {
 export function StoreManufacturerResults({ query, signal, species, lang, choose }: Props) {
   const es = lang === 'es';
   const [matches, setMatches] = useState<StoreManufacturerFood[]>();
+  const [coverage, setCoverage] = useState<Awaited<ReturnType<typeof getStoreSheetCoverage>>>();
   const [failed, setFailed] = useState(false);
   const [visibleCount, setVisibleCount] = useState(3);
   useEffect(() => {
@@ -29,8 +31,13 @@ export function StoreManufacturerResults({ query, signal, species, lang, choose 
     setFailed(false);
     setMatches(undefined);
     setVisibleCount(3);
-    searchStoreManufacturerFoods(query, species).then(
-      rows => { if (current && !signal.aborted) setMatches(rows); },
+    Promise.all([searchStoreManufacturerFoods(query, species), getStoreSheetCoverage()]).then(
+      ([rows, counts]) => {
+        if (current && !signal.aborted) {
+          setMatches(rows);
+          setCoverage(counts);
+        }
+      },
       () => { if (current && !signal.aborted) setFailed(true); },
     );
     return () => { current = false; };
@@ -84,5 +91,13 @@ export function StoreManufacturerResults({ query, signal, species, lang, choose 
     })}
     {matches && visibleCount < matches.length && <button type="button" onClick={() => setVisibleCount(count => count + 5)}
       className="min-h-11 font-bold text-[#0B5D2E] underline">{es ? 'Ver más de Agrocentro Pets' : 'More from Agrocentro Pets'} ({matches.length - visibleCount})</button>}
+    {matches && coverage && <details className="text-[#44544A]">
+      <summary className="cursor-pointer py-2 font-semibold">{es ? 'Cobertura de las fichas de la tienda' : 'Store product sheet coverage'}</summary>
+      <p>{es
+        ? `${coverage.total} referencias de la tienda: ${coverage.complete} completas, ${coverage.partial} parciales y ${coverage.pending} pendientes.`
+        : `${coverage.total} store listings: ${coverage.complete} complete, ${coverage.partial} partial and ${coverage.pending} pending.`}</p>
+      <p>{es ? 'Una ficha completa incluye proteína, grasa, fibra, kcal/kg y al menos un tamaño de empaque identificado en la ficha o en la tienda.'
+        : 'A complete sheet includes protein, fat, fiber, kcal/kg and at least one package size documented by the brand or the store.'}</p>
+    </details>}
   </section>;
 }

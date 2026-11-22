@@ -20,6 +20,8 @@ export interface OfficialFormula {
   feedingGuide?: FoodItem['feedingGuide'];
   registration?: string;
   sourceName?: string;
+  nutrientSourceUrl?: string;
+  nutrientSourceName?: string;
   packageSources?: Record<string,string>;
   basis?: MeasurementBasis;
   protein?: number;
@@ -97,6 +99,22 @@ export function getStoreManufacturerCatalog() {
   return snapshot ??= loadStore().catch(error => { snapshot = undefined; throw error; });
 }
 
+export function storeSheetStatus(row: StoreManufacturerFood): 'complete' | 'partial' | 'pending' {
+  const formula = row.formula;
+  if (!formula) return 'pending';
+  const percentages = [formula.proteinMin ?? formula.protein, formula.fatMin ?? formula.fat, formula.fiberMax ?? formula.fiber];
+  const hasAnalysis = percentages.every(value => value !== undefined && Number.isFinite(value) && value >= 0 && value <= 100);
+  return hasAnalysis && Number.isFinite(formula.kcalKg) && (formula.kcalKg ?? 0) > 0 && row.packagesKg.length > 0
+    ? 'complete' : 'partial';
+}
+
+export async function getStoreSheetCoverage() {
+  const rows = await getStoreManufacturerCatalog();
+  const counts = { complete: 0, partial: 0, pending: 0, total: rows.length };
+  for (const row of rows) counts[storeSheetStatus(row)]++;
+  return counts;
+}
+
 export async function searchStoreManufacturerFoods(query: string, species: Species): Promise<StoreManufacturerFood[]> {
   const terms = words(query).filter(w => !ignore.has(w));
   if (!terms.length) return [];
@@ -119,6 +137,9 @@ function withFormula(food: FoodItem, row:StoreManufacturerFood): FoodItem {
   const formula = row.formula;
   if (!formula || food.labelStatus === 'user_confirmed_label') return food;
   const source = {name:formula.sourceName ?? row.house, url:formula.url, observedAt:formula.verifiedOn};
+  const analysisSource = formula.nutrientSourceUrl
+    ? {...source, name: formula.nutrientSourceName ?? source.name, url: formula.nutrientSourceUrl}
+    : source;
   const data: NutritionDatasheet = { ...food.fichaNutricional, fuenteNombre:source.name, fuenteUrl:formula.url,
     fechaConsulta:formula.verifiedOn, coincidenciaEstado:'verificado' };
   if (formula.discrepancies?.length) {
@@ -131,13 +152,13 @@ function withFormula(food: FoodItem, row:StoreManufacturerFood): FoodItem {
   for (const [key,bound,typical,qualifier,flat] of fields) {
     const valor = formula[bound] ?? formula[typical];
     if (valor === undefined) continue;
-    data[key] = {valor, unidadOriginal:'%', baseMedicion:basis, calificador:formula[bound] === undefined ? 'tipico' : qualifier, source};
+    data[key] = {valor, unidadOriginal:'%', baseMedicion:basis, calificador:formula[bound] === undefined ? 'tipico' : qualifier, source:analysisSource};
     if (basis === 'tal_como_se_vende') result[flat] = valor;
     else if (flat === 'ashPct') result.ashPct = undefined;
     else result[flat] = 0;
   }
   if (formula.carbs !== undefined) {
-    data.carbohidratos = {valor:formula.carbs, unidadOriginal:'%',baseMedicion:basis,calificador:'tipico',source};
+    data.carbohidratos = {valor:formula.carbs, unidadOriginal:'%',baseMedicion:basis,calificador:'tipico',source:analysisSource};
     result.carbsPct = basis === 'tal_como_se_vende' ? formula.carbs : undefined;
   }
   if (formula.kcalKg !== undefined) {
@@ -148,7 +169,7 @@ function withFormula(food: FoodItem, row:StoreManufacturerFood): FoodItem {
   const nutritionalFields = ['proteina','grasa','fibra','humedad','cenizas','carbohidratos','kcalPerKg'] as const;
   const values = nutritionalFields.map(key => data[key]).filter((v): v is NutrientValue => !!v);
   const onlyOfficial = values.length > 0 && (food.labelStatus === 'verified_manufacturer' ||
-    values.every(v => v.source?.url === formula.url || (formula.kcalSourceUrl && v.source?.url === formula.kcalSourceUrl)));
+    values.every(v => v.source?.url === formula.url || v.source?.url === analysisSource.url || (formula.kcalSourceUrl && v.source?.url === formula.kcalSourceUrl)));
   data.coincidenciaEstado = onlyOfficial ? 'verificado' : values.length ? 'revision_requerida' : 'pendiente';
   data.notasRevision = onlyOfficial ? 'Ficha oficial de la fórmula seleccionada.' : 'Revisa la procedencia de cada valor y completa los campos pendientes con el empaque.';
   return {...result, fichaNutricional:data, dataSource:source.name,

@@ -1,6 +1,26 @@
 const assert = require('node:assert/strict');
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright-core');
 
+function expectedCoverage() {
+  const inventory = require('../../src/data/manufacturers/store.json');
+  const sheets = new Map();
+  for (const name of ['colombia', 'internacional', 'otras', 'especialidades']) {
+    for (const sheet of require('../../src/data/manufacturers/' + name + '.json')) {
+      for (const handle of sheet.handles) sheets.set(handle, sheet);
+    }
+  }
+  let complete = 0;
+  let pending = 0;
+  for (const item of inventory) {
+    const sheet = sheets.get(item.handle);
+    if (!sheet) { pending++; continue; }
+    const values = [sheet.proteinMin ?? sheet.protein, sheet.fatMin ?? sheet.fat, sheet.fiberMax ?? sheet.fiber];
+    const hasSize = [...item.storePackagesKg, ...(sheet.packagesKg ?? [])].some(kg => kg > 0);
+    if (values.every(Number.isFinite) && sheet.kcalKg > 0 && hasSize) complete++;
+  }
+  return {total: inventory.length, complete, partial: inventory.length - pending - complete, pending};
+}
+
 async function verify() {
   const site = process.argv[2];
   const browser = await chromium.launch({channel:'chrome', headless:true});
@@ -17,9 +37,20 @@ async function verify() {
     await button(/continuar a condición/i).click();
     await button(/continuar a objetivo/i).click();
     await button(/continuar a alimento/i).click();
-    await page.getByRole('textbox', {name:'Buscar alimentos en internet'}).fill('Monello select castrados');
-    await button('Buscar en internet').click();
+    const search = page.getByRole('textbox', {name:'Buscar alimentos en internet'});
     const store = page.getByRole('region', {name:'Alimentos de Agrocentro Pets'});
+    await search.fill('Nupec felino weight care');
+    await button('Buscar en internet').click();
+    const nupec = store.getByRole('article').filter({hasText:/NUPEC.*Weight Care/i}).first();
+    await nupec.getByText(/Mín\. 38 %/).waitFor();
+    await nupec.getByText(/Mín\. 11 %/).waitFor();
+    await store.getByText('Cobertura de las fichas de la tienda', {exact:true}).click();
+    const {total, complete, partial, pending} = expectedCoverage();
+    const coverageText = total + ' referencias de la tienda: ' + complete + ' completas, ' + partial + ' parciales y ' + pending + ' pendientes.';
+    await store.getByText(coverageText, {exact:true}).waitFor();
+    console.log(JSON.stringify({site, coverage:coverageText, label:'NUPEC Felino Weight Care', proteinMin:38, fatMin:11}));
+    await search.fill('Monello select castrados');
+    await button('Buscar en internet').click();
     const item = store.getByRole('article').filter({hasText:/Monello Select Castrados/i});
     const sourceUrl = 'https://www.nutrire.ind.br/produto/select-by-monello-castrados-gatos-adultos';
     assert.equal(await item.getByRole('link', {name:'Ficha oficial'}).getAttribute('href'), sourceUrl);
