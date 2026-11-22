@@ -1649,7 +1649,32 @@
     "fat": 10,
     "fiber": 5.9,
     "nutrientSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Grain-Free-Feline-Sterilized_Racion.jpg?nc=1738584261",
-    "nutrientSourceName": "Bonnat · Tabla nutricional del fabricante"
+    "nutrientSourceName": "Bonnat · Tabla nutricional del fabricante",
+    "feedingGuide": {
+      "sourceName": "Bonnat · Ración diaria de la fórmula",
+      "sourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Grain-Free-Feline-Sterilized_Racion.jpg?nc=1738584261",
+      "lifeStage": "adult",
+      "ranges": [
+        {
+          "minWeightKg": 2,
+          "maxWeightKg": 4,
+          "minGrams": 30,
+          "maxGrams": 50
+        },
+        {
+          "minWeightKg": 4,
+          "maxWeightKg": 6,
+          "minGrams": 50,
+          "maxGrams": 60
+        },
+        {
+          "minWeightKg": 6,
+          "maxWeightKg": 8,
+          "minGrams": 60,
+          "maxGrams": 80
+        }
+      ]
+    }
   },
   {
     "brand": "Bonnat",
@@ -1689,7 +1714,68 @@
     "fat": 15,
     "fiber": 4.2,
     "nutrientSourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Grain-Free-Canine-Puppy-MediumLarge-Breeds2kg_Racion.jpg?nc=1738583123",
-    "nutrientSourceName": "Bonnat · Tabla nutricional del fabricante"
+    "nutrientSourceName": "Bonnat · Tabla nutricional del fabricante",
+    "feedingGuide": {
+      "sourceName": "Bonnat · Ración diaria de la fórmula",
+      "sourceUrl": "https://www.bonnatpets.com/swfiles/files/Bonnat-Grain-Free-Canine-Puppy-MediumLarge-Breeds2kg_Racion.jpg?nc=1738583123",
+      "lifeStage": "adult",
+      "ranges": [
+        {
+          "minWeightKg": 10,
+          "maxWeightKg": 15,
+          "minGrams": 180,
+          "maxGrams": 240
+        },
+        {
+          "minWeightKg": 15,
+          "maxWeightKg": 20,
+          "minGrams": 240,
+          "maxGrams": 300
+        },
+        {
+          "minWeightKg": 20,
+          "maxWeightKg": 25,
+          "minGrams": 300,
+          "maxGrams": 350
+        },
+        {
+          "minWeightKg": 25,
+          "maxWeightKg": 30,
+          "minGrams": 350,
+          "maxGrams": 410
+        },
+        {
+          "minWeightKg": 30,
+          "maxWeightKg": 35,
+          "minGrams": 410,
+          "maxGrams": 460
+        },
+        {
+          "minWeightKg": 35,
+          "maxWeightKg": 40,
+          "minGrams": 460,
+          "maxGrams": 500
+        },
+        {
+          "minWeightKg": 40,
+          "maxWeightKg": 45,
+          "minGrams": 500,
+          "maxGrams": 550
+        },
+        {
+          "minWeightKg": 45,
+          "maxWeightKg": 50,
+          "minGrams": 550,
+          "maxGrams": 600
+        },
+        {
+          "minWeightKg": 50,
+          "maxWeightKg": 55,
+          "minGrams": 600,
+          "maxGrams": 640
+        }
+      ]
+    }
   },
   {
     "brand": "Bonnat",

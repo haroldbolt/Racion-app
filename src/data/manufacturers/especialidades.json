@@ -1842,5 +1842,26 @@
       7.0
     ],
     "verifiedOn": "2026-11-21"
+  },
+  {
+    "brand": "Nulo",
+    "name": "Alimento Seco Para Gato Nulo Grain Free Indoor Duck And Lentils",
+    "species": "cat",
+    "handles": [
+      "alimento-seco-para-gato-nulo-grain-free-indoor-duck-and-lentils"
+    ],
+    "url": "https://nulo.com/mix-it-recipes/freestyle-duck-lentils-cat",
+    "sourceName": "Nulo · FreeStyle Indoor Duck & Lentils",
+    "nutrientSourceUrl": "https://image.chewy.com/is/image/catalog/76759_PT1.jpg",
+    "nutrientSourceName": "Nulo · etiqueta del empaque Indoor Cat Duck & Lentils",
+    "proteinMin": 40,
+    "fatMin": 17,
+    "fiberMax": 5,
+    "moistureMax": 10,
+    "verifiedOn": "2026-11-22",
+    "kcalKg": 3724,
+    "kcalSourceUrl": "https://image.chewy.com/is/image/catalog/76759_PT1.jpg",
+    "kcalSourceName": "Nulo · etiqueta del empaque, energía metabolizable calculada",
+    "complete": true
   }
 ]

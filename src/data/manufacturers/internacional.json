@@ -948,8 +948,8 @@
     "handles": [
       "alimento-gato-cat-chow-vida-sana"
     ],
-    "url": "https://purina.com.co/catchow/productos/vida-sana",
-    "verifiedOn": "2026-11-21",
+    "url": "https://purina.com.co/sites/default/files/styles/webp/public/2023-03/Purina-Cat-Chow-DRY-Vida-Sana-03.png.webp?itok=S269bFSC",
+    "verifiedOn": "2026-11-22",
     "name": "Cat Chow Vida Sana - Salmón, Pollo y Queso",
     "proteinMin": 36.0,
     "fiberMax": 5.0,
@@ -959,7 +959,33 @@
       0.45,
       1.3,
       3.0
-    ]
+    ],
+    "discrepancies": [
+      {
+        "field": "grasa",
+        "other": {
+          "valor": 13,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Purina Colombia · tabla del sitio de la marca",
+            "url": "https://purina.com.co/catchow/productos/vida-sana",
+            "observedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/catchow/productos/vida-sana"
+      }
+    ],
+    "fatMin": 13,
+    "kcalKg": 3800,
+    "complete": true,
+    "sourceName": "Purina Colombia · etiqueta de la presentación fotografiada",
+    "packageSources": {
+      "0.45": "https://purina.com.co/catchow/productos/vida-sana",
+      "1.3": "https://purina.com.co/catchow/productos/vida-sana",
+      "3": "https://purina.com.co/catchow/productos/vida-sana"
+    }
   },
   {
     "brand": "Cat Chow",
@@ -1687,10 +1713,11 @@
     "brand": "Dog Chow",
     "species": "dog",
     "handles": [
-      "purina-dog-chow-seleccion-de-proteinas-para-perros"
+      "purina-dog-chow-seleccion-de-proteinas-para-perros",
+      "alimento-seco-para-perro-dog-chow-adulto-cordero"
     ],
     "url": "https://purina.com.co/dogchow/productos/seleccion-de-proteinas",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "name": "Comida para Perros Purina® Dog Chow® Selección Proteína",
     "proteinMin": 23.0,
     "fatMin": 12.0,
@@ -1911,19 +1938,74 @@
     "handles": [
       "excellent-cachorros-razas-medianas-y-grandes-pollo-y-arroz"
     ],
-    "url": "https://purina.com.co/excellent/perros/cachorros-pollo-arroz-medianos-grandes",
-    "verifiedOn": "2026-11-21",
+    "url": "https://purina.com.co/sites/default/files/styles/webp/public/2024-08/7702521106706_4.jpg.webp?itok=rhImxUSs",
+    "verifiedOn": "2026-11-22",
     "name": "Cachorro Pollo y Arroz Razas Medianas y Grandes",
     "fatMin": 13.0,
     "fiberMax": 3.5,
     "moistureMax": 12.0,
-    "ashMax": 9.0,
-    "kcalKg": 3720.0,
+    "ashMax": 8.5,
+    "kcalKg": 3800,
     "packagesKg": [
       1.5,
       3.0,
       17.0
-    ]
+    ],
+    "discrepancies": [
+      {
+        "field": "proteina",
+        "other": {
+          "valor": 28,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Purina Colombia · tabla del sitio de la marca",
+            "url": "https://purina.com.co/excellent/perros/cachorros-pollo-arroz-medianos-grandes",
+            "observedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/excellent/perros/cachorros-pollo-arroz-medianos-grandes"
+      },
+      {
+        "field": "cenizas",
+        "other": {
+          "valor": 9,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Purina Colombia · tabla del sitio de la marca",
+            "url": "https://purina.com.co/excellent/perros/cachorros-pollo-arroz-medianos-grandes",
+            "observedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/excellent/perros/cachorros-pollo-arroz-medianos-grandes"
+      },
+      {
+        "field": "kcalPerKg",
+        "other": {
+          "valor": 3720,
+          "unidadOriginal": "kcal/kg",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "tipico",
+          "source": {
+            "name": "Purina Colombia · tabla del sitio de la marca",
+            "url": "https://purina.com.co/excellent/perros/cachorros-pollo-arroz-medianos-grandes",
+            "observedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/excellent/perros/cachorros-pollo-arroz-medianos-grandes"
+      }
+    ],
+    "proteinMin": 28,
+    "complete": true,
+    "sourceName": "Purina Colombia · etiqueta de la presentación fotografiada",
+    "packageSources": {
+      "1.5": "https://purina.com.co/excellent/perros/cachorros-pollo-arroz-medianos-grandes",
+      "3": "https://purina.com.co/excellent/perros/cachorros-pollo-arroz-medianos-grandes",
+      "17": "https://purina.com.co/excellent/perros/cachorros-pollo-arroz-medianos-grandes"
+    }
   },
   {
     "brand": "Excellent",
@@ -4125,7 +4207,7 @@
           "source": {
             "name": "Purina Colombia · tabla en el sitio de la marca",
             "url": "https://purina.com.co/proplan/dietas-veterinarias/gatos/hydrolizado",
-            "retrievedAt": "2026-11-22"
+            "observedAt": "2026-11-22"
           }
         },
         "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/gatos/hydrolizado"
@@ -4140,7 +4222,7 @@
           "source": {
             "name": "Purina Colombia · tabla en el sitio de la marca",
             "url": "https://purina.com.co/proplan/dietas-veterinarias/gatos/hydrolizado",
-            "retrievedAt": "2026-11-22"
+            "observedAt": "2026-11-22"
           }
         },
         "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/gatos/hydrolizado"
@@ -4155,7 +4237,7 @@
           "source": {
             "name": "Purina Colombia · tabla en el sitio de la marca",
             "url": "https://purina.com.co/proplan/dietas-veterinarias/gatos/hydrolizado",
-            "retrievedAt": "2026-11-22"
+            "observedAt": "2026-11-22"
           }
         },
         "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/gatos/hydrolizado"
@@ -4170,7 +4252,7 @@
           "source": {
             "name": "Purina Colombia · tabla en el sitio de la marca",
             "url": "https://purina.com.co/proplan/dietas-veterinarias/gatos/hydrolizado",
-            "retrievedAt": "2026-11-22"
+            "observedAt": "2026-11-22"
           }
         },
         "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/gatos/hydrolizado"
@@ -4215,7 +4297,7 @@
           "source": {
             "name": "Purina Colombia · tabla en el sitio de la marca",
             "url": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado",
-            "retrievedAt": "2026-11-22"
+            "observedAt": "2026-11-22"
           }
         },
         "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado"
@@ -4230,7 +4312,7 @@
           "source": {
             "name": "Purina Colombia · tabla en el sitio de la marca",
             "url": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado",
-            "retrievedAt": "2026-11-22"
+            "observedAt": "2026-11-22"
           }
         },
         "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado"
@@ -4245,7 +4327,7 @@
           "source": {
             "name": "Purina Colombia · tabla en el sitio de la marca",
             "url": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado",
-            "retrievedAt": "2026-11-22"
+            "observedAt": "2026-11-22"
           }
         },
         "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado"
@@ -4260,7 +4342,7 @@
           "source": {
             "name": "Purina Colombia · tabla en el sitio de la marca",
             "url": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado",
-            "retrievedAt": "2026-11-22"
+            "observedAt": "2026-11-22"
           }
         },
         "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/perros/hydrolizado"
@@ -4304,7 +4386,7 @@
           "source": {
             "name": "Purina Colombia · tabla en el sitio de la marca",
             "url": "https://purina.com.co/proplan/veterinary-diets/perros/articulaciones",
-            "retrievedAt": "2026-11-22"
+            "observedAt": "2026-11-22"
           }
         },
         "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/perros/articulaciones"
@@ -4319,7 +4401,7 @@
           "source": {
             "name": "Purina Colombia · tabla en el sitio de la marca",
             "url": "https://purina.com.co/proplan/veterinary-diets/perros/articulaciones",
-            "retrievedAt": "2026-11-22"
+            "observedAt": "2026-11-22"
           }
         },
         "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/perros/articulaciones"
@@ -4334,7 +4416,7 @@
           "source": {
             "name": "Purina Colombia · tabla en el sitio de la marca",
             "url": "https://purina.com.co/proplan/veterinary-diets/perros/articulaciones",
-            "retrievedAt": "2026-11-22"
+            "observedAt": "2026-11-22"
           }
         },
         "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/perros/articulaciones"
@@ -4391,18 +4473,73 @@
     "handles": [
       "pro-plan-perro-veterinary-diets-om-obesidad"
     ],
-    "url": "https://purina.com.co/proplan/veterinary-diets/perros/obesidad",
-    "verifiedOn": "2026-11-21",
+    "url": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/8445290538062_2_0.png.webp?itok=9UtPHNtx",
+    "verifiedOn": "2026-11-22",
     "name": "Pro Plan OM Obesity Management Fórmula Canina",
-    "proteinMin": 26.0,
-    "fatMin": 5.0,
-    "fiberMax": 16.0,
-    "moistureMax": 12.0,
-    "ashMax": 7.0,
+    "proteinMin": 26,
+    "fatMin": 4,
+    "fiberMax": 13,
+    "moistureMax": 12,
+    "ashMax": 8,
     "packagesKg": [
       2.0,
       7.5
-    ]
+    ],
+    "kcalKg": 2990,
+    "kcalSourceUrl": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/8445290538062_2_0.png.webp?itok=9UtPHNtx",
+    "kcalSourceName": "Purina Colombia · energía declarada en la bolsa",
+    "discrepancies": [
+      {
+        "field": "grasa",
+        "other": {
+          "valor": 5.0,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "minimo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/veterinary-diets/perros/obesidad",
+            "observedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/perros/obesidad"
+      },
+      {
+        "field": "fibra",
+        "other": {
+          "valor": 16.0,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/veterinary-diets/perros/obesidad",
+            "observedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/perros/obesidad"
+      },
+      {
+        "field": "cenizas",
+        "other": {
+          "valor": 7.0,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/veterinary-diets/perros/obesidad",
+            "observedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/perros/obesidad"
+      }
+    ],
+    "sourceName": "Purina Colombia · etiqueta de la presentación fotografiada",
+    "packageSources": {
+      "2": "https://purina.com.co/proplan/veterinary-diets/perros/obesidad",
+      "7.5": "https://purina.com.co/proplan/veterinary-diets/perros/obesidad"
+    }
   },
   {
     "brand": "Pro Plan",
@@ -4478,7 +4615,7 @@
           "source": {
             "name": "Purina Colombia · tabla en el sitio de la marca",
             "url": "https://purina.com.co/proplan/dietas-veterinarias/gatos/gastroenterico",
-            "retrievedAt": "2026-11-22"
+            "observedAt": "2026-11-22"
           }
         },
         "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/gatos/gastroenterico"
@@ -4520,7 +4657,7 @@
           "source": {
             "name": "Purina Colombia · tabla en el sitio de la marca",
             "url": "https://purina.com.co/proplan/veterinary-diets/gatos/funcion-renal-avanzada",
-            "retrievedAt": "2026-11-22"
+            "observedAt": "2026-11-22"
           }
         },
         "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/gatos/funcion-renal-avanzada"
@@ -4535,7 +4672,7 @@
           "source": {
             "name": "Purina Colombia · tabla en el sitio de la marca",
             "url": "https://purina.com.co/proplan/veterinary-diets/gatos/funcion-renal-avanzada",
-            "retrievedAt": "2026-11-22"
+            "observedAt": "2026-11-22"
           }
         },
         "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/gatos/funcion-renal-avanzada"
@@ -4577,7 +4714,7 @@
           "source": {
             "name": "Purina Colombia · tabla en el sitio de la marca",
             "url": "https://purina.com.co/proplan/veterinary-diets/gatos/obesidad",
-            "retrievedAt": "2026-11-22"
+            "observedAt": "2026-11-22"
           }
         },
         "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/gatos/obesidad"
@@ -4592,7 +4729,7 @@
           "source": {
             "name": "Purina Colombia · tabla en el sitio de la marca",
             "url": "https://purina.com.co/proplan/veterinary-diets/gatos/obesidad",
-            "retrievedAt": "2026-11-22"
+            "observedAt": "2026-11-22"
           }
         },
         "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/gatos/obesidad"
@@ -4800,7 +4937,7 @@
           "source": {
             "name": "Purina Colombia · tabla en el sitio de la marca",
             "url": "https://purina.com.co/proplan/dietas-veterinarias/gatos/diabetes",
-            "retrievedAt": "2026-11-22"
+            "observedAt": "2026-11-22"
           }
         },
         "sourceUrl": "https://purina.com.co/proplan/dietas-veterinarias/gatos/diabetes"
@@ -4842,7 +4979,7 @@
           "source": {
             "name": "Purina Colombia · tabla en el sitio de la marca",
             "url": "https://purina.com.co/proplan/veterinary-diets/gatos/urinario",
-            "retrievedAt": "2026-11-22"
+            "observedAt": "2026-11-22"
           }
         },
         "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/gatos/urinario"
@@ -4857,7 +4994,7 @@
           "source": {
             "name": "Purina Colombia · tabla en el sitio de la marca",
             "url": "https://purina.com.co/proplan/veterinary-diets/gatos/urinario",
-            "retrievedAt": "2026-11-22"
+            "observedAt": "2026-11-22"
           }
         },
         "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/gatos/urinario"
@@ -4874,20 +5011,41 @@
     "handles": [
       "pro-plan-perro-veterinary-diets-ur-cuidado-urinario"
     ],
-    "url": "https://purina.com.co/proplan/veterinary-diets/perros/urinario",
+    "url": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/8445290538628_2.png.webp?itok=T7T59UDy",
     "verifiedOn": "2026-11-22",
     "name": "Veterinary Diets Urinario ST/OX Canine",
-    "moistureMax": 12.0,
-    "proteinMin": 21.0,
-    "fatMin": 9.0,
+    "moistureMax": 12,
+    "proteinMin": 21,
+    "fatMin": 9,
     "fiberMax": 6.5,
-    "ashMax": 8.5,
+    "ashMax": 9,
     "packagesKg": [
       2.0
     ],
     "kcalKg": 3542,
     "kcalSourceUrl": "https://purina.com.co/sites/default/files/styles/webp/public/2026-01/8445290538628_2.png.webp?itok=T7T59UDy",
-    "kcalSourceName": "Purina Colombia · energía declarada en la bolsa"
+    "kcalSourceName": "Purina Colombia · energía declarada en la bolsa",
+    "discrepancies": [
+      {
+        "field": "cenizas",
+        "other": {
+          "valor": 8.5,
+          "unidadOriginal": "%",
+          "baseMedicion": "tal_como_se_vende",
+          "calificador": "maximo",
+          "source": {
+            "name": "Purina Colombia · tabla en el sitio de la marca",
+            "url": "https://purina.com.co/proplan/veterinary-diets/perros/urinario",
+            "observedAt": "2026-11-22"
+          }
+        },
+        "sourceUrl": "https://purina.com.co/proplan/veterinary-diets/perros/urinario"
+      }
+    ],
+    "sourceName": "Purina Colombia · etiqueta de la presentación fotografiada",
+    "packageSources": {
+      "2": "https://purina.com.co/proplan/veterinary-diets/perros/urinario"
+    }
   },
   {
     "brand": "Royal Canin",
@@ -7759,13 +7917,90 @@
     "kcalKg": 3840
   },
   {
+    "name": "Junior Perro Gigante",
+    "packagesKg": [
+      15.0
+    ],
+    "fat": 16.0,
+    "fiber": 1.3,
+    "ash": 7.6,
+    "kcalKg": 3906.0,
+    "complete": true,
+    "brand": "Royal Canin",
+    "species": "dog",
+    "url": "https://www.royalcanin.com/co/dogs/products/retail-products/junior---giant-3031",
+    "handles": [
+      "royal-canin-perro-junior-adulto"
+    ],
+    "verifiedOn": "2026-11-22"
+  },
+  {
+    "name": "PURINA® PRO PLAN® Gato Reduced Calorie con Optifit® Sabor Pollo",
+    "proteinMin": 40.0,
+    "fatMin": 7.0,
+    "fiberMax": 7.5,
+    "ashMax": 8.5,
+    "species": "cat",
+    "brand": "Pro Plan",
+    "url": "https://purina.com.mx/proplan/productos/purina-pro-plan-gato-reduced-calorie-optifit-sabor-pollo",
+    "packagesKg": [
+      3
+    ],
+    "complete": true,
+    "sourceName": "Purina · etiqueta de Reduced Calorie Optifit",
+    "handles": [
+      "pro-plan-gato-reduced-calorie"
+    ],
+    "verifiedOn": "2026-11-22"
+  },
+  {
+    "name": "West Highland White Terrier Adult",
+    "brand": "Royal Canin",
+    "species": "dog",
+    "url": "https://www.royalcanin.com/cl/dogs/products/retail-products/west-highland-white-terrier-adult-3981",
+    "sourceName": "Royal Canin Chile · West Highland Adult",
+    "protein": 21,
+    "fat": 16,
+    "fiber": 1.4,
+    "ash": 6,
+    "packagesKg": [
+      3
+    ],
+    "handles": [
+      "royal-canin-west-highland-white-terrier-perro-adulto"
+    ],
+    "verifiedOn": "2026-11-22"
+  },
+  {
+    "name": "Savour Exigent",
+    "brand": "Royal Canin",
+    "species": "cat",
+    "url": "https://www.royalcanin.com/rs/cats/products/retail-products/savour-exigent-2531",
+    "sourceName": "Royal Canin · Savour Exigent",
+    "protein": 33,
+    "fat": 16,
+    "fiber": 3.1,
+    "packagesKg": [
+      0.4,
+      2
+    ],
+    "packageSources": {
+      "0.4": "https://www.royalcanin.com/ec/cats/products/retail-products/savour-exigent-2531",
+      "2": "https://www.royalcanin.com/ec/cats/products/retail-products/savour-exigent-2531"
+    },
+    "handles": [
+      "alimento-para-gato-royal-canin-feline-health-nutrition-savor"
+    ],
+    "verifiedOn": "2026-11-22"
+  },
+  {
     "handles": [
       "nutra-nuggets-profesional-para-gato"
     ],
     "name": "Nutra-Nuggets Professional for Cats",
     "species": "cat",
     "brand": "Nutra-Nuggets",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "url": "https://diamondpet.cl/wp-content/uploads/2021/03/394B-1512_Nutra_Nuggets_Brochure_LR.pdf#page=14",
     "protein": 32,
     "fat": 21,
@@ -7783,7 +8018,7 @@
       "combo-hills-gato-adult-7-3-2kg-feliway-classic-spray-60ml"
     ],
     "species": "cat",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       3.17
     ],
@@ -7801,7 +8036,7 @@
       "combo-hills-gato-adult-hairball-1-59kg-revolution-6-0-75ml"
     ],
     "species": "cat",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       1.59
     ],
@@ -7819,7 +8054,7 @@
       "combo-hills-perro-senior-vitality-7-12-5lb-collar-yoos-m-l"
     ],
     "species": "dog",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "packagesKg": [
       5.67
     ],
@@ -7836,7 +8071,7 @@
     "name": "Acana Adult Small Breed Recipe – Alimento para perros",
     "species": "dog",
     "brand": "ACANA",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "url": "https://emea.acana.com/en/dogs/dog-food/eu-aca-adult-small.html",
     "complete": true,
     "packagesKg": [
@@ -7857,7 +8092,7 @@
     "name": "Orijen Regional Red – Alimento para gatos",
     "species": "cat",
     "brand": "ORIJEN",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "url": "https://emea.orijenpetfoods.com/en/cats/cat-food/eu-ori-ns-ori-regionalred-cat.html",
     "complete": true,
     "packagesKg": [
@@ -7879,7 +8114,7 @@
     "name": "Orijen Tundra – Alimento para gatos",
     "species": "cat",
     "brand": "ORIJEN",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "url": "https://emea.orijenpetfoods.com/en/cats/cat-food/eu-ori-ns-ori-tundra-cat.html",
     "complete": true,
     "packagesKg": [
@@ -7901,7 +8136,7 @@
     "name": "Orijen Small Breed Marine Fish – Alimento para perros",
     "species": "dog",
     "brand": "ORIJEN",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "url": "https://emea.orijenpetfoods.com/en/dogs/dog-food/eu-ori-ns-ori-small-breed-marine-fish.html",
     "complete": true,
     "packagesKg": [
@@ -7922,7 +8157,7 @@
     "name": "Alimento seco para gato Hills Kitten pescado del mar y arroz",
     "species": "cat",
     "brand": "Hill’s",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "url": "https://www.hillspet.com/cat-food/science-diet-kitten-ocean-fish-rice-dry",
     "basis": "materia_seca",
     "kcalKg": 4046.0,
@@ -7939,7 +8174,7 @@
     "name": "Hills - Science Diet Kitten Indoor Kitten",
     "species": "cat",
     "brand": "Hill’s",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "url": "https://www.hillspet.com/cat-food/science-diet-kitten-indoor-dry",
     "basis": "materia_seca",
     "kcalKg": 3900.0,
@@ -7956,7 +8191,7 @@
     "name": "Alimento seco para perro Hills Science Diet Puppy cordero y arroz",
     "species": "dog",
     "brand": "Hill’s",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "url": "https://www.hillspet.com/dog-food/science-diet-puppy-lamb-meal-rice-dry",
     "basis": "materia_seca",
     "kcalKg": 3734.0,
@@ -7973,7 +8208,7 @@
     "name": "Alimento seco para perro Hills Prescription Diet i/d Small Bites cuidado digestivo",
     "species": "dog",
     "brand": "Hill’s",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "url": "https://www.hillspet.com/dog-food/prescription-diet-id-small-bites-digestive-care-dry",
     "basis": "materia_seca",
     "kcalKg": 3589.0,
@@ -7990,7 +8225,7 @@
     "name": "Orijen Regional Red – Alimento para perros",
     "species": "dog",
     "brand": "ORIJEN",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "url": "https://emea.orijenpetfoods.com/en/eu-ori-ns-ori-regionalred.html",
     "kcalKg": 3860,
     "protein": 38,
@@ -8013,7 +8248,7 @@
     "name": "Orijen Tundra – Alimento para perros",
     "species": "dog",
     "brand": "ORIJEN",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "url": "https://www.orijenpetfoods.com/en-CA/dogs/dog-food/tundra/ns-ori-tundra.html",
     "kcalKg": 3860,
     "protein": 40,
@@ -8033,7 +8268,7 @@
     "name": "Orijen Small Breed Puppy – Alimento para perros",
     "species": "dog",
     "brand": "ORIJEN",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "url": "https://www.orijenpetfoods.co.uk/product/orijen-small-breed-puppy/",
     "kcalKg": 4000,
     "protein": 38,
@@ -8050,7 +8285,7 @@
     "name": "Hills - Science Diet Kitten",
     "species": "cat",
     "brand": "Hill’s",
-    "verifiedOn": "2026-11-21",
+    "verifiedOn": "2026-11-22",
     "url": "https://www.hillspet.co/cat-food/science-plan-kitten-original-dry",
     "kcalKg": 4067,
     "protein": 38.5,
@@ -8060,7 +8295,49 @@
     "basis": "materia_seca",
     "complete": true,
     "packagesKg": [
-      1.59
+      1.59,
+      3.17
+    ]
+  },
+  {
+    "handles": [
+      "alimento-seco-para-perro-hills-mature-ob-dry"
+    ],
+    "name": "Alimento seco para perro Hills Mature Ob Dry",
+    "species": "dog",
+    "brand": "Hill’s",
+    "verifiedOn": "2026-11-22",
+    "url": "https://www.hillspet.co/dog-food/science-diet-mature-adult-dry",
+    "protein": 18.7,
+    "fat": 13.5,
+    "fiber": 2.4,
+    "carbs": 58.7,
+    "basis": "materia_seca",
+    "kcalKg": 3550,
+    "complete": true,
+    "packagesKg": [
+      3
+    ]
+  },
+  {
+    "handles": [
+      "alimento-seco-para-perro-hills-science-diet-adult-salmon-y-arroz"
+    ],
+    "name": "Alimento seco para perro Hills Science Diet Adult salmón y arroz",
+    "species": "dog",
+    "brand": "Hill’s",
+    "verifiedOn": "2026-11-22",
+    "url": "https://www.hillspet.com.sg/dog-food/science-diet-adult-salmon-brown-rice-dry",
+    "protein": 25,
+    "fat": 15.5,
+    "fiber": 3.7,
+    "carbs": 49.6,
+    "basis": "materia_seca",
+    "kcalKg": 3612,
+    "complete": true,
+    "packagesKg": [
+      2.04,
+      14.9
     ]
   }
 ]

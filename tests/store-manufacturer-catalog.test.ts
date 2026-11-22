@@ -128,3 +128,14 @@ test('NUPEC 1st Care uses the manufacturer guarantee on the product sheet', asyn
   assert.equal(protein?.source?.url, row.officialUrl);
   assert.equal(food.fichaNutricional?.discrepancies?.[0].other.calificador, 'maximo');
 });
+
+test('Bonnat percentages link to the original nutrition panel', async () => {
+  const rows = await getStoreManufacturerCatalog();
+  const row = rows.find(item => item.handle === 'bonnat-dieta-veterinaria-soporte-hepatico-gatos');
+  assert.ok(row?.formula?.nutrientSourceUrl);
+  const food = selectStoreManufacturerFood(row, 2);
+  const source = getEffectiveNutrientField(food, 'proteina')?.source;
+  assert.equal(source?.url, row.formula.nutrientSourceUrl);
+  assert.equal(getEffectiveNutrientField(food, 'proteina')?.valor, 26);
+  assert.equal(food.labelStatus, 'verified_manufacturer');
+});

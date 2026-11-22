@@ -262,17 +262,23 @@
     "handles": [
       "nupec-felino-hairball-control"
     ],
-    "url": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-hairball",
+    "url": "https://nucan-by-nupec-aguascalientes.com/wp-content/uploads/2026/07/Ficha-HAIRBALL.pdf",
     "verifiedOn": "2026-11-22",
     "proteinMin": 32.0,
     "fatMin": 13.0,
     "fiberMax": 7.0,
     "ashMax": 7.5,
-    "basis": "materia_seca",
+    "basis": "tal_como_se_vende",
     "packagesKg": [
       1.5,
       3.0
-    ]
+    ],
+    "sourceName": "NUPEC · ficha técnica del fabricante",
+    "moistureMax": 12,
+    "packageSources": {
+      "1.5": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-hairball",
+      "3": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-hairball"
+    }
   },
   {
     "brand": "NUPEC",

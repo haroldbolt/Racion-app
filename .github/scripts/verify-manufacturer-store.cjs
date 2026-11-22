@@ -49,6 +49,14 @@ async function verify() {
     const coverageText = total + ' referencias de la tienda: ' + complete + ' completas, ' + partial + ' parciales y ' + pending + ' pendientes.';
     await store.getByText(coverageText, {exact:true}).waitFor();
     console.log(JSON.stringify({site, coverage:coverageText, label:'NUPEC Felino Weight Care', proteinMin:38, fatMin:11}));
+    await search.fill('Agility Gold Gato Esterilizado');
+    await button('Buscar en internet').click();
+    const agility = store.getByRole('article', {name:'Agility Gold Gato Esterilizado',exact:true});
+    await agility.getByText(/3[.\s]?750 kcal\/kg/).waitFor();
+    await agility.getByRole('button',{name:'Elegir 1.5 kg',exact:true}).waitFor();
+    const labelSource = agility.getByText(/3[.\s]?750 kcal\/kg/).locator('..');
+    assert.match(await labelSource.locator('a').first().getAttribute('href'), /italcolmascotas.+Portafolio-Super-Premium/);
+    console.log(JSON.stringify({site, label:'Agility Gold Gato Esterilizado', kcalKg:3750, packKg:1.5}));
     await search.fill('Monello select castrados');
     await button('Buscar en internet').click();
     const item = store.getByRole('article').filter({hasText:/Monello Select Castrados/i});
