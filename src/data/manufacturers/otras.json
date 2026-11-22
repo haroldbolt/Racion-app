@@ -100,17 +100,24 @@
     "handles": [
       "nupec-adulto-perro-razas-mini-3-kg"
     ],
-    "url": "https://nupec.com/es/nutricion-canina/nutricion-diaria/adulto-razas-mini",
+    "url": "https://nucan-by-nupec-aguascalientes.com/wp-content/uploads/2026/07/Ficha-adulto-Raza-mini.pdf",
     "verifiedOn": "2026-11-22",
     "proteinMin": 25.0,
     "fatMin": 14.0,
     "fiberMax": 4.0,
     "ashMax": 8.0,
-    "basis": "materia_seca",
+    "basis": "tal_como_se_vende",
     "packagesKg": [
       1.0,
       3.0
-    ]
+    ],
+    "sourceName": "NUPEC · ficha técnica del fabricante",
+    "moistureMax": 12,
+    "packageSources": {
+      "1": "https://nupec.com/es/nutricion-canina/nutricion-diaria/adulto-razas-mini",
+      "3": "https://nupec.com/es/nutricion-canina/nutricion-diaria/adulto-razas-mini"
+    },
+    "kcalKg": 3550
   },
   {
     "brand": "NUPEC",
@@ -312,16 +319,21 @@
     "handles": [
       "nupec-felino-renal-care-1-5-kg"
     ],
-    "url": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-renal-care",
+    "url": "https://nucan-by-nupec-aguascalientes.com/wp-content/uploads/2026/07/Ficha-RenalCare.pdf",
     "verifiedOn": "2026-11-22",
     "proteinMin": 26.0,
     "fatMin": 17.0,
     "fiberMax": 4.0,
     "ashMax": 5.0,
-    "basis": "materia_seca",
+    "basis": "tal_como_se_vende",
     "packagesKg": [
       1.5
-    ]
+    ],
+    "sourceName": "NUPEC · ficha técnica del fabricante",
+    "moistureMax": 11,
+    "packageSources": {
+      "1.5": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-renal-care"
+    }
   },
   {
     "brand": "NUPEC",
@@ -355,17 +367,23 @@
     "handles": [
       "nupec-felino-weight-care-adulto"
     ],
-    "url": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-weight-care",
+    "url": "https://nucan-by-nupec-aguascalientes.com/wp-content/uploads/2026/07/Ficha-WEIGHT-C.pdf",
     "verifiedOn": "2026-11-22",
     "fiberMax": 4.5,
     "ashMax": 8.0,
-    "basis": "materia_seca",
+    "basis": "tal_como_se_vende",
     "packagesKg": [
       1.5,
       3.0
     ],
     "proteinMin": 38,
-    "fatMin": 11
+    "fatMin": 11,
+    "sourceName": "NUPEC · ficha técnica del fabricante",
+    "moistureMax": 12,
+    "packageSources": {
+      "1.5": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-weight-care",
+      "3": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-weight-care"
+    }
   },
   {
     "brand": "NUPEC",
@@ -508,17 +526,23 @@
     "handles": [
       "nupec-urinary-management-gato"
     ],
-    "url": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-urinary-management",
+    "url": "https://nucan-by-nupec-aguascalientes.com/wp-content/uploads/2026/07/Ficha-Urinary-Management-1.pdf",
     "verifiedOn": "2026-11-22",
     "proteinMin": 32.5,
     "fatMin": 12.5,
     "fiberMax": 4.0,
     "ashMax": 6.0,
-    "basis": "materia_seca",
+    "basis": "tal_como_se_vende",
     "packagesKg": [
       1.5,
       3.0
-    ]
+    ],
+    "sourceName": "NUPEC · ficha técnica del fabricante",
+    "moistureMax": 11,
+    "packageSources": {
+      "1.5": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-urinary-management",
+      "3": "https://nupec.com/es/nutricion-felina/nutricion-especializada/felino-urinary-management"
+    }
   },
   {
     "brand": "NUPEC",
