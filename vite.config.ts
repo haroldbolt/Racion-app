@@ -58,7 +58,7 @@ export default defineConfig(() => {
             'assets/aistudio/Racio_n_App__Nutricio_n_con_carin_o_8fb59a2d.png',
             'assets/aistudio/Catalogo_Alimentos_Racion_App_68a4174d.json',
           ],
-          navigateFallbackDenylist: [/\/api(?:\/|$)/],
+          navigateFallbackDenylist: [/\/api(?:\/|$)/, /\/auditorias\/[^/]+\.html$/],
           maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
           runtimeCaching: [
             {

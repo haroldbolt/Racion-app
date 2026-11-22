@@ -49,6 +49,16 @@ async function verify() {
     const coverageText = total + ' referencias de la tienda: ' + complete + ' completas, ' + partial + ' parciales y ' + pending + ' pendientes.';
     await store.getByText(coverageText, {exact:true}).waitFor();
     console.log(JSON.stringify({site, coverage:coverageText, label:'NUPEC Felino Weight Care', proteinMin:38, fatMin:11}));
+    const reportUrl = await store.getByRole('link', {name:/Ver la revisión de 274 fichas/}).getAttribute('href');
+    const report = await page.context().newPage();
+    await report.goto(new URL(reportUrl, page.url()).href, {waitUntil:'domcontentloaded'});
+    await report.getByRole('heading', {name:'Revisión de 274 fichas de concentrados'}).waitFor();
+    assert.equal(await report.locator('tbody tr').count(), 274);
+    await report.getByLabel('Estado actual').selectOption('Pendiente');
+    const pendingRows = await report.locator('tbody tr[data-status="Pendiente"]').count();
+    assert.ok(pendingRows > 0 && pendingRows < 274);
+    assert.equal(await report.locator('tbody tr:visible').count(), pendingRows);
+    await report.close();
     await search.fill('Agility Gold Gato Esterilizado');
     await button('Buscar en internet').click();
     const agility = store.getByRole('article', {name:'Agility Gold Gato Esterilizado',exact:true});

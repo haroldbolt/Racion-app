@@ -6,6 +6,7 @@ import {
   selectStoreManufacturerFood,
   type StoreManufacturerFood,
 } from '../services/storeManufacturerCatalog';
+import { publicAssetUrl } from '../utils/publicAssetUrl';
 import { FoodLabelComposition } from './FoodLabelComposition';
 
 interface Props {
@@ -98,6 +99,10 @@ export function StoreManufacturerResults({ query, signal, species, lang, choose 
         : `${coverage.total} store listings: ${coverage.complete} complete, ${coverage.partial} partial and ${coverage.pending} pending.`}</p>
       <p>{es ? 'Una ficha completa incluye proteína, grasa, fibra, kcal/kg y al menos un tamaño de empaque identificado en la ficha o en la tienda.'
         : 'A complete sheet includes protein, fat, fiber, kcal/kg and at least one package size documented by the brand or the store.'}</p>
+      <a className="inline-flex min-h-9 items-center font-semibold text-[#0B5D2E] underline"
+        href={publicAssetUrl('/auditorias/fichas-2026-11-22.html')} target="_blank" rel="noopener noreferrer">
+        {es ? 'Ver la revisión de 274 fichas del 22 de noviembre de 2026' : 'View the 274 listings reviewed on November 22, 2026'}
+      </a>
     </details>}
   </section>;
 }
