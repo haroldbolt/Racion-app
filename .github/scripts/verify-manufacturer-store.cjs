@@ -24,7 +24,8 @@ function expectedCoverage() {
 async function verify() {
   const site = process.argv[2];
   const browser = await chromium.launch({channel:'chrome', headless:true});
-  const page = await browser.newPage({locale:'es-CO', timezoneId:'America/Bogota', viewport:{width:390,height:844}, serviceWorkers:'block'});
+  const context = await browser.newContext({locale:'es-CO', timezoneId:'America/Bogota', viewport:{width:390,height:844}, serviceWorkers:'block'});
+  const page = await context.newPage();
   const button = name => page.getByRole('button', {name,exact:typeof name === 'string'});
   try {
     await page.goto(site, {waitUntil:'domcontentloaded'});
@@ -49,9 +50,10 @@ async function verify() {
     const coverageText = total + ' referencias de la tienda: ' + complete + ' completas, ' + partial + ' parciales y ' + pending + ' pendientes.';
     await store.getByText(coverageText, {exact:true}).waitFor();
     console.log(JSON.stringify({site, coverage:coverageText, label:'NUPEC Felino Weight Care', proteinMin:38, fatMin:11}));
-    const reportUrl = await store.getByRole('link', {name:/Ver la revisión de 274 fichas/}).getAttribute('href');
-    const report = await page.context().newPage();
-    await report.goto(new URL(reportUrl, page.url()).href, {waitUntil:'domcontentloaded'});
+    const [report] = await Promise.all([
+      page.waitForEvent('popup'),
+      store.getByRole('link', {name:/Ver la revisión de 274 fichas/}).click(),
+    ]);
     await report.getByRole('heading', {name:'Revisión de 274 fichas de concentrados'}).waitFor();
     assert.equal(await report.locator('tbody tr').count(), 274);
     await report.getByLabel('Estado actual').selectOption('Pendiente');
