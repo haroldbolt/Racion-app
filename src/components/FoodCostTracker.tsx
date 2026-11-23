@@ -5,7 +5,9 @@ import { StorageService } from '../utils/storage';
 import { formatCOP, formatRation } from '../utils/i18n';
 import { localDateKey } from '../utils/localDate';
 import { getPlanCostSummary, sameFoodIdentity, withPurchasedPackage } from '../utils/foodCosts';
-import { parsePurchasedPriceCop } from '../utils/purchaseInput';
+import { parsePurchasedPriceCop, reviewReceiptPackage } from '../utils/purchaseInput';
+import { getConfirmedPresentations } from '../data/foodPresentations';
+import { getManufacturerPackageGuide } from '../services/storeManufacturerCatalog';
 import { OnlineFoodSearch } from './OnlineFoodSearch';
 import { StockSummary, OpenPurchase } from './FoodInventory';
 import { ReceiptReview } from './ReceiptReview';
@@ -51,6 +53,18 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
   const [confirmed, setConfirmed] = useState(false);
   const [receiptFoodConfirmed, setReceiptFoodConfirmed] = useState(false);
   const [receiptPresent, setReceiptPresent] = useState(false);
+  const [weightConfirmed, setWeightConfirmed] = useState(false);
+  const [packageGuide, setPackageGuide] = useState<{ food: FoodItem; sizes: number[]; sourceName?: string; sourceUrl?: string }>();
+  const receiptFood = receiptPresent ? selected?.food : undefined;
+  useEffect(() => {
+    if (!receiptFood) return;
+    let current = true;
+    const food = receiptFood;
+    void getManufacturerPackageGuide(food).catch(() => undefined).then(guide => {
+      if (current) setPackageGuide({ food, ...(guide ?? { sizes: getConfirmedPresentations(food) ?? [] }) });
+    });
+    return () => { current = false; };
+  }, [receiptFood]);
   const [receiptSelectionRequired, setReceiptSelectionRequired] = useState(false);
   const [receiptItemDescription, setReceiptItemDescription] = useState<string>();
   const [receiptReadMethod, setReceiptReadMethod] = useState<ReceiptReadResult['method']>();
@@ -90,6 +104,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
   function resetConfirmation() {
     setConfirmed(false);
     setReceiptFoodConfirmed(false);
+    setWeightConfirmed(false);
   }
 
   function resetForm(food?: FoodItem) {
@@ -142,6 +157,11 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
   const draftQuantity = decimal(draft.quantity);
   const draftPrice = parsePurchasedPriceCop(draft.price);
   const draftComponent = selected && summary.components.find(({ food, role }) => sameFoodIdentity(food, selected.food) && role === selected.role);
+  const reference = receiptFood && packageGuide?.food === receiptFood ? packageGuide : undefined;
+  const checkingPackages = Boolean(receiptFood && !reference);
+  const selectedPackageKg = source === 'plan' ? draftComponent?.packageKg ?? selected?.food.bagSizeKg : selected?.food.bagSizeKg;
+  const { differsFromKnown, smallerSize } = reviewReceiptPackage(draftPackageKg, selectedPackageKg, reference?.sizes ?? []);
+  const confirmPackageWeight = receiptPresent && smallerSize !== undefined;
   const validDraftAmounts = Number.isFinite(draftPackageKg) && draftPackageKg > 0 && draftPackageKg <= 100 &&
     Number.isSafeInteger(draftQuantity) && draftQuantity > 0 && draftQuantity <= 1000 && draftPrice !== undefined;
   const draftChangesPackage = Boolean(validDraftAmounts && draftComponent &&
@@ -179,6 +199,11 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
     const price = parsePurchasedPriceCop(data.get('price'));
     const date = String(data.get('purchaseDate') ?? '');
     const massKg = packageKg * quantity;
+    if (checkingPackages || (receiptPresent && reviewReceiptPackage(packageKg, selectedPackageKg, reference?.sizes ?? []).smallerSize !== undefined &&
+        (!weightConfirmed || !data.has('receiptWeightConfirmed') || packageKg !== draftPackageKg))) {
+      setError(isEs ? 'Verifica el peso de cada empaque en la factura antes de guardar.' : 'Check the weight of each package on your receipt before saving.');
+      return;
+    }
     if (photoLoading || receiptSelectionRequired || (receiptItemDescription && !receiptFoodConfirmed) || !selected || !Number.isFinite(packageKg) || packageKg <= 0 || packageKg > 100 ||
       !Number.isSafeInteger(quantity) || quantity < 1 || quantity > 1000 ||
       !Number.isFinite(massKg) || price === undefined ||
@@ -341,7 +366,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
             onPreview={setReceiptPhotoUrl}
             onSelect={applyReceiptItem}
             onManual={() => { setReceiptItemDescription(undefined); setReceiptReadMethod(undefined); resetConfirmation(); }}
-            onRemove={() => { setReceiptPhotoUrl(''); setReceiptPresent(false); setReceiptItemDescription(undefined); setReceiptReadMethod(undefined); resetConfirmation(); }}
+            onRemove={() => { setDraft(emptyDraft(selected?.food)); setUsePurchasedPackage(false); setReceiptPhotoUrl(''); setReceiptPresent(false); setReceiptItemDescription(undefined); setReceiptReadMethod(undefined); resetConfirmation(); }}
           />
           <div className="flex gap-2">
             {summary.components.length > 0 && (
@@ -383,6 +408,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
           {selected && (
             <form onSubmit={savePurchase} className="space-y-4">
               <p className="rounded-xl bg-[var(--surface-inner)] p-3 text-xs font-bold text-[var(--text-primary)]">{selected.food.brand} {selected.food.name}</p>
+              {receiptPresent && !photoLoading && <h4 className="text-sm font-extrabold text-[var(--text-primary)]">{isEs ? 'Revisa los datos de la factura' : 'Review receipt details'}</h4>}
               <fieldset disabled={photoLoading} className="grid grid-cols-2 gap-3 disabled:opacity-60">
                 <legend className="sr-only">{isEs ? 'Datos de la compra para confirmar' : 'Purchase details to confirm'}</legend>
                 <label className="space-y-1 text-xs font-bold text-[var(--text-primary)]">
@@ -410,6 +436,25 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
                   <input className={inputClass} name="store" value={draft.store} onChange={(event) => changeField('store', event.target.value)} />
                 </label>
               </fieldset>
+              {receiptPresent && !photoLoading && <div className="space-y-2 text-xs text-[var(--text-secondary)]">
+                {checkingPackages ? <p role="status">{isEs ? 'Consultando presentaciones del alimento…' : 'Checking package sizes…'}</p>
+                  : reference?.sizes.length ? <p>{reference.sourceUrl
+                    ? <a className="font-bold underline" href={reference.sourceUrl} target="_blank" rel="noopener noreferrer">{isEs ? 'Presentaciones de ' : 'Package sizes from '}{reference.sourceName}</a>
+                    : (isEs ? 'Presentaciones conocidas del alimento' : 'Known package sizes')}
+                    {' · '}{reference.sizes.map(kg => weightLabel(kg, userAccount.language)).join(' · ')}</p>
+                  : <p>{isEs ? 'Peso por empaque pendiente de contrastar. Compruébalo en la bolsa.' : 'Package size needs verification. Check the weight on the bag.'}</p>}
+                {differsFromKnown && <p role="alert" className="font-bold text-amber-800 dark:text-amber-200">
+                  {weightLabel(draftPackageKg, userAccount.language)}{isEs ? ' no coincide con las presentaciones de esta referencia. Comprueba el peso en el empaque.' : ' does not match the listed package sizes. Check the weight on the package.'}
+                </p>}
+                {smallerSize !== undefined && <div className="space-y-2 rounded-xl border border-amber-300 bg-amber-50 p-3 text-amber-950">
+                  <p role="alert">{isEs ? 'Revisa el separador decimal. Un peso de ' : 'Check the decimal separator. A weight of '}{weightLabel(draftPackageKg, userAccount.language)}
+                    {isEs ? ' es al menos diez veces el de la presentación de ' : ' is at least ten times the size of the '}{weightLabel(smallerSize, userAccount.language)}{isEs ? '.' : ' package.'}</p>
+                  <label className="flex min-h-11 items-center gap-2 font-bold">
+                    <input type="checkbox" name="receiptWeightConfirmed" required checked={weightConfirmed} onChange={(event) => setWeightConfirmed(event.target.checked)} className="accent-[#0B5D2E]" />
+                    <span>{isEs ? 'Verifiqué en la factura que cada empaque pesa ' : 'I checked the receipt and each package weighs '}{weightLabel(draftPackageKg, userAccount.language)}</span>
+                  </label>
+                </div>}
+              </div>}
               <p className="text-xs text-[var(--text-secondary)]">{isEs ? 'Ingresa el total pagado por todos estos empaques. Si la factura incluye otros productos, usa solo el importe de este alimento.' : 'Enter the total paid for these packages. If the receipt includes other products, use only this food’s amount.'}</p>
               <label className="block space-y-1 text-xs font-bold text-[var(--text-primary)]">
                 <span>{isEs ? 'Notas (opcional)' : 'Notes (optional)'}</span>
@@ -434,7 +479,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
                 <span>{isEs ? 'Confirmo el importe y el peso de este alimento' : 'I confirm the amount and weight for this food'}</span>
               </label>
               {error && <p role="alert" className="flex gap-2 rounded-xl bg-red-50 p-3 text-xs text-red-800"><AlertCircle className="size-4 shrink-0" />{error}</p>}
-              <button type="submit" disabled={photoLoading || receiptSelectionRequired} className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#0B5D2E] px-3 text-sm font-extrabold text-white disabled:opacity-50"><Receipt className="size-4" />{photoLoading ? (isEs ? 'Leyendo factura…' : 'Reading receipt…') : (isEs ? 'Guardar compra' : 'Save purchase')}</button>
+              <button type="submit" disabled={photoLoading || receiptSelectionRequired || checkingPackages || (confirmPackageWeight && !weightConfirmed)} className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#0B5D2E] px-3 text-sm font-extrabold text-white disabled:opacity-50"><Receipt className="size-4" />{photoLoading ? (isEs ? 'Leyendo factura…' : 'Reading receipt…') : (isEs ? 'Guardar compra' : 'Save purchase')}</button>
             </form>
           )}
         </div>

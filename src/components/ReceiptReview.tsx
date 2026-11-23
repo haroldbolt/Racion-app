@@ -143,7 +143,7 @@ export function ReceiptReview({ language, onNewFile, onReadingChange, onSelectio
       {extraction && !reading && (
         <div className="space-y-3">
           <h4 className="text-sm font-extrabold text-[var(--text-primary)]">{isEs ? 'Artículos detectados' : 'Detected items'}</h4>
-          <p className="text-xs text-[var(--text-secondary)]">{isEs ? 'Elige la línea del alimento que compraste. El total general, otros productos y el envío se revisan por separado.' : 'Choose the purchased food line. Review the grand total, other products and delivery separately.'}</p>
+          <p className="text-xs text-[var(--text-secondary)]">{isEs ? 'Elige el alimento que compraste y contrasta sus datos con la factura.' : 'Choose the food you bought and check its details against the receipt.'}</p>
           {extraction.items.length === 0 && <p className="text-xs text-[var(--text-secondary)]">{isEs ? 'No pudimos identificar una línea de alimento con suficiente claridad. Completa los campos que faltan con la factura a la vista.' : 'No food line was clear enough to identify. Complete the missing fields using your receipt.'}</p>}
           <div className="space-y-2">
             {extraction.items.map((item) => (
@@ -158,7 +158,8 @@ export function ReceiptReview({ language, onNewFile, onReadingChange, onSelectio
             ))}
           </div>
           {warnings.length > 0 && <ul className="list-disc space-y-1 pl-4 text-xs text-amber-800 dark:text-amber-200">{warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul>}
-          <details className="text-xs text-[var(--text-secondary)]"><summary className="cursor-pointer font-bold">{isEs ? 'Ver texto leído de la factura' : 'View recognized receipt text'}</summary><pre className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap break-words font-sans">{result?.text}</pre></details>
+          <details className="text-xs text-[var(--text-secondary)]"><summary className="cursor-pointer font-bold">{isEs ? 'Ver texto leído de la factura' : 'View recognized receipt text'}</summary>
+            <p className="mt-2 font-bold">{result?.method === 'pdf_text' ? (isEs ? 'Texto original del PDF' : 'Original PDF text') : (isEs ? 'Texto reconocido en la imagen' : 'Text recognized from the image')}</p><pre className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap break-words font-sans">{result?.text}</pre></details>
           <button type="button" onClick={() => { setSelectedId(undefined); onSelectionRequiredChange(false); onManual(); }} className="min-h-10 rounded-xl border border-[var(--border-color)] px-3 text-xs font-bold">{isEs ? 'Completar datos manualmente' : 'Enter details manually'}</button>
         </div>
       )}

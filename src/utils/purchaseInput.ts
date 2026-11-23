@@ -21,3 +21,14 @@ export function parsePurchasedPriceCop(value: FormDataEntryValue | null): number
     ? amount
     : undefined;
 }
+
+/** A missing decimal can turn one valid retail size into a different valid size. */
+export function reviewReceiptPackage(packageKg: number, selectedKg: number | undefined, knownSizes: readonly number[]) {
+  const sameSize = (a: number, b: number) => Math.abs(a - b) <= 0.000001;
+  if (!Number.isFinite(packageKg) || packageKg <= 0) return { differsFromKnown: false, smallerSize: undefined };
+  const differsFromKnown = knownSizes.length > 0 && !knownSizes.some(size => sameSize(size, packageKg));
+  const smallerSize = selectedKg !== undefined && selectedKg > 0 && packageKg >= 10 * selectedKg - 0.000001
+    ? selectedKg
+    : knownSizes.find(size => size > 0 && sameSize(size * 10, packageKg));
+  return { differsFromKnown, smallerSize };
+}

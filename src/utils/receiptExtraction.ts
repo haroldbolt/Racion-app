@@ -1,3 +1,4 @@
+import { localDateKey } from './localDate';
 import { parsePurchasedPriceCop } from './purchaseInput';
 
 export interface ReceiptItemCandidate {
@@ -30,7 +31,15 @@ const itemTotalPattern = /\b(?:total|importe|valor)\s+(?:(?:del?|por)\s+)?(?:art
 const unitPattern = /\b(?:precio|valor|vr|vlr|p)\s*\.?\s*(?:unit(?:ario)?\.?|\/\s*u\b)|\bunitario\b|\bp\s*\/\s*u\b/giu;
 const quantityPattern = /\b(?:cantidad|cant\.?|qty|unidades?|unds?|uds?)\s*[:=]?\s*(\d{1,4})\b/giu;
 const labeledContinuation = /^(?:(?:presentaci[oó]n|peso|contenido|cantidad|cant\.?|qty|unidades?|unds?|uds?|precio\b|valor\s+unit|vr\s+unit|vlr\s+unit|unitario|(?:total|importe|valor)\s+(?:(?:del?|por)\s+)?(?:art[ií]culo|producto|l[ií]nea|[ií]tem))\b|importe\s*:)/i;
+const packageDetail = /^\d{1,4}\s*(?:bolsas?|bultos?|paquetes?|latas?|sobres?|[x×])\s*(?:de\s+)?\d+(?:[.,]\d+)?\s*(?:kg|g|gr|kilogramos?|gramos?)\s*$/i;
 const footer = /^(?:sub\s*total|total\b|gran\s+total|importe\s+total|iva\b|impuestos?\b|env[ií]o\b|flete\b|domicilio\b|propina\b|descuentos?\b|dto\.?\b|ahorro\b|efectivo\b|cambio\b|saldo\b|base\s+(?:gravable|imponible)|retenci[oó]n|vuelto\b|recibido\b|forma\s+de\s+pago|medio\s+de\s+pago|pago\b|visa\b|mastercard\b)/i;
+const merchantLabel = /^(?:tienda|comercio|establecimiento|raz[oó]n social)\s*[:=]\s*/i;
+const dateSource = String.raw`(?:\d{4}\s*[/-]\s*\d{1,2}\s*[/-]\s*\d{1,2}|\d{1,2}\s*[/-]\s*\d{1,2}\s*[/-]\s*\d{4})`;
+const standaloneDate = new RegExp(`^${dateSource}$`);
+const purchaseDateLabel = /\bfecha(?:\s+de\s+(?:compra|emisi[oó]n|venta|factura|expedici[oó]n))?\s*[:=]?\s*(?=\d)/i;
+const labeledDate = new RegExp(`${purchaseDateLabel.source}(${dateSource})(?![\\d/.-])`, 'i');
+const grandTotalLine = new RegExp(String.raw`^(?:gran\s+total|importe\s+total|total(?:\s+a\s+pagar|\s+(?:de\s+la\s+)?factura)?)\s*[:=]?\s*(?:COP\s*)?\$?\s*(${numberSource})(?:\s*COP)?\s*$`, 'i');
+const adjustment = /\b(?:descuento|dto|dcto|iva|impuesto|envio|flete|domicilio|propina|retencion|ahorro)\b/i;
 const metadata = /^(?:nit\b|rut\b|factura\b|resoluci[oó]n\b|cufe\b|cude\b|cliente\b|tel[eé]fono\b|tel\.?\s*:|direcci[oó]n\b|email\b|fecha\b|hora\b|vendedor\b|cajero\b|caja\b|gracias\b|www\.|https?:|@)/i;
 
 function cleanLine(line: string): string {
@@ -121,13 +130,14 @@ function rowColumns(line: string, header?: Header): Partial<Record<Column, numbe
   return values;
 }
 
-function itemFrom(block: Block, index: number): ReceiptItemCandidate {
+function itemFrom(block: Block, index: number, invoiceTotal?: number): ReceiptItemCandidate {
   const evidence = block.lines.join('\n');
   const allWeights = weights(evidence);
   const ambiguousGramSizes = [...evidence.matchAll(weightPattern)].filter((match) =>
     !/^k/i.test(match[2]) && /^\d{1,3}[.,]\d{3}$/.test(match[1]));
   const distinctWeight = uniqueValue(allWeights.map((weight) => weight.kg), 0.000001);
-  const packageKg = ambiguousGramSizes.length ? undefined : distinctWeight;
+  const splitDigits = /\b\d\s+\d\s*(?:kg|kilogramos?|g|gramos?)\b/i.test(evidence);
+  const packageKg = ambiguousGramSizes.length || splitDigits ? undefined : distinctWeight;
   const quantities = [...evidence.matchAll(quantityPattern)].map((match) => Number(match[1]));
   for (const match of evidence.matchAll(/\b(\d{1,4})\s*(?:x|×)\s*\d+(?:[.,]\d{1,3})?\s*(?:k\s*g|g|gr|gramos?|kilogramos?)\b/giu)) quantities.push(Number(match[1]));
   for (const match of evidence.matchAll(/\b\d+(?:[.,]\d{1,3})?\s*(?:k\s*g|g|gr|gramos?|kilogramos?)\s*(?:x|×)\s*(\d{1,4})\b/giu)) quantities.push(Number(match[1]));
@@ -151,6 +161,12 @@ function itemFrom(block: Block, index: number): ReceiptItemCandidate {
       warnings.push('El importe de la línea se calculó con el precio unitario y la cantidad explícitos. Confírmalo en la factura.');
     }
   }
+  if (invoiceTotal !== undefined && totalPaidCop === undefined && totalAmounts.length === 0 &&
+      unitAmounts.length === 0 && !hasAdjustments && packageKg !== undefined && quantity !== undefined) {
+    totalPaidCop = invoiceTotal;
+    warnings.push('El importe procede del TOTAL de esta factura de un solo artículo. Confirma que corresponde al alimento.');
+  }
+  if (splitDigits) warnings.push('Se leyeron dígitos separados en el peso. Comprueba si el empaque lleva una coma o un punto decimal.');
   if (ambiguousGramSizes.length) warnings.push(`El tamaño «${ambiguousGramSizes[0][0]}» puede usar un separador de miles o decimal. Confirma el peso de cada empaque.`);
   else if (allWeights.length && distinctWeight === undefined) warnings.push('Hay varios tamaños posibles en esta línea. Confirma el peso de cada empaque.');
   if (quantities.length && quantity === undefined) warnings.push('Hay cantidades distintas en esta línea. Confirma cuántos empaques compraste.');
@@ -172,21 +188,60 @@ function itemFrom(block: Block, index: number): ReceiptItemCandidate {
   return { id: `receipt-item-${index + 1}`, description, packageKg, quantity, totalPaidCop, unitPriceCop, evidence, warnings };
 }
 
-function purchaseDate(text: string): string | undefined {
-  const labeled = /\bfecha(?:\s+de\s+(?:compra|emisi[oó]n|venta|factura))?\s*[:=]?\s*(\d{4}[/-]\d{1,2}[/-]\d{1,2}|\d{1,2}[/-]\d{1,2}[/-]\d{4})/i.exec(text);
-  if (!labeled) return undefined;
-  const parts = labeled[1].split(/[/-]/).map(Number);
-  const [year, month, day] = parts[0] > 31 ? parts : [parts[2], parts[1], parts[0]];
-  const date = new Date(Date.UTC(year, month - 1, day));
-  return year >= 2000 && year <= 2100 && date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day
-    ? `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}` : undefined;
+function singleItemInvoiceTotal(lines: string[]): number | undefined {
+  const totals: number[] = [];
+  const subtotals: number[] = [];
+  for (const line of lines) {
+    if (!footer.test(line) || labeledContinuation.test(line)) continue;
+    const subtotal = /^sub\s*total\b/i.test(line);
+    if (!subtotal && !/^(?:total\b|gran\s+total\b|importe\s+total\b)/i.test(line)) continue;
+    const amountMatch = grandTotalLine.exec(subtotal ? line.replace(/^sub\s*/i, '') : line);
+    const amount = amountMatch && parsePurchasedPriceCop(amountMatch[1]);
+    if (!amount) return undefined;
+    (subtotal ? subtotals : totals).push(amount);
+  }
+  if (!totals.length) return undefined;
+  return uniqueValue([...totals, ...subtotals]);
+}
+
+function purchaseDate(lines: string[], today: string, warnings: string[]): string | undefined {
+  const labeled = lines.filter(line => purchaseDateLabel.test(line));
+  const matches = labeled.length
+    ? labeled.map(line => labeledDate.exec(line)?.[1])
+    : lines.filter(line => standaloneDate.test(line));
+  const dates = new Set<string>();
+  for (const match of matches) {
+    if (!match) break;
+    const parts = match.split(/[/-]/).map(Number);
+    const [year, month, day] = parts[0] > 31 ? parts : [parts[2], parts[1], parts[0]];
+    const date = new Date(Date.UTC(year, month - 1, day));
+    if (year < 2000 || year > 2100 || date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) {
+      warnings.push('La fecha leída no es una fecha válida. Revisa el día, el mes y el año de compra.');
+      return undefined;
+    }
+    const iso = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    if (iso > today) {
+      warnings.push(`La fecha leída (${match}) está en el futuro. Revisa el año en la factura e ingresa la fecha de compra.`);
+      return undefined;
+    }
+    dates.add(iso);
+  }
+  if (dates.size === 1 && matches.every(Boolean)) return [...dates][0];
+  warnings.push('No se identificó una fecha de compra inequívoca. Compruébala en la factura.');
+  return undefined;
 }
 
 /** Extracts candidates and explicit evidence; the caller must review them before saving. */
-export function extractReceipt(text: string): ReceiptExtraction {
-  const normalized = text.slice(0, 200000).replace(/(?<=\d)\s*([.,])\s*(?=\d)/g, '$1');
+export function extractReceipt(text: string, today = localDateKey()): ReceiptExtraction {
+  const normalized = text.slice(0, 200000).replace(/(?<=\d)[^\S\r\n]*([.,])[^\S\r\n]*(?=\d)/g, '$1');
   const lines = normalized.split(/\r?\n/).map(cleanLine).slice(0, 2000);
   const warnings: string[] = [];
+  const namedStore = lines.find(line => merchantLabel.test(line));
+  const storeHeader = namedStore ?? lines.slice(0, 5).find((line, index) => line.length >= 3 && line.length <= 100 &&
+    /[\p{L}]{3}/u.test(line) && !metadata.test(line) && !weights(line).length && !tokens(line).some((token) => token.moneyLike) &&
+    (/\b(?:pets|mascotas|tienda|veterinaria|laika)\b/i.test(line) || /^(?:factura|nit)\b/i.test(lines[index + 1] ?? '')));
+  const merchantName = storeHeader?.replace(merchantLabel, '').trim() || undefined;
+  let unassignedLine = false;
   const blocks: Block[] = [];
   let block: Block | undefined;
   let header: Header | undefined;
@@ -198,26 +253,32 @@ export function extractReceipt(text: string): ReceiptExtraction {
     const line = lines[index];
     // OCR often inserts blank lines between a product and its labeled fields.
     // Only an explicit new product, header or footer ends that association.
-    if (!line) continue;
+    if (!line || line === storeHeader) continue;
     const nextHeader = headerFrom(line);
     if (nextHeader) { finish(); header = nextHeader; continue; }
-    const continuation = labeledContinuation.test(line) && !headerFrom(line);
+    const continuation = labeledContinuation.test(line) || (block && packageDetail.test(line));
     if (block && continuation) { block.lines.push(line); continue; }
-    if (footer.test(line) || metadata.test(line)) { finish(); continue; }
+    if (footer.test(line) || metadata.test(line) || standaloneDate.test(line)) { finish(); continue; }
     if (block && !/[\p{L}]/u.test(line.replace(/\bCOP\b/gi, '')) && tokens(line).some((token) => token.moneyLike)) {
       block.lines[block.lines.length - 1] += ` ${line}`;
       continue;
     }
     const hasLetters = /[\p{L}]{2}/u.test(line);
-    const hasFollowingDetails = labeledContinuation.test(lines.slice(index + 1).find(Boolean) ?? '');
+    const next = lines.slice(index + 1).find(Boolean) ?? '';
+    const hasFollowingDetails = labeledContinuation.test(next) || packageDetail.test(next);
     const candidate = hasLetters && !continuation && (weights(line).length > 0 ||
       tokens(line).some((token) => token.moneyLike) || hasFollowingDetails ||
       (header && !/^(?:descripcion|producto|detalle|cantidad|precio|total)\b/i.test(fold(line))));
     finish();
     if (candidate) block = { lines: [line], header };
+    else unassignedLine = true;
   }
   finish();
-  const items = blocks.map(itemFrom);
+  const truncated = text.length > 200000 || lines.length === 2000 || blocks.length === 50;
+  const hasCharges = lines.some(line => adjustment.test(fold(line)));
+  const invoiceTotal = blocks.length === 1 && !truncated && !hasCharges && !unassignedLine
+    ? singleItemInvoiceTotal(lines) : undefined;
+  const items = blocks.map((entry, index) => itemFrom(entry, index, invoiceTotal));
   if (/\b(?:USD|EUR|MXN|ARS|CLP|PEN|BRL)\b|US\s*\$|€/i.test(normalized)) {
     const message = 'La factura menciona una moneda distinta de COP. Confirma el importe en pesos colombianos; no se convirtió automáticamente.';
     warnings.push(message);
@@ -227,14 +288,12 @@ export function extractReceipt(text: string): ReceiptExtraction {
       item.warnings.push(message);
     }
   }
-  const merchantName = lines.slice(0, 5).find((line, index) => line.length >= 3 && line.length <= 100 &&
-    /[\p{L}]{3}/u.test(line) && !metadata.test(line) && !weights(line).length && !tokens(line).some((token) => token.moneyLike) &&
-    (/\b(?:pets|mascotas|tienda|veterinaria|laika)\b/i.test(line) || /^(?:factura|nit)\b/i.test(lines[index + 1] ?? '')));
+  if (!merchantName) warnings.push('No se identificó el nombre completo de la tienda. Revísalo en la factura.');
   if (items.length === 0) warnings.push('No se identificaron líneas de productos. Puedes ingresar los datos manualmente.');
   if (items.length > 1) warnings.push('La factura contiene varios productos. Elige la línea que corresponde al alimento.');
   if (lines.some((line) => footer.test(line) && /\b(?:descuento|dto|dcto|iva|impuesto|envio|flete|domicilio)\b/i.test(fold(line)))) {
     warnings.push('Los descuentos, impuestos y envíos generales no se asignaron al alimento. Revisa el importe que le corresponde.');
   }
-  if (text.length > 200000 || lines.length === 2000 || blocks.length === 50) warnings.push('La lectura se limitó a una parte de la factura. Revisa el documento completo.');
-  return { items, merchantName, purchaseDate: purchaseDate(lines.join('\n')), warnings };
+  if (truncated) warnings.push('La lectura se limitó a una parte de la factura. Revisa el documento completo.');
+  return { items, merchantName, purchaseDate: purchaseDate(lines, today, warnings), warnings };
 }

@@ -199,20 +199,15 @@ export function selectStoreManufacturerFood(row:StoreManufacturerFood, packageKg
     fichaNutricional:{coincidenciaEstado:'pendiente',mercado:'Colombia'}}, row);
 }
 
-/** Merge only on an exact formula or an identified store listing. Choosing another
- * retailer must keep its price, pack, barcode and stock source. */
-export async function enrichFoodFromStoreManufacturer(food:FoodItem): Promise<FoodItem> {
-  if (food.type !== 'dry' || food.labelStatus === 'user_confirmed_label') return food;
-  const catalog = await getStoreManufacturerCatalog();
+function findStoreListing(food:FoodItem, catalog:StoreManufacturerFood[]) {
   const listing = food.storeProductUrl?.split(/[?#]/)[0].replace(/\/$/,'');
-  const direct = catalog.find(row => row.species === food.species &&
+  return catalog.find(row => row.species === food.species &&
     (row.storeUrl === listing || (!listing && food.sourceFoodId === 'agrocentro-' + row.handle)));
-  if (direct) {
-    const availableSizesKg = distinctSizes([...(food.availableSizesKg ?? []), ...direct.packagesKg]);
-    return withFormula({...food, availableSizesKg}, direct);
-  }
+}
+
+function matchFormula(food:FoodItem, catalog:StoreManufacturerFood[]) {
   const brand = identity(food.brand);
-  if (!brand) return food;
+  if (!brand) return undefined;
   const equivalents = (name:string) => {
     const key = identity(name);
     return key.startsWith(brand + ' ') ? key : brand + ' ' + key;
@@ -221,11 +216,36 @@ export async function enrichFoodFromStoreManufacturer(food:FoodItem): Promise<Fo
   const matches = catalog.filter(row => row.species === food.species && identity(row.brand) === brand &&
     (equivalents(row.name) === key || (row.formula && equivalents(row.formula.name) === key)));
   const formulas = new Set(matches.map(row => row.formula));
-  if (!matches.length || formulas.size !== 1 || !matches[0].formula) return food;
-  const formula = matches[0].formula;
-  if (food.declaredIcaRegistration && formula.registration && food.declaredIcaRegistration !== formula.registration) return food;
+  if (!matches.length || formulas.size !== 1 || !matches[0].formula) return undefined;
+  const row = matches[0];
+  if (food.declaredIcaRegistration && row.formula?.registration && food.declaredIcaRegistration !== row.formula.registration) return undefined;
+  return row;
+}
+
+/** Use the manufacturer's declared packages separately from sizes offered only by shops. */
+export async function getManufacturerPackageGuide(food: FoodItem) {
+  if (food.type !== 'dry') return undefined;
+  const catalog = await getStoreManufacturerCatalog();
+  const row = findStoreListing(food, catalog) ?? matchFormula(food, catalog);
+  if (!row?.officialPackagesKg?.length || !row.officialUrl) return undefined;
+  return { sizes: row.officialPackagesKg, sourceUrl: row.officialUrl, sourceName: row.formula?.sourceName ?? row.house };
+}
+
+/** Merge only on an exact formula or an identified store listing. Choosing another
+ * retailer must keep its price, pack, barcode and stock source. */
+export async function enrichFoodFromStoreManufacturer(food:FoodItem): Promise<FoodItem> {
+  if (food.type !== 'dry' || food.labelStatus === 'user_confirmed_label') return food;
+  const catalog = await getStoreManufacturerCatalog();
+  const direct = findStoreListing(food, catalog);
+  if (direct) {
+    const availableSizesKg = distinctSizes([...(food.availableSizesKg ?? []), ...direct.packagesKg]);
+    return withFormula({...food, availableSizesKg}, direct);
+  }
+  const row = matchFormula(food, catalog);
+  const formula = row?.formula;
+  if (!row || !formula) return food;
   const hasRetailOffer = !!(food.storeProductUrl || food.buyUrl || food.priceBasis || food.packagePrices?.length);
   const base = hasRetailOffer ? food : {...food,
     availableSizesKg:distinctSizes([...(food.availableSizesKg ?? []), ...(formula.packagesKg ?? [])])};
-  return withFormula(base,matches[0]);
+  return withFormula(base,row);
 }

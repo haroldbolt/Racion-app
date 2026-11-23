@@ -124,6 +124,139 @@ async function saveProof(page, name) {
   await page.screenshot({ path: path.join(process.env.RECEIPT_SCREENSHOT_DIR, name), fullPage: false });
 }
 
+function museInvoice(size) {
+  return [
+    'FACTURA DE VENTA MUSE-001',
+    'Tienda: Mascotas Prueba S.A.S.',
+    'Fecha: 22/11/2026',
+    '',
+    `Agility Gold Grandes Adultos  2 bolsas de ${size} kg`,
+    '',
+    'TOTAL: $90.000 COP',
+  ];
+}
+
+async function verifyMuseReceipt(page, url) {
+  const button = (name) => page.getByRole('button', { name, exact: typeof name === 'string' });
+  const workerUrls = [];
+  page.on('worker', worker => workerUrls.push(worker.url()));
+  await page.clock.setFixedTime(new Date('2026-11-23T15:00:00-05:00'));
+  await page.goto(url, { waitUntil: 'domcontentloaded' });
+  await button('Agregar mascota').click();
+  await button('🐶 Perro').click();
+  await page.getByRole('textbox', { name: 'Ej. Milo' }).fill('Milo facturas');
+  await page.getByRole('spinbutton', { name: 'Peso Actual (kg)' }).fill('30');
+  await button('Guardar mascota').click();
+  await button('♂ Macho').click();
+  await button(/continuar a condición/i).click();
+  await button(/continuar a objetivo/i).click();
+  await button(/continuar a alimento/i).click();
+  await page.getByRole('textbox', { name: 'Buscar alimentos en internet' }).fill('Agility Gold Grandes Adultos');
+  await button('Buscar en internet').click();
+  const catalog = page.getByRole('region', { name: 'Alimentos de Agrocentro Pets' });
+  const food = catalog.getByRole('article', { name: 'Agility Gold Adulto Raza Grande', exact: true });
+  await food.getByRole('button', { name: 'Elegir 1.5 kg', exact: true }).click();
+  // Two meals of 150 g are the purchase-cost reference specified by Muse.
+  await page.getByRole('spinbutton', { name: 'Gramos diarios elegidos de la tabla' }).fill('300');
+  await button(/continuar a comidas/i).click();
+  await page.getByLabel('Hora de la toma 1', { exact: true }).fill('08:30');
+  await page.getByLabel('Hora de la toma 2', { exact: true }).fill('19:30');
+  await button(/ver su plan nutricional/i).click();
+  await button('Guardar este plan').click();
+  const todayCost = page.getByRole('region', { name: 'Costo de su ración', exact: true });
+  const openPurchase = todayCost.getByRole('button', { name: 'Registrar compra o factura', exact: true });
+  await openPurchase.click();
+  const dialog = page.getByRole('dialog', { name: 'Gastos de alimentación', exact: true });
+  const upload = dialog.getByLabel('Leer factura (foto o PDF)', { exact: true });
+  const review = dialog.getByRole('region', { name: 'Revisión de la factura', exact: true });
+  const recognized = review.getByRole('button', { name: /^Usar artículo:.*Agility Gold Grandes Adultos/i });
+  const weight = dialog.getByLabel('Peso de cada empaque', { exact: true });
+  const general = dialog.getByRole('checkbox', { name: 'Confirmo el importe y el peso de este alimento', exact: true });
+  const sameFood = dialog.getByRole('checkbox', { name: 'Este artículo corresponde al alimento seleccionado', exact: true });
+  const largeWeight = dialog.getByRole('checkbox', { name: /^Verifiqué en la factura que cada empaque pesa 15 kg/ });
+  const save = dialog.getByRole('button', { name: 'Guardar compra', exact: true });
+
+  async function checkReadValues(file, expectedKg) {
+    await upload.setInputFiles(file);
+    await recognized.waitFor({ timeout: 120000 });
+    // A single line is selected automatically. Every field below comes from the reader.
+    await page.waitForFunction(expected => {
+      const input = document.querySelector('input[name="packageWeight"]');
+      return !!input && Number(input.value.replace(',', '.')) === expected;
+    }, expectedKg);
+    assert.equal(Number((await weight.inputValue()).replace(',', '.')), expectedKg);
+    assert.equal(await dialog.getByLabel('Cantidad de empaques', { exact: true }).inputValue(), '2');
+    assert.equal(Number((await dialog.getByLabel('Importe total de este alimento (COP)', { exact: true }).inputValue()).replaceAll('.', '')), 90000);
+    assert.equal(await dialog.getByLabel('Fecha de compra', { exact: true }).inputValue(), '2026-11-22');
+    assert.equal(await dialog.getByLabel('Tienda (opcional)', { exact: true }).inputValue(), 'Mascotas Prueba S.A.S.');
+    assert.equal(await general.isChecked(), false);
+    assert.equal(await sameFood.isChecked(), false);
+  }
+  const pdfFile = (size) => ({ name: 'factura-muse.pdf', mimeType: 'application/pdf', buffer: receiptPdf(museInvoice(size)) });
+  try {
+    const png = await receiptPng(page, museInvoice('1,5'));
+    await checkReadValues({ name: 'factura-muse.png', mimeType: 'image/png', buffer: png }, 1.5);
+    assert.ok(workerUrls.some(value => new URL(value).pathname.endsWith('/ocr/worker.min.js')), 'The original image must run local OCR');
+    assert.equal(await largeWeight.count(), 0);
+    const preview = dialog.getByRole('region', { name: 'Costo antes de guardar', exact: true });
+    await expectMealCosts(preview, 9000, 4500);
+    await page.getByText('Aún no hay compras registradas para esta mascota.', { exact: true }).waitFor();
+    await preview.scrollIntoViewIfNeeded();
+    await saveProof(page, 'muse-revision-150g.png');
+    await general.check();
+    await sameFood.check();
+    await save.click();
+    await expectMealCosts(dialog.getByRole('region', { name: 'Costo de la ración', exact: true }), 9000, 4500);
+    await dialog.getByRole('button', { name: 'Cerrar gastos', exact: true }).click();
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expectMealCosts(todayCost, 9000, 4500);
+    await button('Alimentos').click();
+    await button('Gastos ($ COP)').click();
+    const expenses = page.getByRole('region', { name: 'Gastos de alimentación', exact: true });
+    const purchase = expenses.getByRole('article');
+    await purchase.first().waitFor();
+    assert.equal(await purchase.count(), 1);
+    const savedText = await purchase.innerText();
+    assert.match(savedText, /2026-11-22\s*·\s*Mascotas Prueba S\.A\.S\./);
+    assert.match(savedText, /2\s*×\s*1,5 kg/);
+    assert.match(savedText, /90[.\s]000\s+COP/);
+    assert.match(savedText, /30[.\s]000\s+COP\s*\/\s*kg/);
+    await purchase.getByText('Ración al comprar', { exact: true }).click();
+    for (const time of ['08:30', '19:30']) {
+      await purchase.getByText(new RegExp(time + '.*150 g.*4[.\\s]500\\s+COP')).waitFor();
+    }
+    await purchase.scrollIntoViewIfNeeded();
+    await saveProof(page, 'muse-compra-tras-recarga.png');
+
+    await button('Hoy').click();
+    await openPurchase.click();
+    await checkReadValues(pdfFile('1.5'), 1.5);
+    assert.equal(await largeWeight.count(), 0);
+    await checkReadValues(pdfFile('15'), 15);
+    await general.check();
+    await sameFood.check();
+    assert.equal(await largeWeight.isChecked(), false);
+    assert.equal(await save.isDisabled(), true, 'Even a manufacturer-listed 15 kg bag needs explicit approval when the selected pack is 1.5 kg');
+    await largeWeight.scrollIntoViewIfNeeded();
+    await saveProof(page, 'muse-alerta-peso-10x.png');
+    await largeWeight.check();
+    assert.equal(await save.isEnabled(), true);
+    await weight.fill('8');
+    await dialog.getByText(/8 kg no coincide con (?:las|ninguna de las) presentaciones/i).waitFor();
+    await weight.fill('15');
+    assert.equal(await largeWeight.isChecked(), false, 'Editing the amount invalidates the tenfold weight approval');
+    assert.equal(await save.isDisabled(), true);
+    assert.equal(await dialog.getByRole('article').count(), 1);
+    console.log(JSON.stringify({ scenario:'R3 Muse', food:'Agility Gold Grandes Adultos', receipt:'real PNG OCR / digital PDF',
+      quantity:2, packageKg:1.5, totalPaidCop:90000, merchant:'Mascotas Prueba S.A.S.', purchaseDate:'2026-11-22',
+      costPerGramCop:30, gramsPerMeal:150, costPerMealCop:4500, persisted:true, warnedForUnlistedKg:8, blockedTenfoldKg:15 }));
+  } catch (error) {
+    console.error('R3 receipt test stopped:', (await page.locator('body').innerText()).slice(-9500));
+    await saveProof(page, 'muse-fallo.png');
+    throw error;
+  }
+}
+
 async function verifyReceipt() {
   const url = new URL(process.argv[2]);
   const isLocal = url.protocol === 'http:' && url.hostname === '127.0.0.1';
@@ -276,6 +409,13 @@ async function verifyReceipt() {
       'Receipt reading must use local pixels/text and same-origin support assets, without uploading the invoice');
     await todayCost.scrollIntoViewIfNeeded();
     await saveProof(page, 'receipt-costs-persisted.png');
+
+    const musePage = await browser.newPage({ locale: 'es-CO', timezoneId: 'America/Bogota',
+      viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: 'block' });
+    musePage.setDefaultTimeout(20000);
+    try {
+      await verifyMuseReceipt(musePage, url.href);
+    } finally { await musePage.close(); }
 
     // Initialization failures need a clean IndexedDB context, otherwise cached languages
     // would hide a broken download. Only this isolated failure test replaces model GETs.

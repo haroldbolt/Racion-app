@@ -92,6 +92,24 @@ export function receiptPdfText(items: readonly unknown[]): string {
     .map((row) => row.parts.sort((a, b) => a.x - b.x).map((part) => part.text).join('   ')).join('\n');
 }
 
+/** TSV word confidence catches a single doubtful digit even on an otherwise clear page. */
+export function receiptOcrWarnings(confidence: number, tsv: string | null): string[] {
+  const warnings: string[] = [];
+  if (confidence < 65) warnings.push('La imagen no se leyó con claridad. Revisa los valores o toma otra foto.');
+  const uncertain = new Set<string>();
+  for (const row of (tsv ?? '').split('\n')) {
+    const cells = row.split('\t');
+    if (cells[0] !== '5' || cells.length < 12 || Number(cells[10]) >= 70) continue;
+    const word = cells[11].trim().slice(0, 45);
+    if (/[\p{L}\d]/u.test(word)) uncertain.add(word);
+    if (uncertain.size === 4) break;
+  }
+  if (uncertain.size) {
+    warnings.push(`Lectura dudosa en ${[...uncertain].map(word => `«${word}»`).join(', ')}. Contrasta esos datos con la imagen antes de guardar.`);
+  }
+  return warnings;
+}
+
 /** Receipts stay on the device. Only same-origin OCR support files are downloaded. */
 export async function readReceipt(file: File, options: ReceiptReadOptions = {}): Promise<ReceiptReadResult> {
   if (!file.size || file.size > maxBytes) throw new Error('Usa una factura de hasta 15 MB.');
@@ -119,7 +137,7 @@ export async function readReceipt(file: File, options: ReceiptReadOptions = {}):
   };
   signal.addEventListener('abort', stopResources, { once: true });
 
-  async function recognize(canvas: HTMLCanvasElement): Promise<{ text: string; confidence: number }> {
+  async function recognize(canvas: HTMLCanvasElement): Promise<{ text: string; warnings: string[] }> {
     usedOcr = true;
     if (!worker) {
       report('loading', 0);
@@ -151,8 +169,8 @@ export async function readReceipt(file: File, options: ReceiptReadOptions = {}):
       }), signal);
     }
     report('recognizing', recognitionPage / totalPages);
-    const result = await abortable(worker.recognize(canvas, {}, { text: true }), signal);
-    return { text: result.data.text, confidence: result.data.confidence };
+    const result = await abortable(worker.recognize(canvas, {}, { text: true, tsv: true }), signal);
+    return { text: result.data.text, warnings: receiptOcrWarnings(result.data.confidence, result.data.tsv) };
   }
 
   try {
@@ -166,7 +184,7 @@ export async function readReceipt(file: File, options: ReceiptReadOptions = {}):
       const result = await recognize(canvas);
       stopped(signal);
       return { text: result.text, previewDataUrl: imagePreview, pageCount: 1, pagesRead: 1, method: 'local_ocr',
-        warnings: result.confidence < 65 ? ['La imagen no se leyó con claridad. Revisa los valores o toma otra foto.'] : [] };
+        warnings: result.warnings };
     }
 
     report('pdf', 0);
@@ -218,7 +236,7 @@ export async function readReceipt(file: File, options: ReceiptReadOptions = {}):
         recognitionPage = number - 1;
         const recognized = await recognize(canvas!);
         texts.push(recognized.text);
-        if (recognized.confidence < 65) warnings.push(`Revisa los datos de la página ${number}: la lectura no fue clara.`);
+        warnings.push(...recognized.warnings.map(warning => `Página ${number}. ${warning}`));
       }
       page.cleanup();
     }

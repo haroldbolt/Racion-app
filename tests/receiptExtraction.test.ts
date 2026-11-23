@@ -204,3 +204,46 @@ test('leaves a gram weight with an ambiguous thousands separator pending instead
   assert.equal(extractReceipt('Alimento gato 2000g\nCantidad: 1\nTotal del articulo: $137.000').items[0].packageKg, 2);
   assert.equal(extractReceipt('Alimento gato 0,085kg\nCantidad: 1\nTotal del articulo: $1299').items[0].packageKg, 0.085);
 });
+
+const museHeader = 'FACTURA DE VENTA MUSE-001\nTienda: Mascotas Prueba S.A.S.\nFecha: 22/11/2026';
+const museItem = 'Agility Gold Grandes Adultos 2 bolsas de 1,5 kg';
+const museTotal = 'TOTAL: $90.000 COP';
+
+test('Muse invoice preserves the full merchant, date, package count, decimal size and sole item total', () => {
+  for (const weight of ['1,5', '1.5', '1 , 5']) {
+    const result = extractReceipt([museHeader, museItem.replace('1,5', weight), museTotal].join('\n'), '2026-11-23');
+    assert.equal(result.items.length, 1);
+    const [item] = result.items;
+    assert.equal(result.merchantName, 'Mascotas Prueba S.A.S.');
+    assert.equal(result.purchaseDate, '2026-11-22');
+    assert.equal(item.packageKg, 1.5);
+    assert.equal(item.quantity, 2);
+    assert.equal(item.totalPaidCop, 90000);
+    assert.ok(item.warnings.some(message => /factura de un solo artículo/.test(message)));
+    assert.equal(item.totalPaidCop! / (item.quantity! * item.packageKg! * 1000) * 150, 4500);
+  }
+  const wrapped = extractReceipt([museHeader, 'Agility Gold Grandes Adultos', '2 bolsas de 1,5 kg', museTotal].join('\n'), '2026-11-23');
+  assert.equal(wrapped.items.length, 1);
+  assert.equal(wrapped.items[0].description, 'Agility Gold Grandes Adultos');
+  assert.equal(wrapped.items[0].totalPaidCop, 90000);
+});
+
+test('uses the invoice total only when the entire receipt can be attributed to the food', () => {
+  for (const other of ['Domicilio $12.000', 'Descuento general: $1.000', 'Servicio de baño', 'Collar $25.000', 'Subtotal $80.000', 'TOTAL A PAGAR $99.000', 'TOTAL $90.OOO']) {
+    const result = extractReceipt([museHeader, museItem, other, museTotal].join('\n'), '2026-11-23');
+    assert.equal(result.items[0].totalPaidCop, undefined, other);
+  }
+  const matchingSubtotal = extractReceipt([museHeader, museItem, 'SUBTOTAL: $90.000', museTotal].join('\n'), '2026-11-23');
+  assert.equal(matchingSubtotal.items[0].totalPaidCop, 90000);
+});
+
+test('leaves uncertain dates and lost decimal separators for explicit correction', () => {
+  const future = extractReceipt([museHeader.replace('2026','2028'), museItem, museTotal].join('\n'), '2026-11-23');
+  assert.equal(future.purchaseDate, undefined);
+  assert.ok(future.warnings.some(message => /futuro/.test(message) && /2028/.test(message)));
+  const split = extractReceipt([museHeader, museItem.replace('1,5', '1 5'), museTotal].join('\n'), '2026-11-23');
+  assert.equal(split.items[0].packageKg, undefined);
+  assert.ok(split.items[0].warnings.some(message => /separados/.test(message)));
+  const differentDates = extractReceipt([museHeader, 'Fecha de emisión: 20/11/2026', museItem, museTotal].join('\n'), '2026-11-23');
+  assert.equal(differentDates.purchaseDate, undefined);
+});
