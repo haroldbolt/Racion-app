@@ -1,5 +1,6 @@
 import { ArrowLeft, Clock3, ExternalLink, LoaderCircle, MapPin, Package, Search, Trophy } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { BogotaPostalCodeField } from '../components/BogotaPostalCodeField';
 import { useCity } from '../contexts/CityContext';
 import { CONFIRMED_FOOD_PRESENTATIONS } from '../data/foodPresentations';
 import { FoodSafetyAlerts } from '../components/FoodSafetyAlerts';
@@ -25,11 +26,11 @@ interface PriceComparisonViewProps {
   food: FoodItem;
   pet?: Pet;
   plan?: FeedingPlan;
-  onPick: (food: FoodItem) => void;
+  onPick?: (food: FoodItem) => void;
   onReviewFood?: (food: FoodItem) => void;
   packageKg?: number;
   language?: 'es' | 'en';
-  backTo?: 'plan' | 'foods' | 'more';
+  backTo?: 'plan' | 'foods' | 'more' | 'search';
   onBack: () => void;
   onUsePrice?: (food: FoodItem, basis: FoodPriceBasis) => void;
 }
@@ -66,6 +67,7 @@ function unavailable(city: string, reason: NonNullable<LivePriceResponse['reason
 function hasOfferDetails(offer: LivePriceOffer) {
   return offer && typeof offer.id === 'string' && typeof offer.retailer === 'string' &&
     typeof offer.title === 'string' && typeof offer.productUrl === 'string' &&
+    ['available', 'unknown', 'out_of_stock'].includes(offer.stock) &&
     Number.isSafeInteger(offer.grams) && offer.grams > 0 &&
     Number.isSafeInteger(offer.productPriceCop) && offer.productPriceCop > 0 &&
     Number.isFinite(offer.pricePerKgCop) && offer.pricePerKgCop > 0 &&
@@ -132,13 +134,13 @@ function PriceOfferCard({
     : (isEs ? 'Faltan los gramos' : 'Serving grams needed');
   const gramText = (grams: number) => new Intl.NumberFormat(isEs ? 'es-CO' : 'en', {maximumFractionDigits:3}).format(grams) + ' g';
   const shipping = shippingCop === null
-    ? (isEs ? 'Por confirmar' : 'To confirm')
+    ? (isEs ? 'Envío desconocido' : 'Delivery unknown')
     : shippingCop === 0
     ? (isEs ? 'Incluido' : 'Included')
     : formatCOP(shippingCop, true);
 
   return (
-    <article className={
+    <article aria-label={offer.retailer} className={
       winnerLabel
         ? 'rounded-2xl border border-[#0B5D2E55] bg-[var(--surface-inner)] p-4'
         : 'rounded-2xl border border-[var(--border-color)] bg-[var(--surface-card)] p-4'
@@ -154,11 +156,11 @@ function PriceOfferCard({
         <span className="text-xs font-bold text-[var(--text-secondary)]">{formatKg(offer.grams)} kg</span>
       </div>
       <p className="break-words text-xs leading-snug text-[var(--text-secondary)]">{offer.title}</p>
-      {offer.stock === 'unknown' && (
-        <p className="mt-1.5 text-[11px] font-semibold text-[var(--text-secondary)]">
-          {isEs ? 'Disponibilidad por confirmar' : 'Availability to confirm'}
-        </p>
-      )}
+      <p className="mt-1.5 text-xs font-semibold text-[var(--text-primary)]">
+        {offer.stock === 'available' ? (isEs ? 'En stock' : 'In stock')
+          : offer.stock === 'out_of_stock' ? (isEs ? 'Agotada' : 'Out of stock')
+          : (isEs ? 'Disponibilidad por confirmar' : 'Availability to confirm')}
+      </p>
       <dl className="mt-3 grid grid-cols-[1fr_auto] gap-x-2 gap-y-1.5 border-t border-[var(--border-color)] pt-3 text-xs">
         <dt>{isEs ? 'Precio de la bolsa' : 'Package price'}</dt>
         <dd className="text-right tabular-nums">{formatCOP(offer.productPriceCop, true)}</dd>
@@ -173,7 +175,7 @@ function PriceOfferCard({
         </dd>
         <dt className="font-bold">{isEs ? 'Total con envío' : 'Total with delivery'}</dt>
         <dd className="text-right font-black tabular-nums text-[var(--text-primary)]">
-          {totalCop === null ? (isEs ? 'Por confirmar' : 'To confirm') : formatCOP(totalCop, true)}
+          {totalCop === null ? (isEs ? 'No calculable' : 'Cannot calculate') : formatCOP(totalCop, true)}
         </dd>
         <dt className="font-bold">{isEs ? 'Costo por toma' : 'Cost per serving'}</dt>
         <dd className="text-right tabular-nums">
@@ -247,7 +249,7 @@ export function PriceComparisonView({ food, pet, plan, onPick, onReviewFood, pac
   ].filter(isPackageWeight))].sort((a, b) => a - b);
   const [packageInput, setPackageInput] = useState(() => initialKg?.toString() ?? '');
   const [inputError, setInputError] = useState(false);
-  const [postalCodeInput, setPostalCodeInput] = useState('');
+  const [postalCodeInput, setPostalCodeInput] = useState(() => StorageService.getBogotaPostalCode());
   const [postalCodeError, setPostalCodeError] = useState(false);
   const [manualPortion, setManualPortion] = useState({petId:pet?.id, foodId:food.id, value:''});
   const enteredGrams = manualPortion.petId === pet?.id && manualPortion.foodId === food.id ? manualPortion.value : '';
@@ -303,6 +305,7 @@ export function PriceComparisonView({ food, pet, plan, onPick, onReviewFood, pac
       return;
     }
 
+    if (city === 'Bogotá') StorageService.setBogotaPostalCode(postalCode ?? '');
     controller.current?.abort();
     const request = new AbortController();
     controller.current = request;
@@ -322,7 +325,7 @@ export function PriceComparisonView({ food, pet, plan, onPick, onReviewFood, pac
         ...(postalCode ? { postalCode } : {}),
         product: {
           brand: food.brand,
-          name: food.name,
+          name: food.manufacturerFormulaName || food.name,
           grams,
           ...(food.barcode && food.bagSizeKg !== undefined && Math.round(food.bagSizeKg * 1000) === grams
             ? { barcode: food.barcode }
@@ -340,7 +343,7 @@ export function PriceComparisonView({ food, pet, plan, onPick, onReviewFood, pac
 
   const localizeKg = new Intl.NumberFormat(isEs ? 'es-CO' : 'en', { maximumFractionDigits: 3 });
   const formatKg = (weight: number) => localizeKg.format(weight / 1000);
-  const applyOffer = (offer: LivePriceOffer) => current && !locked && onUsePrice ? (includeShipping: boolean) => onUsePrice(food, {
+  const applyOffer = (offer: LivePriceOffer) => current && offer.stock !== 'out_of_stock' && !locked && onUsePrice ? (includeShipping: boolean) => onUsePrice(food, {
     packageKg: offer.grams / 1000,
     priceCop: offer.productPriceCop,
     source: 'online',
@@ -357,11 +360,11 @@ export function PriceComparisonView({ food, pet, plan, onPick, onReviewFood, pac
     .sort((a, b) => a.pricePerKgCop - b.pricePerKgCop);
   const scopedTotal = (offer: LivePriceOffer) => matchesShippingScope(offer, postalCode) ? offer.totalCop : null;
   const winner = current
-    ? exactOffers.find((offer) => offer.id === result?.cheapestOfferId && scopedTotal(offer) !== null)
+    ? exactOffers.find((offer) => offer.id === result?.cheapestOfferId && offer.stock === 'available' && scopedTotal(offer) !== null)
     : undefined;
   const winnerTotal = winner?.totalCop;
   const unresolvedLowerPrice = typeof winnerTotal === 'number' &&
-    exactOffers.some((offer) => scopedTotal(offer) === null && offer.productPriceCop < winnerTotal);
+    exactOffers.some((offer) => offer.stock !== 'out_of_stock' && scopedTotal(offer) === null && offer.productPriceCop < winnerTotal);
   const winnerLabel = unresolvedLowerPrice
     ? (isEs ? 'Menor total confirmado' : 'Lowest confirmed total')
     : (isEs ? 'Más barato hoy' : 'Cheapest today');
@@ -388,7 +391,8 @@ export function PriceComparisonView({ food, pet, plan, onPick, onReviewFood, pac
       <button type="button" onClick={onBack}
         className="inline-flex min-h-11 items-center gap-2 rounded-lg pr-2 text-sm font-bold text-[#0B5D2E] focus-visible:outline-2 focus-visible:outline-offset-2 dark:text-green-300">
         <ArrowLeft aria-hidden="true" className="size-4" />
-        {backTo === 'foods'
+        {backTo === 'search' ? (isEs ? 'Volver a la búsqueda' : 'Back to search')
+          : backTo === 'foods'
           ? (isEs ? 'Volver a Alimentos' : 'Back to Foods')
           : backTo === 'more'
             ? (isEs ? 'Volver a Más' : 'Back to More')
@@ -414,13 +418,13 @@ export function PriceComparisonView({ food, pet, plan, onPick, onReviewFood, pac
         </div>
 
         <div className="space-y-2 px-4 pt-3">
-          <button type="button" className="min-h-11 rounded-xl border px-3 text-sm font-bold" onClick={() => setPicking(true)}>{isEs ? 'Buscar otro alimento' : 'Find another food'}</button>
+          {onPick && <button type="button" className="min-h-11 rounded-xl border px-3 text-sm font-bold" onClick={() => setPicking(true)}>{isEs ? 'Buscar otro alimento' : 'Find another food'}</button>}
           {onReviewFood && <button type="button" className="ml-2 min-h-11 rounded-xl border px-3 text-sm font-bold" onClick={() => onReviewFood(selectFoodPackage(food, grams ? grams / 1000 : undefined))}>{isEs ? 'Revisar para mi plan' : 'Review for my plan'}</button>}
           {pet && <FoodSafetyAlerts pet={pet} food={food} lang={language} />}
         </div>
-        <UnifiedFoodSearchModal isOpen={picking} onClose={() => setPicking(false)} activePet={pet} lang={language} category="main"
+        {onPick && <UnifiedFoodSearchModal isOpen={picking} onClose={() => setPicking(false)} activePet={pet} lang={language} category="main"
           titleOverride={isEs ? 'Elegir alimento para comparar' : 'Choose food to compare'}
-          onSelectFood={({sourceFoodItem}) => { if (sourceFoodItem) { setPicking(false); onPick(sourceFoodItem); } }} />
+          onSelectFood={({sourceFoodItem}) => { if (sourceFoodItem) { setPicking(false); onPick(sourceFoodItem); } }} />}
         <form onSubmit={search} className="space-y-4 p-4" aria-busy={loading || undefined}>
           <div className="grid grid-cols-2 gap-3">
             <label className="min-w-0 space-y-1.5">
@@ -477,33 +481,8 @@ export function PriceComparisonView({ food, pet, plan, onPick, onReviewFood, pac
             </p>
           )}
           {city === 'Bogotá' && (
-            <div className="space-y-1.5">
-              <div className="flex items-baseline gap-2">
-                <label htmlFor="price-postal-code" className="text-xs font-bold text-[var(--text-primary)]">
-                  {isEs ? 'Código postal de Bogotá' : 'Bogotá postal code'}
-                </label>
-                <span className="text-xs text-[var(--text-secondary)]">{isEs ? 'Opcional' : 'Optional'}</span>
-              </div>
-              <input id="price-postal-code" type="text" inputMode="numeric" autoComplete="off"
-                value={postalCodeInput}
-                onChange={(event) => {
-                  setPostalCodeInput(event.target.value);
-                  setPostalCodeError(false);
-                }}
-                disabled={loading}
-                aria-invalid={postalCodeError || undefined}
-                aria-describedby={postalCodeError ? 'price-postal-error price-postal-help' : 'price-postal-help'}
-                className="min-h-11 w-full rounded-xl border border-[var(--border-color)] bg-[var(--surface-subtle)] px-2.5 text-sm font-semibold tabular-nums focus-visible:outline-2"
-              />
-              {postalCodeError && (
-                <p id="price-postal-error" role="alert" className="text-xs font-bold text-red-800 dark:text-red-300">
-                  {isEs ? 'Escribe seis dígitos que empiecen por 11.' : 'Enter six digits starting with 11.'}
-                </p>
-              )}
-              <p id="price-postal-help" className="text-xs text-[var(--text-secondary)]">
-                {isEs ? 'Sirve para cotizar el envío en las tiendas compatibles.' : 'Use it for delivery quotes from participating stores.'}
-              </p>
-            </div>
+            <BogotaPostalCodeField isEs={isEs} value={postalCodeInput} disabled={loading}
+              invalid={postalCodeError} onChange={value => { setPostalCodeInput(value); setPostalCodeError(false); }} />
           )}
           <button type="submit" disabled={loading || unconfigured}
             className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#0B5D2E] px-4 text-sm font-extrabold text-white focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-55">
@@ -561,7 +540,7 @@ export function PriceComparisonView({ food, pet, plan, onPick, onReviewFood, pac
               </h2>
               {current && !winner && (
                 <p className="mb-2 px-1 text-xs text-[var(--text-secondary)]">
-                  {isEs ? 'Total con envío por confirmar para esta presentación.' : 'Delivery totals for this package are pending confirmation.'}
+                  {isEs ? 'Ninguna oferta de esta presentación tiene stock y total con envío confirmados.' : 'No offer for this package has confirmed stock and a delivery total.'}
                 </p>
               )}
               <div className="mt-2 space-y-2">

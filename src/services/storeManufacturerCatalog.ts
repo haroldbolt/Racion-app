@@ -1,5 +1,7 @@
 import type { FoodItem, MeasurementBasis, NutrientQualifier, NutrientValue, NutritionDatasheet, Species } from '../types';
 
+import { foodFormulaQuery } from '../utils/foodSearchQuery';
+
 interface StoreRow {
   handle: string;
   name: string;
@@ -50,6 +52,7 @@ export interface StoreManufacturerFood extends StoreRow {
   houseUrl: string;
   house: string;
   officialUrl?: string;
+  manufacturerFormulaUrl?: string;
   verifiedOn?: string;
   formula?: OfficialFormula;
 }
@@ -73,8 +76,10 @@ async function loadStore() {
   ]);
   const contacts = new Map(houses.default.map(row => [row.brand,row]));
   const formulas = new Map<string,OfficialFormula>();
+  const urlCounts = new Map<string, number>();
   for (const group of [domestic, international, other, specialty]) {
     for (const formula of group.default as OfficialFormula[]) {
+      urlCounts.set(formula.url, (urlCounts.get(formula.url) ?? 0) + 1);
       for (const handle of formula.handles) {
         if (formulas.has(handle)) throw new Error('Duplicate manufacturer sheet for ' + handle);
         formulas.set(handle, formula);
@@ -88,6 +93,7 @@ async function loadStore() {
     return {...row, house:contact.house, houseUrl:contact.url,
       storeUrl:'https://cultivacenter.com/products/' + row.handle,
       officialUrl:formula?.url, verifiedOn:formula?.verifiedOn, formula,
+      manufacturerFormulaUrl:formula && urlCounts.get(formula.url) === 1 ? formula.url : undefined,
       officialPackagesKg:formula?.packagesKg,
       packagesKg:distinctSizes([...row.storePackagesKg, ...(formula?.packagesKg ?? [])]),
     };
@@ -116,7 +122,7 @@ export async function getStoreSheetCoverage() {
 }
 
 export async function searchStoreManufacturerFoods(query: string, species: Species): Promise<StoreManufacturerFood[]> {
-  const terms = words(query).filter(w => !ignore.has(w));
+  const terms = words(foodFormulaQuery(query)).filter(w => !ignore.has(w));
   if (!terms.length) return [];
   const needle = terms.join(' ');
   return (await getStoreManufacturerCatalog()).filter(row => row.species === species)
@@ -172,7 +178,7 @@ function withFormula(food: FoodItem, row:StoreManufacturerFood): FoodItem {
     values.every(v => v.source?.url === formula.url || v.source?.url === analysisSource.url || (formula.kcalSourceUrl && v.source?.url === formula.kcalSourceUrl)));
   data.coincidenciaEstado = onlyOfficial ? 'verificado' : values.length ? 'revision_requerida' : 'pendiente';
   data.notasRevision = onlyOfficial ? 'Ficha oficial de la fórmula seleccionada.' : 'Revisa la procedencia de cada valor y completa los campos pendientes con el empaque.';
-  return {...result, fichaNutricional:data, dataSource:source.name,
+  return {...result, manufacturerFormulaName:formula.name, manufacturerFormulaUrl:row.manufacturerFormulaUrl, fichaNutricional:data, dataSource:source.name,
     declaredIcaRegistration:formula.registration || food.declaredIcaRegistration,
     feedingGuide:food.feedingGuide ?? formula.feedingGuide,
     ingredientsSummary:formula.ingredients ?? food.ingredientsSummary,

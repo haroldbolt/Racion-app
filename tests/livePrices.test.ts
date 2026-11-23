@@ -15,7 +15,7 @@ const listings = [
   { title: regionalTitle, source: 'Tienda B', price: '$99.000', delivery: 'Envío incluido', product_link: 'https://www.google.com/shopping/product/123' },
   { title: regionalTitle, source: 'Envío sin cotizar', price: '$80.000', delivery: 'Entrega en 2 días', link: 'https://tienda-c.example/producto' },
   { title: regionalTitle.replace('2 kg', '4 kg'), source: 'Otra presentación', price: '$149.000', delivery: 'Gratis', link: 'https://tienda-d.example/producto' },
-];
+].map(listing => ({ ...listing, availability:'in_stock' }));
 
 class MemoryTransactions implements PriceStorageTransactions {
   private readonly values = new Map<string, unknown>();
@@ -83,13 +83,28 @@ test('skips mismatched formulas, multipacks, missing package, unusable links and
     { ...base, link: 'javascript:alert(1)' },
     { ...base, price: 'USD 92.00' },
     { ...base, price: '$92.00' },
-    { ...base, availability: 'out_of_stock' },
     { ...base, ean: '1234567890123' },
   ];
   assert.equal(collectShoppingOffers(rejected, { ...royalCanin, barcode: '6012345678901' }).length, 0);
   const [grouped] = collectShoppingOffers([{ ...base, title: regionalTitle.replace('2 kg', '2.000 g') }], royalCanin);
   assert.equal(grouped.grams, 2000);
   assert.equal(grouped.productPriceCop, 90000);
+});
+
+test('keeps a sold-out exact bag visible and excludes unknown or unavailable stock from winning', () => {
+  const base = listings[0];
+  const offers = collectShoppingOffers([
+    {...base, source:'Agrocentro Pets', price:'$132.400', availability:'out_of_stock'},
+    {...base, source:'Unknown', price:'$80.000', availability:'', delivery:'Envío gratis'},
+    {...base, source:'Laia Pets', price:'$137.000', delivery:'Envío $15.650'},
+  ], royalCanin);
+  const ranked = rankShoppingOffers(offers, 2000);
+  assert.equal(ranked.offers.find(o => o.id === ranked.cheapestOfferId)?.retailer, 'Laia Pets');
+  const agrocentro = ranked.offers.find(o => o.retailer === 'Agrocentro Pets')!;
+  assert.equal(agrocentro.stock, 'out_of_stock');
+  assert.equal(agrocentro.shippingCop, null);
+  assert.equal(agrocentro.totalCop, null);
+  assert.equal(rankShoppingOffers(offers.slice(0,2), 2000).cheapestOfferId, null);
 });
 
 test('excludes a named add-on after the package and keeps the plus sign used in the formula', () => {

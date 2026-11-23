@@ -8,9 +8,9 @@ function packageLabel(size: number): string {
   return size < 1 ? `${Number((size * 1000).toFixed(3))} g` : `${size} kg`;
 }
 
-interface Props {foods: FoodItem[]; lang: 'es' | 'en'; choose: (food: FoodItem) => void}
+interface Props {foods: FoodItem[]; lang: 'es' | 'en'; choose: (food: FoodItem) => void; compare?: (food: FoodItem) => void}
 
-export function OnlineFoodCards({foods, lang, choose}: Props) {
+export function OnlineFoodCards({foods, lang, choose, compare}: Props) {
   const isEs = lang === 'es';
   return <>
     {foods.map((food, index) => {
@@ -53,16 +53,22 @@ export function OnlineFoodCards({foods, lang, choose}: Props) {
           </div> : <p className="text-[#44544A]">{isEs ? 'Composición pendiente. Puedes leer la etiqueta con una foto.' : 'Nutrition pending. You can read the package with a photo.'}</p>}
           <div className="flex flex-wrap gap-2">
             {sizes.map((size) => {
+              const selected = selectFoodPackage({ ...food, availableSizesKg: sizes }, size);
               const price = food.packagePrices?.find((basis) => basis.packageKg === size);
               return (
                 <div key={size} className="space-y-1">
                   <button
                     type="button"
-                    onClick={() => choose(selectFoodPackage({ ...food, availableSizesKg: sizes }, size))}
+                    onClick={() => choose(selected)}
                     className="min-h-11 rounded-xl border border-[#0B5D2E40] bg-[#EAF4EC] px-3 font-bold text-[#0B5D2E]"
                   >
                     {isEs ? 'Elegir' : 'Choose'} {packageLabel(size)}
                   </button>
+                  {compare && food.type !== 'barf' && !food.kcalPerPiece && <button type="button"
+                    onClick={() => compare(selected)}
+                    className="block min-h-11 rounded-lg px-2 font-bold text-[#0B5D2E] underline">
+                    {isEs ? `Comparar ${packageLabel(size)} con envío` : `Compare ${packageLabel(size)} with delivery`}
+                  </button>}
                   <p className="max-w-36 text-[11px] text-[#44544A]">
                     {price ? formatCOP(price.priceCop, true) : (isEs ? 'Precio por confirmar' : 'Price to confirm')}
                   </p>

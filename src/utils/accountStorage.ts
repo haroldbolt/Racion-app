@@ -13,6 +13,7 @@ export const STORAGE_KEYS = {
   RECENT_FOOD_SEARCHES: 'racion_recent_food_searches_v1',
   USER_ACCOUNT: 'racion_user_account_v1',
   USER_CITY: 'racion_user_city_v1',
+  BOGOTA_POSTAL_CODE: 'racion_bogota_postal_code_v1',
   WATER_LOGS: 'racion_water_logs_v1',
   LOCAL_DIARY_DATES: 'racion_local_diary_dates_v1',
 };

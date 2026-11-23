@@ -11,6 +11,20 @@ export interface OfferPortions {
   meals: { grams: number; time?: string; otherCostCop?: number }[];
 }
 
+// Portions follow the formula across retailers. Inventory and purchase identity remain per listing.
+function sameManufacturerFormula(left: FoodItem, right: FoodItem): boolean {
+  if (left.species !== right.species || left.type !== right.type ||
+      left.brand.trim().toLowerCase() !== right.brand.trim().toLowerCase()) return false;
+  const productPage = left.manufacturerFormulaUrl ?? right.manufacturerFormulaUrl;
+  if (!productPage) return false;
+  if (left.manufacturerFormulaName && right.manufacturerFormulaName &&
+      left.manufacturerFormulaName !== right.manufacturerFormulaName) return false;
+  // An older saved plan can have the verified manufacturer URL but predate the catalogue identifier.
+  const verifiedPage = (food: FoodItem) => food.manufacturerFormulaUrl ||
+    (food.labelStatus === 'verified_manufacturer' ? food.fichaNutricional?.fuenteUrl : undefined);
+  return verifiedPage(left) === productPage && verifiedPage(right) === productPage;
+}
+
 /** The compared bag pays for only its own grams, including in a mixed meal. */
 export function getOfferPortions(pet: Pet | undefined, plan: FeedingPlan | undefined, food: FoodItem,
   purchases: readonly FoodCostEntry[] = []): OfferPortions | undefined {
@@ -32,7 +46,7 @@ export function getOfferPortions(pet: Pet | undefined, plan: FeedingPlan | undef
   if (!plan) return;
   const mixed = plan.foodType === 'mixed';
   const matching = (mixed ? [plan.dryFood, plan.wetFood] : [getPrimaryPlanFood(plan)])
-    .find(item => item && sameFoodIdentity(item, food));
+    .find(item => item && (sameFoodIdentity(item, food) || sameManufacturerFormula(item, food)));
   const proposed = matching ? plan : previewFoodChoice(pet, plan, food);
   if (!proposed.rationConfirmed || proposed.isVetLocked || !(proposed.gramsPerDay > 0)) return;
   const portions = getPlannedMeals(proposed);

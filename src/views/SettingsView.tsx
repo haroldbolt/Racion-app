@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { UserAccount, Pet } from '../types';
+import { useCity } from '../contexts/CityContext';
+import { BogotaPostalCodeField } from '../components/BogotaPostalCodeField';
+import { isBogotaPostalCode, LIVE_PRICE_CITIES } from '../types/livePrices';
 import { StorageService } from '../utils/storage';
 import {
   Download,
@@ -35,6 +38,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   onResetAllData,
 }) => {
   const isEs = userAccount.language === 'es';
+  const {selectedCity, setCity} = useCity();
+  const [cityDraft, setCityDraft] = useState(selectedCity);
+  const [postalDraft, setPostalDraft] = useState(() => StorageService.getBogotaPostalCode());
+  const [invalidPostal, setInvalidPostal] = useState(false);
+  const [savedDelivery, setSavedDelivery] = useState(false);
 
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -158,6 +166,41 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </div>
         </div>
       </div>
+
+      <form className="space-y-3 rounded-3xl border border-[#0B5D2E20] bg-white p-5 shadow-sm" onSubmit={event => {
+        event.preventDefault();
+        const code = postalDraft.trim();
+        if (cityDraft === 'Bogotá' && code && !isBogotaPostalCode(code)) {
+          setInvalidPostal(true);
+          return;
+        }
+        setCity(cityDraft);
+        if (cityDraft === 'Bogotá') StorageService.setBogotaPostalCode(code);
+        setSavedDelivery(true);
+      }}>
+        <h4 className="font-heading text-base font-extrabold text-[#1C2B21]">
+          {isEs ? 'Destino de entrega' : 'Delivery destination'}
+        </h4>
+        <label className="block text-xs font-bold">
+          {isEs ? 'Ciudad' : 'City'}
+          <select className="mt-1 block min-h-11 w-full rounded-xl border px-3 text-sm" value={cityDraft} onChange={event => {
+            setCityDraft(event.target.value);
+            setInvalidPostal(false);
+            setSavedDelivery(false);
+          }}>
+            {[...new Set([...LIVE_PRICE_CITIES, selectedCity])].map(city => <option key={city}>{city}</option>)}
+          </select>
+        </label>
+        {cityDraft === 'Bogotá' && <BogotaPostalCodeField isEs={isEs} value={postalDraft} invalid={invalidPostal} onChange={value => {
+          setPostalDraft(value);
+          setInvalidPostal(false);
+          setSavedDelivery(false);
+        }} />}
+        <button type="submit" className="min-h-11 rounded-xl border px-3 text-sm font-bold text-[#0B5D2E]">
+          {isEs ? 'Guardar destino' : 'Save destination'}
+        </button>
+        {savedDelivery && <p role="status" className="text-xs">{isEs ? 'Destino guardado.' : 'Destination saved.'}</p>}
+      </form>
 
       {/* Data Export (CSV & JSON) */}
       <div className="bg-white rounded-3xl p-5 border border-[#0B5D2E20] shadow-sm space-y-3">

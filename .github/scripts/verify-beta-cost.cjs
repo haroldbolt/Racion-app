@@ -56,7 +56,7 @@ async function priceField(card, label) {
 async function verifyOffer(card, bag, total, amounts) {
   assert.match(await priceField(card,'Precio de la bolsa'),pesos(bag));
   const shippingTotal = await priceField(card,'Total con envío');
-  if (total === null) assert.match(shippingTotal,/por confirmar|pendiente/i);
+  if (total === null) assert.equal(shippingTotal, 'No calculable');
   else assert.match(shippingTotal,pesos(total));
   const perMeal = await priceField(card,'Costo por toma');
   assert.match(perMeal, total === null ? /sin envío/i : /con envío/i);

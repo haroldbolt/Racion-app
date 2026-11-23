@@ -277,6 +277,8 @@ const LabelForm: React.FC<LabelFormProps> = ({
     const sameRegistryFormula = initialRegistry && species === pet.species &&
       normalizeIdentity(registeredTitle) === normalizeIdentity(initialRegistry.name);
     const updatedFood: FoodItem = {
+      manufacturerFormulaName: identityUnchanged ? currentFood?.manufacturerFormulaName : undefined,
+      manufacturerFormulaUrl: identityUnchanged ? currentFood?.manufacturerFormulaUrl : undefined,
       declaredIcaRegistration: identityUnchanged ? currentFood?.declaredIcaRegistration : undefined,
       icaRegistry: currentFood ? (identityUnchanged ? currentFood.icaRegistry : undefined)
         : (sameRegistryFormula ? initialRegistry : undefined),

@@ -112,6 +112,9 @@ export interface FoodPriceBasis {
 }
 
 export interface FoodItem {
+  manufacturerFormulaName?: string;
+  /** Official product page assigned to a single formula in the verified catalogue. */
+  manufacturerFormulaUrl?: string;
   declaredIcaRegistration?: string;
   icaRegistry?: {registration:string; name:string; sourceUrl:string};
   storeName?: string;

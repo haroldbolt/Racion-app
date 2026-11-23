@@ -162,11 +162,12 @@ export function collectShoppingOffers(results: unknown[], product: LivePriceProd
     const stockText = normalizePriceWords([
       item.availability, item.tag, item.badge, title, ...(Array.isArray(item.extensions) ? item.extensions : []),
     ].join(' '));
-    if (/\b(?:agotad[oa]|sin stock|sin existencias|no hay stock|no disponible|out of stock|sold out)\b/.test(stockText)) continue;
+    const outOfStock = /\b(?:agotad[oa]s?|sin stock|sin existencias|no hay stock|no disponible|out of stock|sold out)\b/.test(stockText);
+    const stock = outOfStock ? 'out_of_stock' : /\b(?:disponible|en stock|in stock)\b/.test(stockText) ? 'available' : 'unknown';
     const productPriceCop = parseCop(priceText);
     if (productPriceCop === null || productPriceCop <= 0 ||
       (productPriceCop < 1000 && !/\bCOP\b|\bCOL\s*\$/i.test(priceText))) continue;
-    const shippingCop = quotedShippingCop(item.delivery, item.extensions);
+    const shippingCop = outOfStock ? null : quotedShippingCop(item.delivery, item.extensions);
     const offer: LivePriceOffer = {
       id: `offer-${index + 1}`,
       title,
@@ -178,7 +179,7 @@ export function collectShoppingOffers(results: unknown[], product: LivePriceProd
       pricePerKgCop: Math.round(productPriceCop * 1000 / grams),
       productUrl,
       linkSource: /(?:^|\.)google\.(?:com(?:\.co)?|co)$/i.test(new URL(productUrl).hostname) ? 'google_shopping' : 'retailer',
-      stock: /\b(?:disponible|en stock|in stock)\b/.test(stockText) ? 'available' : 'unknown',
+      stock,
     };
     const key = `${normalizePriceWords(retailer)}:${grams}:${productUrl}`;
     const previous = offers.get(key);
@@ -192,8 +193,9 @@ export function rankShoppingOffers(offers: LivePriceOffer[], grams: number) {
   const singlePackages = offers.filter(({ title }) => !packageAddOn.test(title));
   const exact = singlePackages.filter((offer) => offer.grams === grams);
   const alternatives = singlePackages.filter((offer) => offer.grams !== grams);
-  exact.sort((a, b) => (a.totalCop ?? Infinity) - (b.totalCop ?? Infinity) || a.productPriceCop - b.productPriceCop);
+  const deliverableTotal = (offer: LivePriceOffer) => offer.stock === 'available' ? offer.totalCop ?? Infinity : Infinity;
+  exact.sort((a, b) => deliverableTotal(a) - deliverableTotal(b) || a.productPriceCop - b.productPriceCop);
   alternatives.sort((a, b) => a.pricePerKgCop - b.pricePerKgCop);
-  const cheapestOfferId = exact[0]?.totalCop != null ? exact[0].id : null;
+  const cheapestOfferId = exact.find(offer => Number.isFinite(deliverableTotal(offer)))?.id ?? null;
   return { offers: [...exact, ...alternatives].slice(0, 40), cheapestOfferId };
 }

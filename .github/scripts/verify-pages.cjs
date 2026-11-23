@@ -99,7 +99,7 @@ async function verifyAdjustmentAndPrices(page, button, text) {
   assert.match(await winner.innerText(), /99[.\s]000/);
   assert.equal(await winner.getByRole('link').getAttribute('href'), 'https://tienda-b.example/producto');
   const unknownDelivery = result.getByRole('article').filter({ has: page.getByRole('heading', { name: 'Tienda C' }) });
-  assert.match(await unknownDelivery.innerText(), /Por confirmar/i);
+  await unknownDelivery.getByText('Envío desconocido', {exact:true}).waitFor();
   await verifyOffer(unknownDelivery, 82000, null, [1107]);
   assert.doesNotMatch(await unknownDelivery.innerText(), /Más barato hoy/);
   await result.getByRole('heading', { name: 'Tienda D' }).waitFor();

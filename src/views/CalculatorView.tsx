@@ -874,6 +874,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
             {foodSource === 'internet' ? (
               <OnlineFoodSearch
                 species={editablePet.species}
+                compareFor={{pet:editablePet, plan:savedPlan}}
                 foodType={foodType === 'mixed' ? undefined : foodType}
                 initialQuery={foodSearchQuery}
                 lang={userAccount.language}

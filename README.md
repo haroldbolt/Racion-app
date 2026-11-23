@@ -39,7 +39,9 @@ La aplicación guarda perfiles, planes, compras y registros en el almacenamiento
 
 ## Comparación de precios en Colombia
 
-**Hoy → Comparar precios** abre la fórmula habitual. El comparador muestra ofertas de la misma presentación y separa otros tamaños por precio del producto por kilo. El ganador del día requiere un total con envío informado. La fecha corresponde a la consulta de Google Shopping.
+**Hoy → Comparar precios** abre la fórmula habitual. Desde el paso Alimento del asistente y desde **Alimentos → Buscar en internet**, elige **Comparar 2 kg con envío** (o el tamaño que necesites). Los dos recorridos consultan la misma fórmula y presentación. Puedes guardar el código postal de Bogotá en el comparador o en **Más → Ajustes y Privacidad**.
+
+Cada tienda muestra el precio de la bolsa, la disponibilidad de ese empaque, el envío al destino y el total en COP. Solo puede ganar una oferta disponible cuyo total se pueda calcular. Si otra tienda tiene un precio de bolsa inferior y el envío está pendiente, el comparador identifica el **menor total confirmado**. Cambiar de destino requiere una nueva cotización.
 
 El servicio de precios se ejecuta por separado en Cloudflare Workers. La configuración en `workers/live-prices/wrangler.toml` usa un Durable Object SQLite, disponible en Workers Free. Con una sesión de Wrangler autorizada en la cuenta de Cloudflare:
 

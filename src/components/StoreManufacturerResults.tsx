@@ -15,13 +15,14 @@ interface Props {
   species: Species;
   lang: 'es' | 'en';
   choose: (food: FoodItem) => void;
+  compare?: (food: FoodItem) => void;
 }
 
 function packageLabel(kg: number) {
   return kg < 1 ? Math.round(kg * 1000) + ' g' : kg + ' kg';
 }
 
-export function StoreManufacturerResults({ query, signal, species, lang, choose }: Props) {
+export function StoreManufacturerResults({ query, signal, species, lang, choose, compare }: Props) {
   const es = lang === 'es';
   const [matches, setMatches] = useState<StoreManufacturerFood[]>();
   const [coverage, setCoverage] = useState<Awaited<ReturnType<typeof getStoreSheetCoverage>>>();
@@ -77,6 +78,10 @@ export function StoreManufacturerResults({ query, signal, species, lang, choose 
                   className="min-h-11 rounded-xl border border-[#0B5D2E40] bg-[#EAF4EC] px-3 font-bold text-[#0B5D2E]">
                   {es ? 'Elegir' : 'Choose'} {packageLabel(size)}
                 </button>
+                {compare && <button type="button" onClick={() => compare(selectStoreManufacturerFood(item, size))}
+                  className="block min-h-11 rounded-lg px-2 font-bold text-[#0B5D2E] underline">
+                  {es ? `Comparar ${packageLabel(size)} con envío` : `Compare ${packageLabel(size)} with delivery`}
+                </button>}
                 <p className="mt-1 text-[11px] text-[#44544A]">
                   {item.formula?.packageSources?.[String(size)]
                     ? <a href={item.formula.packageSources[String(size)]} target="_blank" rel="noopener noreferrer" className="underline">{source}</a>

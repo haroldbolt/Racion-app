@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ExternalLink, Search } from 'lucide-react';
-import { FoodItem, Species } from '../types';
+import { FeedingPlan, FoodItem, Pet, Species } from '../types';
 import { searchFoodCatalog } from '../services/onlineFoodCatalog';
 import { ColombiaRegistrySearch } from './ColombiaRegistrySearch';
 import { LabelReviewModal } from './LabelReviewModal';
@@ -9,10 +9,13 @@ import { OnlineFoodCards } from './OnlineFoodCards';
 import { StoreManufacturerResults } from './StoreManufacturerResults';
 import { enrichMarketFoods } from '../services/onlineFoodResults';
 
+const SearchPriceDialog = lazy(() => import('./SearchPriceDialog').then(module => ({default:module.SearchPriceDialog})));
+
 interface OnlineFoodSearchProps {
   species: Species;
   foodType?: FoodItem['type'];
   initialQuery?: string;
+  compareFor?: {pet: Pet; plan?: FeedingPlan};
   lang?: 'es' | 'en';
   category?: 'all' | 'main' | 'snacks';
   onSelect: (food: FoodItem, provenance?: 'label' | 'manufacturer') => void;
@@ -20,9 +23,11 @@ interface OnlineFoodSearchProps {
 
 
 /** Internet searches are intentional submissions; typing never calls the service. */
-export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 'es', category = 'all', onSelect }: OnlineFoodSearchProps) {
+export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 'es', category = 'all', compareFor, onSelect }: OnlineFoodSearchProps) {
   const isEs = lang === 'es';
   const [query, setQuery] = useState(initialQuery);
+  const [comparing, setComparing] = useState<FoodItem>();
+  const compare = compareFor ? setComparing : undefined;
   const [foods, setFoods] = useState<FoodItem[]>([]);
   const [unavailable, setUnavailable] = useState<string[]>([]);
   const [labelDraft, setLabelDraft] = useState<{food?: FoodItem; formula?:string; registry?:FoodItem['icaRegistry']} | null>(null);
@@ -156,11 +161,11 @@ export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 
         </a>
       )}
       {submission && !registryOpen && category !== 'snacks' && (!foodType || foodType === 'dry') && (
-        <StoreManufacturerResults query={query.trim()} species={species} lang={lang} signal={submission} choose={chooseStoreFood} />
+        <StoreManufacturerResults query={query.trim()} species={species} lang={lang} signal={submission} choose={chooseStoreFood} compare={compare} />
       )}
       {(searched || error && query.trim().length >= 2) && <ColombiaRegistrySearch
         key={query + ':' + species + ':' + foodType + ':' + category} query={query.trim()} species={species} foodType={foodType} category={category} lang={lang}
-        onOpenChange={setRegistryOpen} onSelect={choose}
+        onOpenChange={setRegistryOpen} onSelect={choose} compare={compare}
         onManual={(item, sourceUrl) => setLabelDraft({formula:item.name,registry:{registration:item.registration,name:item.name,sourceUrl}})} />}
       <div role="region" aria-label={isEs ? 'Resultados de internet' : 'Online results'} aria-busy={loading} className="space-y-3">
         {loading && (
@@ -183,8 +188,11 @@ export function OnlineFoodSearch({ species, foodType, initialQuery = '', lang = 
           className="min-h-11 rounded-xl border border-[#0B5D2E40] px-3 text-xs font-bold text-[#0B5D2E]">
           {isEs ? 'Usar la etiqueta de mi alimento' : 'Use my food label'}
         </button>}
-        {!registryOpen && <OnlineFoodCards foods={foods} lang={lang} choose={choose} />}
+        {!registryOpen && <OnlineFoodCards foods={foods} lang={lang} choose={choose} compare={compare} />}
       </div>
+      {compareFor && comparing && <Suspense fallback={<p role="status">{isEs ? 'Abriendo el comparador…' : 'Opening price comparison…'}</p>}>
+        <SearchPriceDialog food={comparing} pet={compareFor.pet} plan={compareFor.plan} lang={lang} onClose={() => setComparing(undefined)} />
+      </Suspense>}
       {labelDraft && createPortal(
         <LabelReviewModal isOpen pet={{species}} lang={lang}
           mode={labelDraft.food ? 'review' : 'new'} initialFood={labelDraft.food}

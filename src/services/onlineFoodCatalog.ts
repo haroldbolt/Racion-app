@@ -1,4 +1,5 @@
 import type { FoodItem, FoodPriceBasis, Species } from '../types';
+import { foodFormulaQuery } from '../utils/foodSearchQuery';
 import { enrichOnlineNutrition } from './manufacturerNutrition';
 import { parseVariantWeight } from './shopifyCatalogService';
 
@@ -300,8 +301,7 @@ export async function searchFoodCatalog(
   const entered = query.trim().replace(/\s+/g, ' ');
   if (!entered || entered.length > 100) throw new Error('Escribe el nombre del alimento, hasta 100 caracteres.');
   if (signal?.aborted) throw signal.reason ?? new DOMException('Búsqueda cancelada', 'AbortError');
-  const searchable = entered.replace(/^rc\b/i, 'Royal Canin').replace(/^ppp\b/i, 'Purina Pro Plan')
-    .replace(/\b\d+(?:[.,]\d+)?\s*(?:kg|kilos?|g|gr|gramos?|lb|lbs|oz)\b/gi, ' ').replace(/\s+/g, ' ').trim();
+  const searchable = foodFormulaQuery(entered);
   if ((species !== 'dog' && species !== 'cat') || searchable.length < 2) return {foods:[], unavailableSources:[]};
   const key = JSON.stringify([normalized(searchable), species, foodType, endpoint]);
   const cached = cache.get(key);

@@ -2,166 +2,162 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { LivePriceService, parseLivePriceRequest, type PriceStorageTransactions } from '../workers/live-prices/service';
 
-const product = { brand: 'Royal Canin', name: 'Sterilised 37 Neutered Cat Dry', grams: 2000 };
+const product = { brand:'Royal Canin', name:'Sterilised 37', grams:2000 };
 const city = 'Bogotá';
+const normal = {product, city} as const;
+const postal = {...normal, postalCode:'110111'};
 const title = 'Royal Canin Sterilised 37 Concentrado para Gatos Adultos';
-const normal = parseLivePriceRequest({ product, city });
-const postal = parseLivePriceRequest({ product, city, postalCode: '110111' });
-assert.ok(normal);
-assert.ok(postal);
+const handle = 'alimento-para-gato-royal-canin-feline-health-nutrition-sterilised';
+const otherProduct = {...product, name:'Sterilised 37 Neutered Cat Dry'};
 
-function fixture() {
+function fixture(key = 'fixture-key') {
   const map = new Map<string, unknown>();
   const storage: PriceStorageTransactions = {
-    async get<T>(key: string) { return structuredClone(map.get(key)) as T | undefined; },
-    async put<T>(key: string, value: T) { map.set(key, structuredClone(value)); },
+    async get<T>(k: string) { return structuredClone(map.get(k)) as T | undefined; },
+    async put<T>(k: string, value: T) { map.set(k, structuredClone(value)); },
     async transaction(callback) { return callback(storage); },
   };
   const variant = {
-    id: 1600409990, values: ['2 kg'], visible: true, stock: null, stock_management: false,
-    barcode: null, price: '137000.00', promotional_price: null, weight: '0.002',
+    id:1600409990, values:['2 kg'], visible:true, stock:null as number | null, stock_management:false,
+    barcode:null, price:'137000.00', promotional_price:null as string | null,
   };
-  const wrongSize = { ...variant, id: 1600410000, values: ['4 kg'], weight: '2.000' };
-  const stock = { currency: 'COP', detailName: title, searchVariant: { ...variant, values: [] }, detailVariant: variant };
-  const account = { plan_searches_left: 250, plan_renewal_date: '2026-12-16', this_hour_searches: 0, account_rate_limit_per_hour: 50 };
-  const merchant = `${title} (2 kg)`;
-  let now = new Date('2026-11-17T12:00:00Z');
-  const replies = {
-    searchListings: [
-      { title: merchant, price: '$137.000', source: 'Laia Pets', product_link: 'https://www.google.com/shopping/product/123' },
-      { title: merchant, price: '$100.000', delivery: 'Envío gratis', source: 'Otra tienda', link: 'https://pet.example/food' },
-    ],
-    quote: (zip: string) => [
-      { code: 'pickup', name: 'Recoge en tienda', price: '0.00' },
-      { code: 'api_3557701_ServiEntrega - premier', name: 'ServiEntrega Premier', price: zip === '110111' ? '15650.00' : '23450.00' },
-      { code: 'courier', name: 'Otra entrega', price: '49900.00' },
-    ],
+  const shopifyVariant = {
+    id:'gid://shopify/ProductVariant/52674296414488', title:'2 kg', selectedOptions:[{name:'Peso', value:'2 kg'}],
+    price:{currencyCode:'COP', amount:'132400.0'}, availableForSale:false, barcode:null,
   };
+  const source = {
+    currency:'COP', title, laiaFound:true, agroFound:true, method:'Envía a domicilio', fee:'15650.00', failQuote:false,
+    google:[{title:title + ' 2 kg', price:'$100.000', delivery:'Envío gratis', availability:'En stock',
+      source:'Otra tienda', link:'https://otra.example/food'}],
+  };
+  const account = {plan_searches_left:250, plan_renewal_date:'2026-12-16', this_hour_searches:0, account_rate_limit_per_hour:50};
   const serpCalls: URL[] = [];
-  const merchantCalls: URL[] = [];
-  const quoteBodies: unknown[] = [];
+  const quoteBodies: Array<{zip_code:string; variant_id:number; quantity:number}> = [];
+  let now = new Date('2026-11-17T12:00:00Z');
   const fetcher: typeof fetch = async (input, init) => {
     const url = new URL(input instanceof Request ? input.url : input);
     if (url.origin === 'https://serpapi.com') {
       serpCalls.push(url);
       if (url.pathname === '/account.json') return Response.json(account);
       assert.equal(url.pathname, '/search.json');
-      return Response.json({ shopping_results: replies.searchListings });
+      return Response.json({shopping_results:source.google});
     }
-    merchantCalls.push(url);
+    if (url.origin === 'https://cultivacenter.com') {
+      assert.equal(init?.method, 'POST');
+      assert.equal(JSON.parse(String(init.body)).variables.handle, handle);
+      return Response.json({data:{product:source.agroFound ? {
+        handle, title:'Alimento Para Gato Royal Canin Feline Health Nutrition Sterilised', vendor:'Royal Canin',
+        onlineStoreUrl:'https://cultivacenter.com/products/' + handle, variants:{nodes:[shopifyVariant], pageInfo:{hasNextPage:false}},
+      } : null}});
+    }
     assert.equal(url.origin, 'https://storefront-api.tiendanube.com');
     assert.equal(init?.redirect, 'manual');
-    assert.equal(url.searchParams.has('zip_code'), false);
     const path = '/2026-11/stores/5624899';
-    if (url.pathname === path) return Response.json({ id: 5624899, country: 'CO', currency: stock.currency });
-    if (url.pathname === `${path}/search/products`) {
+    if (url.pathname === path) return Response.json({id:5624899, country:'CO', currency:source.currency});
+    if (url.pathname === path + '/search/products') {
       assert.equal(url.searchParams.get('q'), 'royal canin sterilised 37');
-      assert.equal(url.searchParams.get('per_page'), '8');
-      return Response.json({ data: [
-        { id: 354674514, name: '', variants: [stock.searchVariant] },
-        { id: 354674520, name: '', variants: [wrongSize] },
-      ] });
+      return Response.json({data:source.laiaFound ? [{id:354674514}, {id:354674520}] : []});
     }
-    if (url.pathname === `${path}/products/354674514`) {
-      return Response.json({ id: 354674514, name: stock.detailName, variants: [stock.detailVariant] });
+    if (url.pathname === path + '/products/354674514') {
+      return Response.json({id:354674514, name:source.title, handle:'royal-canin-sterilised-37', variants:[variant]});
     }
-    assert.equal(url.pathname, `${path}/shipping-options`);
+    if (url.pathname === path + '/products/354674520') {
+      return Response.json({id:354674520, name:title.replace('37','7+'), handle:'sterilised-7', variants:[{...variant, id:1010}]});
+    }
+    assert.equal(url.pathname, path + '/shipping-options');
     assert.equal(init?.method, 'POST');
-    const body = JSON.parse(String(init.body)) as { zip_code: string; variant_id: number; quantity: number };
-    quoteBodies.push(body);
+    const body = JSON.parse(String(init.body));
     assert.equal(body.variant_id, variant.id);
     assert.equal(body.quantity, 1);
-    return Response.json({ shipping_options: replies.quote(body.zip_code) });
+    quoteBodies.push(body);
+    if (source.failQuote) throw new Error('Merchant timed out');
+    return Response.json({shipping_options:[
+      {code:'local_pickup', name:'Recoge en tienda', price:'0.00'},
+      {code:'courier', name:source.method, price:body.zip_code === '110111' ? source.fee : '23450.00'},
+    ]});
   };
-  const worker = new LivePriceService(storage, 'fixture-key', fetcher, () => now);
-  return { worker, storage: map, serpCalls, merchantCalls, quoteBodies, variant, stock, replies, account, setDate: (date: Date) => { now = date; } };
+  const worker = new LivePriceService(storage, key, fetcher, () => now);
+  return {worker, map, source, variant, shopifyVariant, serpCalls, quoteBodies, account, setDate:(date: Date) => {now = date;}};
 }
 
-test('validates postal input only for Bogotá and exactly six digits starting with 11', () => {
-  assert.equal(postal.postalCode, '110111');
-  assert.equal(normal.postalCode, undefined);
-  for (const invalid of ['500021', '11011', '1101110', '110 111', '11A111', 110111, null, '', []]) {
-    assert.equal(parseLivePriceRequest({ product, city, postalCode: invalid }), null);
+test('validates postal codes for Bogotá', () => {
+  assert.deepEqual(parseLivePriceRequest(postal)?.postalCode, '110111');
+  for (const invalid of ['500021','11011','1101110','110 111','11A111',110111,null,'',[]]) {
+    assert.equal(parseLivePriceRequest({...normal, postalCode:invalid}), null);
   }
-  assert.equal(parseLivePriceRequest({ product, city: 'Medellín', postalCode: '110111' }), null);
+  assert.equal(parseLivePriceRequest({...postal, city:'Medellín'}), null);
 });
 
-test('quotes the exact Bogotá variant per postcode, reranks and leaves the shared shopping cache unchanged', async () => {
+test('the exact two stores can be compared directly when neither is indexed by Google', async () => {
   const mock = fixture();
-  const secondPostal = parseLivePriceRequest({ product, city, postalCode: '110112' });
-  assert.ok(secondPostal);
   const [first, other, cityOnly] = await Promise.all([
-    mock.worker.search(postal, 'one'), mock.worker.search(secondPostal, 'two'), mock.worker.search(normal, 'three'),
+    mock.worker.search(postal, 'one'), mock.worker.search({...postal, postalCode:'110112'}, 'two'), mock.worker.search(normal, 'three'),
   ]);
+  const [laia, otherStore, agro] = first.offers;
   assert.equal(first.status, 'current');
-  assert.equal(first.queriedAt, cityOnly.queriedAt);
-  const quote = first.offers[0];
-  assert.equal(quote.retailer, 'Laia Pets');
-  assert.equal(quote.totalCop, 152650);
-  assert.equal(quote.shippingCop, 15650);
-  assert.equal(quote.shippingPostalCode, '110111');
-  assert.equal(quote.stock, 'available');
-  assert.equal(first.cheapestOfferId, quote.id);
-  assert.equal(first.offers[1].shippingCop, null);
-  assert.equal(first.offers[1].totalCop, null);
-  assert.equal(other.offers[0].shippingPostalCode, '110112');
+  assert.deepEqual([laia.retailer, laia.stock, laia.productPriceCop, laia.shippingCop, laia.totalCop, laia.shippingPostalCode],
+    ['Laia Pets', 'available', 137000, 15650, 152650, '110111']);
+  assert.equal(first.cheapestOfferId, laia.id);
+  assert.deepEqual([agro.retailer, agro.stock, agro.productPriceCop, agro.shippingCop, agro.totalCop],
+    ['Agrocentro Pets', 'out_of_stock', 132400, null, null]);
+  assert.equal(otherStore.shippingCop, null);
+  assert.equal(otherStore.totalCop, null);
   assert.equal(other.offers[0].totalCop, 160450);
-  assert.equal(cityOnly.offers[0].retailer, 'Otra tienda');
   assert.equal(cityOnly.offers[0].shippingCop, 0);
-  assert.equal(cityOnly.offers[1].shippingPostalCode, undefined);
-  assert.deepEqual(await mock.worker.search(normal, 'one'), cityOnly);
-  assert.equal(mock.serpCalls.length, 2);
-  assert.equal(mock.serpCalls.filter((url) => url.pathname === '/search.json').length, 1);
-  assert.ok(mock.serpCalls.every((url) => !/11011[12]/.test(url.href)));
-  assert.doesNotMatch(JSON.stringify([...mock.storage.values()]), /11011[12]|shippingPostalCode/);
+  assert.equal(mock.serpCalls.filter(url => url.pathname === '/search.json').length, 1);
+  assert.ok(mock.serpCalls.every(url => !/11011[12]/.test(url.href)));
+  assert.doesNotMatch(JSON.stringify([...mock.map.values()]), /11011[12]|shippingPostalCode/);
   assert.equal(mock.quoteBodies.length, 2);
-  assert.equal(mock.merchantCalls.length, 8);
 });
 
-test('leaves shipments unknown when the merchant is unsupported, the quote is pickup-only or the exact product cannot be verified', async () => {
-  const unsupported = fixture();
-  unsupported.replies.searchListings.shift();
-  const unavailable = await unsupported.worker.search(postal, 'guest');
-  assert.equal(unavailable.cheapestOfferId, null);
-  assert.equal(unavailable.offers[0].shippingCop, null);
-  assert.equal(unsupported.merchantCalls.length, 0);
-
-  const pickup = fixture();
-  pickup.replies.quote = () => [{ code: 'retiro', name: 'Retiro en tienda', price: '0.00' }];
-  const blank = await pickup.worker.search(postal, 'guest');
-  assert.equal(blank.cheapestOfferId, null);
-  assert.ok(blank.offers.every(({ shippingCop, totalCop }) => shippingCop === null && totalCop === null));
-  assert.equal(pickup.quoteBodies.length, 1);
-
-  const fractional = fixture();
-  fractional.replies.quote = () => [{ code: 'courier', name: 'Entrega', price: '15650.25' }];
-  assert.equal((await fractional.worker.search(postal, 'guest')).cheapestOfferId, null);
-
-  const priceChanged = fixture();
-  priceChanged.stock.detailVariant = { ...priceChanged.variant, price: '135000.00' };
-  assert.equal((await priceChanged.worker.search(postal, 'guest')).cheapestOfferId, null);
-  assert.equal(priceChanged.quoteBodies.length, 0);
-
-  const packageUnconfirmed = fixture();
-  packageUnconfirmed.stock.detailVariant = { ...packageUnconfirmed.variant, values: [], weight: '2.000' };
-  assert.equal((await packageUnconfirmed.worker.search(postal, 'guest')).cheapestOfferId, null);
-  assert.equal(packageUnconfirmed.quoteBodies.length, 0);
-
-  const differentFormula = fixture();
-  differentFormula.stock.detailName = title.replace('37', '38');
-  assert.equal((await differentFormula.worker.search(postal, 'guest')).cheapestOfferId, null);
-  assert.equal(differentFormula.quoteBodies.length, 0);
+test('reflects a new merchant price, delivery and stock without changing the identity or inventing shipping', async () => {
+  const mock = fixture('');
+  mock.source.fee = '17600.00';
+  mock.shopifyVariant.availableForSale = true;
+  const result = await mock.worker.search({...postal, product:otherProduct}, 'guest');
+  const [laia, agro] = result.offers;
+  assert.equal(result.cheapestOfferId, laia.id);
+  assert.equal(laia.totalCop, 154600);
+  assert.equal(agro.stock, 'available');
+  assert.equal(agro.totalCop, null);
+  mock.variant.promotional_price = '135000.00';
+  assert.equal((await mock.worker.search(postal, 'guest')).offers[0].totalCop, 152600);
+  mock.variant.promotional_price = '0.00';
+  assert.equal((await mock.worker.search(postal, 'guest')).offers[0].productPriceCop, 137000);
+  assert.equal(mock.serpCalls.length, 0);
 });
 
-test('does not request postal shipping from an old shopping result after quota expiration', async () => {
+test('rejects unconfirmed sizes, different formulas, ambiguous rates, currency and store pickup', async () => {
+  for (const change of ['size','listedSize','formula','currency','pickup','fractional','timeout','stock']) {
+    const mock = fixture('');
+    if (change === 'size') mock.variant.values = ['4 kg'];
+    if (change === 'listedSize') mock.source.title += ' 4 kg';
+    if (change === 'formula') mock.source.title = title.replace('37','38');
+    if (change === 'currency') mock.source.currency = 'USD';
+    if (change === 'pickup') mock.source.method = 'Retiro en tienda';
+    if (change === 'fractional') mock.source.fee = '15650.25';
+    if (change === 'timeout') mock.source.failQuote = true;
+    if (change === 'stock') { mock.variant.stock = 0; mock.variant.stock_management = true; }
+    const result = await mock.worker.search(postal, 'guest');
+    assert.equal(result.cheapestOfferId, null, change);
+    assert.ok(result.offers.every(o => o.totalCop === null && o.shippingCop === null), change);
+    assert.equal(mock.quoteBodies.length, ['pickup','fractional','timeout'].includes(change) ? 1 : 0, change);
+  }
+});
+
+test('never promotes a stale shopping price to a fresh merchant result after quota expiration', async () => {
   const mock = fixture();
-  const first = await mock.worker.search(normal, 'guest');
+  const previous = await mock.worker.search(normal, 'guest');
   mock.setDate(new Date('2026-11-18T12:00:00Z'));
   mock.account.plan_searches_left = 0;
+  const fresh = await mock.worker.search(postal, 'guest');
+  assert.equal(fresh.status, 'current');
+  assert.deepEqual(fresh.offers.map(o => o.retailer), ['Laia Pets','Agrocentro Pets']);
+  mock.source.laiaFound = false;
+  mock.source.agroFound = false;
   const stale = await mock.worker.search(postal, 'guest');
   assert.equal(stale.status, 'stale');
-  assert.equal(stale.queriedAt, first.queriedAt);
+  assert.equal(stale.queriedAt, previous.queriedAt);
   assert.equal(stale.cheapestOfferId, null);
-  assert.ok(stale.offers.every(({ shippingCop, totalCop }) => shippingCop === null && totalCop === null));
-  assert.equal(mock.merchantCalls.length, 0);
+  assert.ok(stale.offers.every(o => o.shippingCop === null && o.totalCop === null));
 });

@@ -36,7 +36,7 @@ export interface LivePriceOffer {
   pricePerKgCop: number;
   productUrl: string;
   linkSource?: 'retailer' | 'google_shopping';
-  stock: 'available' | 'unknown';
+  stock: 'available' | 'out_of_stock' | 'unknown';
 }
 
 export type PriceUnavailableReason =
@@ -50,7 +50,7 @@ export interface LivePriceResponse {
   city: string;
   queriedAt: string | null;
   offers: LivePriceOffer[];
-  /** Winner among the requested package size and quoted delivery totals. */
+  /** Winner among in-stock offers of the requested package size with a quoted delivery total. */
   cheapestOfferId: string | null;
   reason?: PriceUnavailableReason;
 }

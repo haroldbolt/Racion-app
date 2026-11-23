@@ -604,6 +604,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                 </p>
                 <OnlineFoodSearch
                   species={pet.species}
+                  compareFor={{pet, plan}}
                   foodType={filterType === 'all' ? undefined : filterType}
                   lang={userAccount.language}
                   onSelect={(food, source) => {

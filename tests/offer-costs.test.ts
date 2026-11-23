@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { FeedingPlan, FoodItem, Pet, VetGuideline } from '../src/types';
 import type { LivePriceOffer } from '../src/types/livePrices';
+import { searchStoreManufacturerFoods, selectStoreManufacturerFood } from '../src/services/storeManufacturerCatalog';
+import { sameFoodIdentity } from '../src/utils/foodCosts';
 import { getOfferCosts, getOfferPortions } from '../src/utils/offerCosts';
 
 const pet: Pet = { id:'luna', name:'Luna', species:'cat', breed:'Mestiza', sex:'female', isNeutered:true,
@@ -29,6 +31,43 @@ test('quotes each real serving against its own package and applicable delivery c
   const small = {...offer,grams:500,productPriceCop:6400,shippingCop:0,totalCop:6400};
   assert.equal(getOfferCosts(small,undefined,{mixed:false,meals:[{grams:15}]}).meals?.[0].costCop,192);
   assert.equal(getOfferCosts(offer,undefined).meals,undefined);
+});
+
+test('equivalent merchant listings keep Luna’s confirmed servings and delivered costs without merging inventory', async () => {
+  const [row] = await searchStoreManufacturerFoods('Royal Canin Sterilised 37 de 2 kg', 'cat');
+  const agro = selectStoreManufacturerFood(row, 2);
+  assert.equal(agro.manufacturerFormulaUrl, 'https://www.royalcanin.com/co/cats/products/retail-products/sterilised-37-2537');
+  const laia: FoodItem = {...agro, id:'online_laia_1234', sourceFoodId:'online_laia_1234', name:'Sterilised 37',
+    storeName:'Laia Pets', storeProductUrl:'https://www.laiapets.com.co/productos/royal-canin-sterilised-37-x-400-g/',
+    buyUrl:'https://www.laiapets.com.co/productos/royal-canin-sterilised-37-x-400-g/'};
+  const oldLaia = {...laia, manufacturerFormulaName:undefined, manufacturerFormulaUrl:undefined};
+  const quote = {...offer, productPriceCop:137000, shippingCop:15650, totalCop:152650, shippingPostalCode:'110111'};
+  for (const [saved, compared] of [[laia, agro], [agro, laia], [oldLaia, agro]]) {
+    assert.equal(sameFoodIdentity(saved, compared), false);
+    const savedPlan = {...plan, foodId:saved.id, foodName:saved.name, foodBrand:saved.brand, dryFood:saved};
+    const portions = getOfferPortions(pet, savedPlan, compared);
+    assert.deepEqual(portions?.meals.map(m => m.grams), [30, 29]);
+    assert.deepEqual(getOfferCosts(quote,'110111',portions).meals?.map(m => Math.round(m.costCop)), [2290,2213]);
+  }
+});
+
+test('similar names, unverified links and a shared manufacturer document cannot identify the same serving', async () => {
+  const [row] = await searchStoreManufacturerFoods('Royal Canin Sterilised 37', 'cat');
+  const adult = selectStoreManufacturerFood(row, 2);
+  const savedPlan = {...plan, foodId:adult.id, foodName:adult.name, foodBrand:adult.brand, dryFood:adult};
+  const alternate: FoodItem = {...adult, id:'other', sourceFoodId:'other', name:'Sterilised 37',
+    buyUrl:'https://example.org/offer', storeProductUrl:'https://example.org/offer'};
+  const [seniorRow] = await searchStoreManufacturerFoods('Royal Canin Sterilised 7+', 'cat');
+  const senior = selectStoreManufacturerFood(seniorRow, 1.5);
+  assert.notEqual(senior.manufacturerFormulaUrl, adult.manufacturerFormulaUrl);
+  const unrelated = {...alternate, manufacturerFormulaUrl:senior.manufacturerFormulaUrl, manufacturerFormulaName:senior.manufacturerFormulaName};
+  assert.equal(getOfferPortions(pet,savedPlan,unrelated), undefined);
+  assert.equal(getOfferPortions(pet,savedPlan,{...alternate,manufacturerFormulaUrl:undefined,labelStatus:'unconfirmed'}), undefined);
+  const shared = 'https://example.org/multiple-formulas.pdf';
+  const sharedSheet: FoodItem = {...adult, manufacturerFormulaUrl:undefined,
+    fichaNutricional:{...adult.fichaNutricional!,fuenteUrl:shared}};
+  assert.equal(getOfferPortions(pet,{...savedPlan,dryFood:sharedSheet},
+    {...alternate,manufacturerFormulaUrl:undefined,fichaNutricional:sharedSheet.fichaNutricional}), undefined);
 });
 
 test('quotes only the dry component from this bag and the rest from its own purchase basis', () => {

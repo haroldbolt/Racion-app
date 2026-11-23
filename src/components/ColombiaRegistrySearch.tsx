@@ -17,9 +17,10 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   onManual: (record: RegistryFood, sourceUrl: string) => void;
   onSelect: (food: FoodItem) => void;
+  compare?: (food: FoodItem) => void;
 }
 
-export function ColombiaRegistrySearch({query, species, foodType, category, lang, onOpenChange, onManual, onSelect}: Props) {
+export function ColombiaRegistrySearch({query, species, foodType, category, lang, onOpenChange, onManual, onSelect, compare}: Props) {
   const es = lang === 'es';
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -100,7 +101,7 @@ export function ColombiaRegistrySearch({query, species, foodType, category, lang
             {!market && !marketError && <p role="status">{es ? 'Buscando presentaciones, nutrientes y precios de esta fórmula…' : 'Finding packages, nutrients and prices for this formula…'}</p>}
             {market?.unavailableSources.length ? <p role="status" className="text-amber-900">{es ? 'Consulta parcial · ' : 'Partial results · '}{market.unavailableSources.join(', ')}</p> : null}
             {marketError || (market && market.foods.length === 0) ? <p role="status">{es ? 'No se pudo vincular una ficha u oferta de esta fórmula. Puedes completar su etiqueta.' : 'No product sheet or offer matched this formula. You can enter its label.'}</p> : null}
-            {market && <OnlineFoodCards foods={market.foods} lang={lang} choose={onSelect} />}
+            {market && <OnlineFoodCards foods={market.foods} lang={lang} choose={onSelect} compare={compare} />}
             {(marketError || market?.unavailableSources.length) ? <button type="button" onClick={() => void loadOffers(item,registry!)} className="min-h-10 font-bold text-[#0B5D2E]">{es ? 'Reintentar búsqueda' : 'Retry search'}</button> : null}
           </section>}
         <button type="button" onClick={() => onManual(item,registry!.source)} className="min-h-10 text-[#0B5D2E] underline">{es ? 'Completar etiqueta' : 'Add label details'}</button>

@@ -16,7 +16,7 @@ const request = {
 
 const rows = [
   { source: 'Tienda A', price: '$90.000', delivery: 'Envío $18.000', link: 'https://a.example/2kg' },
-  { source: 'Tienda B', price: '$99.000', delivery: 'Envío incluido', link: 'https://b.example/2kg' },
+  { source: 'Tienda B', availability: 'En stock', price: '$99.000', delivery: 'Envío incluido', link: 'https://b.example/2kg' },
   { source: 'Tienda C', price: '$80.000', delivery: 'Entrega en 2 días', link: 'https://c.example/2kg' },
 ].map((offer) => ({ ...offer, title: 'Royal Canin Sterilised 37 Gatos Adultos 2 kg' }));
 

@@ -169,9 +169,9 @@ export class LivePriceService {
   async search(request: ValidRequest, caller: string): Promise<LivePriceResponse> {
     const { product, city, postalCode } = request;
     // The durable cache and concurrent lookup contain city offers only.
-    const baseline = await this.searchCity({ product, city }, caller);
+    const baseline = this.searchCity({ product, city }, caller);
     if (city !== 'Bogotá' || !isBogotaPostalCode(postalCode)) return baseline;
-    return quotePostalOffers(baseline, product, postalCode, this.fetcher);
+    return quotePostalOffers(baseline, product, postalCode, this.fetcher, this.now);
   }
 
   private async searchCity(request: ValidRequest, caller: string): Promise<LivePriceResponse> {

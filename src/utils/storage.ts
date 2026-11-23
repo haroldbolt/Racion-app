@@ -11,6 +11,7 @@ import {
   TreatLog,
   HydrationDailyState,
 } from '../types';
+import { isBogotaPostalCode } from '../types/livePrices';
 import { repairVetExamples } from './vetRecords';
 import { localDateKey } from './localDate';
 import { getPlanCostSummary, sameFormulaName, withPlanCosts } from './foodCosts';
@@ -517,6 +518,7 @@ export const StorageService = {
     const payload = {
       exportedAt: new Date().toISOString(),
       account: this.getUserAccount(),
+      delivery: {city:this.getUserCity(), bogotaPostalCode:this.getBogotaPostalCode() || undefined},
       pets: this.getPets(),
       plans: this.getPlans(),
       mealLogs: read(STORAGE_KEYS.MEAL_LOGS, []),
@@ -530,6 +532,15 @@ export const StorageService = {
       foodPurchases: this.getFoodPurchases(),
     };
     return JSON.stringify(payload, null, 2);
+  },
+
+  getBogotaPostalCode(): string {
+    const code = accountData.getItem(STORAGE_KEYS.BOGOTA_POSTAL_CODE);
+    return isBogotaPostalCode(code) ? code : '';
+  },
+
+  setBogotaPostalCode(code: string): void {
+    if (code === '' || isBogotaPostalCode(code)) accountData.setItem(STORAGE_KEYS.BOGOTA_POSTAL_CODE, code);
   },
 
   getUserCity(): string {
