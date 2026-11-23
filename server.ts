@@ -25,7 +25,7 @@ app.get([catalogPath, registryNutritionPath], async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-// This beta stores all user data locally. API requests must never fall through to the SPA.
+// The billing sandbox uses a separate Worker. Never serve the SPA for an unknown API route.
 app.use('/api', (_req, res) => {
   res.status(404).json({ error: 'Not available in the local beta' });
 });
@@ -35,6 +35,7 @@ async function startServer() {
     app.use(express.static(path.resolve('dist')));
   } else {
     const vite = await createViteServer({
+      mode: process.env.RACION_LOCAL_MODE === 'anonymous-beta' ? 'anonymous-beta' : 'development',
       server: { middlewareMode: true, hmr: false, ws: false },
       appType: 'spa',
     });

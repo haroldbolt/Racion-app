@@ -1,6 +1,6 @@
 # Ración App
 
-Beta gratuita para estimar la ración de perros y gatos, registrar tomas y pesajes y consultar su historial. Los visitantes pueden usarla sin cuenta, licencia ni cobros. Las raciones son estimaciones y no sustituyen la indicación de un veterinario.
+La beta pública permite estimar la ración de perros y gatos, registrar tomas y pesajes y consultar su historial. Los visitantes pueden usarla sin cuenta, licencia ni cobros. Las raciones son estimaciones y no sustituyen la indicación de un veterinario.
 
 ## Ejecutar en local
 
@@ -8,7 +8,7 @@ Instala [Bun](https://bun.sh/) y [Node.js](https://nodejs.org/) 20.19 o 22.12 en
 
 ```sh
 bun install
-bun run dev
+RACION_LOCAL_MODE=anonymous-beta bun run dev
 ```
 
 Abre [localhost:3000](http://localhost:3000). Para comprobar la compilación y verla en el navegador:
@@ -16,9 +16,18 @@ Abre [localhost:3000](http://localhost:3000). Para comprobar la compilación y v
 ```sh
 bun run lint
 bun run test
-bun run build
+bun run build --mode anonymous-beta
 bun run preview
 ```
+
+## R0 · Registro y cobro único en pruebas
+
+La compilación estándar de esta rama abre el registro. La edición pública anterior se compila de forma explícita con `--mode anonymous-beta`. La nueva edición requiere una conexión para verificar la cuenta al abrirla. Los diarios siguen en el navegador y su vinculación requiere la confirmación del titular del dispositivo.
+
+1. Habilita correo y contraseña en un proyecto Firebase Authentication de pruebas. En el frontend configura `VITE_BILLING_FIREBASE_PROJECT_ID`, `VITE_BILLING_FIREBASE_API_KEY` y `VITE_BILLING_API_URL` con el origen del Worker de pruebas. La configuración pública de Firebase se obtiene de su aplicación web.
+2. En el Worker `workers/billing`, configura `FIREBASE_PROJECT_ID` con el mismo proyecto y `ALLOWED_ORIGINS` con la URL completa del frontend de pruebas, incluida la ruta de regreso. Guarda `STRIPE_SECRET_KEY` y `STRIPE_WEBHOOK_SECRET` exclusivamente como secretos del Worker. Se admiten claves de sandbox. El webhook es `/api/billing/webhook` para los eventos `checkout.session.completed`, `payment_intent.succeeded`, `payment_intent.payment_failed` y `payment_intent.processing`.
+3. Ejecuta `bun run dev` para la interfaz o `bun run build` para generar sus archivos. El registro abre Stripe Checkout. Después de confirmar el método, cada cuenta tiene un vencimiento persistente a las 72 horas. El Worker programa un solo cargo de 1.800 centavos USD. La cancelación se hace desde **Mi cuenta**.
+4. Para repetir la prueba con la API de Stripe, carga una clave de pruebas en el entorno y ejecuta `node --import tsx scripts/verify-billing-sandbox.ts --api-setup`. El modo `--hosted` permite registrar el método directamente en dos formularios de Stripe Checkout. Ambos verifican los cargos del sandbox con su API. El reloj acelerado pertenece al ejecutor de pruebas. La verificación de navegador en CI usa respuestas controladas y también recorre inventario, costos y pesajes después de recargar.
 
 ## Publicar la beta
 

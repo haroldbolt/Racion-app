@@ -30,6 +30,20 @@ jobs:
       - run: bun run test
       - name: Install browser and Worker test runners
         run: npm install --prefix "$RUNNER_TEMP/racion-test-tools" --no-save --package-lock=false --no-audit --no-fund playwright-core@1.62.1 miniflare@4.20260730.0
+      - name: Verify trial registration, cancellation, one-time payment and diary in Chrome
+        env:
+          VITE_BILLING_API_URL: https://billing.example.invalid
+          VITE_BILLING_FIREBASE_PROJECT_ID: demo-racion
+          VITE_BILLING_FIREBASE_API_KEY: fixture-only
+        run: |
+          export PLAYWRIGHT_PATH="$RUNNER_TEMP/racion-test-tools/node_modules/playwright-core"
+          sandbox_dist="$RUNNER_TEMP/racion-billing-fixture"
+          bun run build --outDir "$sandbox_dist" --emptyOutDir
+          bun run preview --outDir "$sandbox_dist" --host 127.0.0.1 --port 4198 --strictPort &
+          preview_pid=$!
+          trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
+          curl --retry 12 --retry-all-errors --retry-delay 1 -fsS http://127.0.0.1:4198/ -o /dev/null
+          node --import tsx .github/scripts/verify-billing-ui.cjs http://127.0.0.1:4198/
       - name: Verify Worker and persistent quota ledger
         run: |
           export MINIFLARE_PATH="$RUNNER_TEMP/racion-test-tools/node_modules/miniflare"
@@ -41,7 +55,7 @@ jobs:
         run: |
           fixture_dist="$RUNNER_TEMP/racion-price-fixture"
           export PLAYWRIGHT_PATH="$RUNNER_TEMP/racion-test-tools/node_modules/playwright-core"
-          bun run build --outDir "$fixture_dist" --emptyOutDir
+          bun run build --mode anonymous-beta --outDir "$fixture_dist" --emptyOutDir
           bun run preview --outDir "$fixture_dist" --host 127.0.0.1 --port 4196 --strictPort &
           preview_pid=$!
           trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
@@ -52,6 +66,7 @@ jobs:
       - name: Verify Colombian stores and national registry
         env:
           PORT: 4197
+          RACION_LOCAL_MODE: anonymous-beta
         run: |
           export PLAYWRIGHT_PATH="$RUNNER_TEMP/racion-test-tools/node_modules/playwright-core"
           bun run dev >"$RUNNER_TEMP/racion-colombia-server.log" 2>&1 &
@@ -75,7 +90,7 @@ jobs:
           name: receipt-browser-evidence
           path: ${{ runner.temp }}/racion-receipt-proof
           if-no-files-found: ignore
-      - run: bun run build
+      - run: bun run build --mode anonymous-beta
         env:
           PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
           VITE_PRICE_API_URL: ${{ vars.PRICE_API_URL || 'https://racion-live-prices.jumer4.workers.dev/api/live-prices' }}

@@ -13,6 +13,7 @@ interface HeaderProps {
   userAccount: UserAccount;
   onUpdateAccount: (updated: Partial<UserAccount>) => void;
   onOpenNotifications?: () => void;
+  onOpenAccount?: () => void;
   unreadNotificationsCount?: number;
 }
 
@@ -24,6 +25,7 @@ export const Header: React.FC<HeaderProps> = ({
   userAccount,
   onUpdateAccount,
   onOpenNotifications,
+  onOpenAccount,
   unreadNotificationsCount = 1,
 }) => {
   const { isInstallable, isInstalled, install, isIOS } = usePWAInstall();
@@ -55,9 +57,14 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="font-heading font-extrabold text-lg text-[#0B5D2E] tracking-tight">
             Ración App
           </span>
-          <span className="bg-[#EAF4EC] text-[#0B5D2E] text-[10px] font-bold px-2 py-0.5 rounded-full">
-            Beta
-          </span>
+          {onOpenAccount ? (
+            <button type="button" onClick={onOpenAccount}
+              className="rounded-full bg-[#EAF4EC] px-2.5 py-1.5 text-xs font-bold text-[#0B5D2E]">
+              {isEs ? 'Mi cuenta' : 'My account'}
+            </button>
+          ) : (
+            <span className="bg-[#EAF4EC] text-[#0B5D2E] text-[10px] font-bold px-2 py-0.5 rounded-full">Beta</span>
+          )}
         </div>
 
         <div className="flex items-center gap-1.5">

@@ -1,0 +1,19 @@
+name = "racion-billing-sandbox"
+main = "index.ts"
+compatibility_date = "2025-10-01"
+workers_dev = true
+preview_urls = false
+
+# Configure the test Firebase project and the frontend sandbox URL before deploying.
+# Entries may include the app base path for Checkout redirects.
+[vars]
+ALLOWED_ORIGINS = "http://localhost:3000,http://127.0.0.1:3000"
+FIREBASE_PROJECT_ID = ""
+
+[[durable_objects.bindings]]
+name = "BILLING_ACCOUNTS"
+class_name = "BillingAccount"
+
+[[migrations]]
+tag = "billing-v1"
+new_sqlite_classes = ["BillingAccount"]

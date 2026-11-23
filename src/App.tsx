@@ -30,7 +30,7 @@ type PriceSelection = {
   returnTo: 'today' | 'compare' | 'more';
 };
 
-export default function App() {
+export default function App({ onOpenAccount }: { onOpenAccount?: () => void }) {
   // Primary reactive state
   const [pets, setPets] = useState<Pet[]>(() => {
     StorageService.initialize();
@@ -309,6 +309,7 @@ export default function App() {
     }`}>
       {/* Top Header */}
       <Header
+        onOpenAccount={onOpenAccount}
         pets={pets}
         activePet={activePet}
         onSelectPet={selectPetFromHeader}

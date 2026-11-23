@@ -1,10 +1,15 @@
+import { lazy, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App.tsx';
-import { CityProvider } from './contexts/CityContext';
 import './index.css';
 
+// Separate build for the previously published anonymous beta. A URL or a saved
+// browser preference cannot change the access policy of a billing build.
+const Entry = import.meta.env.MODE === 'anonymous-beta'
+  ? lazy(() => import('./PetWorkspace'))
+  : lazy(() => import('./components/BillingGate'));
+
 createRoot(document.getElementById('root')!).render(
-  <CityProvider>
-    <App />
-  </CityProvider>
+  <Suspense fallback={<p className="p-6 text-center" role="status">Cargando Ración App…</p>}>
+    <Entry />
+  </Suspense>
 );
