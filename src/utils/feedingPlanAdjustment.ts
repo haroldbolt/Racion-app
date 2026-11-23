@@ -71,7 +71,7 @@ function readEnergy(energy: string): number | undefined {
   return /^\d+(?:[.,]\d+)?$/.test(value) ? Number(value.replace(',', '.')) : NaN;
 }
 
-function updateLabelEnergy(food: FoodItem | undefined, energy: number | undefined): FoodItem | undefined {
+export function updateLabelEnergy(food: FoodItem | undefined, energy: number | undefined): FoodItem | undefined {
   if (!food || getFoodKcalPerKg(food) === energy) return food;
 
   const ficha = food.fichaNutricional?.coincidenciaEstado === 'verificado' ? food.fichaNutricional : undefined;

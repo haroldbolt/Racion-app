@@ -9,6 +9,7 @@ import {
   previewFeedingPlanAdjustment,
   retainManufacturerPortion,
   retainManualPortion,
+  updateLabelEnergy,
   type FormulaType,
 } from '../utils/feedingPlanAdjustment';
 import { calculateDailyMealNutritionSummary } from '../utils/mealNutrition';
@@ -188,7 +189,7 @@ export function FeedingPlanEditor({
                   })}
 
                   {draft.foodType !== 'mixed' && !(draft.foodType === 'dry' ? draft.dryEnergy : draft.wetEnergy).trim() && (
-                    <ManufacturerRationInput food={draft.foodType === 'dry' ? draft.dryFood : draft.wetFood} pet={pet} goal={plan.goal ?? 'maintain'} value={draft.manufacturerGramsPerDay}
+                    <ManufacturerRationInput food={updateLabelEnergy(draft.foodType === 'dry' ? draft.dryFood : draft.wetFood, undefined)} pet={pet} goal={plan.goal ?? 'maintain'} value={draft.manufacturerGramsPerDay}
                       onChange={(grams) => setDraft((previous) => ({ ...previous, manufacturerGramsPerDay: grams }))}
                       manualValue={draft.manualGramsPerDay} onManualChange={(grams) => setDraft((previous) => ({ ...previous, manualGramsPerDay: grams }))} lang={language} />
                   )}
@@ -264,7 +265,7 @@ export function FeedingPlanEditor({
                 <h3 id="feeding-adjustment-preview" className="font-heading text-sm font-extrabold text-[#0B5D2E]">
                   {isEs ? 'Vista previa de la ración' : 'Feeding plan preview'}
                 </h3>
-                {'error' in preview && <p className="mt-2 text-xs text-[#44544A]">{errors[preview.error]}</p>}
+                {'error' in preview && <p className="mt-2 text-xs text-[#44544A]">{errors[preview.error === 'guide' && draft.manualGramsPerDay !== undefined ? 'manual' : preview.error]}</p>}
                 {nextPlan && (!nextPlan.rationConfirmed && nextPlan.rationSource !== 'manual' ? (
                   <p className="mt-2 text-xs text-[#44544A]">
                     {editable
