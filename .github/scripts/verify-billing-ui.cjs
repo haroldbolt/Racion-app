@@ -1,6 +1,8 @@
-/* Local browser integration. The account and Stripe transports below never reach an external service. */
+/* Chrome + Firebase Auth Emulator + local HTTP billing Worker. Only Stripe Checkout is intercepted. */
 const assert = require('node:assert/strict');
-const { randomUUID, randomBytes, createHmac } = require('node:crypto');
+const { randomUUID } = require('node:crypto');
+const { createServer } = require('node:http');
+const { once } = require('node:events');
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright-core');
 const { seedLegacyDiary, verifyLinkedDiary } = require('./verify-billing-diary.cjs');
 
@@ -9,15 +11,30 @@ async function main() {
   assert.ok(['localhost', '127.0.0.1'].includes(base.hostname), 'Use the local billing build');
   const { BillingEngine, TRIAL_DURATION_MS } = await import('../../workers/billing/engine.ts');
   const { handleBilling } = await import('../../workers/billing/http.ts');
-  let now = Date.now();
-  const accounts = new Map(), identities = new Map(), sessions = new Map(), payments = new Map();
+  const billingOrigin = 'http://127.0.0.1:4209', emulatorOrigin = 'http://127.0.0.1:9099';
+  assert.equal(process.env.VITE_BILLING_API_URL, billingOrigin, 'Build and run the smoke with the loopback billing service');
+  assert.equal(process.env.VITE_BILLING_AUTH_EMULATOR_URL, emulatorOrigin, 'Build and run with the official Firebase Auth emulator');
+  assert.equal(process.env.VITE_BILLING_FIREBASE_PROJECT_ID, 'demo-racion');
+  assert.equal(process.env.VITE_BILLING_FIREBASE_API_KEY, 'fixture-only');
+  let now = Date.now(), stage = 'iniciar los servicios locales';
+  const accounts = new Map(), sessions = new Map(), payments = new Map();
   const ledger = new Map(), engines = new Map();
-  const signingKey = randomBytes(32);
-  function fixtureToken(uid) {
-    const encode = value => Buffer.from(JSON.stringify(value)).toString('base64url');
-    const iat = Math.floor(Date.now() / 1000);
-    const message = encode({alg:'HS256'}) + '.' + encode({sub:uid, iat, exp:iat+3600, auth_time:iat, firebase:{sign_in_provider:'password'}});
-    return message + '.' + createHmac('sha256', signingKey).update(message).digest('base64url');
+  const trace = [];
+  function observe(value) { trace.push(value); if (trace.length > 20) trace.shift(); }
+  async function identify(token) {
+    const response = await fetch(emulatorOrigin + '/identitytoolkit.googleapis.com/v1/accounts:lookup?key=fixture-only', {
+      method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({idToken:token}),
+      signal:AbortSignal.timeout(10000), redirect:'error',
+    });
+    observe('Firebase lookup ' + response.status);
+    if (!response.ok) throw new Error('Firebase Auth Emulator rejected the session');
+    const {users} = await response.json();
+    const user = users?.[0];
+    if (users?.length !== 1 || typeof user.localId !== 'string' || !user.email?.endsWith('@example.invalid')) {
+      throw new Error('Expected exactly one synthetic account in the emulator');
+    }
+    accounts.set(user.email, user.localId);
+    return user.localId;
   }
   const gateway = {
     async createCheckout({ uid, attemptId }) {
@@ -54,57 +71,51 @@ async function main() {
       const action = new URL(request.url).pathname.slice(1);
       return Response.json(await engine(uid).run(action, await request.json()));
     }})}};
-  const browser = await chromium.launch({channel:'chrome', headless:true});
+  const server = createServer(async (req, res) => {
+    try {
+      const chunks = [];
+      for await (const chunk of req) chunks.push(chunk);
+      const body = chunks.length ? Buffer.concat(chunks) : undefined;
+      const request = new Request(new URL(req.url, billingOrigin), {method:req.method, headers:req.headers, body});
+      const response = await handleBilling(request, worker, identify);
+      observe('Worker ' + request.method + ' ' + new URL(request.url).pathname + ' ' + response.status);
+      res.writeHead(response.status, Object.fromEntries(response.headers));
+      res.end(Buffer.from(await response.arrayBuffer()));
+    } catch (error) {
+      observe('Error del servidor HTTP: ' + (error?.name || 'Error'));
+      if (!res.headersSent) res.writeHead(500);
+      res.end();
+    }
+  });
+  let browser, page;
   try {
+    await fetch(emulatorOrigin + '/', {signal:AbortSignal.timeout(5000)});
+    server.listen(4209, '127.0.0.1');
+    await once(server, 'listening');
+    browser = await chromium.launch({channel:'chrome', headless:true});
     const context = await browser.newContext({serviceWorkers:'block', viewport:{width:425, height:840}});
-    await context.route('**/*', async route => {
-      const req = route.request(), url = new URL(req.url());
-      if (url.origin === base.origin) return route.continue();
-      const headers = {'access-control-allow-origin':base.origin, 'access-control-allow-methods':'POST, GET, OPTIONS',
-        'access-control-allow-headers':req.headers()['access-control-request-headers'] || '*'};
-      if (req.method() === 'OPTIONS') return route.fulfill({status:204, headers});
-      if (url.hostname === 'identitytoolkit.googleapis.com') {
-        const input = req.postDataJSON() || {};
-        const name = url.pathname.split(':').at(-1);
-        if (name === 'signUp' || name === 'signInWithPassword') {
-          assert.ok(input.email.endsWith('@example.invalid'), 'Only synthetic accounts can register');
-          if (name === 'signUp') {
-            assert.ok(!accounts.has(input.email));
-            const uid = randomUUID(), token = fixtureToken(uid);
-            accounts.set(input.email, {localId:uid, email:input.email, idToken:token, refreshToken:randomUUID(), expiresIn:'3600'});
-            identities.set(token, uid);
-          }
-          return route.fulfill({headers, json:accounts.get(input.email)});
-        }
-        if (name === 'lookup') {
-          const user = [...accounts.values()].find(item => item.idToken === input.idToken);
-          assert.ok(user);
-          return route.fulfill({headers, json:{users:[{localId:user.localId, email:user.email, emailVerified:false,
-            providerUserInfo:[{providerId:'password', rawId:user.email, email:user.email}]}]}});
-        }
-        return route.fulfill({headers, status:404, json:{error:{message:'UNSUPPORTED_FIXTURE_AUTH_ROUTE'}}});
-      }
-      if (url.pathname.startsWith('/api/billing/') && url.hostname.endsWith('.invalid')) {
-        const response = await handleBilling(new Request(url, {method:req.method(), headers:{...req.headers(), Origin:base.origin},
-          body:req.method() === 'POST' ? req.postData() : undefined}), worker, async token => {
-          const uid = identities.get(token);
-          assert.ok(uid, 'Each test request must carry the SDK-issued session');
-          return uid;
-        });
-        return route.fulfill({status:response.status, headers:Object.fromEntries(response.headers), body:await response.text()});
-      }
-      if (url.hostname === 'checkout.stripe.com') {
-        const id = url.pathname.split('/').at(-1);
-        assert.ok(sessions.has(id), 'Only the intercepted test checkout can be opened');
-        if (url.searchParams.has('complete')) {
-          sessions.get(id).complete = true;
-          return route.fulfill({status:302, headers:{Location:base.href + '?billing_session=' + id}});
-        }
-        return route.fulfill({contentType:'text/html', body:'<a href="?complete=1">Confirmar tarjeta de prueba</a>'});
-      }
-      return route.abort();
+    context.on('response', response => {
+      const url = new URL(response.url());
+      if (url.origin === emulatorOrigin) observe('Navegador ' + url.pathname + ' ' + response.status());
     });
-    let page = await context.newPage();
+    context.on('requestfailed', request => {
+      const url = new URL(request.url());
+      if (url.origin === billingOrigin || url.origin === emulatorOrigin) {
+        observe('Falló la red ' + url.origin + url.pathname + ' ' + request.failure()?.errorText);
+      }
+    });
+    // Every request to Firebase and to the billing API travels over real loopback HTTP.
+    await context.route('https://checkout.stripe.com/c/pay/cs_test_**', async route => {
+      const url = new URL(route.request().url());
+      const id = url.pathname.split('/').at(-1);
+      assert.ok(sessions.has(id), 'Only the generated test checkout can be opened');
+      if (url.searchParams.has('complete')) {
+        sessions.get(id).complete = true;
+        return route.fulfill({status:302, headers:{Location:base.href + '?billing_session=' + id}});
+      }
+      return route.fulfill({contentType:'text/html', body:'<a href="?complete=1">Confirmar tarjeta de prueba</a>'});
+    });
+    page = await context.newPage();
     const button = name => page.getByRole('button', {name, exact:true});
     const heading = name => page.getByRole('heading', {name, exact:true});
     await page.goto(base.href, {waitUntil:'domcontentloaded'});
@@ -112,28 +123,33 @@ async function main() {
     assert.equal(await button('Agregar mascota').count(), 0);
     await seedLegacyDiary(page);
     async function register(email) {
+      stage = 'registrar la cuenta en Firebase y consultar su estado';
       await page.getByLabel('Correo electrónico').fill(email);
       await page.getByLabel('Contraseña').fill('Solo-prueba-2026');
       await button('Crear cuenta').click();
       await heading('Activa tu prueba').waitFor();
       assert.ok(await button('Registrar tarjeta de prueba').isDisabled());
       await page.getByRole('checkbox').check();
+      stage = 'crear Checkout y confirmar la prueba';
       await button('Registrar tarjeta de prueba').click();
       await page.getByRole('link', {name:'Confirmar tarjeta de prueba'}).click();
       await page.getByRole('dialog', {name:'Mi cuenta'}).getByRole('heading', {name:'Prueba activa'}).waitFor();
     }
-    const first = 'cancel@example.invalid', second = 'pago@example.invalid';
+    const run = randomUUID();
+    const first = 'cancel-' + run + '@example.invalid', second = 'pago-' + run + '@example.invalid';
     await register(first);
     await button('Volver a la app').click();
     await button('Vincular mis datos anteriores').click();
+    stage = 'verificar factura, inventario, pesajes y recarga';
     await verifyLinkedDiary(page);
+    stage = 'cancelar durante la prueba y verificar el saldo';
     await button('Mi cuenta').click();
     await button('Cancelar prueba').click();
     now += TRIAL_DURATION_MS - 1000;
     await button('Confirmar cancelación').click();
     await heading('Prueba cancelada').waitFor();
     now += 2000;
-    await engine(accounts.get(first).localId).run('alarm');
+    await engine(accounts.get(first)).run('alarm');
     assert.equal(payments.size, 0);
     await page.reload({waitUntil:'domcontentloaded'});
     await heading('Prueba cancelada').waitFor();
@@ -144,8 +160,9 @@ async function main() {
     await heading('La rutina de tu mascota').waitFor();
     assert.equal(await page.getByText('Luna de la beta',{exact:true}).count(), 0);
     await page.close();
+    stage = 'verificar un solo cobro el cuarto día y reabrir';
     now += TRIAL_DURATION_MS;
-    const uid = accounts.get(second).localId;
+    const uid = accounts.get(second);
     await engine(uid).run('alarm');
     await engine(uid).run('alarm');
     assert.deepEqual([...payments.values()].map(p => [p.uid,p.amountCents,p.currency,p.status]), [[uid,1800,'USD','succeeded']]);
@@ -154,7 +171,18 @@ async function main() {
     await button('Mi cuenta').click();
     await heading('Acceso activo').waitFor();
     assert.equal(await button('Cancelar prueba').count(), 0);
-    console.log('Chrome con transportes controlados: registro, vinculación e historial tras recarga, cancelación antes de 72 horas sin cargo, segunda cuenta aislada, un solo pago de 18 USD con la página cerrada y acceso tras reabrir.');
-  } finally { await browser.close(); }
+    console.log('Chrome con Firebase Auth Emulator y Worker HTTP local, pagos controlados: registro, vinculación e historial tras recarga, cancelación antes de 72 horas sin cargo, segunda cuenta aislada, un solo pago de 18 USD con la página cerrada y acceso tras reabrir.');
+  } catch (error) {
+    // Endpoint names, HTTP codes and user-facing alerts help locate a failure without printing tokens or payment URLs.
+    const alerts = page && !page.isClosed() ? await page.getByRole('alert').allTextContents().catch(() => []) : [];
+    console.error('Etapa:', stage, '\nHTTP:', trace.join(' | '), '\nAvisos:', alerts.slice(0, 2).map(x => x.slice(0, 180)));
+    throw error;
+  } finally {
+    await browser?.close();
+    if (server.listening) {
+      server.closeAllConnections();
+      await new Promise(resolve => server.close(resolve));
+    }
+  }
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });

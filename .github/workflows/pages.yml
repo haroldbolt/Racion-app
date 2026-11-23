@@ -29,10 +29,11 @@ jobs:
       - run: bun run lint
       - run: bun run test
       - name: Install browser and Worker test runners
-        run: npm install --prefix "$RUNNER_TEMP/racion-test-tools" --no-save --package-lock=false --no-audit --no-fund playwright-core@1.62.1 miniflare@4.20260730.0
+        run: npm install --prefix "$RUNNER_TEMP/racion-test-tools" --no-save --package-lock=false --no-audit --no-fund playwright-core@1.62.1 miniflare@4.20260730.0 firebase-tools@15.37.0
       - name: Verify trial registration, cancellation, one-time payment and diary in Chrome
         env:
-          VITE_BILLING_API_URL: https://billing.example.invalid
+          VITE_BILLING_API_URL: http://127.0.0.1:4209
+          VITE_BILLING_AUTH_EMULATOR_URL: http://127.0.0.1:9099
           VITE_BILLING_FIREBASE_PROJECT_ID: demo-racion
           VITE_BILLING_FIREBASE_API_KEY: fixture-only
         run: |
@@ -43,7 +44,10 @@ jobs:
           preview_pid=$!
           trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
           curl --retry 12 --retry-all-errors --retry-delay 1 -fsS http://127.0.0.1:4198/ -o /dev/null
-          node --import tsx .github/scripts/verify-billing-ui.cjs http://127.0.0.1:4198/
+          echo '{"emulators":{"auth":{"host":"127.0.0.1","port":9099},"ui":{"enabled":false}}}' > "$RUNNER_TEMP/racion-firebase.json"
+          "$RUNNER_TEMP/racion-test-tools/node_modules/.bin/firebase" emulators:exec \
+            --only auth --project demo-racion --config "$RUNNER_TEMP/racion-firebase.json" \
+            "node --import tsx .github/scripts/verify-billing-ui.cjs http://127.0.0.1:4198/"
       - name: Verify Worker and persistent quota ledger
         run: |
           export MINIFLARE_PATH="$RUNNER_TEMP/racion-test-tools/node_modules/miniflare"
