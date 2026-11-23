@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { beforeEach, test } from 'node:test';
-import type { Pet } from '../src/types';
+import type { FeedingPlan, FoodCostEntry, FoodItem, Pet } from '../src/types';
 import { localDateKey } from '../src/utils/localDate';
 import { StorageService } from '../src/utils/storage';
 
@@ -91,4 +91,66 @@ test('keeps the food, price paid per gram, servings and intake bound to the orig
   assert.equal(StorageService.getMealHistory('milo').length, 0);
   StorageService.toggleMealCompleted('luna', 0, 'Ana', 0, '08:00');
   assert.equal(StorageService.getMealHistory('luna').length, 0);
+});
+
+test('stored purchases price the current rations of their named pets after reload or unsharing', () => {
+  const food: FoodItem = {id:'shared-dog-food', name:'Adultos', brand:'Marca de prueba', species:'dog', type:'dry',
+    lifeStage:'adult', country:'Colombia', kcalPerKg:3610, proteinPct:0, fatPct:0, fiberPct:0, moisturePct:0, bagSizeKg:10};
+  const rocky: FeedingPlan = {id:'plan-rocky', petId:'rocky', createdAt:'2026-11-20', foodId:food.id, foodName:food.name, foodBrand:food.brand,
+    foodType:'dry', dryFood:food, mixedDryPct:100, mixedWetPct:0, mealsPerDay:2, mealTimes:['08:00','20:00'],
+    rer:451, mer:722, factor:1.6, gramsPerDay:200, gramsPerMeal:100, kcalPerMeal:361,
+    treatsBudgetKcal:0, treatsCountToday:0, manualAdjustmentPct:0, rationConfirmed:true, bagWeightKg:10};
+  const luna = {...rocky, id:'plan-luna', petId:'luna', gramsPerDay:279, gramsPerMeal:140};
+  const bag: FoodCostEntry = {id:'one-bag', petId:'luna', date:'2026-11-22', createdAt:'2026-11-22T12:00:00Z',
+    foodId:food.id, foodName:food.name, foodBrand:food.brand, foodType:'dry', quantity:1, bagSizeKg:10,
+    pricePaidCop:150000, costPerKgCop:15000};
+  StorageService.savePlan(rocky);
+  StorageService.savePlan(luna);
+  StorageService.addFoodPurchase(bag);
+  assert.equal(StorageService.getPlan('rocky')?.dailyCostCop,undefined);
+  const shared = {...bag, openedOn:bag.date, sharedWithPetIds:['rocky']};
+  StorageService.updateFoodPurchase(shared);
+  assert.deepEqual(StorageService.getFoodPurchases('rocky').map(p => p.id),[bag.id]);
+  assert.deepEqual(StorageService.getFoodPurchases('otro'),[]);
+  assert.equal(StorageService.getFoodPurchases().length,1);
+  assert.equal(StorageService.getPlans().rocky.dailyCostCop,3000);
+  assert.equal(StorageService.getPlans().luna.dailyCostCop,4185);
+  StorageService.toggleMealCompleted('rocky',0,'Yo',100,'08:00');
+  StorageService.updateFoodPurchase({...shared, sharedWithPetIds:[]});
+  assert.deepEqual(StorageService.getFoodPurchases('rocky'),[]);
+  assert.equal(StorageService.getPlans().rocky.dailyCostCop,undefined);
+  assert.equal(StorageService.getMealHistory('rocky')[0].mixedComponents?.[0].priceSnapshot?.copPerGram,15);
+  StorageService.updateFoodPurchase(shared);
+  StorageService.savePlan({...luna, gramsPerDay:284, gramsPerMeal:142});
+  assert.equal(StorageService.getPlan('luna')?.dailyCostCop,4260);
+  assert.equal(StorageService.getPlan('luna')?.monthlyCostCop,129930);
+  assert.equal(StorageService.getPlan('rocky')?.dailyCostCop,3000);
+  StorageService.deleteFoodPurchase(bag.id);
+  assert.equal(StorageService.getPlan('luna')?.dailyCostCop,undefined);
+  assert.equal(StorageService.getPlan('rocky')?.dailyCostCop,undefined);
+});
+
+test('sparse historical plan costs survive reads and only matching receipt caches are cleared', () => {
+  const plansKey = 'racion_plans_v1';
+  for (const invalid of ['null', '[]', '"invalid"']) {
+    entries.set(plansKey, invalid);
+    assert.deepEqual(StorageService.getPlans(), {});
+    assert.equal(StorageService.getPlan('luna'), undefined);
+  }
+  const historical = {petId:'viejo', dailyCostCop:231, bagPriceCop:70000};
+  const food = {id:'k', name:'Adultos', type:'dry', bagSizeKg:10};
+  const legacyPlan = {petId:'luna', foodType:'dry', dryFood:food, mealsPerDay:2, gramsPerDay:284, rationConfirmed:true,
+    bagPriceCop:150000, dailyCostCop:4260, monthlyCostCop:129930};
+  entries.set(plansKey, JSON.stringify({viejo:historical, luna:legacyPlan, broken:null}));
+  const bag: FoodCostEntry = {id:'p', petId:'rocky', sharedWithPetIds:['luna'], date:'2026-11-20',
+    createdAt:'2026-11-20', foodId:'k', foodName:'Adultos', foodBrand:'', foodType:'dry', bagSizeKg:10,
+    pricePaidCop:150000, costPerKgCop:15000};
+  StorageService.addFoodPurchase(bag);
+  assert.deepEqual(StorageService.getPlans().viejo, historical);
+  assert.equal(StorageService.getPlans().broken, undefined);
+  assert.equal(StorageService.getPlan('luna')?.bagPriceCop, 150000);
+  assert.equal(StorageService.getPlan('luna')?.monthlyCostCop, 129930);
+  StorageService.updateFoodPurchase({...bag, sharedWithPetIds:[]});
+  assert.equal(StorageService.getPlans().luna.dailyCostCop, undefined);
+  assert.deepEqual(StorageService.getPlans().viejo, historical);
 });

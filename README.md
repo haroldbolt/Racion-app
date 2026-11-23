@@ -68,7 +68,7 @@ Para calcular la ración, tienen prioridad las kcal/kg confirmadas de la etiquet
 
 El botón **Buscar también en el registro del ICA** consulta el PDF enlazado en el [listado oficial colombiano](https://www.ica.gov.co/areas/pecuaria/servicios/alimentos-para-animales/listado-de-alimentos-para-animales-registrados) y busca por nombre o número de registro para la especie seleccionada. Permite identificar un alimento aunque falte en las tiendas. Los datos nutricionales, el empaque y el precio se obtienen de la ficha, etiqueta u oferta correspondiente. Ambas consultas usan fuentes públicas y funcionan sin clave de SerpApi.
 
-En Gastos se registra la apertura de la compra y las mascotas que comparten el alimento. El inventario descuenta cada toma registrada una vez y estima la fecha de reposición con las raciones actuales.
+En **Gastos**, registra la compra una vez y selecciona las mascotas que comen de la bolsa al guardar su apertura. Si sus planes usan esa fórmula y presentación, cada perfil aplica el mismo precio por gramo a su propia ración para calcular el costo por toma, día y mes. El mes estimado equivale a 30,5 días. El desembolso se contabiliza una sola vez, en el perfil que registró la compra. El inventario descuenta cada toma registrada una vez y estima la fecha de reposición con las raciones actuales.
 
 Elegir un empaque conserva la fórmula, tamaño, imagen, fuente y precio observado de esa variante. La energía y los nutrientes ausentes permanecen pendientes de la etiqueta. Al usar la ficha en el plan, el diario, Ajustar y el comparador comparten esa selección. Cambiar de fórmula o presentación invalida cualquier precio que no corresponda al nuevo alimento.
 

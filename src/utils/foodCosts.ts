@@ -38,7 +38,13 @@ export function sameFoodIdentity(left: FoodItem, right: FoodItem): boolean {
   return left.id === right.id || Boolean(left.sourceFoodId && left.sourceFoodId === right.sourceFoodId) || Boolean(leftUrl && leftUrl === rightUrl);
 }
 
+/** Sharing grants access to the purchase price without creating another expense. */
+export function purchaseAppliesToPet(purchase: FoodCostEntry, petId: string): boolean {
+  return purchase.petId === petId || purchase.sharedWithPetIds?.includes(petId) === true;
+}
+
 export function foodPurchaseMatches(purchase: FoodCostEntry, food: FoodItem, packageKg?: number): boolean {
+  if (typeof purchase.foodName !== 'string' || typeof food.name !== 'string') return false;
   const formula = sameFormulaName({brand:purchase.foodBrand, name:purchase.foodName, sourceFoodId:purchase.sourceFoodId}, food);
   const purchaseUrl = productUrl(purchase.foodSourceUrl);
   const foodUrl = productUrl(food.buyUrl ?? food.fichaNutricional?.fuenteUrl);
@@ -47,6 +53,18 @@ export function foodPurchaseMatches(purchase: FoodCostEntry, food: FoodItem, pac
   const quantity = positive(purchase.quantity) ? purchase.quantity : 1;
   return identity && purchase.foodType === food.type && positive(purchase.bagSizeKg) && positive(purchase.pricePaidCop) &&
     (!positive(packageKg) || sameWeight(purchase.bagSizeKg / quantity, packageKg));
+}
+
+/** A receipt can determine the price of the selected presentation for one or both plan components. */
+export function purchaseMatchesPlan(purchase: FoodCostEntry, plan: FeedingPlan): boolean {
+  if (!purchaseAppliesToPet(purchase, plan.petId)) return false;
+  const primary = getPrimaryPlanFood(plan);
+  const foods = plan.foodType === 'mixed' ? [plan.dryFood, plan.wetFood] : [primary];
+  return foods.some(food => {
+    if (!food) return false;
+    const packageKg = food === primary ? plan.bagWeightKg ?? food.bagSizeKg : food.bagSizeKg;
+    return positive(packageKg) && foodPurchaseMatches(purchase, food, packageKg);
+  });
 }
 
 export function getPricePerGram(basis?: Pick<FoodPriceBasis, 'packageKg' | 'priceCop' | 'includeShipping' | 'shippingCop'>): number | undefined {
@@ -79,7 +97,10 @@ export function resolveFoodPrice(food: FoodItem, packageKg?: number, purchases: 
       storeName: purchase.storeName,
     });
   }
-  return candidates.sort((a, b) => timestamp(b.selectedAt || b.observedAt) - timestamp(a.selectedAt || a.observedAt))[0];
+  // Refreshing a store listing must not replace a price the guardian paid or explicitly selected.
+  const chosen = candidates.filter(basis => basis.source !== 'online' || basis.selectedAt);
+  return (chosen.length ? chosen : candidates)
+    .sort((a, b) => timestamp(b.selectedAt || b.observedAt) - timestamp(a.selectedAt || a.observedAt))[0];
 }
 
 export interface FoodCostComponent {
@@ -106,7 +127,7 @@ export function getPlanCostSummary(plan: FeedingPlan | undefined, purchases: rea
   if (!plan) return { components: [], meals: [], partial: true, estimated: false };
   const portions = getPlannedMeals(plan);
   const primary = getPrimaryPlanFood(plan);
-  const scopedPurchases = purchases.filter((purchase) => purchase.petId === plan.petId);
+  const scopedPurchases = purchases.filter(purchase => purchaseAppliesToPet(purchase, plan.petId));
   const descriptors: Array<{ food?: FoodItem; role: FoodCostComponent['role']; grams: number }> = plan.foodType === 'mixed'
     ? [
       { food: plan.dryFood, role: 'dry', grams: portions.reduce((sum, meal) => sum + (meal.dryGrams ?? 0), 0) },
@@ -132,7 +153,7 @@ export function getPlanCostSummary(plan: FeedingPlan | undefined, purchases: rea
       const grams = component.role === 'dry' ? meal.dryGrams : component.role === 'wet' ? meal.wetGrams : meal.grams;
       return grams !== undefined && component.costPerGramCop !== undefined ? grams * component.costPerGramCop : undefined;
     }).filter((value): value is number => value !== undefined);
-    return { index, time: plan.mealTimes[index] ?? '', grams: meal.grams,
+    return { index, time: plan.mealTimes?.[index] ?? '', grams: meal.grams,
       costCop: hasRation && values.length ? values.reduce((sum, value) => sum + value, 0) : undefined, partial };
   });
   return { components, costPerDayCop, costPerMonthCop: costPerDayCop === undefined ? undefined : costPerDayCop * 30.5,
@@ -141,7 +162,8 @@ export function getPlanCostSummary(plan: FeedingPlan | undefined, purchases: rea
 
 export function withPlanCosts(plan: FeedingPlan, purchases: readonly FoodCostEntry[] = []): FeedingPlan {
   const summary = getPlanCostSummary(plan, purchases);
-  const primary = summary.components.find((component) => component.food.id === plan.foodId);
+  const primaryFood = getPrimaryPlanFood(plan);
+  const primary = summary.components.find((component) => component.food === primaryFood);
   const price = primary?.costPerGramCop;
   const bagWeightKg = primary?.packageKg;
   return { ...plan,

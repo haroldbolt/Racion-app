@@ -74,9 +74,10 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
   const formatNumber = new Intl.NumberFormat(isEs ? 'es-CO' : 'en', { maximumFractionDigits: 1 });
 
   useEffect(() => {
-    setPurchases(StorageService.getFoodPurchases(pet.id));
+    const visiblePurchases = StorageService.getFoodPurchases(pet.id);
+    setPurchases(visiblePurchases);
     setShowForm(startWithForm);
-    const first = getPlanCostSummary(plan, StorageService.getFoodPurchases(pet.id)).components[0];
+    const first = getPlanCostSummary(plan, visiblePurchases).components[0];
     setSelected(first ? { food: first.food, role: first.role } : undefined);
     setSource(first ? 'plan' : 'internet');
     resetForm(first?.food);
@@ -278,7 +279,9 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
     refreshPurchases();
   }
 
-  const totalSpent = purchases.reduce((total, entry) =>
+  const pets = StorageService.getPets();
+  const ownPurchases = purchases.filter(purchase => purchase.petId === pet.id);
+  const totalPaid = ownPurchases.reduce((total, entry) =>
     total + (Number.isFinite(entry.pricePaidCop) && entry.pricePaidCop > 0 ? entry.pricePaidCop : 0), 0);
   const cost = (value?: number) => value === undefined
     ? (isEs ? 'Por definir' : 'To confirm')
@@ -336,7 +339,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
             </p>
             {component.basis && <p className="mt-1 text-[var(--text-secondary)]">
               {component.basis.source === 'online' ? (isEs ? 'Referencia de internet' : 'Online reference')
-                : component.basis.source === 'receipt' ? (isEs ? 'Compra con recibo' : 'Purchase with receipt') : (isEs ? 'Importe ingresado por ti' : 'Amount entered by you')}
+                : component.basis.source === 'receipt' ? (isEs ? 'Compra con recibo' : 'Purchase with receipt') : (isEs ? 'Precio de compra' : 'Purchase price')}
               {component.basis.storeName && ` · ${component.basis.storeName}`}
             </p>}
           </div>
@@ -488,34 +491,44 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
       <div className="space-y-3 rounded-3xl border border-[var(--border-color)] bg-[var(--surface-card)] p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="font-heading text-lg font-extrabold text-[var(--text-primary)]">{isEs ? 'Compras registradas' : 'Saved purchases'}</h3>
-          <span className="text-xs font-bold text-[var(--text-secondary)]">{cost(totalSpent)} {isEs ? 'en total' : 'total'}</span>
+          {totalPaid > 0 && <span className="text-xs font-bold text-[var(--text-secondary)]">
+            {cost(totalPaid)} {ownPurchases.length === purchases.length
+              ? (isEs ? 'en total' : 'total')
+              : (isEs ? 'en compras propias' : 'in own purchases')}
+          </span>}
         </div>
         <StockSummary petId={pet.id} language={userAccount.language} />
         {purchases.length === 0 && <p className="text-sm text-[var(--text-secondary)]">{isEs ? 'Aún no hay compras registradas para esta mascota.' : 'No purchases saved for this pet yet.'}</p>}
-        {purchases.map((purchase) => (
-          <article key={purchase.id} className="space-y-2 rounded-2xl border border-[var(--border-color)] p-3">
+        {purchases.map((purchase) => {
+          const owned = purchase.petId === pet.id;
+          const owner = !owned && pets.find(item => item.id === purchase.petId);
+          return <article key={purchase.id} className="space-y-2 rounded-2xl border border-[var(--border-color)] p-3">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h4 className="text-sm font-extrabold text-[var(--text-primary)]">{purchase.foodBrand} {purchase.foodName}</h4>
+                {!owned && <p className="mt-1 text-xs font-bold text-[var(--text-primary)]">
+                  {isEs ? 'Compra compartida' : 'Shared purchase'}
+                  {owner && (isEs ? ' · Registrada para ' : ' · Recorded for ') + owner.name}
+                </p>}
                 <p className="mt-1 text-xs text-[var(--text-secondary)]">{purchase.date}{purchase.storeName && ` · ${purchase.storeName}`}</p>
               </div>
-              <button type="button" onClick={() => removePurchase(purchase.id)} aria-label={isEs ? 'Eliminar compra' : 'Delete purchase'} className="flex size-10 shrink-0 items-center justify-center rounded-xl text-red-700 hover:bg-red-50"><Trash2 className="size-4" /></button>
+              {owned && <button type="button" onClick={() => removePurchase(purchase.id)} aria-label={isEs ? 'Eliminar compra' : 'Delete purchase'} className="flex size-10 shrink-0 items-center justify-center rounded-xl text-red-700 hover:bg-red-50"><Trash2 className="size-4" /></button>}
             </div>
             <p className="text-xs text-[var(--text-primary)]">
               {purchase.quantity && purchase.quantity > 1 ? `${purchase.quantity} × ${weightLabel(purchase.bagSizeKg / purchase.quantity, userAccount.language)}` : weightLabel(purchase.bagSizeKg, userAccount.language)}
               {' · '}{cost(purchase.pricePaidCop)}
               {purchase.bagSizeKg > 0 && ` · ${cost(purchase.pricePaidCop / purchase.bagSizeKg)} / kg`}
             </p>
-            <OpenPurchase purchase={purchase} pets={StorageService.getPets()} language={userAccount.language} onSaved={refreshPurchases} />
-            {Boolean(purchase.plannedMealCostsAtPurchase?.some(meal => meal.costCop !== undefined)) && <details className="text-xs">
+            {owned && <OpenPurchase purchase={purchase} pets={pets} language={userAccount.language} onSaved={refreshPurchases} />}
+            {owned && Boolean(purchase.plannedMealCostsAtPurchase?.some(meal => meal.costCop !== undefined)) && <details className="text-xs">
               <summary className="cursor-pointer font-bold">{isEs ? 'Ración al comprar' : 'Portions at purchase'}</summary>
               {purchase.plannedMealCostsAtPurchase?.map((meal,index) => <p key={index}>{meal.time} · {formatRation(meal.grams, 'metric', userAccount.language)} · {meal.costCop === undefined ? '—' : cost(meal.costCop)}{meal.partial && (isEs ? ' (parcial)' : ' (partial)')}</p>)}
               {purchase.formulaAtPurchase?.analysis?.fuenteNombre && <p>{purchase.formulaAtPurchase.analysis.fuenteNombre} · {purchase.formulaAtPurchase.analysis.fechaConsulta?.slice(0, 10)}</p>}
             </details>}
             {purchase.notes && <p className="text-xs text-[var(--text-secondary)]">{purchase.notes}</p>}
             {purchase.receiptPhotoUrl && <a href={purchase.receiptPhotoUrl} target="_blank" rel="noopener noreferrer" className="inline-block text-xs font-bold text-[#0B5D2E] dark:text-green-300"><img src={purchase.receiptPhotoUrl} alt={isEs ? 'Factura de esta compra' : 'Receipt for this purchase'} className="mb-1 max-h-32 rounded-xl border border-[var(--border-color)] object-contain" />{isEs ? 'Ver recibo' : 'View receipt'}</a>}
-          </article>
-        ))}
+          </article>;
+        })}
       </div>
     </section>
   );

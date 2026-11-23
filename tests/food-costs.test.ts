@@ -50,6 +50,28 @@ test('uses paid total divided by total purchased mass, scoped to pet, formula an
   assert.equal(getPlanCostSummary(plan, [purchase]).estimated, false);
 });
 
+test('only the assigned pets use the paid price of a shared package, even after a store refresh', () => {
+  const food = {...dry, bagSizeKg:10, priceBasis:{...dry.priceBasis!, packageKg:10, priceCop:200000, observedAt:'2026-11-23'}};
+  const bag = {...purchase, petId:'rocky', sharedWithPetIds:['luna'], openedOn:'2026-11-20',
+    bagSizeKg:10, quantity:1, pricePaidCop:150000, costPerKgCop:15000};
+  const luna = {...plan, dryFood:food, bagWeightKg:10, gramsPerDay:284};
+  const summary = getPlanCostSummary(luna, [bag]);
+  assert.equal(summary.estimated,false);
+  assert.deepEqual(summary.meals.map(meal => meal.costCop), [2130,2130]);
+  assert.equal(summary.costPerDayCop,4260);
+  assert.equal(summary.costPerMonthCop,129930);
+  const beforeWeighIn = getPlanCostSummary({...luna, gramsPerDay:279}, [bag]);
+  assert.deepEqual(beforeWeighIn.meals.map(meal => meal.costCop), [2100,2085]);
+  const rocky = getPlanCostSummary({...luna, petId:'rocky', gramsPerDay:200}, [bag]);
+  assert.deepEqual(rocky.meals.map(meal => meal.costCop), [1500,1500]);
+  assert.equal(rocky.costPerDayCop,3000);
+  assert.equal(rocky.costPerMonthCop,91500);
+  assert.equal(getPlanCostSummary({...luna, petId:'bruma'}, [bag]).estimated,true);
+  assert.equal(getPlanCostSummary({...luna, bagWeightKg:2}, [bag]).costPerDayCop,undefined);
+  assert.equal(getPlanCostSummary(luna, [{...bag, foodName:'Otra fórmula'}]).estimated,true);
+  assert.equal(getPlanCostSummary(luna, [{...bag, bagSizeKg:20, quantity:2, pricePaidCop:300000}]).costPerDayCop,4260);
+});
+
 test('preserves purchase compatibility for exact legacy names and never falls back to another formula', () => {
   assert.equal(resolveFoodPrice(dry, 2, [{ ...purchase, foodId: undefined }])?.source, 'manual');
   assert.equal(resolveFoodPrice(dry, 2, [{ ...purchase, foodId: undefined, foodName: 'Sterilised 7+' }])?.source, 'online');

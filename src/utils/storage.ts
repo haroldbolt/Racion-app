@@ -14,8 +14,8 @@ import {
 import { isBogotaPostalCode } from '../types/livePrices';
 import { repairVetExamples } from './vetRecords';
 import { localDateKey } from './localDate';
-import { getPlanCostSummary, sameFormulaName, withPlanCosts } from './foodCosts';
-import { getPlannedMealComponents, getPlannedMeals } from './mealPortions';
+import { getPlanCostSummary, purchaseAppliesToPet, purchaseMatchesPlan, sameFormulaName, withPlanCosts } from './foodCosts';
+import { getPlannedMealComponents, getPlannedMeals, getPrimaryPlanFood } from './mealPortions';
 
 import { accountData, STORAGE_KEYS } from './accountStorage';
 
@@ -95,6 +95,41 @@ function migrateHydrationDates() {
   }
 }
 
+function readStoredPlans(): Record<string, FeedingPlan> {
+  try {
+    const data = accountData.getItem(STORAGE_KEYS.PLANS);
+    const plans = data && JSON.parse(data);
+    if (!plans || typeof plans !== 'object' || Array.isArray(plans)) return {};
+    for (const [key, plan] of Object.entries(plans)) {
+      if (!plan || typeof plan !== 'object' || Array.isArray(plan)) delete plans[key];
+    }
+    return plans;
+  } catch {
+    return {};
+  }
+}
+
+function withCurrentPurchases(plan: FeedingPlan, purchases: FoodCostEntry[]): FeedingPlan {
+  // Historical plans may retain prices without a structured food label or purchase.
+  return purchases.some(purchase => purchaseMatchesPlan(purchase, plan)) ? withPlanCosts(plan, purchases) : plan;
+}
+
+function clearCachedPurchaseCost(previous: FoodCostEntry) {
+  // Older versions persisted the purchase's price in the plan. On withdrawal, clear only matching copies.
+  // Write the base first so an interrupted ledger update still reads the original valid purchase.
+  const plans = readStoredPlans();
+  let changed = false;
+  for (const [id, plan] of Object.entries(plans)) {
+    if (!purchaseMatchesPlan(previous, plan)) continue;
+    const base = withPlanCosts(plan);
+    if (base.bagPriceCop !== plan.bagPriceCop || base.dailyCostCop !== plan.dailyCostCop || base.monthlyCostCop !== plan.monthlyCostCop) {
+      plans[id] = base;
+      changed = true;
+    }
+  }
+  if (changed) accountData.setItem(STORAGE_KEYS.PLANS, JSON.stringify(plans));
+}
+
 export const StorageService = {
   initialize() {
     if (typeof window === 'undefined') return;
@@ -167,22 +202,23 @@ export const StorageService = {
   },
 
   getPlans(): Record<string, FeedingPlan> {
-    try {
-      const data = accountData.getItem(STORAGE_KEYS.PLANS);
-      return data ? JSON.parse(data) : {};
-    } catch {
-      return {};
+    const plans = readStoredPlans();
+    const purchases = this.getFoodPurchases();
+    if (!purchases.length) return plans;
+    for (const [petId, plan] of Object.entries(plans)) {
+      plans[petId] = withCurrentPurchases(plan, purchases);
     }
+    return plans;
   },
 
   getPlan(petId: string): FeedingPlan | undefined {
-    const plans = this.getPlans();
-    return plans[petId];
+    const plan = readStoredPlans()[petId];
+    return plan && withCurrentPurchases(plan, this.getFoodPurchases(petId));
   },
 
   savePlan(plan: FeedingPlan) {
-    const plans = this.getPlans();
-    plans[plan.petId] = withPlanCosts(plan, this.getFoodPurchases(plan.petId));
+    const plans = readStoredPlans();
+    plans[plan.petId] = getPrimaryPlanFood(plan) ? withPlanCosts(plan) : plan;
     accountData.setItem(STORAGE_KEYS.PLANS, JSON.stringify(plans));
   },
 
@@ -243,7 +279,7 @@ export const StorageService = {
       accountData.setItem(STORAGE_KEYS.MEAL_LOGS, JSON.stringify(all));
       return current;
     }
-    const plan = this.getPlan(petId);
+    const plan = readStoredPlans()[petId];
     const portion = plan && getPlannedMeals(plan)[mealIndex];
     const components: import('../types').MealMixedComponent[] = mixedComponents ?? (plan && portion && getPlannedMealComponents(plan, portion, grams)) ??
       [{ foodName: plan?.foodName || 'Alimento registrado', role: 'main' as const, gramsPlanned: plannedGrams ?? grams, gramsFed: grams, kcalPerKg: 0 }];
@@ -471,7 +507,7 @@ export const StorageService = {
     try {
       const data = accountData.getItem(STORAGE_KEYS.FOOD_PURCHASES);
       const all: FoodCostEntry[] = data ? JSON.parse(data) : [];
-      const list = petId ? all.filter(p => p.petId === petId) : all;
+      const list = petId ? all.filter(purchase => purchaseAppliesToPet(purchase, petId)) : all;
       return list.sort((a, b) => b.date.localeCompare(a.date));
     } catch {
       return [];
@@ -482,27 +518,24 @@ export const StorageService = {
     const all = this.getFoodPurchases();
     all.unshift(entry);
     accountData.setItem(STORAGE_KEYS.FOOD_PURCHASES, JSON.stringify(all));
-    const plan = this.getPlan(entry.petId);
-    if (plan) this.savePlan(plan);
   },
 
   deleteFoodPurchase(id: string) {
     const all = this.getFoodPurchases();
+    const previous = all.find(p => p.id === id);
+    if (!previous) return;
+    clearCachedPurchaseCost(previous);
     const filtered = all.filter(p => p.id !== id);
     accountData.setItem(STORAGE_KEYS.FOOD_PURCHASES, JSON.stringify(filtered));
-    const removed = all.find((entry) => entry.id === id);
-    const plan = removed && this.getPlan(removed.petId);
-    if (plan) this.savePlan(plan);
   },
 
   updateFoodPurchase(entry: FoodCostEntry) {
     const all = this.getFoodPurchases();
     const idx = all.findIndex(p => p.id === entry.id);
     if (idx >= 0) {
+      clearCachedPurchaseCost(all[idx]);
       all[idx] = entry;
       accountData.setItem(STORAGE_KEYS.FOOD_PURCHASES, JSON.stringify(all));
-      const plan = this.getPlan(entry.petId);
-      if (plan) this.savePlan(plan);
     }
   },
 

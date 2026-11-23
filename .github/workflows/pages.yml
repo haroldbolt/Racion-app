@@ -68,6 +68,7 @@ jobs:
           POSTAL_SCREENSHOT_DIR="$RUNNER_TEMP/racion-postal-proof/muse" node .github/scripts/verify-postal-prices.cjs "http://127.0.0.1:4196${PAGES_BASE_PATH%/}/"
           AGILITY_SCREENSHOT_DIR="$RUNNER_TEMP/racion-agility-proof" node .github/scripts/verify-agility.cjs "http://127.0.0.1:4196${PAGES_BASE_PATH%/}/"
           RECEIPT_SCREENSHOT_DIR="$RUNNER_TEMP/racion-receipt-proof" node .github/scripts/verify-receipt.cjs "http://127.0.0.1:4196${PAGES_BASE_PATH%/}/"
+          SHARED_BAG_SCREENSHOT_DIR="$RUNNER_TEMP/racion-shared-bag" node .github/scripts/verify-shared-bag.cjs "http://127.0.0.1:4196${PAGES_BASE_PATH%/}/"
       - name: Verify Colombian stores and national registry
         env:
           PORT: 4197
@@ -95,6 +96,13 @@ jobs:
         with:
           name: agility-mobile
           path: ${{ runner.temp }}/racion-agility-proof
+          if-no-files-found: ignore
+      - name: Save shared purchase evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shared-bag
+          path: ${{ runner.temp }}/racion-shared-bag
           if-no-files-found: ignore
       - name: Save receipt browser evidence
         if: always()
