@@ -8,12 +8,14 @@ import {
   minimumMealCount,
   previewFeedingPlanAdjustment,
   retainManufacturerPortion,
+  retainManualPortion,
   type FormulaType,
 } from '../utils/feedingPlanAdjustment';
 import { calculateDailyMealNutritionSummary } from '../utils/mealNutrition';
-import { getFoodKcalPerKg, getPlannedMeals } from '../utils/mealPortions';
+import { getFoodKcalPerKg, getPreviewMeals } from '../utils/mealPortions';
 import { PlanChangePreview } from './PlanChangePreview';
-import { ManufacturerRationInput } from './ManufacturerRationInput';
+import { StorageService } from '../utils/storage';
+import { ManufacturerRationInput, RationSourceNote } from './ManufacturerRationInput';
 import { getPlanSafetyNotices } from '../utils/foodSafety';
 import { NutritionSummary } from './NutritionSummary';
 import { UnifiedFoodSearchModal } from './UnifiedFoodSearchModal';
@@ -46,7 +48,7 @@ export function FeedingPlanEditor({
   const preview = previewFeedingPlanAdjustment(pet, plan, draft, meals);
   const nextPlan = 'plan' in preview ? preview.plan : undefined;
   const unsafeFormula = Boolean(editable && nextPlan && getPlanSafetyNotices(pet, nextPlan, language).some((notice) => notice.level === 'mismatch'));
-  const portions = nextPlan ? getPlannedMeals(nextPlan) : [];
+  const portions = nextPlan ? getPreviewMeals(nextPlan) : [];
   const summary = nextPlan ? calculateDailyMealNutritionSummary({ plan: nextPlan, mealLogs: [] }) : undefined;
   const grams = new Intl.NumberFormat(isEs ? 'es-CO' : 'en-US', { maximumFractionDigits: 3 });
   const slots: FoodSlot[] = draft.foodType === 'mixed' ? ['dry', 'wet'] :
@@ -78,6 +80,7 @@ export function FeedingPlanEditor({
     mealCount: isEs ? 'Conserva los espacios de las tomas registradas hoy.' : 'Keep the slots for servings already logged today.',
     formula: isEs ? 'Elige cada fórmula que forma parte de la ración.' : 'Choose every formula in the ration.',
     guide: isEs ? 'Elige una cantidad dentro del rango de la tabla que corresponda al peso actual.' : 'Choose an amount inside the guide range for the current weight.',
+    manual: isEs ? 'Ingresa una cantidad diaria válida mayor que cero.' : 'Enter a valid positive daily amount.',
     density: isEs ? 'Ingresa las kcal/kg de la etiqueta con un valor mayor que cero.' : 'Enter a positive kcal/kg value from the label.',
   };
 
@@ -108,7 +111,15 @@ export function FeedingPlanEditor({
               if (picking || unsafeFormula) return;
               const mealTimes = new FormData(event.currentTarget).getAll('mealTime').map(String);
               const saved = previewFeedingPlanAdjustment(pet, plan, { ...draft, mealTimes }, meals);
-              if ('plan' in saved && (!editable || !getPlanSafetyNotices(pet, saved.plan, language).some((notice) => notice.level === 'mismatch'))) onSave(saved.plan);
+              if (!('plan' in saved) || (editable && getPlanSafetyNotices(pet, saved.plan, language).some((notice) => notice.level === 'mismatch'))) return;
+              if (editable) {
+                for (const slot of slots) {
+                  const key = slot === 'dry' ? 'dryFood' : 'wetFood';
+                  const updatedFood = saved.plan[key];
+                  if (updatedFood && getFoodKcalPerKg(updatedFood) !== getFoodKcalPerKg(draft[key])) StorageService.addCustomFood(updatedFood);
+                }
+              }
+              onSave(saved.plan);
             }}
           >
             <div className="space-y-5 overflow-y-auto overscroll-contain p-5">
@@ -121,7 +132,7 @@ export function FeedingPlanEditor({
                         key={type}
                         type="button"
                         aria-pressed={draft.foodType === type}
-                        onClick={() => setDraft((previous) => ({ ...previous, foodType: type, manufacturerGramsPerDay: undefined }))}
+                        onClick={() => setDraft((previous) => type === previous.foodType ? previous : { ...previous, foodType: type, manufacturerGramsPerDay: undefined, manualGramsPerDay: undefined })}
                         className={`min-h-11 rounded-xl border px-2 text-sm font-bold transition ${draft.foodType === type
                           ? 'border-[#0B5D2E] bg-[#0B5D2E] text-white'
                           : 'border-[#0B5D2E30] bg-white text-[#0B5D2E] hover:bg-[#EAF4EC]'}`}
@@ -166,6 +177,7 @@ export function FeedingPlanEditor({
                                 ...previous,
                                 [dry ? 'dryEnergy' : 'wetEnergy']: event.target.value,
                                 manufacturerGramsPerDay: undefined,
+                                manualGramsPerDay: undefined,
                               }))}
                               className="mt-1 min-h-11 w-full rounded-xl border border-[#0B5D2E30] bg-white px-3 text-sm font-bold text-[#1C2B21]"
                             />
@@ -177,7 +189,8 @@ export function FeedingPlanEditor({
 
                   {draft.foodType !== 'mixed' && !(draft.foodType === 'dry' ? draft.dryEnergy : draft.wetEnergy).trim() && (
                     <ManufacturerRationInput food={draft.foodType === 'dry' ? draft.dryFood : draft.wetFood} pet={pet} goal={plan.goal ?? 'maintain'} value={draft.manufacturerGramsPerDay}
-                      onChange={(grams) => setDraft((previous) => ({ ...previous, manufacturerGramsPerDay: grams }))} lang={language} />
+                      onChange={(grams) => setDraft((previous) => ({ ...previous, manufacturerGramsPerDay: grams }))}
+                      manualValue={draft.manualGramsPerDay} onManualChange={(grams) => setDraft((previous) => ({ ...previous, manualGramsPerDay: grams }))} lang={language} />
                   )}
 
                   {draft.foodType === 'mixed' && (
@@ -252,7 +265,7 @@ export function FeedingPlanEditor({
                   {isEs ? 'Vista previa de la ración' : 'Feeding plan preview'}
                 </h3>
                 {'error' in preview && <p className="mt-2 text-xs text-[#44544A]">{errors[preview.error]}</p>}
-                {nextPlan && (!nextPlan.rationConfirmed ? (
+                {nextPlan && (!nextPlan.rationConfirmed && nextPlan.rationSource !== 'manual' ? (
                   <p className="mt-2 text-xs text-[#44544A]">
                     {editable
                       ? (isEs ? 'Elige el alimento e ingresa sus kcal/kg para ver las porciones.' : 'Choose the food and enter its kcal/kg to see the portions.')
@@ -263,6 +276,7 @@ export function FeedingPlanEditor({
                     <p className="my-2 text-xl font-extrabold text-[#1C2B21]">
                       {grams.format(nextPlan.gramsPerDay)} {isEs ? 'g al día' : 'g per day'}
                     </p>
+                    <RationSourceNote plan={nextPlan} lang={language} />
                     {nextPlan.foodType === 'mixed' && !nextPlan.isVetLocked && (
                       <p className="mb-2 text-xs font-semibold text-[#44544A]">
                         {grams.format(nextPlan.dryGramsPerDay ?? 0)} g {isEs ? 'seco' : 'dry'} · {grams.format(nextPlan.wetGramsPerDay ?? 0)} g {isEs ? 'húmedo' : 'wet'}
@@ -314,9 +328,16 @@ export function FeedingPlanEditor({
               ? { ...sourceFoodItem, bagSizeKg: weightKg, barcode: undefined }
               : sourceFoodItem;
             const energy = String(getFoodKcalPerKg(food) ?? '');
-            setDraft((previous) => picking === 'dry'
-              ? { ...previous, dryFood: food, dryEnergy: energy, manufacturerGramsPerDay: retainManufacturerPortion(previous.dryFood, food, previous.manufacturerGramsPerDay) }
-              : { ...previous, wetFood: food, wetEnergy: energy, manufacturerGramsPerDay: retainManufacturerPortion(previous.wetFood, food, previous.manufacturerGramsPerDay) });
+            setDraft((previous) => {
+              const currentFood = picking === 'dry' ? previous.dryFood : previous.wetFood;
+              return {
+                ...previous,
+                [picking === 'dry' ? 'dryFood' : 'wetFood']: food,
+                [picking === 'dry' ? 'dryEnergy' : 'wetEnergy']: energy,
+                manufacturerGramsPerDay: retainManufacturerPortion(currentFood, food, previous.manufacturerGramsPerDay),
+                manualGramsPerDay: retainManualPortion(currentFood, food, previous.manualGramsPerDay),
+              };
+            });
           }}
           activePet={pet}
           formulaType={picking}

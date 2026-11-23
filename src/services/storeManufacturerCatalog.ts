@@ -180,7 +180,7 @@ function withFormula(food: FoodItem, row:StoreManufacturerFood): FoodItem {
   data.notasRevision = onlyOfficial ? 'Ficha oficial de la fórmula seleccionada.' : 'Revisa la procedencia de cada valor y completa los campos pendientes con el empaque.';
   return {...result, manufacturerFormulaName:formula.name, manufacturerFormulaUrl:row.manufacturerFormulaUrl, fichaNutricional:data, dataSource:source.name,
     declaredIcaRegistration:formula.registration || food.declaredIcaRegistration,
-    feedingGuide:food.feedingGuide ?? formula.feedingGuide,
+    feedingGuide:formula.feedingGuide ? { ...formula.feedingGuide, sourceType: 'manufacturer' } : food.feedingGuide,
     ingredientsSummary:formula.ingredients ?? food.ingredientsSummary,
     labelStatus:onlyOfficial ? 'verified_manufacturer' : 'unconfirmed',
     nutritionalUse:formula.complete ? 'complete' : food.nutritionalUse,
@@ -200,7 +200,7 @@ export function selectStoreManufacturerFood(row:StoreManufacturerFood, packageKg
 }
 
 /** Merge only on an exact formula or an identified store listing. Choosing another
- * retailer must keep its price, pack, barcode, stock source and serving guide. */
+ * retailer must keep its price, pack, barcode and stock source. */
 export async function enrichFoodFromStoreManufacturer(food:FoodItem): Promise<FoodItem> {
   if (food.type !== 'dry' || food.labelStatus === 'user_confirmed_label') return food;
   const catalog = await getStoreManufacturerCatalog();

@@ -2,7 +2,7 @@ import type { FeedingPlan, FoodItem, MealLog, Pet } from '../types';
 import { defaultMealTimes, recalculatePlanForPet, requiresVetGuidance } from './calculator';
 import { getEffectiveNutrientField } from './mealNutrition';
 import { sameFoodIdentity } from './foodCosts';
-import { getApplicableFeedingRange } from './manufacturerRation';
+import { canUseManualRation, getApplicableFeedingRange, getSavedRationInputs, isValidDailyGrams } from './manufacturerRation';
 import { getFoodKcalPerKg, getPlannedMeals, getPrimaryPlanFood } from './mealPortions';
 
 export type FormulaType = 'dry' | 'wet' | 'mixed';
@@ -12,6 +12,7 @@ export interface FeedingPlanAdjustment {
   dryFood?: FoodItem;
   wetFood?: FoodItem;
   manufacturerGramsPerDay?: number;
+  manualGramsPerDay?: number;
   dryEnergy: string;
   wetEnergy: string;
   mixedDryPct: number;
@@ -35,6 +36,11 @@ export function retainManufacturerPortion(previous: FoodItem | undefined, next: 
     ? grams : undefined;
 }
 
+export function retainManualPortion(previous: FoodItem | undefined, next: FoodItem | undefined, grams?: number): number | undefined {
+  return previous && next && sameFoodIdentity(previous, next) && getFoodKcalPerKg(next) === undefined
+    ? grams : undefined;
+}
+
 export function createFeedingPlanAdjustment(plan: FeedingPlan, food?: FoodItem): FeedingPlanAdjustment {
   const existingDryFood = plan.dryFood?.type === 'dry' ? plan.dryFood :
     plan.wetFood?.type === 'dry' ? plan.wetFood : undefined;
@@ -43,11 +49,14 @@ export function createFeedingPlanAdjustment(plan: FeedingPlan, food?: FoodItem):
   const dryFood = food?.type === 'dry' ? food : existingDryFood;
   const wetFood = food?.type === 'wet' ? food : existingWetFood;
   const defaultTimes = defaultMealTimes(plan.mealsPerDay);
+  const primary = getPrimaryPlanFood(plan);
+  const chosen = getSavedRationInputs(plan);
   return {
     foodType: plan.foodType === 'mixed' || food?.type === 'barf' ? plan.foodType : food?.type ?? plan.foodType,
     dryFood,
     wetFood,
-    manufacturerGramsPerDay: food ? retainManufacturerPortion(getPrimaryPlanFood(plan), food, plan.manufacturerGramsPerDay) : plan.manufacturerGramsPerDay,
+    manufacturerGramsPerDay: food ? retainManufacturerPortion(primary, food, chosen.manufacturerGramsPerDay) : chosen.manufacturerGramsPerDay,
+    manualGramsPerDay: food ? retainManualPortion(primary, food, chosen.manualGramsPerDay) : chosen.manualGramsPerDay,
     dryEnergy: String(getFoodKcalPerKg(dryFood) ?? ''),
     wetEnergy: String(getFoodKcalPerKg(wetFood) ?? ''),
     mixedDryPct: Number.isFinite(plan.mixedDryPct) ? plan.mixedDryPct : 50,
@@ -118,7 +127,7 @@ export function previewFeedingPlanAdjustment(
     mealsPerDay,
     mealTimes: [...mealTimes],
     scheduleConfigured: true,
-    kcalPerMeal: draft.manufacturerGramsPerDay ? 0 : Math.round(foodKcal / mealsPerDay),
+    kcalPerMeal: original.kcalPerMeal > 0 ? Math.round(foodKcal / mealsPerDay) : 0,
   };
 
   if (!formulaEditable) return { plan: { ...original, mealTimes: schedule.mealTimes, scheduleConfigured: true } };
@@ -151,18 +160,25 @@ export function previewFeedingPlanAdjustment(
   const dryFood = includesDry ? updateLabelEnergy(draft.dryFood, dryEnergy) : original.dryFood;
   const wetFood = includesWet ? updateLabelEnergy(draft.wetFood, wetEnergy) : original.wetFood;
   const primaryFood = draft.foodType === 'wet' ? wetFood : dryFood;
-  if (draft.manufacturerGramsPerDay !== undefined) {
-    const range = draft.foodType !== 'mixed'
-      ? getApplicableFeedingRange(primaryFood, pet, original.goal ?? 'maintain') : undefined;
-    if (!range || !Number.isInteger(draft.manufacturerGramsPerDay) ||
-        draft.manufacturerGramsPerDay < range.minGrams || draft.manufacturerGramsPerDay > range.maxGrams) return { error: 'guide' };
+  const goal = original.goal ?? 'maintain';
+  const singleFood = draft.foodType === 'mixed' ? undefined : primaryFood;
+  const needsGrams = singleFood && getFoodKcalPerKg(singleFood) === undefined;
+  const guideGrams = needsGrams ? draft.manufacturerGramsPerDay : undefined;
+  const range = getApplicableFeedingRange(singleFood, pet, goal);
+  if (guideGrams !== undefined && (!range || !isValidDailyGrams(guideGrams) ||
+      guideGrams < range.minGrams || guideGrams > range.maxGrams)) return { error: 'guide' };
+  const manualGrams = needsGrams && !range ? draft.manualGramsPerDay : undefined;
+  if (manualGrams !== undefined && (!canUseManualRation(singleFood, pet, goal) || !isValidDailyGrams(manualGrams))) {
+    return { error: 'guide' };
   }
   const primaryChanged = original.foodId !== primaryFood?.id;
   const bagWeightKg = primaryChanged ? primaryFood?.bagSizeKg : primaryFood?.bagSizeKg ?? original.bagWeightKg;
   const updated: FeedingPlan = {
     ...original,
     ...schedule,
-    manufacturerGramsPerDay: draft.manufacturerGramsPerDay,
+    rationSource: guideGrams !== undefined ? 'manufacturer_adjusted' : undefined,
+    manufacturerGramsPerDay: guideGrams,
+    manualGramsPerDay: manualGrams,
     foodType: draft.foodType,
     dryFood,
     wetFood,
@@ -177,10 +193,11 @@ export function previewFeedingPlanAdjustment(
       : {}),
   };
 
-  const rationChanged = updated.manufacturerGramsPerDay !== original.manufacturerGramsPerDay || updated.foodType !== original.foodType || primaryChanged ||
+  const rationChanged = range !== undefined || manualGrams !== undefined ||
+    updated.manufacturerGramsPerDay !== original.manufacturerGramsPerDay || manualGrams !== original.manualGramsPerDay || updated.foodType !== original.foodType || primaryChanged ||
     (draft.foodType === 'mixed' && draft.mixedDryPct !== (original.mixedDryPct ?? 50)) ||
     (includesDry && (dryFood?.id !== original.dryFood?.id || dryEnergy !== getFoodKcalPerKg(original.dryFood))) ||
     (includesWet && (wetFood?.id !== original.wetFood?.id || wetEnergy !== getFoodKcalPerKg(original.wetFood)));
   if (rationChanged) return { plan: recalculatePlanForPet(pet, { ...updated, foodMerKcal: foodKcal }) };
-  return { plan: { ...updated, gramsPerMeal: getPlannedMeals(updated)[0]?.grams ?? 0 } };
+  return { plan: { ...updated, rationSource: original.rationSource, gramsPerMeal: getPlannedMeals(updated)[0]?.grams ?? 0 } };
 }

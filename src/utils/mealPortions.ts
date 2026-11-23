@@ -32,6 +32,11 @@ export function distributeWholeGrams(grams: number, meals: number, offset = 0): 
   );
 }
 
+/** Preserve the chart's fractional daily amount and allocate any hundredth-gram remainder. */
+export function distributeRationGrams(grams: number, meals: number): number[] {
+  return distributeWholeGrams(Math.round(grams * 100), meals).map(portion => portion / 100);
+}
+
 /** The recipe percentage is a share of energy, converted to mass using both labels. */
 export function getMixedMassFraction(
   plan: Pick<FeedingPlan, 'mixedDryPct' | 'dryFood' | 'wetFood'>
@@ -67,6 +72,10 @@ export function getPlannedMeals(plan: FeedingPlan, trainingGrams = 0): PlannedMe
   if (plan.isVetLocked && total > 0) {
     return Array.from({ length: count }, () => ({ grams: total / count }));
   }
+  if (plan.rationSource === 'manufacturer_midpoint' || plan.rationSource === 'manufacturer_adjusted') {
+    const available = Math.max(0, total - (positive(trainingGrams) ? trainingGrams : 0));
+    return distributeRationGrams(available, count).map(grams => ({ grams }));
+  }
   const totalGrams = Math.round(total);
   const available = Math.max(0, totalGrams - (positive(trainingGrams) ? Math.round(trainingGrams) : 0));
 
@@ -94,6 +103,15 @@ export function getPlannedMeals(plan: FeedingPlan, trainingGrams = 0): PlannedMe
   }
 
   return distributeWholeGrams(available, count).map((grams) => ({ grams }));
+}
+
+/** Include a pending owner's entry only in previews, never in the confirmed diary or costs. */
+export function getPreviewMeals(plan: FeedingPlan): PlannedMealPortion[] {
+  if (plan.rationSource === 'manual' && positive(plan.manualGramsPerDay)) {
+    const count = positive(plan.mealsPerDay) ? Math.min(6, Math.max(1, Math.trunc(plan.mealsPerDay))) : 2;
+    return distributeRationGrams(plan.manualGramsPerDay, count).map(grams => ({ grams }));
+  }
+  return getPlannedMeals(plan);
 }
 
 export function getPrimaryPlanFood(plan?: FeedingPlan): FoodItem | undefined {

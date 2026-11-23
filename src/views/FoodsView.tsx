@@ -497,7 +497,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                         <div className="space-y-1 text-xs">
                           <div className="flex flex-wrap items-baseline justify-between gap-2">
                             <strong className="text-[#1C2B21] font-heading text-sm">
-                              {formatRation(gramsPerMeal, units)} por toma ({mealsPerDay}/día · {formatRation(gramsDay, units)}/día)
+                              {formatRation(gramsPerMeal, units, userAccount.language)} por toma ({mealsPerDay}/día · {formatRation(gramsDay, units, userAccount.language)}/día)
                             </strong>
                             <span className="font-mono font-bold text-[#0B5D2E]">
                               {portionNutrients.energia.displayText} / toma

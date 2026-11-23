@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import type { FeedingPlan, Pet } from '../types';
 import { getPlanCostSummary } from '../utils/foodCosts';
-import { getPlannedMeals, getPlanFoodKcalForGrams } from '../utils/mealPortions';
+import { getPreviewMeals, getPlanFoodKcalForGrams } from '../utils/mealPortions';
+import { formatRation } from '../utils/i18n';
+import { RationSourceNote } from './ManufacturerRationInput';
 import { StorageService } from '../utils/storage';
 import { PlanSafetyAlerts } from './FoodSafetyAlerts';
 
@@ -18,12 +20,13 @@ export function PlanChangePreview({pet, current, proposed, lang = 'es'}: {pet: P
           <h3 className="text-xs font-extrabold text-[#0B5D2E]">{label} · {pet.name}</h3>
           {plan ? <>
             <p className="mt-1 break-words text-xs font-bold">{plan.foodType === 'mixed' ? [plan.dryFood?.name, plan.wetFood?.name].filter(Boolean).join(' + ') : plan.foodName}</p>
-            {getPlannedMeals(plan).map((portion,i) => {
+            <RationSourceNote plan={plan} lang={lang} />
+            {getPreviewMeals(plan).map((portion,i) => {
               const kcal = getPlanFoodKcalForGrams(plan, portion.grams);
               const meal = costs.meals[i];
               return <div key={i} className="mt-2 border-t border-[#e2ebe4] pt-1 text-xs leading-relaxed">
                 <strong>{plan.mealTimes[i] || (es ? `Toma ${i+1}` : `Meal ${i+1}`)}</strong>
-                <div>{plan.rationConfirmed ? number.format(portion.grams) + ' g' : (es ? 'Gramos pendientes' : 'Grams pending')} · {kcal > 0 ? number.format(kcal) + ' kcal' : (es ? 'kcal pendientes' : 'kcal pending')}</div>
+                <div>{plan.rationConfirmed || plan.rationSource === 'manual' ? formatRation(portion.grams, 'metric', lang) : (es ? 'Gramos pendientes' : 'Grams pending')} · {kcal > 0 ? number.format(kcal) + ' kcal' : (es ? 'kcal pendientes' : 'kcal pending')}</div>
                 <div>{meal?.costCop !== undefined ? cop.format(meal.costCop) + ' COP' + (meal.partial ? (es ? ' (parcial)' : ' (partial)') : '') : (es ? 'Costo pendiente' : 'Cost pending')}</div>
               </div>;
             })}

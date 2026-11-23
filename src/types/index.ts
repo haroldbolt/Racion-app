@@ -124,6 +124,7 @@ export interface FoodItem {
     aboveWeight?: { afterKg: number; startGrams: number; gramsPerKg: number };
     sourceUrl: string;
     sourceName: string;
+    sourceType?: 'manufacturer' | 'store';
     ranges: { minWeightKg: number; maxWeightKg: number; minGrams: number; maxGrams: number }[];
   };
   sourceFoodId?: string;
@@ -274,7 +275,9 @@ export interface FeedingPlan {
   factor: number;
   goal?: Goal;
   mer: number; // total kcal/day
-  manufacturerGramsPerDay?: number; // Quantity confirmed within this formula’s published feeding guide
+  rationSource?: 'label' | 'manufacturer_midpoint' | 'manufacturer_adjusted' | 'manual' | 'veterinary';
+  manufacturerGramsPerDay?: number; // Suggested or adjusted amount from this formula’s feeding guide
+  manualGramsPerDay?: number; // Owner-entered amount pending label or manufacturer confirmation
   foodMerKcal?: number; // daily kcal from meals, excluding reserved treats
   treatsKcal?: number; // daily kcal entered when calculating, before the budget cap
   gramsPerDay: number;

@@ -206,12 +206,16 @@ export function formatWeight(kg: number, units: UnitSystem = 'metric'): string {
 /**
  * Format food ration in grams or ounces
  */
-export function formatRation(grams: number, units: UnitSystem = 'metric'): string {
+const rationFormats = {
+  es: new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 }),
+  en: new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }),
+};
+
+export function formatRation(grams: number, units: UnitSystem = 'metric', language: Language = 'es'): string {
   if (units === 'imperial') {
-    const oz = (grams / 28.3495).toFixed(1);
-    return `${oz} oz`;
+    return `${rationFormats[language].format(grams / 28.3495)} oz`;
   }
-  return `${grams} g`;
+  return `${rationFormats[language].format(grams)} g`;
 }
 
 /**

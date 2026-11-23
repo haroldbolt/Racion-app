@@ -189,6 +189,25 @@ async function verifyFoodPriceCoherence(page, button) {
   await expectMealCosts(todayCost, 3780, 1890);
   assert.equal(priceCalls, 2, 'Reloads and pet switches must not spend additional price lookups');
   console.log('Coherencia de alimentos: RC37 de 2 kg, energía manual, costos por toma, precio con y sin envío, factura adjunta persistente y otra mascota aislada verificados.');
+
+  // The 400 g food still has neither label energy nor a feeding guide.
+  await button(/🐱\s*Bruma/).click();
+  await button('Hoy').click();
+  await button('Ajustar ración').click();
+  const manualEditor = page.getByRole('dialog', { name: 'Ajustar ración', exact: true });
+  const manualGrams = manualEditor.getByRole('spinbutton', { name: 'Gramos diarios que sirves', exact: true });
+  assert.equal(await manualGrams.inputValue(), '');
+  await manualGrams.fill('60');
+  await manualEditor.getByRole('button', { name: 'Guardar cambios para Bruma', exact: true }).click();
+  await manualEditor.waitFor({ state: 'hidden' });
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.getByText(/Gramos ingresados por ti.*pendiente de confirmar/i).first().waitFor();
+  await page.getByRole('region', { name: 'Progreso diario de Bruma' }).getByText('Calorías pendientes').waitFor();
+  await button('Ajustar ración').click();
+  assert.equal(await manualGrams.inputValue(), '60');
+  assert.equal(await manualEditor.getByLabel('Energía de la etiqueta (kcal/kg)', { exact: true }).inputValue(), '');
+  await manualEditor.getByRole('button', { name: 'Cerrar', exact: true }).click();
+  console.log('Los 60 g ingresados para Bruma sobreviven la recarga como pendientes de confirmar, con las calorías pendientes.');
 }
 
 async function verifyFoodSearch() {

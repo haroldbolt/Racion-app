@@ -4,7 +4,10 @@ const path = require('node:path');
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright-core');
 
 const formula = 'Agility Gold Grandes Adultos';
-const pet = 'Luna Agility';
+const pet = 'Milo';
+const times = ['08:00', '20:00'];
+const guideAmount = 'Gramos diarios elegidos de la tabla';
+const projected = /estimad[oa] según (?:la )?tabla del fabricante/i;
 const qualifiers = [
   ['Proteína', '23', 'minimo'], ['Grasa', '15', 'minimo'], ['Fibra cruda', '4', 'maximo'],
   ['Cenizas', '8', 'maximo'], ['Humedad', '11', 'maximo'],
@@ -45,9 +48,9 @@ async function verify() {
     await button('Agregar mascota').click();
     await button('🐶 Perro').click();
     await page.getByRole('textbox', {name:'Ej. Milo'}).fill(pet);
-    await page.getByRole('spinbutton', {name:'Peso Actual (kg)'}).fill('29');
+    await page.getByRole('spinbutton', {name:'Peso Actual (kg)'}).fill('30');
     await button('Guardar mascota').click();
-    await button('♀ Hembra').click();
+    await button('♂ Macho').click();
     await button(/continuar a condición/i).click();
     await button(/continuar a objetivo/i).click();
     await button(/continuar a alimento/i).click();
@@ -83,19 +86,25 @@ async function verify() {
     await proof(page,'agility-etiqueta.png');
     await label.getByRole('button',{name:'Cerrar',exact:true}).click();
 
-    const dailyGrams = page.getByRole('spinbutton',{name:'Gramos diarios elegidos de la tabla',exact:true});
+    const dailyGrams = page.getByRole('spinbutton',{name:guideAmount,exact:true});
     assert.equal(await dailyGrams.getAttribute('min'),'261');
     assert.equal(await dailyGrams.getAttribute('max'),'336');
-    await dailyGrams.fill('300');
+    assert.equal(await dailyGrams.inputValue(),'298.5', 'El punto medio debe aparecer sin ingresar gramos');
+    const guideSection = dailyGrams.locator('xpath=ancestor::section[1]');
+    assert.equal(await guideSection.getByRole('link').getAttribute('href'), expectedSheet);
+    await guideSection.getByText(/punto medio, 298,5 g al día/i).waitFor();
+    assert.ok(await dailyGrams.evaluate(field => field.validity.valid), 'El valor decimal propuesto debe ser válido');
     await button(/continuar a comidas/i).click();
     await page.getByLabel('Hora de la toma 1',{exact:true}).fill('08:00');
     await page.getByLabel('Hora de la toma 2',{exact:true}).fill('20:00');
     await button(/ver su plan nutricional/i).click();
-    await page.getByText('300 g',{exact:true}).waitFor();
-    for (const time of ['08:00','20:00']) {
+    await page.getByText('298,5 g',{exact:true}).waitFor();
+    await page.getByText(projected).first().waitFor();
+    for (const time of times) {
       const meal = page.getByRole('listitem').filter({hasText:' · ' + time});
-      await meal.getByText('150 g',{exact:true}).waitFor();
+      await meal.getByText('149,25 g',{exact:true}).waitFor();
     }
+    await proof(page,'milo-propuesta.png');
     await button('Guardar este plan').click();
     await page.reload({waitUntil:'domcontentloaded'});
     const ring = page.getByRole('region',{name:'Progreso diario de ' + pet,exact:true});
@@ -104,12 +113,45 @@ async function verify() {
     const arcBox = await ring.locator('svg').first().boundingBox();
     assert.ok(arcBox && arcBox.y >= 0 && arcBox.y + arcBox.height < 844,'the entire dual ring must be visible without scrolling');
     await ring.getByText('Calorías pendientes',{exact:true}).waitFor();
-    await ring.getByText('Ración diaria: 300 g',{exact:true}).waitFor();
+    await ring.getByText('Ración diaria: 298,5 g',{exact:true}).waitFor();
+    await page.getByText(projected).first().waitFor();
+    async function scheduledPortions(amount) {
+      for (const [index,time] of times.entries()) {
+        const row = page.getByText('Comida ' + (index + 1) + ' (' + time + ')',{exact:true}).locator('..');
+        await row.getByText(amount).waitFor();
+      }
+    }
+    await scheduledPortions(/^149,25 g$/);
     await proof(page,'agility-hoy.png');
 
+    await button('Ajustar ración').click();
+    const editor = page.getByRole('dialog',{name:'Ajustar ración',exact:true});
+    const adjustGrams = editor.getByRole('spinbutton',{name:guideAmount,exact:true});
+    const labelEnergy = editor.getByLabel('Energía de la etiqueta (kcal/kg)',{exact:true});
+    assert.equal(await labelEnergy.inputValue(), '');
+    assert.equal(await adjustGrams.inputValue(), '298.5');
+    await adjustGrams.fill('310');
+    const preview = editor.getByRole('region',{name:'Vista previa de la ración',exact:true});
+    await preview.getByText('310 g al día',{exact:true}).waitFor();
+    for (const time of times) {
+      const serving = preview.getByRole('listitem').filter({hasText:time});
+      await serving.getByText('155 g',{exact:true}).waitFor();
+    }
+    await proof(page,'milo-ajuste.png');
+    await editor.getByRole('button',{name:'Guardar cambios para ' + pet,exact:true}).click();
+    await editor.waitFor({state:'hidden'});
+    await page.reload({waitUntil:'domcontentloaded'});
+    await ring.getByText('Ración diaria: 310 g',{exact:true}).waitFor();
+    await ring.getByText('Calorías pendientes',{exact:true}).waitFor();
+    await scheduledPortions(/^155 g$/);
+    await button('Ajustar ración').click();
+    assert.equal(await adjustGrams.inputValue(), '310', 'El ajuste confirmado debe sobrevivir la recarga y reapertura');
+    assert.equal(await labelEnergy.inputValue(), '');
+    await editor.getByRole('button',{name:'Cerrar',exact:true}).click();
+
     const costs = page.getByRole('region',{name:'Costo de su ración',exact:true});
-    const dailyCost = Math.round(price * 300 / 3000);
-    const portionCost = Math.round(price * 150 / 3000);
+    const dailyCost = Math.round(price * 310 / 3000);
+    const portionCost = Math.round(price * 155 / 3000);
     await costs.getByText(asCop(dailyCost)).waitFor();
     for (const time of ['08:00','20:00']) {
       await costs.getByRole('listitem').filter({hasText:' · ' + time}).getByText(asCop(portionCost)).waitFor();
@@ -119,7 +161,7 @@ async function verify() {
     await ring.getByText('1 de 2 comidas',{exact:true}).waitFor();
     await ring.getByText('Calorías pendientes',{exact:true}).waitFor();
     const nutrients = page.getByRole('table',{name:'Nutrientes de hoy',exact:true});
-    assert.match(await nutrients.getByRole('row').filter({hasText:'Proteína'}).innerText(),/≥\s*34[.,]5\s*g/);
+    assert.match(await nutrients.getByRole('row').filter({hasText:'Proteína'}).innerText(),/≥\s*35[.,]6\s*g/);
 
     await button('Perfil').click();
     const restrictions = page.getByText('Ingredientes a evitar y límites veterinarios',{exact:true});
@@ -139,8 +181,9 @@ async function verify() {
     console.log(JSON.stringify({
       site:url.origin, sources:[...sources], food:formula, sizesKg:[1.5,3,15], price3kgCop:price,
       guaranteed:{proteinMin:23,fatMin:15,fiberMax:4,ashMax:8,moistureMax:11},
-      metabolizableEnergy:'undeclared', carbs:'undeclared', petKg:29, guideGrams:[261,336],
-      confirmedGrams:300, portionGrams:150, dailyCop:dailyCost, portionCop:portionCost,
+      metabolizableEnergy:'undeclared', carbs:'undeclared', pet, petKg:30, guideGrams:[261,336], guideSource:expectedSheet,
+      suggestedAndSaved:{dailyGrams:298.5, perMealGrams:[149.25,149.25]},
+      adjustedAndSaved:{dailyGrams:310, perMealGrams:[155,155]}, dailyCop:dailyCost, portionCop:portionCost,
       notices:['declared chicken','test vet fat maximum 10% exceeded by declared minimum 15%'],
       persisted:true, mobileFirst:'dual progress ring',
     }));

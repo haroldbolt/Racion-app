@@ -9,6 +9,7 @@ import {
   TreatCatalogItem,
   TreatLog,
 } from '../types';
+import { formatRation } from '../utils/i18n';
 import { localDateKey } from '../utils/localDate';
 import { defaultMealTimes } from '../utils/calculator';
 import { getFoodKcalPerKg, getLoggedMealEnergy, getPlannedMeals, getPlannedMealComponents, snapshotMealFood } from '../utils/mealPortions';
@@ -898,7 +899,7 @@ export const RegisterMealModal: React.FC<RegisterMealModalProps> = ({
               Gramos servidos
               {plannedGrams !== undefined && (
                 <span className="font-normal text-[#44544A] block text-[10px]">
-                  Planificado: {plannedGrams} g
+                  Planificado: {formatRation(plannedGrams)}
                 </span>
               )}
             </label>

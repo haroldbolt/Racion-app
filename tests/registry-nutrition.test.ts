@@ -110,13 +110,13 @@ test('manufacturer kitten guide handles shared endpoints, one-sided rule and wei
   assert.equal(getApplicableFeedingRange(conflicting,{...kitten,currentWeightKg:3},'growth'),undefined);
 });
 
-test('kitten ration requires an eligible pet, matching stage and purpose, and explicit in-range confirmation', () => {
+test('kitten ration uses the chart midpoint or an in-range adjustment for an eligible growing kitten', () => {
   for (const change of [
     {goal:'maintain'}, {pet:{...kitten,species:'dog'}}, {dryFood:{...foodWithGuide,lifeStage:'adult'}},
     {dryFood:{...foodWithGuide,labelStatus:'unconfirmed'}},{dryFood:{...foodWithGuide,suitableForGrowth:false}},
     {pet:{...kitten,ageMonths:0.8}},{pet:{...kitten,ageMonths:12}},{pet:{...kitten,ageMonths:undefined,ageYears:undefined}},
     {pet:{...kitten,dietType:'therapeutic'}},{pet:{...kitten,hasVetGuideline:true}},
-    {manufacturerGramsPerDay:undefined},{manufacturerGramsPerDay:24},{manufacturerGramsPerDay:56},{manufacturerGramsPerDay:45.5},
+    {manufacturerGramsPerDay:24},{manufacturerGramsPerDay:56},{manufacturerGramsPerDay:NaN},
   ] satisfies Partial<CalculationInputs>[]) {
     const inputs = {...kittenInputs,...change};
     const plan = buildFeedingPlan(inputs,calculateFeedingPlan(inputs));
@@ -124,7 +124,8 @@ test('kitten ration requires an eligible pet, matching stage and purpose, and ex
     assert.equal(plan.manufacturerGramsPerDay,undefined);
     assert.equal(getPlanCostSummary(plan).costPerDayCop,undefined);
   }
-  for (const grams of [25,55]) {
+  assert.equal(calculateFeedingPlan({...kittenInputs,manufacturerGramsPerDay:undefined}).gramsPerDay,40);
+  for (const grams of [25,45.5,55]) {
     assert.equal(calculateFeedingPlan({...kittenInputs,manufacturerGramsPerDay:grams}).rationConfirmed,true);
   }
 });

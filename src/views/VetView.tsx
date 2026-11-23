@@ -235,7 +235,7 @@ export const VetView: React.FC<VetViewProps> = ({
             <div>
               <span className="text-[#44544A] block">{isEs ? 'Alimento y porción:' : 'Food & Portion:'}</span>
               <p className="font-semibold text-[#1C2B21]">
-                {foodName} · {confirmedPlan && plan ? formatRation(plan.gramsPerMeal, units) + (isEs ? ' por toma' : ' per meal') : pending}
+                {foodName} · {confirmedPlan && plan ? formatRation(plan.gramsPerMeal, units, userAccount.language) + (isEs ? ' por toma' : ' per meal') : pending}
               </p>
             </div>
           </div>

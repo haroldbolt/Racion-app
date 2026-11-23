@@ -147,7 +147,7 @@ test('published retail weight tables retain their provenance and require explici
     fichaNutricional:{...food.fichaNutricional!, fuenteNombre:'Puppis', fuenteUrl:productUrl}};
   const table = '<table><tr><th>Peso de la mascota (kg)</th><th>Gramos diarios</th></tr><tr><td>10 a 15</td><td>120 a 155</td></tr><tr><td>20 kg</td><td>180</td></tr></table>';
   const result = await enrichOnlineNutrition(merchant,'Marca de prueba',table,new AbortController().signal);
-  assert.deepEqual(result.feedingGuide,{sourceUrl:productUrl,sourceName:'Puppis',ranges:[
+  assert.deepEqual(result.feedingGuide,{sourceUrl:productUrl,sourceName:'Puppis',sourceType:'store',ranges:[
     {minWeightKg:10,maxWeightKg:15,minGrams:120,maxGrams:155},{minWeightKg:20,maxWeightKg:20,minGrams:180,maxGrams:180},
   ]});
   assert.equal(readFeedingGuide(table.replace('Gramos diarios','Gramos por porción'),productUrl,'Puppis'),undefined);

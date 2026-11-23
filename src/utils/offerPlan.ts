@@ -20,7 +20,7 @@ export function previewFoodChoice(pet: Pet, current: FeedingPlan, food: FoodItem
         buyUrl: price?.sourceUrl ?? food.buyUrl ?? component.buyUrl };
     };
     const proposed = { ...next, dryFood: update(next.dryFood), wetFood: update(next.wetFood) };
-    return refresh && (getFoodKcalPerKg(existing) !== getFoodKcalPerKg(food) || current.manufacturerGramsPerDay)
+    return refresh && (getFoodKcalPerKg(existing) !== getFoodKcalPerKg(food) || food.feedingGuide || current.manufacturerGramsPerDay || current.manualGramsPerDay)
       ? recalculatePlanForPet(pet, proposed) : withPlanCosts(proposed);
   }
   const candidate = { ...food, bagSizeKg: packageKg, priceBasis: price ?? food.priceBasis,
@@ -28,7 +28,8 @@ export function previewFoodChoice(pet: Pet, current: FeedingPlan, food: FoodItem
   return recalculatePlanForPet(pet, {
     ...current, foodId: food.id, foodName: food.name, foodBrand: food.brand, foodType: food.type,
     dryFood: food.type === 'wet' ? undefined : candidate, wetFood: food.type === 'wet' ? candidate : undefined,
-    manufacturerGramsPerDay: undefined, bagWeightKg: packageKg, bagPriceCop: undefined,
+    manufacturerGramsPerDay: undefined, manualGramsPerDay: undefined, rationSource: undefined,
+    bagWeightKg: packageKg, bagPriceCop: undefined,
     dailyCostCop: undefined, monthlyCostCop: undefined,
   });
 }

@@ -15,7 +15,7 @@ import {
 import { formatRation, formatCOP } from '../utils/i18n';
 import { StorageService } from '../utils/storage';
 import { localDateKey } from '../utils/localDate';
-import { getPlannedMeals, getPlannedMealComponents, getPlanFoodKcalForGrams, getLoggedMealEnergy } from '../utils/mealPortions';
+import { getPlannedMeals, getPreviewMeals, getPlannedMealComponents, getPlanFoodKcalForGrams, getLoggedMealEnergy } from '../utils/mealPortions';
 import { MealDiaryHistory } from '../components/MealDiaryHistory';
 import { PlanSafetyAlerts } from '../components/FoodSafetyAlerts';
 import { getPlanSafetyNotices } from '../utils/foodSafety';
@@ -23,6 +23,7 @@ import { UnifiedFoodSearchModal, resolveFoodThumbnail } from '../components/Unif
 import { FeedingPlanEditor } from '../components/FeedingPlanEditor';
 import { FoodCostTracker } from '../components/FoodCostTracker';
 import { getPlanCostSummary } from '../utils/foodCosts';
+import { RationSourceNote } from '../components/ManufacturerRationInput';
 import { DailyKcalRingChart } from '../components/DailyKcalRingChart';
 import { HomeMealCost } from '../components/HomeMealCost';
 import { LabelReviewModal } from '../components/LabelReviewModal';
@@ -341,12 +342,14 @@ export const TodayView: React.FC<TodayViewProps> = ({
 
   const isBarf = effectivePlan.foodType === 'barf' || pet.dietType === 'barf';
   const needsVetGuidance = requiresVetGuidance(pet, effectivePlan);
+  const hasDailyGramAmount = effectivePlan.rationConfirmed || effectivePlan.rationSource === 'manual';
   const hasEnergyForPlan = getPlanFoodKcalForGrams(effectivePlan, 100) > 0;
   const hasMismatch = getPlanSafetyNotices(pet, effectivePlan, userAccount.language).some((notice) => notice.level === 'mismatch');
   const needsFoodData = !isBarf && !needsVetGuidance && (!hasEnergyForPlan || nextStep?.id === 'complete_label');
   const plannedMeals = getPlannedMeals(effectivePlan, treatsGuidance.trainingGramsAllocatedToday);
+  const displayPortions = effectivePlan.rationSource === 'manual' ? getPreviewMeals(effectivePlan) : plannedMeals;
   const totalMealsPlanned = plannedMeals.length;
-  const nextMealPortion = nextMeal.nextMealIndex === null ? undefined : plannedMeals[nextMeal.nextMealIndex];
+  const nextMealPortion = nextMeal.nextMealIndex === null ? undefined : displayPortions[nextMeal.nextMealIndex];
 
   return (
     <div className="p-4 space-y-4 pb-28">
@@ -368,9 +371,10 @@ export const TodayView: React.FC<TodayViewProps> = ({
             <strong className="block text-sm text-[#1C2B21]">
               {nextMeal.allMealsCompleted ? (isEs ? 'Todas las tomas registradas' : 'All meals logged') :
                 (isEs ? 'Próxima toma' : 'Next meal') + ' · ' + (nextMeal.nextMealTime ?? '—')}
-              {nextMealPortion && effectivePlan.rationConfirmed && ' · ' + formatRation(nextMealPortion.grams, units)}
+              {nextMealPortion && hasDailyGramAmount && ' · ' + formatRation(nextMealPortion.grams, units, userAccount.language)}
             </strong>
-            {effectivePlan.rationConfirmed && <span>{isEs ? 'Ración diaria: ' : 'Daily ration: '}{formatRation(effectivePlan.gramsPerDay, units)}</span>}
+            {hasDailyGramAmount && <span>{isEs ? 'Ración diaria: ' : 'Daily ration: '}{formatRation(effectivePlan.gramsPerDay, units, userAccount.language)}</span>}
+            <RationSourceNote plan={effectivePlan} lang={userAccount.language} />
           </div>
           <button type="button" onClick={() => {
             setSelectedMealIndex(nextMeal.nextMealIndex ?? 0);
@@ -504,9 +508,9 @@ export const TodayView: React.FC<TodayViewProps> = ({
                       <span className="font-heading font-bold text-[#1C2B21]">
                         Comida {idx + 1} ({scheduledTime})
                       </span>
-                      {effectivePlan.rationConfirmed && (
+                      {hasDailyGramAmount && (
                         <span className="font-extrabold text-[#0B5D2E] tabular-nums">
-                          {formatRation(isFed ? log.plannedGrams ?? portion.grams : portion.grams, units)}
+                          {formatRation(isFed ? log.plannedGrams ?? portion.grams : displayPortions[idx].grams, units, userAccount.language)}
                         </span>
                       )}
                     </div>
@@ -514,9 +518,9 @@ export const TodayView: React.FC<TodayViewProps> = ({
                       {isFed
                         ? `Comió con ${log.fedBy || selectedFeeder} (${log.completedAt || scheduledTime})${
                             log.gramsFed > 0
-                              ? ` · Servido: ${formatRation(log.gramsFed, units)}${
+                              ? ` · Servido: ${formatRation(log.gramsFed, units, userAccount.language)}${
                                   log.plannedGrams && log.plannedGrams !== log.gramsFed
-                                    ? ` (plan: ${formatRation(log.plannedGrams, units)})`
+                                    ? ` (plan: ${formatRation(log.plannedGrams, units, userAccount.language)})`
                                     : ''
                                 }`
                               : ''
@@ -524,7 +528,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
                         : 'Pendiente'}
                     </p>
                     {isFed && log.gramsEaten !== undefined && log.gramsEaten < log.gramsFed && (
-                      <p className="text-[11px] font-bold text-[#0B5D2E]">{isEs ? 'Comió ' : 'Ate '}{formatRation(log.gramsEaten, units)}</p>
+                      <p className="text-[11px] font-bold text-[#0B5D2E]">{isEs ? 'Comió ' : 'Ate '}{formatRation(log.gramsEaten, units, userAccount.language)}</p>
                     )}
                     {isFed && log.mealTime !== scheduledTime && (
                       <p className="text-[11px] text-[#44544A]">

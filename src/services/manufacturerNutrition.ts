@@ -104,13 +104,16 @@ export async function enrichOnlineNutrition(food: FoodItem, title: string, descr
       : hasFields ? 'Contrasta con tu empaque los valores publicados por la tienda antes de aplicar la ficha.' : 'Análisis pendiente de la etiqueta.',
     discrepancies:page ? labelDiscrepancies(official, store, storeUrl) : undefined,
   };
+  const officialGuide = page && readFeedingGuide(page.html, page.url, page.sourceName);
+  const storeGuide = !officialGuide && readFeedingGuide(description, storeUrl, storeSource.name);
   const use = (page && declaredUse(page.html)) || declaredUse(description) || food.nutritionalUse;
   return {
     ...food, fichaNutricional:ficha, declaredIcaRegistration:registration,
     labelStatus:manufacturerVerified ? 'verified_manufacturer' : 'unconfirmed',
     dataSource:productSource.name,
     ingredientsSummary:(page && declaredIngredients(page.html)) || declaredIngredients(description),
-    feedingGuide:(page && readFeedingGuide(page.html,page.url,page.sourceName)) || readFeedingGuide(description,storeUrl,storeSource.name),
+    feedingGuide: officialGuide ? { ...officialGuide, sourceType: 'manufacturer' }
+      : storeGuide ? { ...storeGuide, sourceType: 'store' } : food.feedingGuide,
     nutritionalUse:use,
     isCompleteAndBalanced:use === 'complete' ? true : undefined,
     kcalPerKg:manufacturerVerified ? (official.kcalPerKg?.valor ?? 0) : 0,

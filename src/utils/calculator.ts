@@ -1,8 +1,8 @@
 import { Pet, FoodItem, Goal, FeedingPlan, BreedSize } from '../types';
 import { findBreedProfile, getIdealWeightForBreedAndSex, BreedProfile } from '../data/breeds';
-import { distributeWholeGrams, getFoodKcalPerKg } from './mealPortions';
+import { distributeRationGrams, distributeWholeGrams, getFoodKcalPerKg } from './mealPortions';
 import { localDateKey } from './localDate';
-import { getApplicableFeedingRange } from './manufacturerRation';
+import { canUseManualRation, getApplicableFeedingRange, getSavedRationInputs, isValidDailyGrams } from './manufacturerRation';
 import { withPlanCosts } from './foodCosts';
 
 export interface CalculationInputs {
@@ -17,6 +17,7 @@ export interface CalculationInputs {
   mealTimes?: string[];
   treatsKcal?: number;
   manufacturerGramsPerDay?: number;
+  manualGramsPerDay?: number;
   manualAdjustmentPct?: number;
   manualAdjustmentReason?: string;
   bagWeightKg?: number;
@@ -41,6 +42,7 @@ export interface CalculationResult {
   gramsPerMeal: number;
   kcalPerMeal: number;
   rationConfirmed: boolean;
+  rationSource?: FeedingPlan['rationSource'];
   requiresVetGuidance: boolean;
   cupsPerDay?: number;
   cansPerDay?: number;
@@ -408,6 +410,7 @@ export function calculateFeedingPlan(inputs: CalculationInputs): CalculationResu
       gramsPerMeal: vetGramsPerMeal,
       kcalPerMeal: Math.round(vetMer / vetMeals),
       rationConfirmed: vetGramsPerDay > 0,
+      rationSource: 'veterinary',
       requiresVetGuidance: false,
       dailyWaterMl: 0, // Vet-managed hydration
       bagDaysRemaining,
@@ -440,10 +443,10 @@ export function calculateFeedingPlan(inputs: CalculationInputs): CalculationResu
 
   const singleFood = foodType === 'dry' ? dryFood : foodType === 'wet' ? wetFood : undefined;
   const guideRange = !vetGuidanceRequired ? getApplicableFeedingRange(singleFood, pet, goal) : undefined;
-  const chosenGrams = inputs.manufacturerGramsPerDay;
-  const usingGuide = Boolean(guideRange && chosenGrams !== undefined && Number.isInteger(chosenGrams) &&
-    chosenGrams >= guideRange.minGrams && chosenGrams <= guideRange.maxGrams);
-  if (usingGuide && chosenGrams !== undefined) {
+  const chosenGrams = inputs.manufacturerGramsPerDay ?? (guideRange && (guideRange.minGrams + guideRange.maxGrams) / 2);
+  let rationSource: FeedingPlan['rationSource'];
+  if (guideRange && isValidDailyGrams(chosenGrams) && chosenGrams >= guideRange.minGrams && chosenGrams <= guideRange.maxGrams) {
+    rationSource = inputs.manufacturerGramsPerDay === undefined ? 'manufacturer_midpoint' : 'manufacturer_adjusted';
     totalGramsPerDay = chosenGrams;
     dryGramsPerDay = foodType === 'dry' ? chosenGrams : 0;
     wetGramsPerDay = foodType === 'wet' ? chosenGrams : 0;
@@ -479,15 +482,19 @@ export function calculateFeedingPlan(inputs: CalculationInputs): CalculationResu
     dryGramsPerMeal = distributeWholeGrams(dryGramsPerDay, validMeals)[0];
     wetGramsPerMeal = distributeWholeGrams(wetGramsPerDay, validMeals, dryGramsPerDay % validMeals)[0];
     rationConfirmed = true;
-  } else {
-    // Label or manufacturer datasheet is missing/unconfirmed: DO NOT fabricate exact grams
-    rationConfirmed = false;
-    totalGramsPerDay = 0;
+  } else if (!vetGuidanceRequired && isValidDailyGrams(inputs.manualGramsPerDay) && canUseManualRation(singleFood, pet, goal)) {
+    rationSource = 'manual';
+    totalGramsPerDay = inputs.manualGramsPerDay;
+    dryGramsPerDay = foodType === 'dry' ? totalGramsPerDay : 0;
+    wetGramsPerDay = foodType === 'wet' ? totalGramsPerDay : 0;
   }
 
   rationConfirmed = rationConfirmed && totalGramsPerDay > 0;
-  const gramsPerMeal = rationConfirmed ? distributeWholeGrams(totalGramsPerDay, validMeals)[0] : 0;
-  const kcalPerMeal = usingGuide ? 0 : Math.round(foodMerKcal / validMeals);
+  if (rationConfirmed && !rationSource) rationSource = 'label';
+  const gramsPerMeal = !rationSource ? 0 : rationSource === 'label'
+    ? distributeWholeGrams(totalGramsPerDay, validMeals)[0]
+    : distributeRationGrams(totalGramsPerDay, validMeals)[0];
+  const kcalPerMeal = rationSource === 'label' ? Math.round(foodMerKcal / validMeals) : 0;
 
   // Daily water reference (approx. 50-60 ml/kg/day) — only used when validated rule applies
   const dailyWaterMl = vetGuidanceRequired ? 0 : Math.round(pet.currentWeightKg * 55);
@@ -536,6 +543,7 @@ export function calculateFeedingPlan(inputs: CalculationInputs): CalculationResu
     gramsPerMeal,
     kcalPerMeal,
     rationConfirmed,
+    rationSource,
     requiresVetGuidance: vetGuidanceRequired,
     cupsPerDay,
     cansPerDay,
@@ -585,8 +593,10 @@ export function buildFeedingPlan(inputs: CalculationInputs, result: CalculationR
     factor: result.factor,
     goal: inputs.goal,
     mer: result.mer,
-    manufacturerGramsPerDay: !vet && !result.kcalPerMeal && result.rationConfirmed &&
-      result.gramsPerDay === inputs.manufacturerGramsPerDay ? inputs.manufacturerGramsPerDay : undefined,
+    rationSource: result.rationSource,
+    manufacturerGramsPerDay: result.rationSource === 'manufacturer_midpoint' || result.rationSource === 'manufacturer_adjusted'
+      ? result.gramsPerDay : undefined,
+    manualGramsPerDay: result.rationSource === 'manual' ? result.gramsPerDay : undefined,
     foodMerKcal: result.foodMerKcal,
     treatsKcal: inputs.treatsKcal ?? 0,
     gramsPerDay: result.gramsPerDay,
@@ -666,7 +676,7 @@ export function recalculatePlanForPet(pet: Pet, existingPlan: FeedingPlan): Feed
     mixedDryPct: existingPlan.mixedDryPct ?? 50,
     mealsPerDay: existingPlan.mealsPerDay || 2,
     mealTimes: existingPlan.mealTimes,
-    manufacturerGramsPerDay: existingPlan.manufacturerGramsPerDay,
+    ...getSavedRationInputs(existingPlan),
     treatsKcal: existingPlan.treatsKcal ?? estimateLegacyTreatsKcal(existingPlan),
     manualAdjustmentPct: existingPlan.manualAdjustmentPct || 0,
     manualAdjustmentReason: existingPlan.manualAdjustmentReason,

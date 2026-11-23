@@ -134,7 +134,7 @@ export const PetsView: React.FC<PetsViewProps> = ({
                   <div className="text-xs">
                     <span className="text-[#44544A] block">{isEs ? 'Ración recomendada:' : 'Ration:'}</span>
                     <strong className="font-heading font-black text-base text-[#1C2B21]">
-                      {formatRation(petPlan.gramsPerMeal, units)}{' '}
+                      {formatRation(petPlan.gramsPerMeal, units, userAccount.language)}{' '}
                       <span className="text-xs font-normal text-[#44544A]">
                         {isEs ? 'por comida' : 'per meal'} ({petPlan.mealsPerDay} tomas)
                       </span>

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { AlertCircle, Check, Plus, Receipt, Trash2, X } from 'lucide-react';
 import type { FeedingPlan, FoodCostEntry, FoodItem, UserAccount, Pet } from '../types';
 import { StorageService } from '../utils/storage';
-import { formatCOP } from '../utils/i18n';
+import { formatCOP, formatRation } from '../utils/i18n';
 import { localDateKey } from '../utils/localDate';
 import { getPlanCostSummary, sameFoodIdentity, withPurchasedPackage } from '../utils/foodCosts';
 import { parsePurchasedPriceCop } from '../utils/purchaseInput';
@@ -295,7 +295,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
           <ul className="space-y-2">
             {summary.meals.map((meal) => (
               <li key={meal.index} className="flex flex-wrap justify-between gap-2 text-xs text-[var(--text-primary)]">
-                <span>{isEs ? 'Toma' : 'Meal'} {meal.index + 1} · {meal.time} · {formatNumber.format(meal.grams)} g</span>
+                <span>{isEs ? 'Toma' : 'Meal'} {meal.index + 1} · {meal.time} · {formatRation(meal.grams, 'metric', userAccount.language)}</span>
                 <strong className="tabular-nums">{cost(meal.costCop)}{meal.partial && meal.costCop !== undefined ? (isEs ? ' · parcial' : ' · partial') : ''}</strong>
               </li>
             ))}
@@ -420,7 +420,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
                 {validDraftAmounts && draftPrice !== undefined && <p>{formatCOP(draftPrice / (draftPackageKg * draftQuantity), true)} / kg · {draftQuantity} × {weightLabel(draftPackageKg, userAccount.language)}</p>}
                 {draftSummary?.costPerDayCop !== undefined ? <>
                   <dl className="grid grid-cols-2 gap-2"><div><dt>{isEs ? 'Por día' : 'Per day'}</dt><dd className="font-bold">{cost(draftSummary.costPerDayCop)}</dd></div><div><dt>{isEs ? 'Por mes estimado' : 'Estimated month'}</dt><dd className="font-bold">{cost(draftSummary.costPerMonthCop)}</dd></div></dl>
-                  <ul className="space-y-1">{draftSummary.meals.map((meal) => <li key={meal.index} className="flex justify-between gap-2"><span>{isEs ? 'Toma' : 'Meal'} {meal.index + 1} · {meal.time} · {formatNumber.format(meal.grams)} g</span><strong>{cost(meal.costCop)}{meal.partial ? (isEs ? ' · parcial' : ' · partial') : ''}</strong></li>)}</ul>
+                  <ul className="space-y-1">{draftSummary.meals.map((meal) => <li key={meal.index} className="flex justify-between gap-2"><span>{isEs ? 'Toma' : 'Meal'} {meal.index + 1} · {meal.time} · {formatRation(meal.grams, 'metric', userAccount.language)}</span><strong>{cost(meal.costCop)}{meal.partial ? (isEs ? ' · parcial' : ' · partial') : ''}</strong></li>)}</ul>
                   {draftSummary.partial && <p className="font-bold text-amber-800 dark:text-amber-200">{isEs ? 'Costo parcial: falta precio de otra parte de la ración.' : 'Partial cost: another part of the ration has no price.'}</p>}
                 </> : <p className="text-[var(--text-secondary)]">{!draftComponent ? (isEs ? 'Selecciona el alimento de su plan para calcular el costo por porción. La compra de otro alimento se guarda sin cambiar su ración.' : 'Select the plan’s food to calculate cost per portion. A different food purchase does not change the feeding plan.') : (isEs ? 'Completa peso, cantidad e importe, y guarda una ración confirmada para calcular el costo por toma.' : 'Complete weight, quantity and amount, and save a confirmed feeding plan to calculate meal costs.')}</p>}
                 {draftChangesPackage && <p className="text-[var(--text-secondary)]">{isEs ? `Este costo corresponde al empaque de la compra. ${draftComponent?.packageKg ? `Tu plan usa ${weightLabel(draftComponent.packageKg, userAccount.language)}.` : 'Tu plan todavía no tiene un empaque confirmado.'}` : `This cost refers to the purchased package. ${draftComponent?.packageKg ? `Your plan uses ${weightLabel(draftComponent.packageKg, userAccount.language)}.` : 'Your plan does not have a confirmed package yet.'}`}</p>}
@@ -464,7 +464,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
             <OpenPurchase purchase={purchase} pets={StorageService.getPets()} language={userAccount.language} onSaved={refreshPurchases} />
             {Boolean(purchase.plannedMealCostsAtPurchase?.some(meal => meal.costCop !== undefined)) && <details className="text-xs">
               <summary className="cursor-pointer font-bold">{isEs ? 'Ración al comprar' : 'Portions at purchase'}</summary>
-              {purchase.plannedMealCostsAtPurchase?.map((meal,index) => <p key={index}>{meal.time} · {meal.grams} g · {meal.costCop === undefined ? '—' : cost(meal.costCop)}{meal.partial && (isEs ? ' (parcial)' : ' (partial)')}</p>)}
+              {purchase.plannedMealCostsAtPurchase?.map((meal,index) => <p key={index}>{meal.time} · {formatRation(meal.grams, 'metric', userAccount.language)} · {meal.costCop === undefined ? '—' : cost(meal.costCop)}{meal.partial && (isEs ? ' (parcial)' : ' (partial)')}</p>)}
               {purchase.formulaAtPurchase?.analysis?.fuenteNombre && <p>{purchase.formulaAtPurchase.analysis.fuenteNombre} · {purchase.formulaAtPurchase.analysis.fechaConsulta?.slice(0, 10)}</p>}
             </details>}
             {purchase.notes && <p className="text-xs text-[var(--text-secondary)]">{purchase.notes}</p>}
