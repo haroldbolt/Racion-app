@@ -217,7 +217,7 @@ async function verify() {
     stage = 'Comparar desde el paso 4';
     await laiaProduct.getByRole('button',{name:'Comparar 2 kg con envío',exact:true}).click({timeout:45000});
     assert.equal(await dialog.getByLabel('Presentación (kg)',{exact:true}).inputValue(), '2');
-    assert.equal(await dialog.getByLabel('Ciudad',{exact:true}).inputValue(), 'Bogotá');
+    assert.equal(await dialog.getByRole('combobox').inputValue(), 'Bogotá');
     await postal.fill(destination);
     const wizard = await checkComparison(page, dialog, destination, live, 'asistente');
     if (!live) assert.deepEqual(wizard, {...historical, winner:'Laia Pets', winningTotal:152650});
