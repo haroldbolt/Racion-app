@@ -7,6 +7,8 @@
     "dev": "node --import tsx server.ts",
     "start": "node --import tsx server.ts",
     "build": "vite build",
+    "build:muse-review": "vite build --mode muse-review && esbuild workers/muse-review/index.js --bundle --target=es2022 --platform=browser --format=esm --outfile=dist/_worker.js",
+    "build:public": "RACION_PUBLIC_BUILD=1 vite build --mode production",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",

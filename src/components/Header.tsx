@@ -63,7 +63,7 @@ export const Header: React.FC<HeaderProps> = ({
               {isEs ? 'Mi cuenta' : 'My account'}
             </button>
           ) : (
-            <span className="bg-[#EAF4EC] text-[#0B5D2E] text-[10px] font-bold px-2 py-0.5 rounded-full">Beta</span>
+            <span className="bg-[#EAF4EC] text-[#0B5D2E] text-[10px] font-bold px-2 py-0.5 rounded-full">{import.meta.env.MODE === 'muse-review' ? 'Revisión Muse · Sin cobros' : 'Beta'}</span>
           )}
         </div>
 

@@ -1,6 +1,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const { museBrowserOptions, verifyReviewPage } = require('./muse-review.cjs');
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright-core');
 
 const formula = 'Agility Gold Grandes Adultos';
@@ -27,9 +28,10 @@ async function proof(page, name) {
 async function verify() {
   const url = new URL(process.argv[2]);
   assert.ok(url.protocol === 'https:' || (url.protocol === 'http:' && url.hostname === '127.0.0.1'));
+  const reviewOptions = museBrowserOptions(url);
   const browser = await chromium.launch({channel:'chrome', headless:true});
   const context = await browser.newContext({
-    locale:'es-CO', timezoneId:'America/Bogota', viewport:{width:390,height:844},
+    ...reviewOptions, locale:'es-CO', timezoneId:'America/Bogota', viewport:{width:390,height:844},
     isMobile:true, hasTouch:true, serviceWorkers:'block',
   });
   const page = await context.newPage();
@@ -45,6 +47,7 @@ async function verify() {
   // Fresh browser only. All writes use the application's normal controls.
   try {
     await page.goto(url.href, {waitUntil:'domcontentloaded'});
+    await verifyReviewPage(page, url);
     await button('Agregar mascota').click();
     await button('🐶 Perro').click();
     await page.getByRole('textbox', {name:'Ej. Milo'}).fill(pet);

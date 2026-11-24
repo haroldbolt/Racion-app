@@ -4,7 +4,7 @@ import './index.css';
 
 // Separate build for the previously published anonymous beta. A URL or a saved
 // browser preference cannot change the access policy of a billing build.
-const Entry = import.meta.env.MODE === 'anonymous-beta'
+const Entry = ['anonymous-beta', 'muse-review'].includes(import.meta.env.MODE)
   ? lazy(() => import('./PetWorkspace'))
   : lazy(() => import('./components/BillingGate'));
 

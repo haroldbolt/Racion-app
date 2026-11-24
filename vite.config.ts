@@ -4,8 +4,9 @@ import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 import {defineConfig} from 'vite';
 import { receiptAssets } from './receiptAssets.ts';
+import { publicRelease } from './scripts/public-release-preflight.mjs';
 
-export default defineConfig(() => {
+export default defineConfig(({ mode }) => {
   const pagesPath = process.env.PAGES_BASE_PATH?.replace(/^\/+|\/+$/g, '');
   const base = pagesPath ? `/${pagesPath}/` : '/';
   const appIcon = `${base}assets/aistudio/Racio_n_App__Nutricio_n_con_carin_o_8fb59a2d.png`;
@@ -16,7 +17,9 @@ export default defineConfig(() => {
       react(),
       tailwindcss(),
       receiptAssets(),
+      publicRelease(),
       VitePWA({
+        disable: mode === 'muse-review',
         registerType: 'autoUpdate',
         scope: base,
         manifest: {

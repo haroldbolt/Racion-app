@@ -1,6 +1,7 @@
 const assert = require('node:assert/strict');
 const { mkdir } = require('node:fs/promises');
 const path = require('node:path');
+const { museReviewOrigin, museBrowserOptions, verifyReviewPage } = require('./muse-review.cjs');
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright-core');
 const { searchQuery, installMerchantFixtures } = require('./laia-food-fixture.cjs');
 
@@ -116,6 +117,7 @@ async function checkComparison(page, dialog, postalCode, live, flow) {
     dialog.getByRole('button', {name:'Consultar precios', exact:true}).click(),
   ]);
   const body = res.request().postDataJSON();
+  assert.ok(res.ok(), `El comparador devolvió HTTP ${res.status()}`);
   assert.equal(body.city, 'Bogotá');
   assert.equal(body.product.grams, 2000);
   assert.match(body.product.brand, /royal canin/i);
@@ -188,34 +190,42 @@ async function verify() {
   const live = process.argv.includes('--live');
   assert.ok(['127.0.0.1','localhost'].includes(base.hostname) || (live && base.protocol === 'https:'),
     'Las respuestas históricas deben usarse en la compilación local de pruebas');
+  assert.ok(!base.username && !base.password, 'Usa una URL sin credenciales');
+  const review = base.origin === museReviewOrigin;
+  const reviewOptions = museBrowserOptions(base);
   const browser = await chromium.launch({channel:'chrome',headless:true});
-  const page = await browser.newPage({locale:'es-CO', timezoneId:'America/Bogota', viewport:{width:390,height:844},
+  const page = await browser.newPage({...reviewOptions, locale:'es-CO', timezoneId:'America/Bogota', viewport:{width:390,height:844},
     isMobile:true, hasTouch:true, serviceWorkers:'block'});
   page.setDefaultTimeout(22000);
   const button = name => page.getByRole('button',{name,exact:typeof name === 'string'});
   const dialog = page.getByRole('dialog',{name:'Comparar precios',exact:true});
   const postal = dialog.getByLabel('Código postal de Bogotá',{exact:true});
-  let stage = 'Abrir el asistente';
-  try {
-    if (!live) await installFixtures(page);
-    await page.goto(base.href,{waitUntil:'domcontentloaded'});
-    await button('Agregar mascota').click();
-    await button('🐱 Gato').click();
-    await page.getByRole('textbox',{name:'Ej. Milo'}).fill('Luna');
-    await page.getByRole('spinbutton',{name:'Peso Actual (kg)'}).fill('4.3');
-    await button('Guardar mascota').click();
+  const input = page.getByRole('textbox',{name:'Buscar alimentos en internet',exact:true});
+  const openWizardComparison = async () => {
     await button('♀ Hembra').click();
     await button(/continuar a condición/i).click();
     await button(/continuar a objetivo/i).click();
     await button(/continuar a alimento/i).click();
-    const input = page.getByRole('textbox',{name:'Buscar alimentos en internet',exact:true});
     await input.fill(searchText);
     await input.press('Enter');
     const laiaProduct = page.getByRole('region',{name:'Resultados de internet',exact:true})
       .getByRole('article').filter({has:page.getByText('Fuente: Laia Pets',{exact:true})})
       .filter({has:page.getByRole('heading',{name:/Royal Canin Sterilised 37/i})});
-    stage = 'Comparar desde el paso 4';
     await laiaProduct.getByRole('button',{name:'Comparar 2 kg con envío',exact:true}).click({timeout:45000});
+  };
+  let stage = 'Abrir el asistente';
+  try {
+    if (!live) await installFixtures(page);
+    const landing = await page.goto(base.href,{waitUntil:'domcontentloaded'});
+    await verifyReviewPage(page, base);
+    assert.ok(landing?.ok(), `El sitio devolvió HTTP ${landing?.status()}`);
+    await button('Agregar mascota').click();
+    await button('🐱 Gato').click();
+    await page.getByRole('textbox',{name:'Ej. Milo'}).fill('Luna');
+    await page.getByRole('spinbutton',{name:'Peso Actual (kg)'}).fill('4.3');
+    await button('Guardar mascota').click();
+    stage = 'Comparar desde el paso 4';
+    await openWizardComparison();
     assert.equal(await dialog.getByLabel('Presentación (kg)',{exact:true}).inputValue(), '2');
     assert.equal(await dialog.getByRole('combobox').inputValue(), 'Bogotá');
     await postal.fill(destination);
@@ -229,7 +239,18 @@ async function verify() {
     await button('Alimentos').click();
     await button('Buscar en internet').first().click();
     await input.fill(searchText);
-    await input.press('Enter');
+    if (live) {
+      const [catalog] = await Promise.all([
+        page.waitForResponse(response => new URL(response.url()).pathname === '/api/colombia-foods' &&
+          response.request().method() === 'GET', {timeout:45000}),
+        input.press('Enter'),
+      ]);
+      assert.ok(catalog.ok(), `El catálogo colombiano devolvió HTTP ${catalog.status()}`);
+      const result = await catalog.json();
+      assert.ok(Array.isArray(result.foods) && Array.isArray(result.unavailableSources), 'La consulta debe devolver el catálogo colombiano');
+    } else {
+      await input.press('Enter');
+    }
     const agroProduct = page.getByRole('region',{name:'Alimentos de Agrocentro Pets',exact:true})
       .getByRole('article').filter({has:page.locator('a[href="' + agroUrl + '"]')});
     await agroProduct.getByRole('button',{name:'Comparar 2 kg con envío',exact:true}).click({timeout:45000});
@@ -249,6 +270,17 @@ async function verify() {
       assert.equal(foods.shipping,laia.value.shipping);
       assert.equal(foods.agroBag,agro.value.bag);
       assert.equal(foods.agroStock,agro.value.stock);
+      if (review) {
+        stage = 'Recargar y repetir el asistente con el destino guardado';
+        await page.reload({waitUntil:'domcontentloaded'});
+        await button('+ Calcular').click();
+        await openWizardComparison();
+        assert.equal(await postal.inputValue(), destination, 'El asistente debe conservar el CP tras recargar');
+        assert.deepEqual(await checkComparison(page, dialog, destination, live, 'asistente-recargado'), foods);
+        assert.equal(foods.winner, 'Laia Pets', 'La ganadora cambió respecto al caso de Muse');
+        assert.equal(foods.winningTotal, 152650, 'El total vigente cambió respecto al caso de Muse');
+        assert.equal(foods.agroStock, 'out_of_stock', 'La disponibilidad vigente cambió respecto al caso de Muse');
+      }
     } else {
       stage = 'Cotización anterior al cambiar de destino';
       await postal.fill(otherDestination);

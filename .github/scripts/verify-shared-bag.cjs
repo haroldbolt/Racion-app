@@ -1,6 +1,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const { museReviewOrigin, museBrowserOptions, verifyReviewPage } = require('./muse-review.cjs');
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright-core');
 
 const formula = 'Adultos compartida R4';
@@ -103,13 +104,16 @@ async function bagHistory(page, pet, gramsRemaining) {
 
 async function run() {
   const url = new URL(process.argv[2]);
-  assert.ok(url.hostname === '127.0.0.1' || url.hostname === 'localhost', 'Run the shared bag fixture in a local test build');
+  const local = url.protocol === 'http:' && ['127.0.0.1', 'localhost'].includes(url.hostname);
+  assert.ok(local || url.origin === museReviewOrigin, 'Run the shared bag case on localhost or the protected Muse review');
+  const reviewOptions = museBrowserOptions(url);
   const browser = await chromium.launch({ channel: 'chrome', headless: true });
-  const page = await browser.newPage({ locale: 'es-CO', timezoneId: 'America/Bogota', viewport: { width: 390, height: 844 },
+  const page = await browser.newPage({ ...reviewOptions, locale: 'es-CO', timezoneId: 'America/Bogota', viewport: { width: 390, height: 844 },
     isMobile: true, hasTouch: true, serviceWorkers: 'block' });
   page.setDefaultTimeout(20000);
   try {
     await page.goto(url.href, { waitUntil: 'domcontentloaded' });
+    await verifyReviewPage(page, url);
     await createPlan(page, rocky, true);
     await createPlan(page, luna, false);
     const history = region(page, 'Historial de pesajes de Luna');

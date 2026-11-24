@@ -30,7 +30,7 @@ jobs:
       - run: bun run test
       - name: Install browser and Worker test runners
         run: npm install --prefix "$RUNNER_TEMP/racion-test-tools" --no-save --package-lock=false --no-audit --no-fund playwright-core@1.62.1 miniflare@4.20260730.0 firebase-tools@15.37.0
-      - name: Verify trial registration, cancellation, one-time payment and diary in Chrome
+      - name: Test trial registration, cancellation, simulated payment and diary in Chrome
         env:
           VITE_BILLING_API_URL: http://127.0.0.1:4209
           VITE_BILLING_AUTH_EMULATOR_URL: http://127.0.0.1:9099
@@ -44,6 +44,7 @@ jobs:
           preview_pid=$!
           trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
           curl --retry 12 --retry-all-errors --retry-delay 1 -fsS http://127.0.0.1:4198/ -o /dev/null
+          node .github/scripts/verify-public-access.cjs http://127.0.0.1:4198/ "$GITHUB_SHA"
           echo '{"emulators":{"auth":{"host":"127.0.0.1","port":9099},"ui":{"enabled":false}}}' > "$RUNNER_TEMP/racion-firebase.json"
           "$RUNNER_TEMP/racion-test-tools/node_modules/.bin/firebase" emulators:exec \
             --only auth --project demo-racion --config "$RUNNER_TEMP/racion-firebase.json" \
@@ -111,9 +112,15 @@ jobs:
           name: receipt-browser-evidence
           path: ${{ runner.temp }}/racion-receipt-proof
           if-no-files-found: ignore
-      - run: bun run build --mode anonymous-beta
+      - name: Comprobar el lanzamiento comercial con Hotmart antes de publicar
+        if: github.ref == 'refs/heads/main'
+        run: bun run build:public
         env:
           PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          RACION_PUBLIC_URLS: https://racion-app.pages.dev,${{ steps.pages.outputs.base_url }}
+          VITE_BILLING_FIREBASE_PROJECT_ID: ${{ vars.VITE_BILLING_FIREBASE_PROJECT_ID }}
+          VITE_BILLING_FIREBASE_API_KEY: ${{ vars.VITE_BILLING_FIREBASE_API_KEY }}
+          VITE_BILLING_API_URL: ${{ vars.VITE_BILLING_API_URL }}
           VITE_PRICE_API_URL: ${{ vars.PRICE_API_URL || 'https://racion-live-prices.jumer4.workers.dev/api/live-prices' }}
       - uses: actions/upload-pages-artifact@v4
         if: github.ref == 'refs/heads/main'
@@ -137,10 +144,10 @@ jobs:
         id: deployment
 
   verify:
-    name: Verify published diary
+    name: Verify published beta access
     needs: deploy
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
@@ -149,11 +156,7 @@ jobs:
       - run: npm install --prefix "$RUNNER_TEMP/racion-browser" --no-save --package-lock=false --no-audit --no-fund playwright-core@1.62.1
       - run: |
           export PLAYWRIGHT_PATH="$RUNNER_TEMP/racion-browser/node_modules/playwright-core"
-          node .github/scripts/verify-pages.cjs "$PAGES_URL"
-          node .github/scripts/verify-pages.cjs "https://racion-app.pages.dev/?release=$GITHUB_SHA" --published-offer
-          node .github/scripts/verify-agility.cjs "https://racion-app.pages.dev/?release=$GITHUB_SHA"
-          node .github/scripts/verify-colombia-foods.cjs "https://racion-app.pages.dev/?release=$GITHUB_SHA"
-          node .github/scripts/verify-ica.cjs "https://racion-app.pages.dev/?release=$GITHUB_SHA"
-          node .github/scripts/verify-manufacturer-store.cjs "https://racion-app.pages.dev/?release=$GITHUB_SHA"
+          node .github/scripts/verify-public-access.cjs "$PAGES_URL" "$GITHUB_SHA"
+          node .github/scripts/verify-public-access.cjs "https://racion-app.pages.dev/" "$GITHUB_SHA"
         env:
           PAGES_URL: ${{ needs.deploy.outputs.page_url }}

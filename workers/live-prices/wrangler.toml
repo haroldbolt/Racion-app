@@ -5,7 +5,7 @@ workers_dev = true
 preview_urls = false
 
 [vars]
-ALLOWED_ORIGINS = "https://haroldbolt.github.io,https://racion-app.pages.dev"
+ALLOWED_ORIGINS = "https://haroldbolt.github.io,https://racion-app.pages.dev,https://muse.racion-app.pages.dev"
 
 [[durable_objects.bindings]]
 name = "LIVE_PRICE_BUDGET"

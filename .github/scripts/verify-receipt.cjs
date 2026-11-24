@@ -2,6 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { jsPDF } = require('jspdf');
+const { museReviewOrigin, museBrowserOptions, verifyReviewPage } = require('./muse-review.cjs');
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright-core');
 
 const formula = 'Royal Canin Sterilised 37';
@@ -153,8 +154,9 @@ async function verifyMuseReceipt(page, url) {
   const button = (name) => page.getByRole('button', { name, exact: typeof name === 'string' });
   const workerUrls = [];
   page.on('worker', worker => workerUrls.push(worker.url()));
-  await page.clock.setFixedTime(new Date('2026-11-23T15:00:00-05:00'));
+  if (new URL(url).origin !== museReviewOrigin) await page.clock.setFixedTime(new Date('2026-11-23T15:00:00-05:00'));
   await page.goto(url, { waitUntil: 'domcontentloaded' });
+  await verifyReviewPage(page, url);
   await button('Agregar mascota').click();
   await button('🐶 Perro').click();
   await page.getByRole('textbox', { name: 'Ej. Milo' }).fill('Milo facturas');
@@ -312,12 +314,26 @@ async function verifyMuseReceipt(page, url) {
 async function verifyReceipt() {
   const url = new URL(process.argv[2]);
   const isLocal = url.protocol === 'http:' && url.hostname === '127.0.0.1';
-  assert.ok(isLocal || url.origin === 'https://racion-app.pages.dev', 'Use local test preview or the branded public beta');
+  const isMuseReview = url.origin === museReviewOrigin;
+  assert.ok(isLocal || isMuseReview || url.origin === 'https://racion-app.pages.dev', 'Use local test preview, the protected Muse review, or the branded public beta');
+  const reviewOptions = museBrowserOptions(url);
   if (process.env.GITHUB_SHA) url.searchParams.set('receipt-check', process.env.GITHUB_SHA);
-  await waitForSite(url);
+  if (!isMuseReview) await waitForSite(url);
   const browser = await chromium.launch({ channel: 'chrome', headless: true });
+  async function runMuseCase() {
+    const musePage = await browser.newPage({ ...reviewOptions, locale: 'es-CO', timezoneId: 'America/Bogota',
+      viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: 'block' });
+    musePage.setDefaultTimeout(20000);
+    try {
+      await verifyMuseReceipt(musePage, url.href);
+    } finally { await musePage.close(); }
+  }
   let page;
   try {
+    if (isMuseReview) {
+      await runMuseCase();
+      return;
+    }
     page = await browser.newPage({ locale: 'es-CO', timezoneId: 'America/Bogota', viewport: { width: 390, height: 844 },
       isMobile: true, hasTouch: true, serviceWorkers: 'block' });
     page.setDefaultTimeout(15000);
@@ -462,12 +478,7 @@ async function verifyReceipt() {
     await todayCost.scrollIntoViewIfNeeded();
     await saveProof(page, 'receipt-costs-persisted.png');
 
-    const musePage = await browser.newPage({ locale: 'es-CO', timezoneId: 'America/Bogota',
-      viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: 'block' });
-    musePage.setDefaultTimeout(20000);
-    try {
-      await verifyMuseReceipt(musePage, url.href);
-    } finally { await musePage.close(); }
+    await runMuseCase();
 
     // Initialization failures need a clean IndexedDB context, otherwise cached languages
     // would hide a broken download. Only this isolated failure test replaces model GETs.

@@ -1,0 +1,49 @@
+name: Verificar la revisión de Muse
+
+on:
+  push:
+    branches: ['feature/publicar-beta-muse']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  review:
+    name: Muse · ${{ matrix.scenario }}
+    if: github.ref == 'refs/heads/feature/publicar-beta-muse'
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario: [postal, agility, receipt, shared-bag]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar las herramientas del navegador
+        run: npm install --prefix "$RUNNER_TEMP/muse-browser" --no-save --package-lock=false --no-audit --no-fund --ignore-scripts playwright-core@1.62.1 jspdf@4.2.1
+      - name: Verificar el recorrido y la persistencia en la revisión publicada
+        env:
+          SCENARIO: ${{ matrix.scenario }}
+          NODE_PATH: ${{ runner.temp }}/muse-browser/node_modules
+          POSTAL_SCREENSHOT_DIR: ${{ runner.temp }}/muse-evidence
+          AGILITY_SCREENSHOT_DIR: ${{ runner.temp }}/muse-evidence
+          RECEIPT_SCREENSHOT_DIR: ${{ runner.temp }}/muse-evidence
+          SHARED_BAG_SCREENSHOT_DIR: ${{ runner.temp }}/muse-evidence
+        run: node .github/scripts/run-muse-review.cjs "$SCENARIO"
+      - name: Guardar capturas de las pruebas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: muse-${{ matrix.scenario }}-${{ github.sha }}
+          path: ${{ runner.temp }}/muse-evidence/*.png
+          if-no-files-found: ignore
+          retention-days: 14
