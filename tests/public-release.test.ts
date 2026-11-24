@@ -9,29 +9,48 @@ const config = {
 };
 const sites = ['https://racion-app.pages.dev', 'https://haroldbolt.github.io/Racion-app/'];
 
-test('working registration and CORS on both public origins cannot release the Stripe sandbox as Hotmart', async () => {
-  const calls: string[] = [];
-  const responder = (async (input, init) => {
+const terms = {provider: 'hotmart', amountCents: 2500, currency: 'USD', renewal: false, checkoutUrl: 'https://pay.hotmart.com/A12345B?off=one'};
+
+function servePublicConfiguration(offer = terms, calls: string[] = []) {
+  return (async (input, init) => {
     const origin = new Headers(init?.headers).get('Origin')!;
-    assert.equal(String(input), 'https://cuentas.racion.app/api/billing/status');
-    calls.push(init?.method + ' ' + origin);
+    const path = new URL(String(input)).pathname;
+    calls.push(origin + ' ' + init?.method + ' ' + path);
     const headers = {
       'Access-Control-Allow-Origin': origin,
       'Access-Control-Allow-Methods': 'GET, OPTIONS',
       'Access-Control-Allow-Headers': 'Authorization, Content-Type',
     };
-    if (init?.method === 'OPTIONS') return new Response(null, {status: 204, headers});
     assert.equal(new Headers(init?.headers).has('Authorization'), false);
-    return Response.json({error: 'sign_in_required'}, {status: 401, headers});
+    if (init?.method === 'OPTIONS') return new Response(null, {status: 204, headers});
+    if (path === '/api/billing/status') return Response.json({error: 'sign_in_required'}, {status: 401, headers});
+    assert.equal(path, '/api/billing/offer');
+    return Response.json(offer, {headers});
   }) as typeof fetch;
-  await assert.rejects(verifyPublicRelease(config, sites, responder), /Publicación comercial bloqueada.*Hotmart.*único cobro de 18 USD/);
-  assert.deepEqual(calls, sites.flatMap(url => ['OPTIONS', 'GET'].map(method => method + ' ' + new URL(url).origin)));
-  for (const failure of [new Response(null, {status: 204}), Response.json({error:'billing_not_configured'}, {status:503})]) {
-    await assert.rejects(verifyPublicRelease(config, [sites[0]], async (url, init) => {
-      if (init?.method === 'OPTIONS' && failure.status !== 204) return responder(url, init);
-      return failure;
-    }), /El Worker (no permite solicitudes|de cuentas no está listo)/);
+}
+
+test('the public build requires Hotmart checkout and an authenticated diary for each site', async () => {
+  const calls: string[] = [];
+  await verifyPublicRelease(config, sites, servePublicConfiguration(terms, calls));
+  assert.deepEqual(calls, sites.flatMap(url =>
+    ['OPTIONS /api/billing/status', 'GET /api/billing/status', 'GET /api/billing/offer'].map(step => new URL(url).origin + ' ' + step)));
+});
+
+test('the public build rejects incorrect sale terms, missing offers and unprotected status', async () => {
+  for (const overrides of [
+    {amountCents: 1800}, {currency: 'COP'}, {renewal: true}, {provider: 'other'}, {checkoutUrl: ''},
+    {checkoutUrl: 'https://pay.hotmart.com.example.org/off'}, {checkoutUrl: 'https://pay.hotmart.com/'},
+  ]) {
+    await assert.rejects(verifyPublicRelease(config, [sites[0]], servePublicConfiguration({...terms, ...overrides})), /oferta de Hotmart/);
   }
+  const configured = servePublicConfiguration();
+  for (const status of [200, 503]) {
+    await assert.rejects(verifyPublicRelease(config, [sites[0]], async (url, init) => {
+      if (init?.method === 'OPTIONS') return configured(url, init);
+      return Response.json({}, {status});
+    }), /El Worker de cuentas no está listo/);
+  }
+  await assert.rejects(verifyPublicRelease(config, [sites[0]], async () => new Response(null, {status: 204})), /CORS/);
 });
 
 test('public release rejects incomplete, local and fixture configuration before contacting any service', async () => {

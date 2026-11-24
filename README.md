@@ -1,50 +1,37 @@
 # Ración App
 
-Ración App permite estimar la ración de perros y gatos, registrar tomas y pesajes y consultar su historial. La oferta prevista para Muse incluye registro, 72 horas de prueba gratuita y un único cobro de 18 USD al cuarto día, sin renovación. El procedimiento de publicación describe cómo validarla en Hotmart. Las raciones son estimaciones y no sustituyen la indicación de un veterinario.
+Ración App permite estimar la ración de perros y gatos y llevar un diario de comidas, compras y pesajes. La edición comercial ofrece acceso por un pago único de **25 USD** a través de Hotmart. Las raciones son estimaciones y no sustituyen la indicación de un veterinario.
 
 ## Ejecutar en local
 
-Instala [Bun](https://bun.sh/) y [Node.js](https://nodejs.org/) 20.19 o 22.12 en adelante:
+Instala [Bun](https://bun.sh/) y [Node.js](https://nodejs.org/) 20.19 o 22.12 en adelante y ejecuta:
 
 ```sh
 bun install
-RACION_LOCAL_MODE=anonymous-beta bun run dev
+bun run dev
 ```
 
-Abre [localhost:3000](http://localhost:3000). Para comprobar la compilación y verla en el navegador:
+Abre [localhost:3000](http://localhost:3000). En el modo normal verás **Comprar** y **Ya compré**. Para probar únicamente el diario con perfiles locales, usa `RACION_LOCAL_MODE=anonymous-beta bun run dev`. Las comprobaciones del repositorio se ejecutan con `bun run lint` y `bun run test`.
 
-```sh
-bun run lint
-bun run test
-bun run build --mode anonymous-beta
-bun run preview
-```
+## Compra y acceso con Hotmart
 
-## R0 · Prueba histórica de registro y cobro con Stripe Sandbox
+1. Configura en Hotmart el producto y la oferta de **pago único de 25 USD**. Obtén el enlace directo de pago en `pay.hotmart.com`, el identificador de producto y el código de oferta.
+2. Habilita correo y contraseña en Firebase Authentication y configura los dominios autorizados para los enlaces de verificación y recuperación. Define `VITE_BILLING_API_URL` (origen del Worker), `VITE_BILLING_FIREBASE_PROJECT_ID` y `VITE_BILLING_FIREBASE_API_KEY` al compilar la aplicación. Las variables `VITE_*` son públicas.
+3. En el Worker de `workers/billing`, configura `FIREBASE_PROJECT_ID`, `ALLOWED_ORIGINS`, `HOTMART_CHECKOUT_URL`, `HOTMART_PRODUCT_ID` y `HOTMART_OFFER_CODE`. Guarda el Hottok en el secreto **HOTMART_HOTTOK** del Worker. Usa un Worker distinto para pruebas de envío desde el panel y para eventos de ventas reales.
+4. En Hotmart registra el webhook HTTPS `/api/billing/webhook` del Worker para los eventos de compra v2. **Comprar** abre la oferta publicada. **Ya compré** permite ingresar con el correo de compra y verificar su titularidad. La aprobación activa el acceso. El acceso se comprueba de nuevo al volver a la app, y un reembolso o contracargo debe reflejarse para la compra correspondiente. [Eventos oficiales de Hotmart](https://developers.hotmart.com/docs/es/2.0.0/webhook/purchase-webhook/)
+5. Para abrir ventas, comprueba el precio y la modalidad en la página de pago oficial y valida que una transacción de prueba del proveedor llegue a la cuenta correcta. Las pruebas automáticas usan transacciones ficticias y conservan el dinero fuera del recorrido.
 
-La compilación estándar de esta rama abre el registro. La edición pública anterior se compila de forma explícita con `--mode anonymous-beta`. La nueva edición requiere una conexión para verificar la cuenta al abrirla. Los diarios siguen en el navegador y su vinculación requiere la confirmación del titular del dispositivo.
+## Actualizar la app y conservar el diario
 
-1. Habilita correo y contraseña en un proyecto Firebase Authentication de pruebas. En el frontend configura `VITE_BILLING_FIREBASE_PROJECT_ID`, `VITE_BILLING_FIREBASE_API_KEY` y `VITE_BILLING_API_URL` con el origen del Worker de pruebas. La configuración pública de Firebase se obtiene de su aplicación web.
-2. En el Worker `workers/billing`, configura `FIREBASE_PROJECT_ID` con el mismo proyecto y `ALLOWED_ORIGINS` con la URL completa del frontend de pruebas, incluida la ruta de regreso. Guarda `STRIPE_SECRET_KEY` y `STRIPE_WEBHOOK_SECRET` exclusivamente como secretos del Worker. Se admiten claves de sandbox. El webhook es `/api/billing/webhook` para los eventos `checkout.session.completed`, `payment_intent.succeeded`, `payment_intent.payment_failed` y `payment_intent.processing`.
-3. Ejecuta `bun run dev` para la interfaz o `bun run build` para generar sus archivos. El registro abre Stripe Checkout. Después de confirmar el método, cada cuenta tiene un vencimiento persistente a las 72 horas. El Worker programa un solo cargo de 1.800 centavos USD. La cancelación se hace desde **Mi cuenta**.
-4. Para repetir la prueba con la API de Stripe, carga una clave de pruebas en el entorno y ejecuta `node --import tsx scripts/verify-billing-sandbox.ts --api-setup`. El modo `--hosted` permite registrar el método directamente en dos formularios de Stripe Checkout. Ambos verifican los cargos del sandbox con su API. El reloj acelerado pertenece al ejecutor de pruebas. La verificación en Chrome usa el emulador oficial de Firebase Authentication y una pasarela de pagos controlada. También comprueba inventario, costos y pesajes después de recargar.
+Publica la actualización en el mismo origen que usaba el cliente. Al entrar por primera vez con su compra verificada, quien ya tenga datos en ese navegador puede elegir **Vincular mis datos anteriores**. Esta opción conserva sus mascotas, planes, registros y compras para esa cuenta. Los datos que ya estén vinculados se abren con la misma identidad. Un pago pendiente o una sesión cerrada no borra el diario.
 
-## Publicar la beta
+El acceso del comprador se puede recuperar en otro dispositivo. El historial se guarda por navegador y dispositivo. En **Más → Ajustes y Privacidad → Exportar JSON** se puede descargar una copia con los registros y sus recibos.
 
-La [revisión de Muse](https://muse.racion-app.pages.dev/) permite probar R1–R5 con la invitación de pruebas, sin tarjeta ni cobros. El dominio [racion-app.pages.dev](https://racion-app.pages.dev/) corresponde a la beta anterior. El lanzamiento comercial de R0 queda pendiente de integrar y probar la oferta de Hotmart.
+## Publicar
 
-Para actualizar la revisión, configura los secretos de Pages `MUSE_REVIEW_PASSWORD` y `MUSE_REVIEW_SIGNING_KEY` únicamente en **Previews**. Compila el commit que vas a publicar con `GITHUB_SHA` y `VITE_PRICE_API_URL` definidos, ejecuta `bun run build:muse-review` y despliega `dist` en la rama **muse** del proyecto de Cloudflare Pages **racion-app**. La prueba en GitHub Actions abre esa misma versión con una credencial temporal, recarga la app y conserva capturas de los cuatro recorridos. El nombre de usuario de la invitación es `muse`.
+Usa `bun run build:public` para compilar la versión comercial y sirve `dist/` con HTTPS. La compilación comprueba la oferta que anuncia el Worker y que el diario requiera una sesión. Para probar la PWA antes de actualizar un dominio, usa la prueba de actualización del workflow de GitHub Actions. En GitHub Pages el workflow configura la ruta base del repositorio. En Cloudflare Pages conserva la configuración de Firebase, compras y precios para el dominio que se publica.
 
-Para publicarla en otro sitio, sirve `dist/` como contenido estático en un dominio con HTTPS. El diario funciona en el navegador. Si tu alojamiento usa el servidor incluido, ejecuta `NODE_ENV=production bun run start` después de compilar. El puerto por defecto es 3000 y se puede cambiar con la variable de entorno `PORT`.
-
-La aplicación guarda perfiles, planes, compras y registros en el almacenamiento local del navegador. Los datos no se sincronizan entre dispositivos; cambiar de navegador, dominio o borrar sus datos deja esos registros fuera de alcance. En **Más → Ajustes y Privacidad → Exportar JSON** puedes descargar una copia de tus datos. Tras la primera carga en producción, la PWA guarda los recursos principales para que el diario y las fichas personales estén disponibles sin conexión. Buscar productos y actualizar precios requiere internet.
-
-### Hotmart · Configurar y probar la oferta de Muse
-
-1. **Preparar la oferta.** En Hotmart abre **Productos → Mis productos → Crear producto → Suscripción**. En **Fijación de precio → Nuevo plan**, fija **18 USD**, modalidad de prueba **Gratis**, **3 días** y **número máximo de cobros = 1**. Vuelve a abrir la oferta y comprueba que muestre esos valores. La ayuda documenta la cancelación automática al llegar al máximo y deja sin especificar el mínimo que acepta el formulario. Si rechaza el valor 1, conserva la oferta en borrador y solicita a soporte una modalidad de cobro único diferido. [Configuración de planes](https://suportehotmart.zendesk.com/hc/es-es/articles/360060619412--C%C3%B3mo-crear-y-configurar-planes-de-suscripci%C3%B3n-y-cupones-de-descuento) · [Condiciones de la prueba, sección 5.1](https://hotmart.com/es/legal/plazo-de-compra)
-2. **Preparar el entorno de pruebas.** Usa un Worker de pruebas y datos ficticios. En Hotmart selecciona **Herramientas → Credenciales de desarrollador → Sandbox**. Guarda las credenciales OAuth y el token privado del webhook (Hottok) como secretos del Worker. Los valores `VITE_*` se distribuyen al navegador. [Credenciales](https://developers.hotmart.com/docs/en/start/app-auth) · [Alcance del sandbox](https://developers.hotmart.com/docs/es/start/about/)
-3. **Probar la notificación.** Apunta el webhook de pruebas al Worker de pruebas. En **Herramientas → Webhook → Configuraciones** ejecuta una prueba de envío y revisa el historial. El receptor debe verificar `X-HOTMART-HOTTOK`, producto, oferta, moneda e importe, y aplicar cada transacción aprobada una sola vez. Esta prueba acredita la recepción del mensaje. [Prueba de envío](https://suportehotmart.zendesk.com/hc/es-es/articles/360001491352--C%C3%B3mo-configuro-la-API-de-mi-producto-usando-el-Webhook-Postback) · [Eventos de compra](https://developers.hotmart.com/docs/en/2.0.0/webhook/purchase-webhook/)
-4. **Probar el cobro antes de activar la oferta.** Usa un recorrido de compra que Hotmart identifique como de pruebas. Con una cuenta ficticia, cancela desde la app antes de las 72 horas y comprueba en Hotmart la cancelación y cero cargos tras el vencimiento. Con otra, registra la hora de inicio y verifica en Hotmart un único cargo aprobado de 18 USD al cuarto día, sin otro pago programado. Recarga la app en ambas cuentas y comprueba el acceso correspondiente. Si el sandbox solo entrega datos de muestra o carece de un flujo de compra para esa oferta, deja el cobro pendiente de validar y pide a Hotmart una prueba de extremo a extremo sin dinero real.
+La [revisión de Muse](https://muse.racion-app.pages.dev/) es un entorno privado de QA para probar el diario. Para actualizarlo, configura los secretos de Pages `MUSE_REVIEW_PASSWORD` y `MUSE_REVIEW_SIGNING_KEY` únicamente en **Previews**. Compila el commit con `GITHUB_SHA` y `VITE_PRICE_API_URL` definidos, ejecuta `bun run build:muse-review` y despliega `dist` en la rama **muse** del proyecto **racion-app**.
 
 ## Comparación de precios en Colombia
 

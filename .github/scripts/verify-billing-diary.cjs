@@ -1,11 +1,11 @@
 const assert = require('node:assert/strict');
 
-// This runs once, on the billing registration screen of an isolated local browser context.
-// Everything after linking uses the same controls as an existing beta customer.
+// Load a representative old-format backup in the released anonymous beta. The meal,
+// migration, and all diary assertions then go through normal browser controls.
 async function seedLegacyDiary(page) {
   assert.ok(['localhost', '127.0.0.1'].includes(new URL(page.url()).hostname));
   await page.evaluate(() => {
-    if (localStorage.getItem('racion_pets_v1')) throw new Error('Expected a fresh regression context');
+    if (JSON.parse(localStorage.getItem('racion_pets_v1') || '[]').length) throw new Error('Expected a fresh regression context');
     const date = '2020-01-02';
     const rocky = { id:'legacy-rocky', name:'Rocky', species:'dog', breed:'Mestizo', sex:'male', isNeutered:true,
       ageYears:4, currentWeightKg:12, idealWeightKg:12, targetWeightKg:12, bcs:5, activityLevel:'moderate',
@@ -26,12 +26,18 @@ async function seedLegacyDiary(page) {
     const bag = {id:'qa-shared-bag', petId:luna.id, foodId:sharedFood.id, foodBrand:sharedFood.brand,
       foodName:sharedFood.name, foodType:'dry', date, createdAt:date, openedOn:date, quantity:1,
       bagSizeKg:10, pricePaidCop:150000, costPerKgCop:15000, sharedWithPetIds:[rocky.id]};
-    const receipt = {...bag, id:'qa-receipt', foodId:receiptFood.id, foodName:receiptFood.name,
+    const photo = document.createElement('canvas');
+    photo.width = 32;
+    photo.height = 12;
+    photo.getContext('2d').fillRect(2, 2, 28, 6);
+    const receipt = {...bag, receiptPhotoUrl:photo.toDataURL('image/png'), id:'qa-receipt', foodId:receiptFood.id, foodName:receiptFood.name,
       bagSizeKg:3, quantity:2, pricePaidCop:90000, costPerKgCop:30000, sharedWithPetIds:[]};
     const records = {
       racion_pets_v1:[luna, rocky],
       racion_plans_v1:{[rocky.id]:plan(rocky, sharedFood, 100), [luna.id]:plan(luna, receiptFood, 150)},
       racion_weight_records_v1:[
+        {id:'w_first_luna', petId:luna.id, date:'2019-12-15', weightKg:20, notes:'Primer pesaje de Luna'},
+        {id:'w_first_rocky', petId:rocky.id, date:'2019-12-15', weightKg:11.5, notes:'Primer pesaje de Rocky'},
         {id:'w_qa_luna', petId:luna.id, date, weightKg:20.5, notes:'Control previo a R0'},
         {id:'w_qa_rocky', petId:rocky.id, date, weightKg:12, notes:'Control de Rocky anterior al registro'},
       ],
@@ -39,6 +45,22 @@ async function seedLegacyDiary(page) {
     };
     for (const [key, data] of Object.entries(records)) localStorage.setItem(key, JSON.stringify(data));
     localStorage.setItem('racion_active_pet_id_v1', luna.id);
+  });
+}
+
+async function recordMealInPreviousBeta(page) {
+  await page.reload({waitUntil:'domcontentloaded'});
+  const rocky = page.locator('header').getByRole('button').filter({has:page.getByText('Rocky', {exact:true})});
+  await rocky.click();
+  await page.getByRole('button', {name:'Hoy',exact:true}).click();
+  await page.getByRole('button', {name:'Ya comió',exact:true}).first().click();
+  await page.getByRole('button', {name:'Deshacer',exact:true}).waitFor();
+  await page.getByText(/Servido:\s*100\s*g/).waitFor();
+  return page.evaluate(() => {
+    const key = 'racion_meal_logs_v1';
+    const meals = JSON.parse(localStorage.getItem(key));
+    if (meals.length !== 1 || meals[0].petId !== 'legacy-rocky') throw new Error('Expected the legacy beta to store one actual meal for Rocky');
+    return meals[0].id;
   });
 }
 
@@ -65,6 +87,11 @@ async function verifyLinkedDiary(page) {
       const line = await invoice.innerText();
       assert.match(line, /2\s*×\s*1[.,]5\s*kg/i);
       assert.match(line, /90[.\s,]?000\s*COP/i);
+      await invoice.getByRole('button', {name:'Ver recibo',exact:true}).click();
+      const image = page.getByRole('dialog', {name:'Recibo de la compra'}).getByRole('img', {name:'Imagen del recibo'});
+      await image.waitFor();
+      await image.evaluate(async element => { await element.decode(); if (element.naturalWidth !== 32) throw new Error('Receipt image lost'); });
+      await button('Cerrar recibo').click();
     }
   }
   async function receiptCost() {
@@ -78,20 +105,18 @@ async function verifyLinkedDiary(page) {
       assert.match(await costs.getByRole('listitem').filter({hasText:time}).innerText(), /4[.\s,]?500\s*COP/);
     }
   }
-  async function weight(name, note) {
+  async function weight(name, note, first) {
     await button('Progreso').click();
     await page.getByRole('heading', {name:'Historial de pesajes de ' + name, exact:true}).waitFor();
-    await page.getByText(note,{exact:true}).waitFor();
+    const history = page.getByRole('region', {name:'Historial de pesajes de ' + name});
+    await history.getByText(note,{exact:true}).waitFor();
+    await history.getByText(first,{exact:true}).waitFor();
+    assert.equal(await history.getByText(name === 'Rocky' ? 'Control previo a R0' : 'Control de Rocky anterior al registro',{exact:true}).count(), 0);
   }
 
-  await lunaRing.waitFor();
-  await receiptCost();
-  await stock(10000, true);
   await pet('Rocky').click();
-  await stock(10000);
   await button('Hoy').click();
   await rockyRing.waitFor();
-  await button('Ya comió').first().click();
   await button('Deshacer').waitFor();
   await page.getByText(/Servido:\s*100\s*g/).waitFor();
   await page.reload({waitUntil:'domcontentloaded'});
@@ -109,12 +134,12 @@ async function verifyLinkedDiary(page) {
   await page.reload({waitUntil:'domcontentloaded'});
   await rockyRing.waitFor();
   await stock(10000);
-  await weight('Rocky', 'Control de Rocky anterior al registro');
+  await weight('Rocky', 'Control de Rocky anterior al registro', 'Primer pesaje de Rocky');
   await pet('Luna de la beta').click();
   await stock(10000, true);
   await receiptCost();
-  await weight('Luna de la beta', 'Control previo a R0');
+  await weight('Luna de la beta', 'Control previo a R0', 'Primer pesaje de Luna');
   console.log('Diario vinculado y recargado: 150 g cuestan $4.500 COP con la factura de 2 × 1,5 kg. Al servir y deshacer 100 g a Rocky, la otra bolsa compartida pasó por 10.000 → 9.900 → 10.000 g para ambas mascotas. Persistieron los dos planes, compras, pesajes y la toma al recargar.');
 }
 
-module.exports = { seedLegacyDiary, verifyLinkedDiary };
+module.exports = { seedLegacyDiary, recordMealInPreviousBeta, verifyLinkedDiary };

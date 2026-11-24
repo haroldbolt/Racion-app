@@ -2,25 +2,27 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readAccess, readCheckoutUrl } from '../src/services/billingClient';
 
-const trial = {
-  status:'trial_active', canAccess:true, trialStartedAt:'2026-11-22T23:40:00.000Z',
-  trialEndsAt:'2026-11-25T23:40:00.000Z', chargedAt:null,
-  amountCents:1800, currency:'USD', renewal:false, serverTime:'2026-11-22T23:45:00.000Z',
-};
+const terms = {amountCents:2500, currency:'USD', renewal:false};
+const offer = {...terms, provider:'hotmart', checkoutUrl:'https://pay.hotmart.com/A123456B?off=example'};
 
-test('the app accepts only the agreed trial and access state from the account service', () => {
-  assert.deepEqual(readAccess(trial), trial);
-  assert.throws(() => readAccess({ ...trial, amountCents:2000 }));
-  assert.throws(() => readAccess({ ...trial, renewal:true }));
-  assert.throws(() => readAccess({ ...trial, trialEndsAt:'2026-11-26T23:40:00.000Z' }));
-  assert.throws(() => readAccess({ ...trial, status:'canceled', canAccess:true }));
-  assert.throws(() => readAccess({ ...trial, status:'paid', chargedAt:null }));
+test('only a confirmed single USD 25 purchase opens the workspace', () => {
+  for (const status of ['not_purchased', 'pending', 'paid', 'revoked']) {
+    const entry = {...terms, status, canAccess:status === 'paid'};
+    assert.deepEqual(readAccess(entry), entry);
+    assert.throws(() => readAccess({...entry, canAccess:!entry.canAccess}));
+  }
+  for (const invalid of [{amountCents:1800}, {currency:'COP'}, {renewal:true}, {status:'trial_active'}]) {
+    assert.throws(() => readAccess({...terms, status:'paid', canAccess:true, ...invalid}));
+  }
 });
 
-test('the sandbox redirects only to a test session on Stripe Checkout', () => {
-  const url = 'https://checkout.stripe.com/c/pay/cs_test_fixture#client';
-  assert.equal(readCheckoutUrl({url}), url);
-  assert.throws(() => readCheckoutUrl({url:url.replace('cs_test_', 'cs_live_')}));
-  assert.throws(() => readCheckoutUrl({url:url.replace('checkout.stripe.com', 'example.org')}));
-  assert.throws(() => readCheckoutUrl({}));
+test('the offer links to Hotmart only for the configured single USD 25 payment', () => {
+  assert.equal(readCheckoutUrl(offer), offer.checkoutUrl);
+  for (const checkoutUrl of ['https://pay.hotmart.com/', 'https://elsewhere.example/A123456B', 'https://pay.hotmart.com.evil.invalid/A123456B',
+    'https://someone@pay.hotmart.com/A123456B','http://pay.hotmart.com/A123456B']) {
+    assert.throws(() => readCheckoutUrl({...offer,checkoutUrl}));
+  }
+  assert.throws(() => readCheckoutUrl({...offer,amountCents:1800}));
+  assert.throws(() => readCheckoutUrl({...offer,renewal:true}));
+  assert.throws(() => readCheckoutUrl({...offer,provider:'other'}));
 });

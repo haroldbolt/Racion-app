@@ -856,7 +856,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : mode === 'register' ? (
                 <>
-                  <span>Crear Cuenta Gratis</span>
+                  <span>Crear cuenta</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               ) : (
@@ -895,7 +895,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   }}
                   className="font-bold text-[#0B5D2E] hover:underline"
                 >
-                  Crear cuenta gratis
+                  Crear cuenta
                 </button>
               </p>
             )}

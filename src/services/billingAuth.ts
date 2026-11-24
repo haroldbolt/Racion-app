@@ -10,4 +10,5 @@ const app = initializeApp({
 export const billingAuth = initializeAuth(app, {
   persistence: [indexedDBLocalPersistence, browserLocalPersistence, browserSessionPersistence],
 });
+billingAuth.languageCode = 'es';
 if (config.emulator) connectAuthEmulator(billingAuth, config.emulator, { disableWarnings: true });

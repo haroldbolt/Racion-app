@@ -1,4 +1,5 @@
 import { isIP } from 'node:net';
+import { hasPurchaseTerms, hotmartCheckoutUrl } from '../src/utils/hotmart.mjs';
 
 const betaOrigin = 'https://racion-app.pages.dev';
 
@@ -15,8 +16,8 @@ function publicUrl(value, field) {
   return url;
 }
 
-/** Check public registration independently of the payment provider. These probes are read-only. */
-async function verifyPublicRegistration(env, appUrls, request) {
+/** Read the offer and confirm the customer status endpoint requires authentication. */
+export async function verifyPublicRelease(env, appUrls, request = fetch) {
   const required = ['VITE_BILLING_FIREBASE_PROJECT_ID', 'VITE_BILLING_FIREBASE_API_KEY', 'VITE_BILLING_API_URL'];
   const missing = required.filter(name => !env[name]?.trim());
   if (missing.length) throw new Error('Falta configurar ' + missing.join(', ') + '.');
@@ -47,19 +48,15 @@ async function verifyPublicRegistration(env, appUrls, request) {
         response.headers.get('Access-Control-Allow-Origin') !== origin) {
       throw new Error(`El Worker de cuentas no está listo para ${origin} (HTTP ${response.status}).`);
     }
+    const offer = await request(new URL('/api/billing/offer', worker), {
+      ...options, method: 'GET', headers: { Origin: origin },
+    });
+    const terms = await offer.json().catch(() => null);
+    if (!offer.ok || offer.headers.get('Access-Control-Allow-Origin') !== origin ||
+        terms?.provider !== 'hotmart' || !hasPurchaseTerms(terms) || !hotmartCheckoutUrl(terms.checkoutUrl)) {
+      throw new Error(`Falta una oferta de Hotmart configurada para un único pago de 25 USD desde ${origin}.`);
+    }
   }
-}
-
-export async function verifyPublicRelease(env, appUrls, request = fetch) {
-  // The current billing UI and Worker only implement Stripe Sandbox.
-  // Replace this hold with an end-to-end Hotmart release check when the integration exists.
-  const blocked = 'Publicación comercial bloqueada. Falta integrar Hotmart y verificar una oferta de 72 horas con un único cobro de 18 USD al cuarto día, sin renovación.';
-  try {
-    await verifyPublicRegistration(env, appUrls, request);
-  } catch (cause) {
-    throw new Error(`${blocked} ${cause.message}`, { cause });
-  }
-  throw new Error(blocked);
 }
 
 /**
@@ -75,7 +72,7 @@ export function publicRelease() {
       commit = process.env.GITHUB_SHA || process.env.CF_PAGES_COMMIT_SHA;
       if (commit && !/^[\da-f]{40}$/i.test(commit)) throw new Error('El identificador de versión no es un SHA de Git válido.');
       if (process.env.RACION_PUBLIC_BUILD !== '1' && process.env.CF_PAGES !== '1') return;
-      if (config.mode !== 'production') throw new Error('La beta pública requiere el modo production con acceso R0.');
+      if (config.mode !== 'production') throw new Error('La publicación comercial requiere el modo production con acceso de comprador.');
       const urls = (process.env.RACION_PUBLIC_URLS || betaOrigin).split(',').map(url => url.trim());
       await verifyPublicRelease(config.env, urls);
     },

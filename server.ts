@@ -43,7 +43,7 @@ app.post('/api/live-prices', express.json({ limit: '1kb' }), async (req, res, ne
   } catch (error) { next(error); }
 });
 
-// The billing sandbox uses a separate Worker. Never serve the SPA for an unknown API route.
+// Purchase verification uses a separate Worker. Never serve the SPA for an unknown API route.
 app.use('/api', (_req, res) => {
   res.status(404).json({ error: 'Not available in the local beta' });
 });

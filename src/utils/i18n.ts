@@ -77,11 +77,6 @@ export const TRANSLATIONS = {
     emergencyCallVet: 'Llamar a mi veterinario de urgencia',
     emergencyClinicSearch: 'Clínicas veterinarias 24h cercanas',
     toxicFirstStepsTitle: 'Primeros auxilios ante comida tóxica',
-    // Payment
-    unlockLifetimeTitle: 'Desbloquear para siempre - $ 80.000 COP (~20 USD)',
-    oneTimePaymentTag: 'Pago único - sin suscripción',
-    unlockLifetimeDesc: 'La ración exacta de cualquier alimento, para todas tus mascotas, para siempre en todos tus dispositivos.',
-    activateKey: 'Tengo una clave de licencia',
     // Settings
     settingsTitle: 'Ajustes y Familia',
     familyRolesTitle: 'Familia compartida',
@@ -164,10 +159,6 @@ export const TRANSLATIONS = {
     emergencyCallVet: 'Call my emergency veterinarian',
     emergencyClinicSearch: 'Nearest 24h vet clinics',
     toxicFirstStepsTitle: 'First aid for toxic foods',
-    unlockLifetimeTitle: 'Unlock forever - $ 80,000 COP (~$20 USD)',
-    oneTimePaymentTag: 'One-time payment - no subscription',
-    unlockLifetimeDesc: 'The exact feeding ration for any food, for all your pets, forever on all your household devices.',
-    activateKey: 'I have a license key',
     settingsTitle: 'Settings & Family',
     familyRolesTitle: 'Family sharing',
     exportDataTitle: 'Export my data (CSV / PDF)',

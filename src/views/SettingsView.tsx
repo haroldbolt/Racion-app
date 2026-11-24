@@ -334,8 +334,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             <div className="text-xs text-[#1C2B21] space-y-2.5 leading-relaxed">
               <p>
                 {isEs
-                  ? 'Esta beta no tiene cuentas. Los perfiles, planes, tomas y pesajes se guardan en este navegador.'
-                  : 'This beta has no accounts. Profiles, plans, meals and weigh-ins are saved in this browser.'}
+                  ? 'Los perfiles, planes, tomas, pesajes y comprobantes se guardan en este navegador. Para el acceso de pago usamos tu correo verificado y la confirmación de compra de Hotmart. Puedes volver a ingresar con tu cuenta en otro dispositivo. El diario permanece en el dispositivo de origen.'
+                  : 'Profiles, plans, meals, weigh-ins and receipts are saved in this browser. Paid access uses your verified email and Hotmart purchase confirmation. You can sign in on another device. Your diary stays on the original device.'}
               </p>
               <p>
                 {isEs

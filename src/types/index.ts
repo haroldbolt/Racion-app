@@ -421,39 +421,6 @@ export interface UserAccount {
   whatsappPhone?: string;
 }
 
-export type MonetizationStatus =
-  | 'unregistered'
-  | 'trial_active'
-  | 'trial_expiring_soon' // <= 24 hours left
-  | 'charged_lifetime' // 20 USD single charge completed
-  | 'canceled' // Canceled before trial end, 0 USD charged
-  | 'payment_failed'; // Authorized charge failed at trial end
-
-export interface TokenizedCardSummary {
-  brand: string;
-  last4: string;
-  cardholderName: string;
-  token: string;
-}
-
-export interface MonetizationInfo {
-  status: MonetizationStatus;
-  canAccessFeatures: boolean;
-  trialStartedAt?: string;
-  trialEndsAt?: string;
-  hoursLeft: number;
-  minutesLeft: number;
-  is24hReminderDue: boolean;
-  reminder24hSent: boolean;
-  chargedAt?: string;
-  chargeTransactionId?: string;
-  chargeAmountUsd: number;
-  paymentMethod: TokenizedCardSummary | null;
-  isOneTimePaymentOnly: boolean;
-  hasRecurringSubscription: boolean;
-  effectiveServerTime: string;
-}
-
 export type CityRelation = 'in_city' | 'delivers_to_city' | 'national_coverage';
 export type VerificationLevel = 'verified' | 'unverified_snippet' | 'requires_store_check';
 export type ShippingClassification = 'free' | 'paid' | 'unconfirmed' | 'pickup_only';

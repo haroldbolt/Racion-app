@@ -1,14 +1,19 @@
+# Keep the original Worker and Durable Object identity so previously scheduled
+# sandbox alarms are handled by the inert alarm handler after deployment.
 name = "racion-billing-sandbox"
 main = "index.ts"
 compatibility_date = "2025-10-01"
 workers_dev = true
 preview_urls = false
 
-# Configure the test Firebase project and the frontend sandbox URL before deploying.
-# Entries may include the app base path for Checkout redirects.
+# Set HOTMART_HOTTOK with wrangler secret put. Offer details belong to the
+# merchant account; do not activate checkout until the USD 25 offer exists.
 [vars]
 ALLOWED_ORIGINS = "http://localhost:3000,http://127.0.0.1:3000"
 FIREBASE_PROJECT_ID = ""
+HOTMART_PRODUCT_ID = ""
+HOTMART_OFFER_CODE = ""
+HOTMART_CHECKOUT_URL = ""
 
 [[durable_objects.bindings]]
 name = "BILLING_ACCOUNTS"

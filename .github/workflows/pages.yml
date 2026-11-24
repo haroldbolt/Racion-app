@@ -30,7 +30,7 @@ jobs:
       - run: bun run test
       - name: Install browser and Worker test runners
         run: npm install --prefix "$RUNNER_TEMP/racion-test-tools" --no-save --package-lock=false --no-audit --no-fund playwright-core@1.62.1 miniflare@4.20260730.0 firebase-tools@15.37.0
-      - name: Test trial registration, cancellation, simulated payment and diary in Chrome
+      - name: Verify the Hotmart purchase and upgrade from the published beta in Chrome
         env:
           VITE_BILLING_API_URL: http://127.0.0.1:4209
           VITE_BILLING_AUTH_EMULATOR_URL: http://127.0.0.1:9099
@@ -38,17 +38,21 @@ jobs:
           VITE_BILLING_FIREBASE_API_KEY: fixture-only
         run: |
           export PLAYWRIGHT_PATH="$RUNNER_TEMP/racion-test-tools/node_modules/playwright-core"
-          sandbox_dist="$RUNNER_TEMP/racion-billing-fixture"
-          bun run build --outDir "$sandbox_dist" --emptyOutDir
-          bun run preview --outDir "$sandbox_dist" --host 127.0.0.1 --port 4198 --strictPort &
-          preview_pid=$!
-          trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
-          curl --retry 12 --retry-all-errors --retry-delay 1 -fsS http://127.0.0.1:4198/ -o /dev/null
-          node .github/scripts/verify-public-access.cjs http://127.0.0.1:4198/ "$GITHUB_SHA"
+          export MINIFLARE_PATH="$RUNNER_TEMP/racion-test-tools/node_modules/miniflare"
+          legacy_source="$RUNNER_TEMP/racion-previous-source"
+          legacy_dist="$RUNNER_TEMP/racion-previous-build"
+          paid_dist="$RUNNER_TEMP/racion-hotmart-build"
+          legacy_commit=c4a1beed82b421f442ecaa523541eb5d2c2b9f44
+          git fetch --no-tags --depth=1 origin "$legacy_commit"
+          mkdir "$legacy_source"
+          git archive "$legacy_commit" | tar -x -C "$legacy_source"
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$legacy_source/node_modules"
+          (cd "$legacy_source" && bun run build --outDir "$legacy_dist" --emptyOutDir)
+          bun run build --outDir "$paid_dist" --emptyOutDir
           echo '{"emulators":{"auth":{"host":"127.0.0.1","port":9099},"ui":{"enabled":false}}}' > "$RUNNER_TEMP/racion-firebase.json"
           "$RUNNER_TEMP/racion-test-tools/node_modules/.bin/firebase" emulators:exec \
             --only auth --project demo-racion --config "$RUNNER_TEMP/racion-firebase.json" \
-            "node --import tsx .github/scripts/verify-billing-ui.cjs http://127.0.0.1:4198/"
+            "node .github/scripts/verify-billing-ui.cjs '$legacy_dist' '$paid_dist'"
       - name: Verify Worker and persistent quota ledger
         run: |
           export MINIFLARE_PATH="$RUNNER_TEMP/racion-test-tools/node_modules/miniflare"
