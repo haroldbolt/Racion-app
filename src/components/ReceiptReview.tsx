@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AlertCircle, FileText, LoaderCircle, Trash2 } from 'lucide-react';
-import { readReceipt, type ReceiptProgress, type ReceiptReadResult } from '../services/receiptReader';
+import { ReceiptViewer } from './ReceiptViewer';
+import type { ReceiptProgress, ReceiptReadResult } from '../services/receiptReader';
+import { isPdfReceipt } from '../services/receiptPdf';
 import { extractReceipt, type ReceiptExtraction, type ReceiptItemCandidate } from '../utils/receiptExtraction';
 import { formatCOP } from '../utils/i18n';
 
@@ -9,7 +11,7 @@ interface ReceiptReviewProps {
   onNewFile: () => void;
   onReadingChange: (reading: boolean) => void;
   onSelectionRequiredChange: (required: boolean) => void;
-  onPreview: (url: string) => void;
+  onPreview: (url: string, pdf?: File) => void;
   onSelect: (item: ReceiptItemCandidate, extraction: ReceiptExtraction, method: ReceiptReadResult['method']) => void;
   onManual: () => void;
   onRemove: () => void;
@@ -25,6 +27,7 @@ export function ReceiptReview({ language, onNewFile, onReadingChange, onSelectio
   const [extraction, setExtraction] = useState<ReceiptExtraction>();
   const [selectedId, setSelectedId] = useState<string>();
   const [preview, setPreview] = useState('');
+  const [viewing, setViewing] = useState(false);
   const [error, setError] = useState('');
   const [cancelled, setCancelled] = useState(false);
 
@@ -54,10 +57,12 @@ export function ReceiptReview({ language, onNewFile, onReadingChange, onSelectio
     setReading(true);
     onReadingChange(true);
     try {
+      const { readReceipt } = await import('../services/receiptReader');
+      if (controller.signal.aborted) return;
       const read = await readReceipt(next, { signal: controller.signal, onPreview: (url) => {
         if (operation.current === controller && !controller.signal.aborted) {
           setPreview(url);
-          onPreview(url);
+          onPreview(url, isPdfReceipt(next) ? next : undefined);
         }
       }, onProgress: (nextProgress) => {
         if (operation.current === controller && !controller.signal.aborted) setProgress(nextProgress);
@@ -68,7 +73,7 @@ export function ReceiptReview({ language, onNewFile, onReadingChange, onSelectio
       setExtraction(data);
       if (read.previewDataUrl) {
         setPreview(read.previewDataUrl);
-        onPreview(read.previewDataUrl);
+        onPreview(read.previewDataUrl, isPdfReceipt(next) ? next : undefined);
       }
       onSelectionRequiredChange(data.items.length > 0);
       if (data.items.length === 1) selectItem(data.items[0], data, read);
@@ -164,7 +169,8 @@ export function ReceiptReview({ language, onNewFile, onReadingChange, onSelectio
         </div>
       )}
       {file && !reading && <button type="button" onClick={() => void start(file)} className="min-h-10 rounded-xl border border-[var(--border-color)] px-3 text-xs font-bold">{isEs ? 'Volver a leer factura' : 'Read receipt again'}</button>}
-      {preview && <div className="relative overflow-hidden rounded-xl border border-[var(--border-color)] bg-white"><a href={preview} target="_blank" rel="noopener noreferrer"><img src={preview} alt={isEs ? 'Factura adjunta' : 'Attached receipt'} className="max-h-48 w-full object-contain" /></a><button type="button" onClick={remove} aria-label={isEs ? 'Quitar foto de factura' : 'Remove receipt photo'} className="absolute right-2 top-2 rounded-lg bg-white p-2 text-red-700"><Trash2 aria-hidden="true" className="size-4" /></button></div>}
+      {preview && <div className="relative overflow-hidden rounded-xl border border-[var(--border-color)] bg-white"><button type="button" aria-haspopup="dialog" onClick={() => setViewing(true)} className="block w-full"><img src={preview} alt={isEs ? 'Factura adjunta' : 'Attached receipt'} className="max-h-48 w-full object-contain" /></button><button type="button" onClick={remove} aria-label={isEs ? 'Quitar foto de factura' : 'Remove receipt photo'} className="absolute right-2 top-2 rounded-lg bg-white p-2 text-red-700"><Trash2 aria-hidden="true" className="size-4" /></button></div>}
+      {viewing && preview && <ReceiptViewer image={preview} pdf={file && isPdfReceipt(file) ? file : undefined} isEs={isEs} onClose={() => setViewing(false)} />}
       {file && !preview && !reading && <button type="button" onClick={remove} className="min-h-10 text-xs font-bold text-red-700">{isEs ? 'Quitar factura' : 'Remove receipt'}</button>}
     </section>
   );

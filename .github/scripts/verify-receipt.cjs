@@ -41,11 +41,15 @@ async function receiptPng(page, lines) {
   return Buffer.from(base64, 'base64');
 }
 
-function receiptPdf(lines) {
+function receiptPdf(lines, secondPage) {
   const pdf = new jsPDF({ unit: 'pt', format: 'a4', compress: false });
   pdf.setFont('courier', 'normal');
   pdf.setFontSize(13);
   pdf.text(lines, 36, 50, { lineHeightFactor: 1.7 });
+  if (secondPage) {
+    pdf.addPage();
+    pdf.text(secondPage, 36, 180);
+  }
   return Buffer.from(pdf.output('arraybuffer'));
 }
 
@@ -122,6 +126,15 @@ async function saveProof(page, name) {
   if (!process.env.RECEIPT_SCREENSHOT_DIR) return;
   await fs.mkdir(process.env.RECEIPT_SCREENSHOT_DIR, { recursive: true });
   await page.screenshot({ path: path.join(process.env.RECEIPT_SCREENSHOT_DIR, name), fullPage: false });
+}
+
+async function openStoredReceipt(page, card) {
+  const tabCount = page.context().pages().length;
+  await card.getByRole('button', { name: /Ver recibo/ }).click();
+  const viewer = page.getByRole('dialog', { name: 'Recibo de la compra', exact: true });
+  await viewer.waitFor();
+  assert.equal(page.context().pages().length, tabCount, 'El comprobante debe abrirse en la app');
+  return viewer;
 }
 
 function museInvoice(size) {
@@ -227,6 +240,15 @@ async function verifyMuseReceipt(page, url) {
     }
     await purchase.scrollIntoViewIfNeeded();
     await saveProof(page, 'muse-compra-tras-recarga.png');
+    const imageViewer = await openStoredReceipt(page, purchase);
+    const image = imageViewer.getByRole('img', { name: 'Imagen del recibo', exact: true });
+    await image.waitFor();
+    assert.ok(await image.evaluate(async element => {
+      await element.decode();
+      return element.naturalWidth > 100 && element.naturalHeight > 100;
+    }), 'La foto guardada debe tener píxeles legibles');
+    await saveProof(page, 'muse-imagen-abierta-tras-recarga.png');
+    await imageViewer.getByRole('button', { name: 'Cerrar recibo' }).click();
 
     await button('Hoy').click();
     await openPurchase.click();
@@ -247,6 +269,33 @@ async function verifyMuseReceipt(page, url) {
     assert.equal(await largeWeight.isChecked(), false, 'Editing the amount invalidates the tenfold weight approval');
     assert.equal(await save.isDisabled(), true);
     assert.equal(await dialog.getByRole('article').count(), 1);
+
+    const secondPage = 'Anexo de la factura MUSE-001. Conserve esta pagina con su comprobante.';
+    const originalPdf = receiptPdf(museInvoice('1,5'), secondPage);
+    await checkReadValues({name:'factura-muse-dos-paginas.pdf', mimeType:'application/pdf', buffer:originalPdf}, 1.5);
+    const pdfStore = 'Mascotas Prueba S.A.S. Sucursal PDF';
+    await dialog.getByLabel('Tienda (opcional)', {exact:true}).fill(pdfStore);
+    await general.check();
+    await sameFood.check();
+    await save.click();
+    await dialog.getByRole('article').filter({hasText:pdfStore}).waitFor();
+    await dialog.getByRole('button', { name: 'Cerrar gastos', exact:true }).click();
+    await page.reload({waitUntil:'domcontentloaded'});
+    await button('Alimentos').click();
+    await button('Gastos ($ COP)').click();
+    const savedPdf = expenses.getByRole('article').filter({hasText:pdfStore});
+    const pdfViewer = await openStoredReceipt(page, savedPdf);
+    const pageOne = pdfViewer.getByRole('img', {name:'Página 1 del recibo', exact:true});
+    await pageOne.waitFor();
+    await pdfViewer.getByRole('button', {name:'Página siguiente', exact:true}).click();
+    await pdfViewer.getByText('Página 2 de 2', {exact:true}).waitFor();
+    await pdfViewer.getByRole('img', {name:'Página 2 del recibo', exact:true}).waitFor();
+    const storedBytes = await pdfViewer.getByRole('link', {name:'Descargar PDF'}).evaluate(async link =>
+      Array.from(new Uint8Array(await (await fetch(link.href)).arrayBuffer())));
+    assert.deepEqual(Buffer.from(storedBytes), originalPdf, 'Las dos páginas del PDF se recuperan intactas');
+    await saveProof(page, 'muse-pdf-pagina-2-tras-recarga.png');
+    await pdfViewer.getByRole('button', {name:'Cerrar recibo'}).click();
+    console.log('R5 recibos: foto visible y PDF original de dos páginas recuperado íntegro en la app tras recargar.');
     console.log(JSON.stringify({ scenario:'R3 Muse', food:'Agility Gold Grandes Adultos', receipt:'real PNG OCR / digital PDF',
       quantity:2, packageKg:1.5, totalPaidCop:90000, merchant:'Mascotas Prueba S.A.S.', purchaseDate:'2026-11-22',
       costPerGramCop:30, gramsPerMeal:150, costPerMealCop:4500, persisted:true, warnedForUnlistedKg:8, blockedTenfoldKg:15 }));
@@ -316,7 +365,7 @@ async function verifyReceipt() {
     await preview.scrollIntoViewIfNeeded();
     await saveProof(page, 'receipt-review-before-confirmation.png');
     if (await save.isEnabled()) await save.click();
-    assert.equal(await dialog.getByRole('link', { name: /Ver recibo/ }).count(), 0, 'Unconfirmed OCR data must not be saved');
+    assert.equal(await dialog.getByRole('button', { name: /Ver recibo/ }).count(), 0, 'Unconfirmed OCR data must not be saved');
     await confirm.check();
     await confirmFood.check();
     // Editing a field after review invalidates confirmation, even when the user re-enters the same amount.
@@ -328,7 +377,7 @@ async function verifyReceipt() {
     await confirmFood.check();
     await save.click();
     await expectMealCosts(dialog.getByRole('region', { name: 'Costo de la ración', exact: true }), 3699, 1850);
-    await dialog.getByRole('link', { name: /Ver recibo/ }).waitFor();
+    await dialog.getByRole('button', { name: /Ver recibo/ }).waitFor();
     await dialog.getByRole('button', { name: 'Cerrar gastos', exact: true }).click();
     await page.reload({ waitUntil: 'domcontentloaded' });
     await expectMealCosts(todayCost, 3699, 1850);
@@ -399,7 +448,7 @@ async function verifyReceipt() {
     await button('Alimentos').click();
     await button('Gastos ($ COP)').click();
     await page.getByText('Aún no hay compras registradas para esta mascota.', { exact: true }).waitFor();
-    assert.equal(await page.getByRole('link', { name: /Ver recibo/ }).count(), 0);
+    assert.equal(await page.getByRole('button', { name: /Ver recibo/ }).count(), 0);
     await button(/🐱\s*Nube recibos/).click();
     await button('Hoy').click();
     await expectMealCosts(todayCost, 3699, 1850);
@@ -470,7 +519,7 @@ async function verifyReceipt() {
       await expectMealCosts(failureDialog.getByRole('region', { name: 'Costo antes de guardar', exact: true }), 3699, 1850);
       assert.equal(await failureDialog.getByRole('checkbox', { name: 'Confirmo el importe y el peso de este alimento', exact: true }).isChecked(), false);
       await failurePage.getByText('Aún no hay compras registradas para esta mascota.', { exact: true }).waitFor();
-      assert.equal(await failurePage.getByRole('link', { name: /Ver recibo/ }).count(), 0);
+      assert.equal(await failurePage.getByRole('button', { name: /Ver recibo/ }).count(), 0);
       await failureDialog.getByRole('region', { name: 'Costo antes de guardar', exact: true }).scrollIntoViewIfNeeded();
       await saveProof(failurePage, 'receipt-manual-after-model-error.png');
     } finally { await failureContext.close(); }

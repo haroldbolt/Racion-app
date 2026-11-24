@@ -564,11 +564,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
   const currentDeltaPercent = Number((((latestWeight - targetWeight) / targetWeight) * 100).toFixed(1));
 
   const chartData = React.useMemo(() => {
-    const records: WeightRecord[] = sortedWeights.length > 0
-      ? sortedWeights
-      : [{ id: 'init', petId: pet.id, date: localDateKey(), weightKg: pet.currentWeightKg }];
-
-    const mapped = records.map((w) => {
+    return sortedWeights.map((w) => {
       const d = new Date(w.date + 'T12:00:00');
       const formattedDate = isNaN(d.getTime())
         ? w.date
@@ -590,29 +586,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
         notes: w.notes,
       };
     });
-
-    // If there is only 1 entry, synthesize a baseline starting point 14 days earlier
-    // so Recharts Area/Line renders a visible path across the timeline
-    if (mapped.length === 1) {
-      const single = mapped[0];
-      const singleDate = new Date(records[0].date + 'T12:00:00');
-      const baseDate = new Date(singleDate.getTime() - 14 * 86400000);
-      const baseLabel = isNaN(baseDate.getTime())
-        ? (isEs ? 'Inicio' : 'Start')
-        : baseDate.toLocaleDateString(isEs ? 'es-ES' : 'en-US', { day: 'numeric', month: 'short' });
-
-      return [
-        {
-          ...single,
-          date: baseLabel,
-          notes: isEs ? 'Punto de partida' : 'Starting baseline',
-        },
-        single,
-      ];
-    }
-
-    return mapped;
-  }, [sortedWeights, targetWeight, pet.currentWeightKg, isEs]);
+  }, [sortedWeights, targetWeight, isEs]);
 
   // Target Date Calculator: Linear Regression (OLS) over historical weightRecords
   const targetDateProjection = React.useMemo(() => {
@@ -943,6 +917,11 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
               </div>
 
               {/* Responsive Container with Recharts Chart */}
+              {chartData.length === 0 ? (
+                <p className="text-xs text-[#44544A]">
+                  {isEs ? 'Registra un pesaje para iniciar la gráfica.' : 'Log a weigh-in to start the chart.'}
+                </p>
+              ) : (
               <div className="w-full h-56 pt-1">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
@@ -1050,6 +1029,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
+              )}
 
               {/* Progress Bar & Delta Summary Footer */}
               <div className="bg-[#EAF4EC] p-3 rounded-2xl border border-[#0B5D2E15] space-y-1.5">

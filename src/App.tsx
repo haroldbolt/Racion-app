@@ -196,20 +196,12 @@ export default function App({ onOpenAccount }: { onOpenAccount?: () => void }) {
 
   // Save pet (new or edit)
   const handleSavePet = (savedPet: Pet) => {
-    const existingIdx = pets.findIndex((p) => p.id === savedPet.id);
-    let updatedPets: Pet[] = [];
-    if (existingIdx >= 0) {
-      updatedPets = [...pets];
-      updatedPets[existingIdx] = savedPet;
-    } else {
-      updatedPets = [...pets, savedPet];
-    }
-    setPets(updatedPets);
-    StorageService.savePets(updatedPets);
+    const wasEditing = pets.some(p => p.id === savedPet.id);
+    setPets(StorageService.savePetProfile(savedPet));
     setActivePetId(savedPet.id);
     setShowPetModal(false);
     setPetToEdit(null);
-    if (existingIdx < 0) setCurrentTab('calculate');
+    if (!wasEditing) setCurrentTab('calculate');
 
     // Recalculate active feeding plan when breed, sex, neutered status, weight, or age changes
     const existingPlan = plans[savedPet.id];
@@ -287,8 +279,8 @@ export default function App({ onOpenAccount }: { onOpenAccount?: () => void }) {
   };
 
   // Reset all data
-  const handleResetAllData = () => {
-    StorageService.clearAllData();
+  const handleResetAllData = async () => {
+    await StorageService.clearAllData();
     setPets(StorageService.getPets());
     setActivePetId(StorageService.getActivePetId());
     setPlans(StorageService.getPlans());

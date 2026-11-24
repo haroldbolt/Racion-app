@@ -64,6 +64,37 @@ test('same and backdated weigh-ins persist without changing the latest weight or
   assert.deepEqual(StorageService.getWeightRecords('luna').map((record) => record.weightKg), [4.1, 4.3, 4.4]);
   assert.deepEqual(StorageService.getWeightRecords('milo'), []);
   assert.deepEqual(StorageService.getPets().map((pet) => pet.currentWeightKg), [4.4, 14.2]);
+  StorageService.savePetProfile({ ...milo, name: 'Milo editado' });
+  assert.deepEqual(StorageService.getWeightRecords('milo'), [], 'editing a legacy profile cannot establish its original weight');
+});
+
+test('creation weight is recorded once, on the local day, and remains independent of later weigh-ins', (context) => {
+  context.mock.timers.enable({ apis: ['Date'], now: new Date('2026-11-24T03:45:00Z') });
+  const luna: Pet = {
+    id: 'luna', name: 'Luna', species: 'dog', breed: 'Mestiza', sex: 'female', isNeutered: true,
+    currentWeightKg: 20, idealWeightKg: 20, targetWeightKg: 20, bcs: 5, activityLevel: 'moderate',
+    specialState: 'none', createdAt: new Date().toISOString(),
+  };
+  StorageService.savePetProfile(luna);
+  StorageService.savePetProfile(luna);
+  const first = StorageService.getWeightRecords('luna');
+  assert.equal(first.length, 1, 'retrying profile creation keeps a single initial measurement');
+  assert.equal(first[0].source, 'profile_creation');
+  assert.equal(first[0].weightKg, 20);
+  assert.equal(first[0].date, '2026-11-23');
+
+  const notes = 'Pesaje de prueba escenario de bolsa compartida.\nLuna pesó 20,5 kg antes de su segunda toma.';
+  assert.equal(StorageService.addWeightRecord({ id: 'older', petId: 'luna', date: '2026-11-22', weightKg: 19 }), false);
+  assert.equal(StorageService.getPets()[0].currentWeightKg, 20);
+  assert.equal(StorageService.addWeightRecord({ id: 'control', petId: 'luna', date: '2026-11-23', weightKg: 20.5, notes }), true);
+  StorageService.savePetProfile({ ...luna, name: 'Luna editada', currentWeightKg: 20.5 });
+  StorageService.savePetProfile({ ...luna, id: 'rocky', name: 'Rocky', currentWeightKg: 12 });
+  StorageService.initialize();
+  const history = StorageService.getWeightRecords('luna');
+  assert.deepEqual(history.map(record => record.weightKg), [19, 20, 20.5]);
+  assert.deepEqual(history[1], first[0]);
+  assert.equal(history[2].notes, notes);
+  assert.deepEqual(StorageService.getWeightRecords('rocky').map(record => record.weightKg), [12]);
 });
 
 test('keeps the food, price paid per gram, servings and intake bound to the original meal across plan changes', () => {

@@ -11,7 +11,7 @@ import { FoodLabelComposition } from '../components/FoodLabelComposition';
 import { LabelReviewModal } from '../components/LabelReviewModal';
 import { useManufacturerFoods } from '../hooks/useManufacturerFoods';
 import { OnlineFoodSearch } from '../components/OnlineFoodSearch';
-import { getConfirmedPresentations } from '../data/foodPresentations';
+import { getConfirmedPresentations, packageConfirmation, packageLabel } from '../data/foodPresentations';
 import { NutritionSummary } from '../components/NutritionSummary';
 import { FoodsView } from './FoodsView';
 import {
@@ -926,6 +926,7 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                   (foodType === 'wet' && wetFood?.id === item.id) ||
                   (foodType === 'mixed' && (dryFood?.id === item.id || wetFood?.id === item.id));
                 const kcalPerKg = getFoodKcalPerKg(item);
+                const sizes = getConfirmedPresentations(item) ?? [];
 
                 return (
                   <article
@@ -949,7 +950,8 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
                           : (isEs ? 'Energía sin dato' : 'Energy unavailable')}
                       </p>
                       <p className="text-[11px] text-[#44544A]">
-                        {(getConfirmedPresentations(item) || []).map((size) => `${size} kg`).join(' · ') || (isEs ? 'Empaque sin dato' : 'Package size unknown')}
+                        {sizes.map((size) => <span key={size} className="block">{packageLabel(size)} · {packageConfirmation(item.manufacturerSizesKg, size, isEs)}</span>)}
+                        {sizes.length === 0 && (isEs ? 'Empaque sin dato' : 'Package size unknown')}
                       </p>
                     </button>
 
@@ -971,7 +973,8 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({
 
           {foodSource === 'internet' && (foodType === 'mixed' ? [dryFood, wetFood] : [selectedFood]).filter((food): food is FoodItem => Boolean(food)).map((food) => (
             <section key={food.id} aria-label={isEs ? 'Fórmula seleccionada' : 'Selected formula'} className="space-y-2 rounded-xl border border-[#0B5D2E25] p-3">
-              <h3 className="text-sm font-bold">{food.brand} {food.name}{food.bagSizeKg ? ` · ${food.bagSizeKg} kg` : ''}</h3>
+              <h3 className="text-sm font-bold">{food.brand} {food.name}{food.bagSizeKg ? ` · ${packageLabel(food.bagSizeKg)}` : ''}</h3>
+              {food.bagSizeKg && <p className="text-xs text-[#44544A]">{packageConfirmation(food.manufacturerSizesKg, food.bagSizeKg, isEs)}</p>}
               <FoodLabelComposition food={food} language={userAccount.language} />
               <button type="button" className="min-h-11 font-bold text-[#0B5D2E] underline" onClick={() => { setLabelDraft(food); setShowAddCustomModal(true); }}>
                 {isEs ? 'Contrastar con mi etiqueta' : 'Check against my label'}

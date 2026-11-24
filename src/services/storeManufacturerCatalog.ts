@@ -1,6 +1,7 @@
 import type { FoodItem, MeasurementBasis, NutrientQualifier, NutrientValue, NutritionDatasheet, Species } from '../types';
 
 import { foodFormulaQuery } from '../utils/foodSearchQuery';
+import { distinctPackageSizes, matchingPackage } from '../data/foodPresentations';
 
 interface StoreRow {
   handle: string;
@@ -65,9 +66,6 @@ const ignore = new Set(['alimento','alimentos','comida','concentrado','para','de
 function identity(s:string) {
   return words(s).filter(w => !ignore.has(w)).join(' ');
 }
-function distinctSizes(values: number[]) {
-  return [...new Set(values.filter(v => Number.isFinite(v) && v > 0))].sort((a,b) => a-b);
-}
 async function loadStore() {
   const [inventory, houses, domestic, international, other, specialty] = await Promise.all([
     import('../data/manufacturers/store.json'), import('../data/manufacturers/houses.json'),
@@ -95,7 +93,7 @@ async function loadStore() {
       officialUrl:formula?.url, verifiedOn:formula?.verifiedOn, formula,
       manufacturerFormulaUrl:formula && urlCounts.get(formula.url) === 1 ? formula.url : undefined,
       officialPackagesKg:formula?.packagesKg,
-      packagesKg:distinctSizes([...row.storePackagesKg, ...(formula?.packagesKg ?? [])]),
+      packagesKg:distinctPackageSizes([...row.storePackagesKg, ...(formula?.packagesKg ?? [])]),
     };
   });
 }
@@ -178,7 +176,8 @@ function withFormula(food: FoodItem, row:StoreManufacturerFood): FoodItem {
     values.every(v => v.source?.url === formula.url || v.source?.url === analysisSource.url || (formula.kcalSourceUrl && v.source?.url === formula.kcalSourceUrl)));
   data.coincidenciaEstado = onlyOfficial ? 'verificado' : values.length ? 'revision_requerida' : 'pendiente';
   data.notasRevision = onlyOfficial ? 'Ficha oficial de la fórmula seleccionada.' : 'Revisa la procedencia de cada valor y completa los campos pendientes con el empaque.';
-  return {...result, manufacturerFormulaName:formula.name, manufacturerFormulaUrl:row.manufacturerFormulaUrl, fichaNutricional:data, dataSource:source.name,
+  return {...result, manufacturerFormulaName:formula.name, manufacturerFormulaUrl:row.manufacturerFormulaUrl,
+    manufacturerSizesKg:row.officialPackagesKg, fichaNutricional:data, dataSource:source.name,
     declaredIcaRegistration:formula.registration || food.declaredIcaRegistration,
     feedingGuide:formula.feedingGuide ? { ...formula.feedingGuide, sourceType: 'manufacturer' } : food.feedingGuide,
     ingredientsSummary:formula.ingredients ?? food.ingredientsSummary,
@@ -194,7 +193,7 @@ export function selectStoreManufacturerFood(row:StoreManufacturerFood, packageKg
   const id = 'agrocentro-' + row.handle;
   return withFormula({id,sourceFoodId:id,brand:row.brand,name:row.name,species:row.species,type:'dry',lifeStage:stage,lifeStageKnown:stage!=='all',
     storeName:'Agrocentro Pets',storeProductUrl:row.storeUrl,buyUrl:row.storeUrl,country:'Colombia',
-    availableSizesKg:row.packagesKg, bagSizeKg:packageKg !== undefined && row.packagesKg.includes(packageKg) ? packageKg : undefined,
+    availableSizesKg:row.packagesKg, bagSizeKg:packageKg === undefined ? undefined : matchingPackage(row.packagesKg, packageKg),
     kcalPerKg:0,proteinPct:0,fatPct:0,fiberPct:0,moisturePct:0,labelStatus:'unconfirmed',
     fichaNutricional:{coincidenciaEstado:'pendiente',mercado:'Colombia'}}, row);
 }
@@ -213,8 +212,13 @@ function matchFormula(food:FoodItem, catalog:StoreManufacturerFood[]) {
     return key.startsWith(brand + ' ') ? key : brand + ' ' + key;
   };
   const key = equivalents(food.name);
-  const matches = catalog.filter(row => row.species === food.species && identity(row.brand) === brand &&
-    (equivalents(row.name) === key || (row.formula && equivalents(row.formula.name) === key)));
+  const matches = catalog.filter(row => {
+    const officialBrand = identity(row.brand);
+    // Some stores abbreviate the brand field while spelling out the full brand on the exact product title.
+    const compatibleBrand = officialBrand === brand || (officialBrand.startsWith(brand + ' ') && key.startsWith(officialBrand + ' '));
+    return row.species === food.species && compatibleBrand &&
+      (equivalents(row.name) === key || (row.formula && equivalents(row.formula.name) === key));
+  });
   const formulas = new Set(matches.map(row => row.formula));
   if (!matches.length || formulas.size !== 1 || !matches[0].formula) return undefined;
   const row = matches[0];
@@ -234,11 +238,15 @@ export async function getManufacturerPackageGuide(food: FoodItem) {
 /** Merge only on an exact formula or an identified store listing. Choosing another
  * retailer must keep its price, pack, barcode and stock source. */
 export async function enrichFoodFromStoreManufacturer(food:FoodItem): Promise<FoodItem> {
-  if (food.type !== 'dry' || food.labelStatus === 'user_confirmed_label') return food;
+  if (food.type !== 'dry') return food;
   const catalog = await getStoreManufacturerCatalog();
   const direct = findStoreListing(food, catalog);
+  if (food.labelStatus === 'user_confirmed_label') {
+    const sizes = (direct ?? matchFormula(food, catalog))?.officialPackagesKg;
+    return sizes && sizes.join() !== food.manufacturerSizesKg?.join() ? {...food, manufacturerSizesKg:sizes} : food;
+  }
   if (direct) {
-    const availableSizesKg = distinctSizes([...(food.availableSizesKg ?? []), ...direct.packagesKg]);
+    const availableSizesKg = distinctPackageSizes([...(food.availableSizesKg ?? []), ...direct.packagesKg]);
     return withFormula({...food, availableSizesKg}, direct);
   }
   const row = matchFormula(food, catalog);
@@ -246,6 +254,6 @@ export async function enrichFoodFromStoreManufacturer(food:FoodItem): Promise<Fo
   if (!row || !formula) return food;
   const hasRetailOffer = !!(food.storeProductUrl || food.buyUrl || food.priceBasis || food.packagePrices?.length);
   const base = hasRetailOffer ? food : {...food,
-    availableSizesKg:distinctSizes([...(food.availableSizesKg ?? []), ...(formula.packagesKg ?? [])])};
+    availableSizesKg:distinctPackageSizes([...(food.availableSizesKg ?? []), ...(formula.packagesKg ?? [])])};
   return withFormula(base,row);
 }

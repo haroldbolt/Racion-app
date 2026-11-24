@@ -279,6 +279,7 @@ const LabelForm: React.FC<LabelFormProps> = ({
     const updatedFood: FoodItem = {
       manufacturerFormulaName: identityUnchanged ? currentFood?.manufacturerFormulaName : undefined,
       manufacturerFormulaUrl: identityUnchanged ? currentFood?.manufacturerFormulaUrl : undefined,
+      manufacturerSizesKg: identityUnchanged ? currentFood?.manufacturerSizesKg : undefined,
       declaredIcaRegistration: identityUnchanged ? currentFood?.declaredIcaRegistration : undefined,
       icaRegistry: currentFood ? (identityUnchanged ? currentFood.icaRegistry : undefined)
         : (sameRegistryFormula ? initialRegistry : undefined),

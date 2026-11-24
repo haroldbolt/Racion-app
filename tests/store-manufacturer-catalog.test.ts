@@ -8,6 +8,8 @@ import domestic from '../src/data/manufacturers/colombia.json';
 import international from '../src/data/manufacturers/internacional.json';
 import other from '../src/data/manufacturers/otras.json';
 import specialty from '../src/data/manufacturers/especialidades.json';
+import { getConfirmedPresentations, packageConfirmation } from '../src/data/foodPresentations';
+import { selectFoodPackage } from '../src/services/onlineFoodCatalog';
 
 test('every official sheet belongs to identifiable, published products of the stated brand and species', async () => {
   const rows = await getStoreManufacturerCatalog();
@@ -35,6 +37,34 @@ test('every official sheet belongs to identifiable, published products of the st
       if (density) assert.ok(density.valor > 0 && density.valor < 10000, handle);
     }
   }
+});
+
+test('keeps shop-only Agility packages selectable and separates them from manufacturer sizes after saving', async () => {
+  const [row] = await searchStoreManufacturerFoods('Agility Gold Grandes Adultos', 'dog');
+  const agro = selectStoreManufacturerFood(row, 8);
+  assert.deepEqual(getConfirmedPresentations(agro), [1.5, 3, 8, 15]);
+  assert.deepEqual(getConfirmedPresentations({ id: 'agility-gold-grandes-adultos', availableSizesKg: [8] }), [1.5, 3, 8, 15]);
+
+  const puppis = await enrichFoodFromStoreManufacturer({
+    ...agro, id: 'puppis-test', sourceFoodId: undefined, manufacturerSizesKg: undefined, brand: 'Agility',
+    storeProductUrl: 'https://www.puppis.com.co/alimento-para-perro-agility-gold-grandes-adultos/p',
+    name: 'Alimento Para Perro Agility Gold Grandes Adultos', availableSizesKg: [8],
+  });
+  assert.deepEqual(puppis.availableSizesKg, [8]);
+  const legacy = await enrichFoodFromStoreManufacturer({...agro, manufacturerSizesKg: undefined, labelStatus: 'user_confirmed_label', kcalPerKg: 3601});
+  assert.equal(legacy.kcalPerKg, 3601);
+  for (const food of [agro, puppis, legacy]) {
+    const saved = JSON.parse(JSON.stringify(selectFoodPackage(food, 8)));
+    assert.equal(saved.bagSizeKg, 8);
+    assert.deepEqual(saved.manufacturerSizesKg, [1.5, 3, 15]);
+    assert.equal(packageConfirmation(saved.manufacturerSizesKg, 8, true), 'No confirmada por el fabricante');
+    assert.equal(packageConfirmation(saved.manufacturerSizesKg, 1.5, true), 'Confirmada por el fabricante');
+  }
+  assert.equal(packageConfirmation(undefined, 3, true), 'No confirmada por el fabricante');
+  assert.equal(packageConfirmation([22.679619], 22.680, false), 'Confirmed by the manufacturer');
+  assert.equal(packageConfirmation([22.679619], 22.681, false), 'Not confirmed by the manufacturer');
+  const unrelated = await enrichFoodFromStoreManufacturer({...puppis, manufacturerSizesKg: undefined, name: 'Agility Gold Grandes Adultos Otra Receta'});
+  assert.equal(unrelated.manufacturerSizesKg, undefined);
 });
 
 test('choosing a Monello pack fills all declared values and retains the source after serialization', async () => {

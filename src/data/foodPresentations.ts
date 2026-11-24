@@ -40,22 +40,46 @@ export const CONFIRMED_FOOD_PRESENTATIONS: Record<string, number[]> = {
   'chunky-adultos-pollo': [1.5, 4, 10, 22],
   'whiskas-adulto-pescado': [1.5, 3, 8],
   // Agility Gold (Italcol Colombia - Presentaciones Oficiales)
-  'agility-gold-grandes-adultos': [3, 7, 15],
+  'agility-gold-grandes-adultos': [1.5, 3, 15],
   'agility-gold-pequenos-adultos': [1.5, 3, 7],
   'agility-gold-cachorros': [1.5, 3, 7, 15],
   'agility-gold-gatos-adultos': [1.5, 3, 7],
 };
 
+/** The price service and store SKUs use whole grams, including for bags labelled in pounds. */
+export function matchingPackage(sizes: number[] | undefined, size: number): number | undefined {
+  const grams = Math.round(size * 1000);
+  return Number.isSafeInteger(grams) && grams > 0 ? sizes?.find(weight => Math.round(weight * 1000) === grams) : undefined;
+}
+
+export function distinctPackageSizes(values: number[]): number[] {
+  const sizes: number[] = [];
+  for (const kg of values) {
+    if (Number.isFinite(kg) && kg > 0 && matchingPackage(sizes, kg) === undefined) sizes.push(kg);
+  }
+  return sizes.sort((a, b) => a - b);
+}
+
+export function packageLabel(kg: number): string {
+  const grams = Math.round(kg * 1000);
+  return grams < 1000 ? grams + ' g' : grams / 1000 + ' kg';
+}
+
+export function packageConfirmation(manufacturerSizes: number[] | undefined, size: number, isEs: boolean): string {
+  return matchingPackage(manufacturerSizes, size) !== undefined
+    ? (isEs ? 'Confirmada por el fabricante' : 'Confirmed by the manufacturer')
+    : (isEs ? 'No confirmada por el fabricante' : 'Not confirmed by the manufacturer');
+}
+
 /** Returns sizes declared in the catalog or saved by the user. */
 export function getConfirmedPresentations(food?: Partial<FoodItem> | null): number[] | null {
   if (!food) return null;
-  const sizes = [
-    ...(food.id ? CONFIRMED_FOOD_PRESENTATIONS[food.id] ?? [] : []),
+  const sizes = distinctPackageSizes([
+    ...(food.bagSizeKg ? [food.bagSizeKg] : []),
     ...(food.availableSizesKg ?? []),
-    food.bagSizeKg,
-  ].filter((size): size is number => typeof size === 'number' && Number.isFinite(size) && size > 0);
-  const unique = [...new Set(sizes)].sort((a, b) => a - b);
-  return unique.length > 0 ? unique : null;
+    ...(food.id ? CONFIRMED_FOOD_PRESENTATIONS[food.id] ?? [] : []),
+  ]);
+  return sizes.length > 0 ? sizes : null;
 }
 
 /** Keeps the first nutritional label and combines declared packages of the same formula. */
@@ -65,10 +89,10 @@ export function mergeFoodCatalog(items: FoodItem[]): FoodItem[] {
   for (const item of items) {
     const key = [item.brand, item.name, item.species, item.type].map(normalize).join('__');
     const previous = merged.get(key);
-    const availableSizesKg = [...new Set([
+    const availableSizesKg = distinctPackageSizes([
       ...(getConfirmedPresentations(previous) ?? []),
       ...(getConfirmedPresentations(item) ?? []),
-    ])].sort((a, b) => a - b);
+    ]);
     merged.set(key, { ...(previous ?? item), availableSizesKg });
   }
   return [...merged.values()];

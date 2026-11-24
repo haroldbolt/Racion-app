@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { AlertCircle, Check, Plus, Receipt, Trash2, X } from 'lucide-react';
 import type { FeedingPlan, FoodCostEntry, FoodItem, UserAccount, Pet } from '../types';
 import { StorageService } from '../utils/storage';
@@ -10,6 +10,9 @@ import { getConfirmedPresentations } from '../data/foodPresentations';
 import { getManufacturerPackageGuide } from '../services/storeManufacturerCatalog';
 import { OnlineFoodSearch } from './OnlineFoodSearch';
 import { StockSummary, OpenPurchase } from './FoodInventory';
+import { SavedReceipt } from './ReceiptViewer';
+import { currentStorageSession } from '../utils/accountStorage';
+import { removeReceiptPdfs, saveReceiptPdf } from '../services/receiptDocuments';
 import { ReceiptReview } from './ReceiptReview';
 import type { ReceiptReadResult } from '../services/receiptReader';
 import type { ReceiptExtraction, ReceiptItemCandidate } from '../utils/receiptExtraction';
@@ -45,7 +48,9 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
   const [showForm, setShowForm] = useState(false);
   const [source, setSource] = useState<'plan' | 'internet'>('plan');
   const [selected, setSelected] = useState<SelectedFood>();
-  const [receiptPhotoUrl, setReceiptPhotoUrl] = useState('');
+  const [attachment, setAttachment] = useState<{ image: string; pdf?: File }>();
+  const saving = useRef<AbortController | null>(null);
+  const [savingPdf, setSavingPdf] = useState(false);
   const [photoLoading, setPhotoLoading] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -81,9 +86,11 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
     setSelected(first ? { food: first.food, role: first.role } : undefined);
     setSource(first ? 'plan' : 'internet');
     resetForm(first?.food);
-    setReceiptPhotoUrl('');
+    setAttachment(undefined);
     setError('');
     setNotice('');
+    setSavingPdf(false);
+    return () => { saving.current?.abort(); saving.current = null; };
   }, [pet.id]);
 
   function openForm() {
@@ -91,7 +98,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
     setSelected(first ? { food: first.food, role: first.role } : undefined);
     setSource(first ? 'plan' : 'internet');
     resetForm(first?.food);
-    setReceiptPhotoUrl('');
+    setAttachment(undefined);
     setError('');
     setNotice('');
     setShowForm(true);
@@ -190,8 +197,9 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
     return getPlanCostSummary(previewPlan, [...purchases, previewPurchase]);
   }, [plan, selected, draftComponent, validDraftAmounts, draftPrice, draftPackageKg, draftQuantity, draft.purchaseDate, pet.id, purchases]);
 
-  function savePurchase(event: React.FormEvent<HTMLFormElement>) {
+  async function savePurchase(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (saving.current) return;
     setError('');
     const data = new FormData(event.currentTarget);
     const packageWeight = decimal(data.get('packageWeight'));
@@ -241,7 +249,8 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
       presentationName: weightLabel(packageKg, userAccount.language),
       currency: 'COP',
       storeName: store || undefined,
-      receiptPhotoUrl: receiptPhotoUrl || undefined,
+      receiptPhotoUrl: attachment?.image,
+      receiptFormat: attachment && (attachment.pdf ? 'pdf' : 'image'),
       receiptReadMethod: receiptReadMethod,
       receiptItemDescription: receiptItemDescription,
       formulaAtPurchase: { name: selected.food.name, analysis: selected.food.fichaNutricional },
@@ -251,20 +260,47 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
       createdAt: new Date().toISOString(),
     };
 
-    try {
-      StorageService.addFoodPurchase(entry);
-      if (canUpdatePackage && usePurchasedPackage && plan && onPlanUpdate) {
-        onPlanUpdate(withPurchasedPackage(plan, selected.food, packageKg));
-      }
-      refreshPurchases();
-    } catch {
-      setError(isEs ? 'No pudimos guardar la compra en este navegador. Prueba con una imagen más pequeña.' : 'Could not save the purchase in this browser. Try a smaller image.');
-      return;
+    const pending = new AbortController();
+    if (attachment?.pdf) {
+      saving.current = pending;
+      setSavingPdf(true);
     }
+    const isCurrent = currentStorageSession();
+    let pdfStored = false;
+    try {
+      if (attachment?.pdf) {
+        await saveReceiptPdf(entry.id, attachment.pdf);
+        pdfStored = true;
+        if (pending.signal.aborted || !isCurrent()) {
+          await removeReceiptPdfs([entry.id]);
+          return;
+        }
+      }
+      StorageService.addFoodPurchase(entry);
+    } catch {
+      if (pdfStored) await removeReceiptPdfs([entry.id]).catch(() => {});
+      if (!pending.signal.aborted) setError(isEs ? 'No pudimos guardar la compra y su recibo en este navegador. Revisa el espacio disponible o usa un archivo más pequeño.' : 'Could not save the purchase and receipt in this browser. Check available storage or use a smaller file.');
+      return;
+    } finally {
+      if (saving.current === pending) {
+        saving.current = null;
+        setSavingPdf(false);
+      }
+    }
+    let packageUpdateFailed = false;
+    if (canUpdatePackage && usePurchasedPackage && plan && onPlanUpdate) {
+      try { onPlanUpdate(withPurchasedPackage(plan, selected.food, packageKg)); }
+      catch { packageUpdateFailed = true; }
+    }
+    refreshPurchases();
     setShowForm(false);
     setPhotoLoading(false);
     resetConfirmation();
-    setReceiptPhotoUrl('');
+    setAttachment(undefined);
+    if (packageUpdateFailed) {
+      setNotice(isEs ? 'Compra guardada. Vuelve a Ajustar para actualizar el empaque de tu plan.' : 'Purchase saved. Open Adjust to update the package in your plan.');
+      return;
+    }
     const differentPackage = component && (component.packageKg === undefined || Math.abs(component.packageKg - packageKg) > 0.000001);
     setNotice(differentPackage && !(canUpdatePackage && usePurchasedPackage)
       ? (isEs
@@ -273,10 +309,14 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
       : (isEs ? 'Compra guardada para este alimento y esta mascota.' : 'Purchase saved for this food and pet.'));
   }
 
-  function removePurchase(id: string) {
+  async function removePurchase(id: string) {
     if (!window.confirm(isEs ? '¿Eliminar esta compra y su recibo?' : 'Delete this purchase and receipt?')) return;
-    StorageService.deleteFoodPurchase(id);
-    refreshPurchases();
+    try {
+      await StorageService.deleteFoodPurchase(id);
+      refreshPurchases();
+    } catch {
+      setNotice(isEs ? 'No pudimos eliminar la compra y su recibo. Inténtalo de nuevo.' : 'Could not delete the purchase and its receipt. Please retry.');
+    }
   }
 
   const pets = StorageService.getPets();
@@ -348,7 +388,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
       </div>
 
       {showForm && (
-        <div className="space-y-4 rounded-3xl border border-[#0B5D2E55] bg-[var(--surface-card)] p-5">
+        <div inert={savingPdf} aria-busy={savingPdf} className="space-y-4 rounded-3xl border border-[#0B5D2E55] bg-[var(--surface-card)] p-5">
           <div className="flex justify-between gap-3">
             <h3 className="font-heading text-lg font-extrabold text-[var(--text-primary)]">{isEs ? 'Registrar compra o factura' : 'Log purchase or receipt'}</h3>
             <button type="button" onClick={() => { setShowForm(false); setPhotoLoading(false); resetConfirmation(); }} aria-label={isEs ? 'Cerrar formulario de compra' : 'Close purchase form'} className="flex size-10 items-center justify-center rounded-full"><X className="size-5" /></button>
@@ -358,7 +398,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
             onSelectionRequiredChange={setReceiptSelectionRequired}
             onNewFile={() => {
               setReceiptPresent(true);
-              setReceiptPhotoUrl('');
+              setAttachment(undefined);
               setReceiptItemDescription(undefined);
               setReceiptReadMethod(undefined);
               setDraft({ packageWeight: '', weightUnit: 'kg', quantity: '', price: '', purchaseDate: '', store: '', notes: '' });
@@ -366,10 +406,10 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
               resetConfirmation();
               setError('');
             }}
-            onPreview={setReceiptPhotoUrl}
+            onPreview={(image, pdf) => setAttachment({ image, pdf })}
             onSelect={applyReceiptItem}
             onManual={() => { setReceiptItemDescription(undefined); setReceiptReadMethod(undefined); resetConfirmation(); }}
-            onRemove={() => { setDraft(emptyDraft(selected?.food)); setUsePurchasedPackage(false); setReceiptPhotoUrl(''); setReceiptPresent(false); setReceiptItemDescription(undefined); setReceiptReadMethod(undefined); resetConfirmation(); }}
+            onRemove={() => { setDraft(emptyDraft(selected?.food)); setUsePurchasedPackage(false); setAttachment(undefined); setReceiptPresent(false); setReceiptItemDescription(undefined); setReceiptReadMethod(undefined); resetConfirmation(); }}
           />
           <div className="flex gap-2">
             {summary.components.length > 0 && (
@@ -447,6 +487,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
                     {' · '}{reference.sizes.map(kg => weightLabel(kg, userAccount.language)).join(' · ')}</p>
                   : <p>{isEs ? 'Peso por empaque pendiente de contrastar. Compruébalo en la bolsa.' : 'Package size needs verification. Check the weight on the bag.'}</p>}
                 {differsFromKnown && <p role="alert" className="font-bold text-amber-800 dark:text-amber-200">
+                  {reference?.sourceUrl && <span className="block">{isEs ? 'No confirmada por el fabricante' : 'Not confirmed by the manufacturer'}</span>}
                   {weightLabel(draftPackageKg, userAccount.language)}{isEs ? ' no coincide con las presentaciones de esta referencia. Comprueba el peso en el empaque.' : ' does not match the listed package sizes. Check the weight on the package.'}
                 </p>}
                 {smallerSize !== undefined && <div className="space-y-2 rounded-xl border border-amber-300 bg-amber-50 p-3 text-amber-950">
@@ -482,7 +523,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
                 <span>{isEs ? 'Confirmo el importe y el peso de este alimento' : 'I confirm the amount and weight for this food'}</span>
               </label>
               {error && <p role="alert" className="flex gap-2 rounded-xl bg-red-50 p-3 text-xs text-red-800"><AlertCircle className="size-4 shrink-0" />{error}</p>}
-              <button type="submit" disabled={photoLoading || receiptSelectionRequired || checkingPackages || (confirmPackageWeight && !weightConfirmed)} className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#0B5D2E] px-3 text-sm font-extrabold text-white disabled:opacity-50"><Receipt className="size-4" />{photoLoading ? (isEs ? 'Leyendo factura…' : 'Reading receipt…') : (isEs ? 'Guardar compra' : 'Save purchase')}</button>
+              <button type="submit" disabled={savingPdf || photoLoading || receiptSelectionRequired || checkingPackages || (confirmPackageWeight && !weightConfirmed)} className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#0B5D2E] px-3 text-sm font-extrabold text-white disabled:opacity-50"><Receipt className="size-4" />{savingPdf ? (isEs ? 'Guardando PDF…' : 'Saving PDF…') : photoLoading ? (isEs ? 'Leyendo factura…' : 'Reading receipt…') : (isEs ? 'Guardar compra' : 'Save purchase')}</button>
             </form>
           )}
         </div>
@@ -526,7 +567,7 @@ export function FoodCostTracker({ pet, plan, userAccount, onPlanUpdate, onPurcha
               {purchase.formulaAtPurchase?.analysis?.fuenteNombre && <p>{purchase.formulaAtPurchase.analysis.fuenteNombre} · {purchase.formulaAtPurchase.analysis.fechaConsulta?.slice(0, 10)}</p>}
             </details>}
             {purchase.notes && <p className="text-xs text-[var(--text-secondary)]">{purchase.notes}</p>}
-            {purchase.receiptPhotoUrl && <a href={purchase.receiptPhotoUrl} target="_blank" rel="noopener noreferrer" className="inline-block text-xs font-bold text-[#0B5D2E] dark:text-green-300"><img src={purchase.receiptPhotoUrl} alt={isEs ? 'Factura de esta compra' : 'Receipt for this purchase'} className="mb-1 max-h-32 rounded-xl border border-[var(--border-color)] object-contain" />{isEs ? 'Ver recibo' : 'View receipt'}</a>}
+            <SavedReceipt purchase={purchase} isEs={isEs} />
           </article>;
         })}
       </div>

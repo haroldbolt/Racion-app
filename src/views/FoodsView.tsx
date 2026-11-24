@@ -14,9 +14,9 @@ import { sameFoodIdentity } from '../utils/foodCosts';
 import { FoodCostTracker } from '../components/FoodCostTracker';
 import { FoodLabelComposition } from '../components/FoodLabelComposition';
 import { LabelReviewModal } from '../components/LabelReviewModal';
-import { useManufacturerFoods } from '../hooks/useManufacturerFoods';
+import { useManufacturerFoods, useManufacturerPackageSizes } from '../hooks/useManufacturerFoods';
 import { OnlineFoodSearch } from '../components/OnlineFoodSearch';
-import { getConfirmedPresentations } from '../data/foodPresentations';
+import { getConfirmedPresentations, packageConfirmation, packageLabel } from '../data/foodPresentations';
 import { selectFoodPackage } from '../services/onlineFoodCatalog';
 import { UnifiedFoodSearchModal } from '../components/UnifiedFoodSearchModal';
 import { calculateFoodPortionNutrients, getEffectiveNutrientField } from '../utils/mealNutrition';
@@ -46,6 +46,11 @@ function asSoldAmount(nutrient: { grams?: number; qualifier?: NutrientQualifier 
   return nutrient?.grams === undefined
     ? undefined
     : { valor: nutrient.grams, calificador: nutrient.qualifier };
+}
+
+function ComparedPackage({food, isEs}: {food: FoodItem; isEs: boolean}) {
+  const manufacturerSizes = useManufacturerPackageSizes(food);
+  return food.bagSizeKg ? <p className="text-xs text-[#44544A]">{packageLabel(food.bagSizeKg)} · {packageConfirmation(manufacturerSizes, food.bagSizeKg, isEs)}</p> : null;
 }
 
 type FoodsSubTab = 'compare' | 'costs' | 'search' | 'library' | 'toxic' | 'rubric';
@@ -383,6 +388,7 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                         <h4 className="font-heading font-extrabold text-base text-[#1C2B21] mt-1">
                           {food.name}
                         </h4>
+                        <ComparedPackage food={food} isEs={isEs} />
                       </div>
 
                       <button
@@ -639,6 +645,11 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
               )}
               {filteredFoods.map((entry) => {
                 const sizes = getConfirmedPresentations(entry) || [];
+                const sizeGroups: Record<string, number[]> = {};
+                for (const size of sizes) {
+                  const status = packageConfirmation(entry.manufacturerSizesKg, size, isEs);
+                  (sizeGroups[status] ??= []).push(size);
+                }
                 const selectedKg = libraryPackages[entry.id] ?? entry.bagSizeKg;
                 const food = selectFoodPackage(entry, selectedKg);
                 const kcalPerKg = getFoodKcalPerKg(food);
@@ -665,10 +676,13 @@ export const FoodsView: React.FC<FoodsViewProps> = ({
                           className="min-h-11 w-full rounded-xl border border-gray-200 px-3"
                         >
                           {selectedKg === undefined && <option value="">{isEs ? 'Elige el empaque' : 'Choose a package'}</option>}
-                          {sizes.map((size) => (
-                            <option key={size} value={size}>{size < 1 ? `${size * 1000} g` : `${size} kg`}</option>
+                          {Object.entries(sizeGroups).map(([label, group]) => (
+                            <optgroup key={label} label={label}>
+                              {group.map(size => <option key={size} value={size}>{packageLabel(size)}</option>)}
+                            </optgroup>
                           ))}
                         </select>
+                        {selectedKg && <span className="block text-[11px] font-normal text-[#44544A]">{packageConfirmation(food.manufacturerSizesKg, selectedKg, isEs)}</span>}
                       </label>
                     )}
                     <FoodLabelComposition food={food} language={userAccount.language} />

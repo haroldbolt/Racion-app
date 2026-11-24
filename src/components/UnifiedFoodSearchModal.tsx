@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { Pet, FoodItem, FeedingPlan } from '../types';
 import { StorageService } from '../utils/storage';
-import { getConfirmedPresentations } from '../data/foodPresentations';
+import { getConfirmedPresentations, packageConfirmation, packageLabel } from '../data/foodPresentations';
 import { selectFoodPackage } from '../services/onlineFoodCatalog';
 import { useManufacturerFoods } from '../hooks/useManufacturerFoods';
 import { OnlineFoodSearch } from './OnlineFoodSearch';
@@ -214,14 +214,16 @@ export const UnifiedFoodSearchModal: React.FC<UnifiedFoodSearchModalProps> = ({
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {sizes.map((size) => (
-                        <button
-                          key={size}
-                          type="button"
-                          onClick={() => select(selectFoodPackage(food, size))}
-                          className="min-h-11 rounded-xl border border-[#0B5D2E40] bg-[#EAF4EC] px-3 font-bold text-[#0B5D2E]"
-                        >
-                          {isEs ? 'Elegir' : 'Choose'} {size < 1 ? `${size * 1000} g` : `${size} kg`}
-                        </button>
+                        <div key={size} className="max-w-36 space-y-1">
+                          <button
+                            type="button"
+                            onClick={() => select(selectFoodPackage(food, size))}
+                            className="min-h-11 rounded-xl border border-[#0B5D2E40] bg-[#EAF4EC] px-3 font-bold text-[#0B5D2E]"
+                          >
+                            {isEs ? 'Elegir' : 'Choose'} {packageLabel(size)}
+                          </button>
+                          <p className="text-[11px] text-[#44544A]">{packageConfirmation(food.manufacturerSizesKg, size, isEs)}</p>
+                        </div>
                       ))}
                       {sizes.length === 0 && (
                         <button type="button" onClick={() => select(selectFoodPackage(food))} className="min-h-11 rounded-xl border border-[#0B5D2E40] px-3 font-bold text-[#0B5D2E]">

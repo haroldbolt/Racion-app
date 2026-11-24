@@ -178,6 +178,40 @@ async function verify() {
     await ring.getByText('1 de 2 comidas',{exact:true}).waitFor();
     await alerts.scrollIntoViewIfNeeded();
     await proof(page,'agility-alertas.png');
+
+    await button('Alimentos').click();
+    await button('Buscar en internet').first().click();
+    const search = page.getByRole('region', {name:'Buscar en internet', exact:true});
+    await search.getByRole('textbox', {name:'Buscar alimentos en internet'}).fill(formula);
+    await search.getByRole('button', {name:'Buscar en internet', exact:true}).click();
+    const storeFood = search.getByRole('region', {name:'Alimentos de Agrocentro Pets'})
+      .getByRole('article', {name:'Agility Gold Adulto Raza Grande', exact:true});
+    for (const size of ['1.5', '3', '15', '8']) {
+      const row = storeFood.getByRole('button', {name:'Elegir ' + size + ' kg', exact:true}).locator('..');
+      await row.getByText(size === '8' ? /no confirmada por el fabricante/i : /^confirmada por el fabricante/i).waitFor();
+    }
+    await storeFood.getByRole('button', {name:'Elegir 8 kg', exact:true}).click();
+    const library = page.getByRole('region', {name:'Mis alimentos', exact:true});
+    const saved = library.getByRole('article').filter({has:page.locator('select option:checked[value="8"]')});
+    async function verifyLibrarySelection() {
+      const selector = saved.getByRole('combobox');
+      await selector.waitFor();
+      assert.equal(await selector.inputValue(), '8');
+      await saved.getByText('No confirmada por el fabricante', {exact:true}).waitFor();
+    }
+    await verifyLibrarySelection();
+    await page.reload({waitUntil:'domcontentloaded'});
+    await button('Alimentos').click();
+    await button('Mis alimentos').click();
+    await verifyLibrarySelection();
+    assert.match(await saved.getByRole('heading').innerText(), /Agility|Grandes Adultos/i);
+    await saved.scrollIntoViewIfNeeded();
+    await proof(page, 'agility-8kg-tras-recarga.png');
+    await saved.getByRole('button', {name:'Ver precios', exact:true}).click();
+    for (const [size, status] of [['8', 'No confirmada por el fabricante'], ['3', 'Confirmada por el fabricante']]) {
+      await button(size + ' kg').locator('..').getByText(status, {exact:true}).waitFor();
+    }
+    console.log('R5 presentaciones: Italcol confirma 1,5, 3 y 15 kg. La selección de 8 kg siguió sin confirmar tras la recarga.');
     console.log(JSON.stringify({
       site:url.origin, sources:[...sources], food:formula, sizesKg:[1.5,3,15], price3kgCop:price,
       guaranteed:{proteinMin:23,fatMin:15,fiberMax:4,ashMax:8,moistureMax:11},

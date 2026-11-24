@@ -208,8 +208,8 @@ async function verifyDiary() {
 
     await button('Progreso').click();
     const history = page.getByRole('region', { name: 'Historial de pesajes de Luna' });
-    await history.getByText('4.3 kg', { exact: true }).waitFor();
-    await history.getByText('Pesaje de prueba de publicación', { exact: true }).waitFor();
+    const recordedWeight = history.getByRole('listitem').filter({ hasText: 'Pesaje de prueba de publicación' });
+    await recordedWeight.getByText('4.3 kg', { exact: true }).waitFor();
 
     await button('Más').click();
     await verifyEmptyVet(page);

@@ -149,7 +149,7 @@ async function verifyFoodPriceCoherence(page, button) {
   await expensesDialog.getByRole('checkbox', { name: 'Confirmo el importe y el peso de este alimento', exact: true }).check();
   await expensesDialog.getByRole('button', { name: 'Guardar compra', exact: true }).click();
   await expectMealCosts(expensesDialog.getByRole('region', { name: 'Costo de la ración', exact: true }), 3780, 1890);
-  await expensesDialog.getByRole('link', { name: /Ver recibo/ }).waitFor();
+  await expensesDialog.getByRole('button', { name: /Ver recibo/ }).waitFor();
   await expensesDialog.getByRole('button', { name: 'Cerrar gastos', exact: true }).click();
   await expectMealCosts(todayCost, 3780, 1890);
 
@@ -165,7 +165,12 @@ async function verifyFoodPriceCoherence(page, button) {
   await receipt.getByRole('heading', { name: formula, exact: true }).waitFor();
   assert.match(await receipt.innerText(), /2 kg/);
   assert.match(await receipt.innerText(), /140[.\s]000\s+COP/);
-  assert.match(await receipt.getByRole('link', { name: /Ver recibo/ }).getAttribute('href'), /^data:image\/jpeg;base64,/);
+  await receipt.getByRole('button', { name: /Ver recibo/ }).click();
+  const opened = page.getByRole('dialog', { name: 'Recibo de la compra' });
+  const image = opened.getByRole('img', { name: 'Imagen del recibo' });
+  await image.waitFor();
+  assert.ok(await image.evaluate(async img => { await img.decode(); return img.naturalWidth > 0; }));
+  await opened.getByRole('button', { name: 'Cerrar recibo' }).click();
   await receipt.getByRole('img', { name: 'Factura de esta compra', exact: true }).waitFor();
 
   await button(/🐱\s*Bruma/).click();
@@ -183,7 +188,7 @@ async function verifyFoodPriceCoherence(page, button) {
   await button('Alimentos').click();
   await button('Gastos ($ COP)').click();
   await page.getByText('Aún no hay compras registradas para esta mascota.', { exact: true }).waitFor();
-  assert.equal(await page.getByRole('link', { name: /Ver recibo/ }).count(), 0);
+  assert.equal(await page.getByRole('button', { name: /Ver recibo/ }).count(), 0);
   await button(/🐱\s*Nube/).click();
   await button('Hoy').click();
   await expectMealCosts(todayCost, 3780, 1890);

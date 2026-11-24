@@ -2,11 +2,12 @@ import { ArrowLeft, Clock3, ExternalLink, LoaderCircle, MapPin, Package, Search,
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { BogotaPostalCodeField } from '../components/BogotaPostalCodeField';
 import { useCity } from '../contexts/CityContext';
-import { CONFIRMED_FOOD_PRESENTATIONS } from '../data/foodPresentations';
+import { CONFIRMED_FOOD_PRESENTATIONS, packageConfirmation } from '../data/foodPresentations';
 import { FoodSafetyAlerts } from '../components/FoodSafetyAlerts';
 import { UnifiedFoodSearchModal } from '../components/UnifiedFoodSearchModal';
 import { getOfferCosts, getOfferPortions, type OfferPortions } from '../utils/offerCosts';
 import { selectFoodPackage } from '../services/onlineFoodCatalog';
+import { useManufacturerPackageSizes } from '../hooks/useManufacturerFoods';
 import { StorageService } from '../utils/storage';
 import type { FoodItem, FoodPriceBasis, FeedingPlan, Pet } from '../types';
 import {
@@ -103,6 +104,7 @@ async function lookupPrices(body: LivePriceRequest, signal: AbortSignal): Promis
 
 function PriceOfferCard({
   offer,
+  manufacturerSizes,
   isEs,
   formatKg,
   postalCode,
@@ -112,6 +114,7 @@ function PriceOfferCard({
   onUsePrice,
 }: {
   offer: LivePriceOffer;
+  manufacturerSizes?: number[];
   isEs: boolean;
   formatKg: (grams: number) => string;
   postalCode?: string;
@@ -156,6 +159,7 @@ function PriceOfferCard({
         <span className="text-xs font-bold text-[var(--text-secondary)]">{formatKg(offer.grams)} kg</span>
       </div>
       <p className="break-words text-xs leading-snug text-[var(--text-secondary)]">{offer.title}</p>
+      <p className="text-xs text-[var(--text-secondary)]">{packageConfirmation(manufacturerSizes, offer.grams / 1000, isEs)}</p>
       <p className="mt-1.5 text-xs font-semibold text-[var(--text-primary)]">
         {offer.stock === 'available' ? (isEs ? 'En stock' : 'In stock')
           : offer.stock === 'out_of_stock' ? (isEs ? 'Agotada' : 'Out of stock')
@@ -239,15 +243,17 @@ function PriceOfferCard({
 export function PriceComparisonView({ food, pet, plan, onPick, onReviewFood, packageKg, language = 'es', backTo = 'plan', onBack, onUsePrice }: PriceComparisonViewProps) {
   const [picking, setPicking] = useState(false);
   const isEs = language === 'es';
+  const manufacturerSizes = useManufacturerPackageSizes(food);
   const { selectedCity, setCity } = useCity();
   const city = LIVE_PRICE_CITIES.find((candidate) => candidate === selectedCity) ?? LIVE_PRICE_CITIES[0];
   const initialKg = isPackageWeight(packageKg) ? packageKg : isPackageWeight(food.bagSizeKg) ? food.bagSizeKg : undefined;
   const knownPackages = [...new Set([
     ...(CONFIRMED_FOOD_PRESENTATIONS[food.id] ?? []),
+    ...(manufacturerSizes ?? []),
     ...(food.availableSizesKg ?? []),
     initialKg,
-  ].filter(isPackageWeight))].sort((a, b) => a - b);
-  const [packageInput, setPackageInput] = useState(() => initialKg?.toString() ?? '');
+  ].filter(isPackageWeight).map(kg => Math.round(kg * 1000) / 1000))].sort((a, b) => a - b);
+  const [packageInput, setPackageInput] = useState(() => initialKg === undefined ? '' : String(Math.round(initialKg * 1000) / 1000));
   const [inputError, setInputError] = useState(false);
   const [postalCodeInput, setPostalCodeInput] = useState(() => StorageService.getBogotaPostalCode());
   const [postalCodeError, setPostalCodeError] = useState(false);
@@ -459,19 +465,25 @@ export function PriceComparisonView({ food, pet, plan, onPick, onReviewFood, pac
                 const weightGrams = Math.round(weight * 1000);
                 const selected = grams === weightGrams;
                 return (
-                  <button type="button" key={weight} aria-pressed={selected}
-                    onClick={() => choosePackage(weight.toString())} disabled={loading}
-                    className={
-                      'min-h-11 rounded-xl border px-3 text-xs font-bold tabular-nums focus-visible:outline-2 focus-visible:outline-offset-2 ' +
-                      (selected
-                        ? 'border-[#0B5D2E] bg-[#0B5D2E] text-white'
-                        : 'border-[var(--border-color)] bg-[var(--surface-subtle)] text-[var(--text-primary)]')
-                    }>
-                    {formatKg(weightGrams)} kg
-                  </button>
+                  <div key={weight} className="max-w-32 space-y-1">
+                    <button type="button" aria-pressed={selected}
+                      onClick={() => choosePackage(weight.toString())} disabled={loading}
+                      className={
+                        'min-h-11 rounded-xl border px-3 text-xs font-bold tabular-nums focus-visible:outline-2 focus-visible:outline-offset-2 ' +
+                        (selected
+                          ? 'border-[#0B5D2E] bg-[#0B5D2E] text-white'
+                          : 'border-[var(--border-color)] bg-[var(--surface-subtle)] text-[var(--text-primary)]')
+                      }>
+                      {formatKg(weightGrams)} kg
+                    </button>
+                    <p className="text-[11px] text-[var(--text-secondary)]">{packageConfirmation(manufacturerSizes, weight, isEs)}</p>
+                  </div>
                 );
               })}
             </div>
+          )}
+          {grams !== null && !knownPackages.includes(grams / 1000) && (
+            <p className="text-xs text-[var(--text-secondary)]">{packageConfirmation(manufacturerSizes, grams / 1000, isEs)}</p>
           )}
           {inputError && (
             <p id="price-package-error" role="alert" className="text-xs font-bold text-red-800 dark:text-red-300">
@@ -544,8 +556,8 @@ export function PriceComparisonView({ food, pet, plan, onPick, onReviewFood, pac
                 </p>
               )}
               <div className="mt-2 space-y-2">
-                {winner && <PriceOfferCard offer={winner} portions={portions} locked={locked} isEs={isEs} formatKg={formatKg} postalCode={postalCode} winnerLabel={winnerLabel} onUsePrice={applyOffer(winner)} />}
-                {orderedExactOffers.map((offer) => <PriceOfferCard key={offer.id} offer={offer} portions={portions} locked={locked} isEs={isEs} formatKg={formatKg} postalCode={postalCode} onUsePrice={applyOffer(offer)} />)}
+                {winner && <PriceOfferCard offer={winner} manufacturerSizes={manufacturerSizes} portions={portions} locked={locked} isEs={isEs} formatKg={formatKg} postalCode={postalCode} winnerLabel={winnerLabel} onUsePrice={applyOffer(winner)} />}
+                {orderedExactOffers.map((offer) => <PriceOfferCard key={offer.id} offer={offer} manufacturerSizes={manufacturerSizes} portions={portions} locked={locked} isEs={isEs} formatKg={formatKg} postalCode={postalCode} onUsePrice={applyOffer(offer)} />)}
               </div>
             </div>
           )}
@@ -559,7 +571,7 @@ export function PriceComparisonView({ food, pet, plan, onPick, onReviewFood, pac
                 {isEs ? 'Ordenados por precio del producto por kilo.' : 'Sorted by product price per kg.'}
               </p>
               <div className="space-y-2">
-                {otherSizes.map((offer) => <PriceOfferCard key={offer.id} offer={offer} portions={portions} locked={locked} isEs={isEs} formatKg={formatKg} postalCode={postalCode} onUsePrice={applyOffer(offer)} />)}
+                {otherSizes.map((offer) => <PriceOfferCard key={offer.id} offer={offer} manufacturerSizes={manufacturerSizes} portions={portions} locked={locked} isEs={isEs} formatKg={formatKg} postalCode={postalCode} onUsePrice={applyOffer(offer)} />)}
               </div>
             </div>
           )}

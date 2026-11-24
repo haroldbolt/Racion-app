@@ -10,6 +10,7 @@ const rocky = { name: 'Rocky', sex: '♂ Macho', kg: 12, grams: [100, 100] };
 const luna = { name: 'Luna', sex: '♀ Hembra', kg: 20, grams: [140, 139] };
 const weighedLuna = { ...luna, kg: 20.5, grams: [142, 142] };
 const pricePerGram = 150000 / 10000;
+const weightNote = 'Pesaje de prueba escenario Rocky y Luna. Luna pesó 20,5 kg al volver del paseo y se usó la misma báscula que en el control anterior.';
 const button = (scope, name) => scope.getByRole('button', { name, exact: typeof name === 'string' });
 const region = (scope, name) => scope.getByRole('region', { name, exact: true });
 const petSwitch = (page, name) => page.locator('header').getByRole('button').filter({ has: page.getByText(name, { exact: true }) });
@@ -111,6 +112,11 @@ async function run() {
     await page.goto(url.href, { waitUntil: 'domcontentloaded' });
     await createPlan(page, rocky, true);
     await createPlan(page, luna, false);
+    const history = region(page, 'Historial de pesajes de Luna');
+    const initialWeight = history.getByRole('listitem').filter({ hasText: 'Peso inicial' });
+    await button(page, 'Progreso').click();
+    await initialWeight.getByText(/^20(?:[.,]0)? kg$/).waitFor();
+    assert.equal(await history.getByRole('listitem').count(), 1);
     const panel = await expenses(page);
     await button(panel, 'Registrar compra o factura').click();
     assert.equal(await panel.getByLabel('Peso de cada empaque', { exact: true }).inputValue(), '10');
@@ -136,14 +142,30 @@ async function run() {
     await button(page, 'Registrar peso').click();
     const weightForm = page.locator('form').filter({ has: page.getByRole('heading', { name: 'Registrar peso de Luna' }) });
     await weightForm.getByRole('spinbutton').fill('20.5');
-    await weightForm.getByPlaceholder('Ej. Control mensual en báscula').fill('Pesaje R4 en la báscula');
+    await weightForm.getByPlaceholder('Ej. Control mensual en báscula').fill(weightNote);
     await button(weightForm, 'Guardar peso').click();
     await assertHome(page, weighedLuna);
     await page.reload({ waitUntil: 'domcontentloaded' });
     await assertHome(page, weighedLuna);
     await button(page, 'Progreso').click();
-    const weighIn = region(page, 'Historial de pesajes de Luna').getByRole('listitem').filter({ hasText: 'Pesaje R4 en la báscula' });
+    await initialWeight.getByText(/^20(?:[.,]0)? kg$/).waitFor();
+    assert.equal(await history.getByRole('listitem').count(), 2);
+    const weighIn = history.getByRole('listitem').filter({ hasText: weightNote });
     await weighIn.getByText(/^20[.,]5 kg$/).waitFor();
+    const note = weighIn.getByText(weightNote, { exact: true });
+    await note.scrollIntoViewIfNeeded();
+    const wholeNoteFits = await note.evaluate(element => {
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      const rowBounds = element.closest('li').getBoundingClientRect();
+      const lines = Array.from(range.getClientRects());
+      return lines.length > 1 && lines.every(line =>
+        line.left >= Math.max(0, rowBounds.left) - 1 && line.right <= Math.min(innerWidth, rowBounds.right) + 1 &&
+        line.top >= rowBounds.top - 1 && line.bottom <= rowBounds.bottom + 1);
+    });
+    assert.ok(wholeNoteFits, 'La nota completa debe ocupar varias líneas dentro del historial móvil');
+    await screenshot(history, 'luna-historial-tras-recarga.png');
+    console.log('R5 pesajes: 20 kg iniciales y 20,5 kg con nota completa en móvil después de recargar.');
     await screenshot(await bagHistory(page, weighedLuna, 9900), 'luna-tras-pesaje.png');
     await petSwitch(page, rocky.name).click();
     await assertHome(page, rocky);

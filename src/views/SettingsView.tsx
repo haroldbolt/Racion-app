@@ -28,7 +28,7 @@ interface SettingsViewProps {
   userAccount: UserAccount;
   pets: Pet[];
   onUpdateAccount: (updated: Partial<UserAccount>) => void;
-  onResetAllData: () => void;
+  onResetAllData: () => void | Promise<void>;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
@@ -48,12 +48,19 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [showExportSuccess, setShowExportSuccess] = useState(false);
 
-  const handleExportJSON = () => {
-    downloadData(
-      StorageService.exportAllDataJSON(),
-      'application/json',
-      `RacionApp_Backup_${new Date().toISOString().split('T')[0]}.json`
-    );
+  const [fileError, setFileError] = useState('');
+  const handleExportJSON = async () => {
+    setFileError('');
+    try {
+      downloadData(
+        await StorageService.exportAllDataJSON(),
+        'application/json',
+        `RacionApp_Backup_${new Date().toISOString().split('T')[0]}.json`
+      );
+    } catch {
+      setFileError(isEs ? 'No pudimos incluir todos los recibos en la copia. Inténtalo de nuevo.' : 'Could not include every receipt in the backup. Please retry.');
+      return;
+    }
     setShowExportSuccess(true);
     setTimeout(() => setShowExportSuccess(false), 2500);
   };
@@ -235,6 +242,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </button>
         </div>
 
+        {fileError && <p role="alert" className="text-xs text-red-700">{fileError}</p>}
         {showExportSuccess && (
           <p className="text-xs text-[#1E8A49] font-bold text-center pt-1">
             ✓ {isEs ? 'Copia descargada exitosamente en tu dispositivo.' : 'Backup successfully downloaded.'}
@@ -292,9 +300,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 {isEs ? 'Cancelar' : 'Cancel'}
               </button>
               <button
-                onClick={() => {
-                  onResetAllData();
-                  setShowConfirmDelete(false);
+                onClick={async () => {
+                  try {
+                    await onResetAllData();
+                    setShowConfirmDelete(false);
+                  } catch {
+                    setFileError(isEs ? 'No pudimos borrar el diario y sus recibos. Inténtalo de nuevo.' : 'Could not delete the diary and its receipts. Please retry.');
+                  }
                 }}
                 className="flex-1 py-2.5 bg-[#C0392B] text-white rounded-xl text-xs font-bold shadow-xs"
               >

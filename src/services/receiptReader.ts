@@ -1,4 +1,5 @@
 import type { Worker as OcrWorker } from 'tesseract.js';
+import { isPdfReceipt, loadReceiptPdfJs, openReceiptPdf, receiptAsset } from './receiptPdf';
 import { extractReceipt } from '../utils/receiptExtraction';
 
 export type ReceiptProgress = { stage: 'preparing' | 'loading' | 'recognizing' | 'pdf'; progress: number };
@@ -16,7 +17,6 @@ export interface ReceiptReadOptions {
   onPreview?: (url: string) => void;
 }
 
-const asset = (path: string) => new URL(`${import.meta.env.BASE_URL}ocr/${path}`, window.location.origin).href;
 const maxBytes = 15 * 1024 * 1024;
 const maxPages = 5;
 
@@ -113,7 +113,7 @@ export function receiptOcrWarnings(confidence: number, tsv: string | null): stri
 /** Receipts stay on the device. Only same-origin OCR support files are downloaded. */
 export async function readReceipt(file: File, options: ReceiptReadOptions = {}): Promise<ReceiptReadResult> {
   if (!file.size || file.size > maxBytes) throw new Error('Usa una factura de hasta 15 MB.');
-  const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+  const isPdf = isPdfReceipt(file);
   if (!isPdf && (!file.type.startsWith('image/') || file.type === 'image/svg+xml')) {
     throw new Error('Elige una foto JPG, PNG o WebP, o una factura PDF.');
   }
@@ -143,9 +143,9 @@ export async function readReceipt(file: File, options: ReceiptReadOptions = {}):
       report('loading', 0);
       const { createWorker, OEM, PSM } = await abortable(import('tesseract.js'), signal);
       const pending = createWorker(['spa', 'eng'], OEM.LSTM_ONLY, {
-        workerPath: asset('worker.min.js'),
-        corePath: asset('core'),
-        langPath: asset('lang'),
+        workerPath: receiptAsset('worker.min.js'),
+        corePath: receiptAsset('core'),
+        langPath: receiptAsset('lang'),
         workerBlobURL: false,
         gzip: true,
         logger(message) {
@@ -188,11 +188,9 @@ export async function readReceipt(file: File, options: ReceiptReadOptions = {}):
     }
 
     report('pdf', 0);
-    const pdfjs = await abortable(import('pdfjs-dist/legacy/build/pdf.mjs'), signal);
-    pdfjs.GlobalWorkerOptions.workerSrc = asset('pdf.worker.min.mjs');
+    const pdfjs = await abortable(loadReceiptPdfJs(), signal);
     const bytes = new Uint8Array(await abortable(file.arrayBuffer(), signal));
-    const task = pdfjs.getDocument({ data: bytes, disableAutoFetch: true,
-      standardFontDataUrl: asset('pdf/standard_fonts/'), wasmUrl: asset('pdf/wasm/'), verbosity: 0 });
+    const task = openReceiptPdf(pdfjs, bytes);
     pdfLoadingTask = task;
     const pdf = await abortable(task.promise, signal);
     totalPages = pdf.numPages;

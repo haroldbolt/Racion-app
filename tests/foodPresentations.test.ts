@@ -11,6 +11,7 @@ test('uses declared package sizes without assigning other formulas sizes from a 
   assert.deepEqual(getConfirmedPresentations({ availableSizesKg: [1, 3, 7], bagSizeKg: 5 }), [1, 3, 5, 7]);
   assert.deepEqual(getConfirmedPresentations({ availableSizesKg: [NaN, -1, Infinity, 0, 1, 1, 51] }), [1, 51]);
   assert.equal(getConfirmedPresentations({ id: 'unlisted-food' }), null);
+  assert.deepEqual(getConfirmedPresentations({ availableSizesKg: [22.679619, 22.6796], bagSizeKg: 22.6796 }), [22.6796]);
 });
 
 test('merges exact duplicate formulas packages while preserving the first nutritional label', () => {

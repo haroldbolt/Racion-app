@@ -252,6 +252,7 @@ export const InventoryFoodSearchModal: React.FC<InventoryFoodSearchModalProps> =
       estimatedDaysDuration,
       storeName: storeName.trim() || undefined,
       receiptPhotoUrl: receiptPhotoUrl || undefined,
+      receiptFormat: receiptPhotoUrl ? 'image' : undefined,
       notes: notes.trim() || undefined,
       createdAt: new Date().toISOString(),
       // Specific Shopify Catalog linkage

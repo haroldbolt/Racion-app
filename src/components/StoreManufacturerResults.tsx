@@ -8,6 +8,7 @@ import {
 } from '../services/storeManufacturerCatalog';
 import { publicAssetUrl } from '../utils/publicAssetUrl';
 import { FoodLabelComposition } from './FoodLabelComposition';
+import { matchingPackage, packageConfirmation, packageLabel } from '../data/foodPresentations';
 
 interface Props {
   query: string;
@@ -16,10 +17,6 @@ interface Props {
   lang: 'es' | 'en';
   choose: (food: FoodItem) => void;
   compare?: (food: FoodItem) => void;
-}
-
-function packageLabel(kg: number) {
-  return kg < 1 ? Math.round(kg * 1000) + ' g' : kg + ' kg';
 }
 
 export function StoreManufacturerResults({ query, signal, species, lang, choose, compare }: Props) {
@@ -69,11 +66,12 @@ export function StoreManufacturerResults({ query, signal, species, lang, choose,
         {sizes.length > 0
           ? <div className="flex flex-wrap gap-2">
             {sizes.map(size => {
-              const fromBrand = item.officialPackagesKg?.includes(size);
-              const fromStore = item.storePackagesKg.includes(size);
-              const source = fromBrand && fromStore ? (es ? 'Ficha y tienda' : 'Sheet and store')
-                : fromBrand ? (es ? 'Ficha oficial' : 'Product sheet') : (es ? 'Tienda' : 'Store');
-              return <div key={size} className="text-center">
+              const officialSize = matchingPackage(item.officialPackagesKg, size);
+              const source = officialSize !== undefined
+                ? matchingPackage(item.storePackagesKg, size) !== undefined ? (es ? 'Ficha y tienda' : 'Sheet and store') : (es ? 'Ficha oficial' : 'Product sheet')
+                : (es ? 'Tienda' : 'Store');
+              const packageSourceUrl = item.formula?.packageSources?.[String(officialSize ?? size)];
+              return <div key={size} className="max-w-36 text-center">
                 <button type="button" onClick={() => choose(selectStoreManufacturerFood(item, size))}
                   className="min-h-11 rounded-xl border border-[#0B5D2E40] bg-[#EAF4EC] px-3 font-bold text-[#0B5D2E]">
                   {es ? 'Elegir' : 'Choose'} {packageLabel(size)}
@@ -82,9 +80,10 @@ export function StoreManufacturerResults({ query, signal, species, lang, choose,
                   className="block min-h-11 rounded-lg px-2 font-bold text-[#0B5D2E] underline">
                   {es ? `Comparar ${packageLabel(size)} con envío` : `Compare ${packageLabel(size)} with delivery`}
                 </button>}
+                <p className="text-[11px] text-[#44544A]">{packageConfirmation(item.officialPackagesKg, size, es)}</p>
                 <p className="mt-1 text-[11px] text-[#44544A]">
-                  {item.formula?.packageSources?.[String(size)]
-                    ? <a href={item.formula.packageSources[String(size)]} target="_blank" rel="noopener noreferrer" className="underline">{source}</a>
+                  {packageSourceUrl
+                    ? <a href={packageSourceUrl} target="_blank" rel="noopener noreferrer" className="underline">{source}</a>
                     : source}
                 </p>
               </div>;

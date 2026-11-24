@@ -29,7 +29,7 @@ export function WeightHistory({ pet, records, account }: WeightHistoryProps) {
       ) : (
         <ol className="space-y-2">
           {newestFirst.map(record => (
-            <li key={record.id} className="flex items-center justify-between p-3 rounded-xl bg-[#EAF4EC]/60 border border-[#0B5D2E15]">
+            <li key={record.id} className="p-3 rounded-xl bg-[#EAF4EC]/60 border border-[#0B5D2E15]">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-white text-[#0B5D2E] flex items-center justify-center border border-[#0B5D2E20]">
                   <Scale className="w-4 h-4" aria-hidden="true" />
@@ -43,13 +43,16 @@ export function WeightHistory({ pet, records, account }: WeightHistoryProps) {
                       </span>
                     )}
                   </div>
-                  <time dateTime={record.date} className="text-[11px] text-[#44544A]">{record.date}</time>
+                  <div className="text-[11px] text-[#44544A]">
+                    <time dateTime={record.date}>{record.date}</time>
+                    {record.source === 'profile_creation' && <> · <span>{isEs ? 'Peso inicial' : 'Starting weight'}</span></>}
+                  </div>
                 </div>
               </div>
               {record.notes && (
-                <span className="text-xs text-[#0B5D2E] font-semibold max-w-[140px] truncate text-right">
+                <p className="mt-2 text-xs text-[#0B5D2E] font-semibold whitespace-pre-wrap [overflow-wrap:anywhere]">
                   {record.notes}
-                </span>
+                </p>
               )}
             </li>
           ))}

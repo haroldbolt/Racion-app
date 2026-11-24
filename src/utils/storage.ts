@@ -17,7 +17,8 @@ import { localDateKey } from './localDate';
 import { getPlanCostSummary, purchaseAppliesToPet, purchaseMatchesPlan, sameFormulaName, withPlanCosts } from './foodCosts';
 import { getPlannedMealComponents, getPlannedMeals, getPrimaryPlanFood } from './mealPortions';
 
-import { accountData, STORAGE_KEYS } from './accountStorage';
+import { accountData, currentStorageSession, STORAGE_KEYS } from './accountStorage';
+import { exportReceiptPdf, removeReceiptPdfs } from '../services/receiptDocuments';
 
 const DEFAULT_USER: UserAccount = {
   email: '',
@@ -172,6 +173,24 @@ export const StorageService = {
     accountData.setItem(STORAGE_KEYS.PETS, JSON.stringify(pets));
   },
 
+  savePetProfile(pet: Pet): Pet[] {
+    const pets = this.getPets();
+    const index = pets.findIndex(item => item.id === pet.id);
+    if (index < 0) {
+      // One write commits both the new profile and its immutable first measurement.
+      const initialWeighIn: WeightRecord = {
+        id: 'initial_' + pet.id, petId: pet.id, date: localDateKey(),
+        weightKg: pet.currentWeightKg, source: 'profile_creation',
+      };
+      pets.push({ ...pet, initialWeighIn });
+    } else {
+      // A pre-existing profile may have no recorded creation weight.
+      pets[index] = { ...pet, initialWeighIn: pets[index].initialWeighIn };
+    }
+    this.savePets(pets);
+    return pets;
+  },
+
   deletePet(petId: string) {
     const pets = this.getPets().filter(p => p.id !== petId);
     accountData.setItem(STORAGE_KEYS.PETS, JSON.stringify(pets));
@@ -315,7 +334,10 @@ export const StorageService = {
     try {
       const data = accountData.getItem(STORAGE_KEYS.WEIGHT_RECORDS);
       const all: WeightRecord[] = data ? JSON.parse(data) : [];
-      return all.filter(w => w.petId === petId).sort((a, b) => a.date.localeCompare(b.date));
+      const records = all.filter(w => w.petId === petId);
+      const initial = this.getPets().find(pet => pet.id === petId)?.initialWeighIn;
+      if (initial) records.unshift(initial);
+      return records.sort((a, b) => a.date.localeCompare(b.date));
     } catch {
       return [];
     }
@@ -324,15 +346,14 @@ export const StorageService = {
   addWeightRecord(record: WeightRecord): boolean {
     const data = accountData.getItem(STORAGE_KEYS.WEIGHT_RECORDS);
     const all: WeightRecord[] = data ? JSON.parse(data) : [];
-    const hasNewerWeight = all.some(weight => weight.petId === record.petId && weight.date > record.date);
     all.push(record);
     accountData.setItem(STORAGE_KEYS.WEIGHT_RECORDS, JSON.stringify(all));
-
-    if (hasNewerWeight) return false;
 
     const pets = this.getPets();
     const pet = pets.find(p => p.id === record.petId);
     if (!pet || pet.currentWeightKg === record.weightKg) return false;
+    if (pet.initialWeighIn && pet.initialWeighIn.date > record.date) return false;
+    if (all.some(weight => weight.petId === record.petId && weight.date > record.date)) return false;
 
     pet.currentWeightKg = record.weightKg;
     this.savePets(pets);
@@ -521,12 +542,19 @@ export const StorageService = {
   },
 
   deleteFoodPurchase(id: string) {
-    const all = this.getFoodPurchases();
-    const previous = all.find(p => p.id === id);
-    if (!previous) return;
-    clearCachedPurchaseCost(previous);
-    const filtered = all.filter(p => p.id !== id);
-    accountData.setItem(STORAGE_KEYS.FOOD_PURCHASES, JSON.stringify(filtered));
+    const original = this.getFoodPurchases().find(p => p.id === id);
+    if (!original) return;
+    const isCurrent = currentStorageSession();
+    const removeEntry = () => {
+      if (!isCurrent()) throw new Error('La sesión del diario cambió.');
+      const all = this.getFoodPurchases();
+      const previous = all.find(p => p.id === id);
+      if (!previous) return;
+      clearCachedPurchaseCost(previous);
+      accountData.setItem(STORAGE_KEYS.FOOD_PURCHASES, JSON.stringify(all.filter(p => p.id !== id)));
+    };
+    if (original.receiptFormat === 'pdf') return removeReceiptPdfs([id], removeEntry);
+    removeEntry();
   },
 
   updateFoodPurchase(entry: FoodCostEntry) {
@@ -539,7 +567,7 @@ export const StorageService = {
     }
   },
 
-  exportAllDataJSON(): string {
+  async exportAllDataJSON(): Promise<string> {
     const read = (key: string, fallback: unknown): unknown => {
       try {
         const stored = accountData.getItem(key);
@@ -564,7 +592,9 @@ export const StorageService = {
       customFoods: this.getCustomFoods(),
       foodPurchases: this.getFoodPurchases(),
     };
-    return JSON.stringify(payload, null, 2);
+    const foodPurchases = await Promise.all(payload.foodPurchases.map(async purchase => purchase.receiptFormat === 'pdf'
+      ? { ...purchase, receiptPdfDataUrl: await exportReceiptPdf(purchase.id) } : purchase));
+    return JSON.stringify({ ...payload, foodPurchases }, null, 2);
   },
 
   getBogotaPostalCode(): string {
@@ -618,6 +648,11 @@ export const StorageService = {
   },
 
   clearAllData() {
-    accountData.clear();
+    const ids = this.getFoodPurchases().filter(purchase => purchase.receiptFormat === 'pdf').map(purchase => purchase.id);
+    const isCurrent = currentStorageSession();
+    return removeReceiptPdfs(ids, () => {
+      if (!isCurrent()) throw new Error('La sesión del diario cambió.');
+      accountData.clear();
+    });
   },
 };

@@ -36,6 +36,7 @@ export interface Pet {
   ageYears?: number;
   ageMonths?: number;
   currentWeightKg: number;
+  initialWeighIn?: WeightRecord;
   idealWeightKg: number;
   targetWeightKg: number;
   expectedAdultWeightKg?: number;
@@ -153,7 +154,8 @@ export interface FoodItem {
   priceApproxUsd?: number;
   priceApproxCop?: number; // Price in Colombian Pesos (COP)
   bagSizeKg?: number;
-  availableSizesKg?: number[]; // Confirmed real commercial package sizes in kg
+  availableSizesKg?: number[]; // Sizes offered by shops, saved by the user or listed on the product sheet.
+  manufacturerSizesKg?: number[]; // Only sizes documented for this exact formula on its manufacturer sheet.
   packagePrices?: FoodPriceBasis[];
   priceBasis?: FoodPriceBasis;
   imageUrl?: string;
@@ -231,6 +233,7 @@ export interface FoodCostEntry {
   estimatedDaysDuration?: number; // days the bag lasts
   storeName?: string; // e.g. "Agrocampo", "Laika", "Éxito", "Veterinaria"
   receiptPhotoUrl?: string; // photo or receipt image data URL
+  receiptFormat?: 'image' | 'pdf'; // Original PDFs are stored locally under the purchase ID.
   receiptReadMethod?: 'local_ocr' | 'pdf_text';
   receiptItemDescription?: string;
   notes?: string;
@@ -307,6 +310,7 @@ export interface WeightRecord {
   petId: string;
   date: string;
   weightKg: number;
+  source?: 'profile_creation';
   waistCm?: number;
   photoUrl?: string;
   notes?: string;

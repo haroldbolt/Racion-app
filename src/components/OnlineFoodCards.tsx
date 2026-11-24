@@ -3,10 +3,7 @@ import type { FoodItem } from '../types';
 import { selectFoodPackage } from '../services/onlineFoodCatalog';
 import { FoodLabelComposition } from './FoodLabelComposition';
 import { formatCOP } from '../utils/i18n';
-
-function packageLabel(size: number): string {
-  return size < 1 ? `${Number((size * 1000).toFixed(3))} g` : `${size} kg`;
-}
+import { distinctPackageSizes, packageConfirmation, packageLabel } from '../data/foodPresentations';
 
 interface Props {foods: FoodItem[]; lang: 'es' | 'en'; choose: (food: FoodItem) => void; compare?: (food: FoodItem) => void}
 
@@ -14,10 +11,10 @@ export function OnlineFoodCards({foods, lang, choose, compare}: Props) {
   const isEs = lang === 'es';
   return <>
     {foods.map((food, index) => {
-      const sizes = [...new Set([
+      const sizes = distinctPackageSizes([
         ...(food.availableSizesKg || []),
         ...(food.bagSizeKg ? [food.bagSizeKg] : []),
-      ])].filter((size) => Number.isFinite(size) && size > 0).sort((a, b) => a - b);
+      ]);
       const sourceUrl = food.storeProductUrl || food.buyUrl || food.fichaNutricional?.fuenteUrl;
       const safeSource = sourceUrl && /^https:\/\//i.test(sourceUrl) ? sourceUrl : undefined;
       const retailer = food.storeName || food.priceBasis?.storeName || food.fichaNutricional?.fuenteNombre;
@@ -64,6 +61,7 @@ export function OnlineFoodCards({foods, lang, choose, compare}: Props) {
                   >
                     {isEs ? 'Elegir' : 'Choose'} {packageLabel(size)}
                   </button>
+                  <p className="max-w-36 text-[11px] text-[#44544A]">{packageConfirmation(food.manufacturerSizesKg, size, isEs)}</p>
                   {compare && food.type !== 'barf' && !food.kcalPerPiece && <button type="button"
                     onClick={() => compare(selected)}
                     className="block min-h-11 rounded-lg px-2 font-bold text-[#0B5D2E] underline">

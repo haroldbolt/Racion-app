@@ -84,6 +84,12 @@ export function releaseAccountStorage() {
   scope = undefined;
 }
 
+/** Capture the session for a diary edit which waits for local file storage. */
+export function currentStorageSession() {
+  const generation = epoch;
+  return () => generation === epoch;
+}
+
 // Each browser tab reads its own signed-in workspace. Legacy values form a
 // read-only baseline for their owner; changed values are saved under the UID.
 export const accountData = {
