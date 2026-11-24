@@ -82,4 +82,12 @@ async function verifyEmail(email) {
   assert.equal(response.status, 200, 'The Auth emulator must verify the test address');
 }
 
-module.exports = { billing, checkout, emulator, key, project, startBillingFixture, notify, verifyEmail };
+async function resetPassword(email, newPassword) {
+  const oobCode = await emailAction(email, 'PASSWORD_RESET');
+  const response = await fetch(emulator + '/identitytoolkit.googleapis.com/v1/accounts:resetPassword?key=' + key, {
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({oobCode,newPassword}),
+  });
+  assert.equal(response.status, 200, 'The Auth emulator must redeem the recovery code for the buyer');
+}
+
+module.exports = { billing, checkout, emulator, key, project, startBillingFixture, notify, verifyEmail, resetPassword };

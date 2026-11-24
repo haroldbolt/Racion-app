@@ -73,8 +73,16 @@ export class PurchaseIdentityError extends Error {}
 
 export async function fetchAccess(user: User) {
   const send = async (refresh: boolean) => workerGet('status', { Authorization: 'Bearer ' + await user.getIdToken(refresh) });
-  let response = await send(false);
-  if (response.status === 401) response = await send(true);
+  let response: Response;
+  try {
+    response = await send(false);
+    if (response.status === 401) response = await send(true);
+  } catch (error) {
+    if (['auth/user-token-expired', 'auth/user-disabled', 'auth/invalid-user-token'].includes((error as {code?:string})?.code || '')) {
+      throw new PurchaseIdentityError('Tu sesión venció. Vuelve a ingresar para consultar tu compra.');
+    }
+    throw new Error('No pudimos conectar con el servicio de compras. Tus datos siguen guardados en este navegador.');
+  }
   if (response.status === 401 || response.status === 403) throw new PurchaseIdentityError('Verifica tu correo y vuelve a ingresar para consultar tu compra.');
   if (!response.ok) throw new Error('No pudimos consultar tu compra. Inténtalo de nuevo.');
   return readAccess(await response.json());

@@ -186,7 +186,7 @@ export default function BillingGate() {
       : <button className={primaryButton} disabled>Comprar</button>}
     {offer === null || authError ? <div className="text-sm" role="status">La venta aún no está disponible.
       {!authError && <button className={textButton} onClick={() => { setOffer(undefined); setAttempt(a => a + 1); }}>Volver a consultar</button>}
-    </div> : undefined}
+    </div> : (!offer || !session) && <p className="text-sm" role="status">Consultando disponibilidad…</p>}
     <button className={textButton} onClick={() => setAccessForm(true)}>Ya compré</button>
   </AccessScreen>;
 }

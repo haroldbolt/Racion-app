@@ -6,7 +6,7 @@ const { resolve } = require('node:path');
 const express = require('express');
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright-core');
 const { seedLegacyDiary, recordMealInPreviousBeta, verifyLinkedDiary } = require('./verify-billing-diary.cjs');
-const { billing, checkout, emulator, key, project, startBillingFixture, notify, verifyEmail } = require('./hotmart-worker-fixture.cjs');
+const { billing, checkout, emulator, key, project, startBillingFixture, notify, verifyEmail, resetPassword } = require('./hotmart-worker-fixture.cjs');
 const { checkOffer } = require('./verify-public-access.cjs');
 
 async function updateInstalledApp(page) {
@@ -100,7 +100,7 @@ async function main() {
     stage = 'verificar que una compra pendiente conserva cerrado el diario';
     await notify(buyer,transaction,'PURCHASE_DELAYED','DELAYED');
     await createAndVerify(buyer);
-    await button('Actualizar estado').waitFor();
+    await heading('Pago pendiente').waitFor();
     assert.equal(await button('Hoy').count(), 0);
     assert.ok(await legacyMeal());
 
@@ -120,9 +120,17 @@ async function main() {
     assert.equal(await page.getByText('Rocky',{exact:true}).count(), 0);
     await button('Mi cuenta').click();
     await button('Cerrar sesión').click();
+    stage = 'recuperar el acceso del comprador y volver a encontrar su historial';
     await button('Ya compré').click();
+    await button('Olvidé mi contraseña').click();
     await page.getByLabel('Correo electrónico',{exact:true}).fill(buyer);
-    await page.getByLabel('Contraseña',{exact:true}).fill(password);
+    await button('Enviar enlace').click();
+    await page.getByText(/recibirás un enlace para recuperar tu contraseña/).waitFor();
+    const recoveredPassword = password + '-recuperada';
+    await resetPassword(buyer, recoveredPassword);
+    await button('Volver a ingresar').click();
+    await page.getByLabel('Correo electrónico',{exact:true}).fill(buyer);
+    await page.getByLabel('Contraseña',{exact:true}).fill(recoveredPassword);
     await button('Ingresar').click();
     await page.locator('header').getByText('Luna de la beta',{exact:true}).waitFor();
     await page.getByRole('button',{name:'Progreso',exact:true}).click();
@@ -130,13 +138,13 @@ async function main() {
     stage = 'aplicar reembolso y conservar los datos locales';
     await notify(buyer,transaction,'PURCHASE_REFUNDED','REFUNDED');
     await page.reload({waitUntil:'domcontentloaded'});
-    await button('Cerrar sesión').waitFor();
+    await heading('Acceso retirado').waitFor();
     assert.equal(await button('Hoy').count(), 0);
     assert.ok(await legacyMeal());
     console.log(JSON.stringify({origin:appOrigin, previousRelease:'c4a1beed', upgradedInstalledPwa:true,
       identity:'Firebase Auth Emulator', providerEvents:'Hotmart v2 synthetic', oneTimeUsd:25, moneyMoved:false,
       pets:['Rocky','Luna de la beta'], weightsPerPet:2, legacyMealPersisted:true, receiptPhotoPersisted:true,
-      receiptCostPerMealCop:4500, sharedStockGrams:[10000,9900,10000], isolatedBuyers:true, refundRevokedAccess:true}));
+      receiptCostPerMealCop:4500, sharedStockGrams:[10000,9900,10000], isolatedBuyers:true, purchaseRecovered:true, refundRevokedAccess:true}));
   } catch (error) {
     const alerts = await page?.getByRole('alert').allTextContents().catch(() => []);
     console.error('Etapa:',stage, 'Avisos:',alerts);
