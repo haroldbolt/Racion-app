@@ -25,12 +25,12 @@ async function openRunnerSession(request, signingKey) {
   try {
     ({ payload: claims } = await jwtVerify(match[1], keys, {
       algorithms: ['RS256'], issuer, audience: origin, requiredClaims: ['exp', 'iat'],
-      subject: 'repo:' + repo + ':ref:' + branch,
+      subject: 'repo:haroldbolt@347563793/Racion-app@1456129077:ref:' + branch,
     }));
   } catch {
     return reply(null, 401);
   }
-  if (claims.repository_id !== '1456129077' || claims.ref !== branch ||
+  if (claims.repository_id !== '1456129077' || claims.repository_owner_id !== '347563793' || claims.ref !== branch ||
       claims.workflow_ref !== repo + '/.github/workflows/muse-review.yml@' + branch ||
       !['push', 'workflow_dispatch'].includes(claims.event_name)) return reply(null, 403);
   const expires = Math.floor(Date.now() / 1000) + 1800;
