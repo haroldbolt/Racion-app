@@ -189,7 +189,8 @@ async function verifyMuseReceipt(page, url) {
   const largeWeight = dialog.getByRole('checkbox', { name: /^Verifiqué en la factura que cada empaque pesa 15 kg/ });
   const save = dialog.getByRole('button', { name: 'Guardar compra', exact: true });
 
-  async function checkReadValues(file, expectedKg) {
+  const amount = dialog.getByLabel('Importe total de este alimento (COP)', { exact: true });
+  async function checkReadValues(file, expectedKg, expectedAmount = '90000') {
     await upload.setInputFiles(file);
     await recognized.waitFor({ timeout: 120000 });
     // A single line is selected automatically. Every field below comes from the reader.
@@ -199,7 +200,7 @@ async function verifyMuseReceipt(page, url) {
     }, expectedKg);
     assert.equal(Number((await weight.inputValue()).replace(',', '.')), expectedKg);
     assert.equal(await dialog.getByLabel('Cantidad de empaques', { exact: true }).inputValue(), '2');
-    assert.equal(Number((await dialog.getByLabel('Importe total de este alimento (COP)', { exact: true }).inputValue()).replaceAll('.', '')), 90000);
+    assert.equal((await amount.inputValue()).replaceAll('.', ''), expectedAmount);
     assert.equal(await dialog.getByLabel('Fecha de compra', { exact: true }).inputValue(), '2026-11-22');
     assert.equal(await dialog.getByLabel('Tienda (opcional)', { exact: true }).inputValue(), 'Mascotas Prueba S.A.S.');
     assert.equal(await general.isChecked(), false);
@@ -272,7 +273,9 @@ async function verifyMuseReceipt(page, url) {
 
     const secondPage = 'Anexo de la factura MUSE-001. Conserve esta pagina con su comprobante.';
     const originalPdf = receiptPdf(museInvoice('1,5'), secondPage);
-    await checkReadValues({name:'factura-muse-dos-paginas.pdf', mimeType:'application/pdf', buffer:originalPdf}, 1.5);
+    // The annex contains unassigned text. Review the amount printed on the receipt.
+    await checkReadValues({name:'factura-muse-dos-paginas.pdf', mimeType:'application/pdf', buffer:originalPdf}, 1.5, '');
+    await amount.fill('90000');
     const pdfStore = 'Mascotas Prueba S.A.S. Sucursal PDF';
     await dialog.getByLabel('Tienda (opcional)', {exact:true}).fill(pdfStore);
     await general.check();
