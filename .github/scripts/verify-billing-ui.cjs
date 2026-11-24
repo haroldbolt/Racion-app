@@ -62,23 +62,29 @@ async function main() {
     const legacyMeal = () => page.evaluate(id => JSON.parse(localStorage.getItem('racion_meal_logs_v1')).some(meal => meal.id === id), originalMeal);
     assert.ok(await legacyMeal(), 'The payment gate must preserve pre-existing meals');
     // A click is intercepted only at the test checkout. The signed event is delivered separately.
+    stage = 'abrir la página de pago controlada de Hotmart';
     let visits = 0;
     await context.route('https://pay.hotmart.com/**', async route => {
       assert.equal(route.request().url(), checkout);
       visits++;
-      await route.fulfill({contentType:'text/html',body:'<p>Checkout Hotmart simulado · 25 USD</p>'});
+      await route.fulfill({contentType:'text/html; charset=utf-8',body:'<!doctype html><meta charset="utf-8"><h1>Checkout de prueba Hotmart</h1><p>25 USD</p>'});
     });
     const purchase = page.getByRole('link',{name:'Comprar',exact:true});
-    if (await purchase.getAttribute('target') === '_blank') {
-      const [popup] = await Promise.all([page.waitForEvent('popup'),purchase.click()]);
-      await popup.getByText('Checkout Hotmart simulado · 25 USD').waitFor();
-      await popup.close();
-    } else {
-      await purchase.click();
-      await page.getByText('Checkout Hotmart simulado · 25 USD').waitFor();
-    }
+    let checkoutPage = page;
+    try {
+      if (await purchase.getAttribute('target') === '_blank') {
+        [checkoutPage] = await Promise.all([page.waitForEvent('popup'),purchase.click()]);
+      } else {
+        await purchase.click();
+      }
+      await checkoutPage.waitForURL(checkout);
+      await checkoutPage.getByRole('heading', {name:'Checkout de prueba Hotmart',exact:true}).waitFor();
+      assert.equal(visits, 1, 'Only the intercepted test checkout should receive the browser navigation');
+    } catch (error) {
+      console.error('Checkout de prueba:', {origin:new URL(checkoutPage.url()).origin, visits});
+      throw error;
+    } finally { if (checkoutPage !== page) await checkoutPage.close(); }
     await page.goto(appOrigin + '/?purchase=approved',{waitUntil:'domcontentloaded'});
-    assert.equal(visits, 1);
     await checkOffer(page);
 
     const run = randomUUID().replaceAll('-', '');

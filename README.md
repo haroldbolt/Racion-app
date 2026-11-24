@@ -31,6 +31,8 @@ El acceso del comprador se puede recuperar en otro dispositivo. El historial se 
 
 Usa `bun run build:public` para compilar la versión comercial y sirve `dist/` con HTTPS. La compilación comprueba la oferta que anuncia el Worker y que el diario requiera una sesión. Para probar la PWA antes de actualizar un dominio, usa la prueba de actualización del workflow de GitHub Actions. En GitHub Pages el workflow configura la ruta base del repositorio. En Cloudflare Pages conserva la configuración de Firebase, compras y precios para el dominio que se publica.
 
+Las vistas previas de las ramas `feature/` en Cloudflare muestran la entrada comercial. **Comprar** se habilita cuando el servicio de compras tiene configurada la oferta del productor.
+
 La [revisión de Muse](https://muse.racion-app.pages.dev/) es un entorno privado de QA para probar el diario. Para actualizarlo, configura los secretos de Pages `MUSE_REVIEW_PASSWORD` y `MUSE_REVIEW_SIGNING_KEY` únicamente en **Previews**. Compila el commit con `GITHUB_SHA` y `VITE_PRICE_API_URL` definidos, ejecuta `bun run build:muse-review` y despliega `dist` en la rama **muse** del proyecto **racion-app**.
 
 ## Comparación de precios en Colombia

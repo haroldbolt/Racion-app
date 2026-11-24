@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { verifyPublicRelease } from '../scripts/public-release-preflight.mjs';
+import { publicRelease, verifyPublicRelease } from '../scripts/public-release-preflight.mjs';
 
 const config = {
   VITE_BILLING_FIREBASE_PROJECT_ID: 'racion-muse',
@@ -8,6 +8,30 @@ const config = {
   VITE_BILLING_API_URL: 'https://cuentas.racion.app',
 };
 const sites = ['https://racion-app.pages.dev', 'https://haroldbolt.github.io/Racion-app/'];
+
+test('a feature preview can show the gated entry before sales open; public builds require configuration', async () => {
+  const env = ['CF_PAGES', 'CF_PAGES_BRANCH', 'RACION_PUBLIC_BUILD'];
+  const original = env.map(name => process.env[name]);
+  try {
+    process.env.CF_PAGES = '1';
+    process.env.CF_PAGES_BRANCH = 'feature/check';
+    delete process.env.RACION_PUBLIC_BUILD;
+    const plugin = publicRelease() as { configResolved(config: {mode: string; env: Record<string, string>}): Promise<void> };
+    const configure = (mode: string) => plugin.configResolved({mode, env: {}});
+    await configure('production');
+    await assert.rejects(configure('anonymous-beta'), /acceso de comprador/);
+    process.env.RACION_PUBLIC_BUILD = '1';
+    await assert.rejects(configure('production'), /Falta configurar/);
+    delete process.env.RACION_PUBLIC_BUILD;
+    process.env.CF_PAGES_BRANCH = 'main';
+    await assert.rejects(configure('production'), /Falta configurar/);
+  } finally {
+    env.forEach((name, i) => {
+      if (original[i] === undefined) delete process.env[name];
+      else process.env[name] = original[i];
+    });
+  }
+});
 
 const terms = {provider: 'hotmart', amountCents: 2500, currency: 'USD', renewal: false, checkoutUrl: 'https://pay.hotmart.com/A12345B?off=one'};
 

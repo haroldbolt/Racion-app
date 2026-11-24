@@ -73,6 +73,10 @@ export function publicRelease() {
       if (commit && !/^[\da-f]{40}$/i.test(commit)) throw new Error('El identificador de versión no es un SHA de Git válido.');
       if (process.env.RACION_PUBLIC_BUILD !== '1' && process.env.CF_PAGES !== '1') return;
       if (config.mode !== 'production') throw new Error('La publicación comercial requiere el modo production con acceso de comprador.');
+      // A feature preview can display the purchase screen before the merchant creates
+      // the offer. The browser only enables checkout after the Worker returns an offer.
+      const branch = process.env.CF_PAGES_BRANCH;
+      if (process.env.CF_PAGES === '1' && branch?.startsWith('feature/') && process.env.RACION_PUBLIC_BUILD !== '1') return;
       const urls = (process.env.RACION_PUBLIC_URLS || betaOrigin).split(',').map(url => url.trim());
       await verifyPublicRelease(config.env, urls);
     },
