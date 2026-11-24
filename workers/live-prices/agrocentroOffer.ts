@@ -50,6 +50,75 @@ interface Variant {
   price?: { amount?: string; currencyCode?: string };
 }
 
+interface StoreProduct {
+  handle?: string;
+  title?: string;
+  variants?: {pageInfo?: {hasNextPage?: boolean}; nodes?: Variant[]};
+}
+
+async function readStorefront(listing: Listing, fetcher: typeof fetch): Promise<StoreProduct | undefined> {
+  try {
+    const response = await fetcher(shop + '/api/2026-10/graphql.json', {
+      method:'POST', headers:{'content-type':'application/json', Accept:'application/json'},
+      body:JSON.stringify({query:document, variables:{handle:listing.handle}}),
+      signal:AbortSignal.timeout(5000), redirect:'manual',
+    });
+    if (!response.ok) return;
+    const result = await response.json() as {errors?: unknown; data?: {product?: StoreProduct}};
+    if (!result.errors) return result.data?.product ?? undefined;
+  } catch {
+    // The public Ajax product and cart can still confirm the variant and currency.
+  }
+}
+
+async function readAjaxProduct(listing: Listing, brand: string, fetcher: typeof fetch): Promise<StoreProduct | undefined> {
+  const init = {headers:{Accept:'application/json'}, signal:AbortSignal.timeout(5000), redirect:'manual'} as const;
+  const [detail, cart] = await Promise.all([
+    fetcher(shop + '/products/' + listing.handle + '.js', init), fetcher(shop + '/cart.js', init),
+  ]);
+  if (!detail.ok || !cart.ok) return;
+  const [item, market] = await Promise.all([detail.json(), cart.json()]) as [
+    {handle?: string; title?: string; vendor?: string; variants?: Array<{
+      id?: number; title?: string; available?: boolean; barcode?: string | null; price?: number;
+    }>}, {currency?: string},
+  ];
+  if (market.currency !== 'COP' || typeof item.vendor !== 'string' || words(item.vendor) !== brand ||
+      !Array.isArray(item.variants) || item.variants.length >= 250) return;
+  const nodes: Variant[] = item.variants.map(sku => ({
+    id: typeof sku?.id === 'number' && Number.isSafeInteger(sku.id) && sku.id > 0
+      ? 'gid://shopify/ProductVariant/' + sku.id : undefined,
+    title:sku?.title, availableForSale:sku?.available, barcode:sku?.barcode,
+    // Ajax returns integer hundredths of the cart's presentment currency.
+    price:typeof sku?.price === 'number' && Number.isSafeInteger(sku.price) && sku.price > 0 && sku.price % 100 === 0
+      ? {amount:String(sku.price / 100), currencyCode:market.currency} : undefined,
+  }));
+  return {handle:item.handle, title:item.title, variants:{nodes, pageInfo:{hasNextPage:false}}};
+}
+
+function offerFromProduct(item: StoreProduct | undefined, listing: Listing, brand: string, product: LivePriceProduct): LivePriceOffer | null {
+  const variants = item?.variants;
+  if (item?.handle !== listing.handle || typeof item.title !== 'string' ||
+      !listing.keys.has(formulaKey(item.title, brand, listing.species)) ||
+      variants?.pageInfo?.hasNextPage !== false || !Array.isArray(variants.nodes) ||
+      !variants.nodes.every(sku => typeof sku?.title === 'string' && sku.title.trim())) return null;
+
+  const matches = variants.nodes.filter(sku => typeof sku?.title === 'string' && packageGrams(sku.title) === product.grams);
+  if (matches.length !== 1) return null;
+  const sku = matches[0];
+  if (product.barcode && sku.barcode !== product.barcode) return null;
+  const id = typeof sku.id === 'string' && /^gid:\/\/shopify\/ProductVariant\/([1-9]\d*)$/.exec(sku.id)?.[1];
+  if (!id || typeof sku.availableForSale !== 'boolean' || sku.price?.currencyCode !== 'COP' ||
+      typeof sku.price.amount !== 'string' || !/^\d{1,9}(?:\.0+)?$/.test(sku.price.amount)) return null;
+  const price = Number(sku.price.amount);
+  if (!Number.isSafeInteger(price) || price <= 0) return null;
+  return {
+    id:'agrocentro-' + id, title:item.title + ' · ' + sku.title, retailer:'Agrocentro Pets',
+    grams:product.grams, productPriceCop:price, pricePerKgCop:Math.round(price * 1000 / product.grams),
+    shippingCop:null, totalCop:null, stock:sku.availableForSale ? 'available' : 'out_of_stock',
+    productUrl:shop + '/products/' + listing.handle + '?variant=' + id, linkSource:'retailer',
+  };
+}
+
 export async function findAgrocentroOffer(product: LivePriceProduct, fetcher: typeof fetch): Promise<LivePriceOffer | null> {
   const brand = words(product.brand);
   const plainName = withoutPackageWeight(product.name).trim();
@@ -58,37 +127,8 @@ export async function findAgrocentroOffer(product: LivePriceProduct, fetcher: ty
   if (listings?.length !== 1) return null;
   const listing = listings[0];
 
-  try {
-    const response = await fetcher(shop + '/api/2026-10/graphql.json', {
-      method:'POST', headers:{'content-type':'application/json', Accept:'application/json'},
-      body:JSON.stringify({query:document, variables:{handle:listing.handle}}),
-      signal:AbortSignal.timeout(5000), redirect:'error',
-    });
-    if (!response.ok) return null;
-    const result = await response.json() as {errors?: unknown; data?: {product?: {handle?: string; title?: string;
-      variants?: {pageInfo?: {hasNextPage?: boolean}; nodes?: Variant[]}}}};
-    const item = result.data?.product, variants = item?.variants;
-    if (result.errors || item?.handle !== listing.handle || typeof item.title !== 'string' ||
-        !listing.keys.has(formulaKey(item.title, brand, listing.species)) ||
-        variants?.pageInfo?.hasNextPage !== false || !Array.isArray(variants.nodes) ||
-        !variants.nodes.every(sku => typeof sku?.title === 'string' && sku.title.trim())) return null;
-
-    const matches = variants.nodes.filter(sku => typeof sku?.title === 'string' && packageGrams(sku.title) === product.grams);
-    if (matches.length !== 1) return null;
-    const sku = matches[0];
-    if (product.barcode && sku.barcode !== product.barcode) return null;
-    const id = typeof sku.id === 'string' && /^gid:\/\/shopify\/ProductVariant\/([1-9]\d*)$/.exec(sku.id)?.[1];
-    if (!id || typeof sku.availableForSale !== 'boolean' || sku.price?.currencyCode !== 'COP' ||
-        typeof sku.price.amount !== 'string' || !/^\d{1,9}(?:\.0+)?$/.test(sku.price.amount)) return null;
-    const price = Number(sku.price.amount);
-    if (!Number.isSafeInteger(price) || price <= 0) return null;
-    return {
-      id:'agrocentro-' + id, title:item.title + ' · ' + sku.title, retailer:'Agrocentro Pets',
-      grams:product.grams, productPriceCop:price, pricePerKgCop:Math.round(price * 1000 / product.grams),
-      shippingCop:null, totalCop:null, stock:sku.availableForSale ? 'available' : 'out_of_stock',
-      productUrl:shop + '/products/' + listing.handle + '?variant=' + id, linkSource:'retailer',
-    };
-  } catch {
-    return null;
-  }
+  const fromStorefront = offerFromProduct(await readStorefront(listing, fetcher), listing, brand, product);
+  if (fromStorefront) return fromStorefront;
+  const fromAjax = await readAjaxProduct(listing, brand, fetcher).catch(() => undefined);
+  return offerFromProduct(fromAjax, listing, brand, product);
 }

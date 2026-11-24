@@ -152,7 +152,8 @@ async function checkComparison(page, dialog, postalCode, live, flow) {
   assert.match(shippingText, /110111/);
   if (laiaOffer.shippingCop === 0) assert.match(shippingText, /incluido|gratis/i);
   else assert.equal(priceAmount(shippingText), laiaOffer.shippingCop);
-  assert.equal(priceAmount(await field(laia,'Total con envío')), laiaOffer.totalCop);
+  const laiaTotalCop = priceAmount(await field(laia,'Total con envío'));
+  assert.equal(laiaTotalCop, laiaOffer.totalCop);
   assert.equal(priceAmount(await field(agro,'Precio de la bolsa')), agroOffer.productPriceCop);
   const statusLabels = {out_of_stock:'Agotada', available:'En stock', unknown:'Disponibilidad por confirmar'};
   assert.ok(Object.hasOwn(statusLabels, agroOffer.stock));
@@ -181,7 +182,7 @@ async function checkComparison(page, dialog, postalCode, live, flow) {
     assert.equal(await agro.getByText(badge).count(), 0);
   }
   await saveEvidence(page, group, (live ? 'vivo-' : 'historico-') + flow);
-  return {laiaBag:laiaOffer.productPriceCop, shipping:laiaOffer.shippingCop,
+  return {laiaBag:laiaOffer.productPriceCop, shipping:laiaOffer.shippingCop, laiaTotalCop,
     agroBag:agroOffer.productPriceCop, agroStock:agroOffer.stock, winner:winner.retailer, winningTotal:winner.totalCop};
 }
 
@@ -213,6 +214,7 @@ async function verify() {
       .filter({has:page.getByRole('heading',{name:/Royal Canin Sterilised 37/i})});
     await laiaProduct.getByRole('button',{name:'Comparar 2 kg con envío',exact:true}).click({timeout:45000});
   };
+  const historicalLaiaTotalCop = 152650;
   let stage = 'Abrir el asistente';
   try {
     if (!live) await installFixtures(page);
@@ -230,7 +232,7 @@ async function verify() {
     assert.equal(await dialog.getByRole('combobox').inputValue(), 'Bogotá');
     await postal.fill(destination);
     const wizard = await checkComparison(page, dialog, destination, live, 'asistente');
-    if (!live) assert.deepEqual(wizard, {...historical, winner:'Laia Pets', winningTotal:152650});
+    if (!live) assert.deepEqual(wizard, {...historical, laiaTotalCop:historicalLaiaTotalCop, winner:'Laia Pets', winningTotal:historicalLaiaTotalCop});
     await dialog.getByRole('button',{name:'Volver a la búsqueda',exact:true}).click();
     assert.equal(await input.inputValue(), searchText, 'Volver conserva la búsqueda del asistente');
 
@@ -262,12 +264,17 @@ async function verify() {
     if (live) {
       stage = 'Contrastar las dos pantallas con las dos tiendas';
       const [laia,agro] = await readLiveSources();
-      console.log('Resultado visible en ambos recorridos:',JSON.stringify({...foods, totalCop:foods.laiaBag + foods.shipping}));
+      console.log('Resultado visible en ambos recorridos:', JSON.stringify(foods));
       const unavailable = [laia,agro].filter(result => result.status === 'rejected');
       if (unavailable.length) throw new Error('No se pudieron corroborar todas las fuentes de venta: ' +
         unavailable.map(result => result.reason.message).join(', '));
       assert.equal(foods.laiaBag,laia.value.bag);
       assert.equal(foods.shipping,laia.value.shipping);
+      const merchantTotalCop = laia.value.bag + laia.value.shipping;
+      assert.equal(foods.laiaTotalCop, merchantTotalCop, 'El total mostrado debe sumar la bolsa y el envío vigentes en la tienda');
+      console.log(JSON.stringify({ comparison:'Total Laia Pets en Bogotá', postalCode:destination, historicalLaiaTotalCop,
+        currentLaiaTotalCop:merchantTotalCop, matchesHistoricalTotal:merchantTotalCop === historicalLaiaTotalCop,
+        differenceCop:merchantTotalCop - historicalLaiaTotalCop }));
       assert.equal(foods.agroBag,agro.value.bag);
       assert.equal(foods.agroStock,agro.value.stock);
       if (review) {
@@ -278,7 +285,7 @@ async function verify() {
         assert.equal(await postal.inputValue(), destination, 'El asistente debe conservar el CP tras recargar');
         assert.deepEqual(await checkComparison(page, dialog, destination, live, 'asistente-recargado'), foods);
         assert.equal(foods.winner, 'Laia Pets', 'La ganadora cambió respecto al caso de Muse');
-        assert.equal(foods.winningTotal, 152650, 'El total vigente cambió respecto al caso de Muse');
+        assert.equal(foods.winningTotal, merchantTotalCop, 'La ganadora debe mostrar bolsa más envío cotizado por Laia Pets');
         assert.equal(foods.agroStock, 'out_of_stock', 'La disponibilidad vigente cambió respecto al caso de Muse');
       }
     } else {
@@ -294,7 +301,7 @@ async function verify() {
         'Ajustes y el comparador comparten el último CP consultado');
     }
     console.log(JSON.stringify({source:live?'Tiendas en vivo':'Ofertas de la prueba de Muse',flows:['Asistente, paso 4','Alimentos, Buscar en internet'],
-      product:searchText,postalCode:destination,...foods,laiaTotalCop:foods.laiaBag + foods.shipping,postalCodeSurvivesReload:true}));
+      product:searchText,postalCode:destination,...foods,postalCodeSurvivesReload:true}));
   } catch (error) {
     console.error('Etapa:',stage,'Pantalla:',(await page.locator('body').innerText()).slice(-2300));
     throw error;

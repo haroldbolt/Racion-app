@@ -14,6 +14,7 @@ function storefront(nodes: unknown[], titleOverride = title, hasNextPage = false
   return async (input, init) => {
     assert.equal(String(input), 'https://cultivacenter.com/api/2026-10/graphql.json');
     assert.equal(init?.method, 'POST');
+    assert.equal(init?.redirect, 'manual');
     const body = JSON.parse(String(init.body));
     assert.match(body.query, /@inContext\(country:\s*CO\)/);
     assert.deepEqual(body.variables, {handle});
@@ -62,4 +63,31 @@ test('ambiguous or incomplete size, stock, market, money and identity cannot pro
   }
   assert.equal(await findAgrocentroOffer({brand:'ACANA',name:'Puppy Recipe Dry Dog Food',grams:2000},unused),null);
   assert.equal(calls,0);
+});
+
+test('unavailable Storefront falls back to the identical Ajax variant and its cart currency', async () => {
+  const ajaxSku = {id:52674296414488, title:'2 kg', available:false, price:13240000, barcode:sku.barcode};
+  const ajax = {handle, title, vendor:'Royal Canin', variants:[ajaxSku]};
+  const reads: string[] = [];
+  const fallback = (detail: unknown, currency = 'COP'): typeof fetch => async (input, init) => {
+    const url = new URL(String(input));
+    assert.equal(url.origin, 'https://cultivacenter.com');
+    assert.equal(init?.redirect, 'manual');
+    if (init?.method === 'POST') return new Response(null, {status:403});
+    reads.push(url.pathname);
+    if (url.pathname === '/cart.js') return Response.json({currency});
+    assert.equal(url.pathname, '/products/' + handle + '.js');
+    return Response.json(detail);
+  };
+  const offer = await findAgrocentroOffer({...product, barcode:sku.barcode}, fallback(ajax));
+  assert.deepEqual(offer, await findAgrocentroOffer(product, storefront([sku])));
+  assert.deepEqual(reads.sort(), ['/cart.js', '/products/' + handle + '.js']);
+  const inStock = await findAgrocentroOffer(product, fallback({...ajax, variants:[{...ajaxSku, available:true, price:14500000}]}));
+  assert.deepEqual([inStock?.stock, inStock?.productPriceCop], ['available', 145000]);
+  for (const fetcher of [
+    fallback(ajax, 'USD'), fallback({...ajax, vendor:'Otra marca'}), fallback({...ajax, handle:'otra-formula'}),
+    fallback({...ajax, variants:[ajaxSku, {...ajaxSku,id:12}]}), fallback({...ajax, variants:[{...ajaxSku,available:null}]}),
+    fallback({...ajax, variants:[{...ajaxSku, title:'4 kg'}]}), fallback({...ajax, variants:[{...ajaxSku, price:13240012}]}),
+  ]) assert.equal(await findAgrocentroOffer(product, fetcher), null);
+  assert.equal(await findAgrocentroOffer({...product, barcode:'12345678'}, fallback(ajax)), null);
 });
